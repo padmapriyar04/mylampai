@@ -1,0 +1,33 @@
+@keyframes slide {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+.infinite-logo-slide {
+    animation: 25s slide infinite linear;
+}
+
+.home-infinite-logos:before,
+.home-infinite-logos:after {
+  position: absolute;
+  top: 0;
+  width: 250px;
+  height: 100%;
+  content: "";
+  z-index: 2;
+}
+
+.home-infinite-logos:before {
+  left: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0), hsl(260, 100%, 94%));
+}
+
+.home-infinite-logos:after {
+  right: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), hsl(260, 100%, 94%));
+}

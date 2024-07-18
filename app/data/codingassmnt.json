@@ -1,0 +1,26 @@
+[
+  [
+    { "name": "Coding Problems", "svg": "/practice/codingsub1.svg" },
+    { "name": "100 Days DSA Sprint", "svg": "/practice/codingsub2.svg" },
+    { "name": "Coding Assessments", "svg": "/practice/codingsub3.svg" },
+    { "name": "Coding Trivia", "svg": "/practice/codingsub4.svg" }
+  ],
+  [
+    { "name": "Coding Problems1", "svg": "/practice/codingsub1.svg" },
+    { "name": "100 Days DSA Sprint1", "svg": "/practice/codingsub2.svg" },
+    { "name": "Coding Assessments1", "svg": "/practice/codingsub3.svg" },
+    { "name": "Coding Trivia1", "svg": "/practice/codingsub4.svg" }
+  ],
+  [
+    { "name": "Coding Problems2", "svg": "/practice/codingsub1.svg" },
+    { "name": "100 Days DSA Sprint2", "svg": "/practice/codingsub2.svg" },
+    { "name": "Coding Assessments2", "svg": "/practice/codingsub3.svg" },
+    { "name": "Coding Trivia2", "svg": "/practice/codingsub4.svg" }
+  ],
+  [
+    { "name": "Coding Problems3", "svg": "/practice/codingsub1.svg" },
+    { "name": "100 Days DSA Sprint3", "svg": "/practice/codingsub2.svg" },
+    { "name": "Coding Assessments3", "svg": "/practice/codingsub3.svg" },
+    { "name": "Coding Trivia3", "svg": "/practice/codingsub4.svg" }
+  ]
+]

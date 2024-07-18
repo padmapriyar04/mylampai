@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Home",
+        "icon": "/sidebar/home.svg",
+        "Link":"/"
+    },
+    {
+        "name": "Explore",
+        "icon": "/sidebar/explore.svg",
+        "Link":"/explore"
+    },
+    {
+        "name": "Learn",
+        "icon": "/sidebar/learn.svg",
+        "Link":"/learn"
+    },
+    {
+        "name": "Achieve",
+        "icon": "/sidebar/achieve.svg",
+        "Link":"/achieve"
+    },
+    {
+        "name": "Practice",
+        "icon": "/sidebar/practice.svg",
+        "Link":"/practice"
+    },
+    {
+        "name": "Projects",
+        "icon": "/sidebar/projects.svg",
+        "Link":"/projects"
+    },
+    {
+        "name": "Career",
+        "icon": "/sidebar/career.svg",
+        "Link":"/career"
+    },
+    {
+        "name": "Mentorship",
+        "icon": "/sidebar/mentorship.svg",
+        "Link":"/mentorship"
+    },
+    {
+        "name": "Blogs",
+        "icon": "/sidebar/blogs.svg",
+        "Link":"/blogs"
+    },
+    {
+        "name": "Community",
+        "icon": "/sidebar/community.svg",
+        "Link":"/community"
+    }
+]
