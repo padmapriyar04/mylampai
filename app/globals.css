@@ -89,6 +89,7 @@ body::--webkit-scrollbar {
   }
 }
 
+
 /* typed js library cursor color */
 .typed-cursor {
   color: #8c52ff;
@@ -96,34 +97,4 @@ body::--webkit-scrollbar {
 .embla__slide {
   flex: 0 0 70%;
 }
-.carousel-root {
-  height: 100%;
-}
 
-.carousel.carousel-slider {
-  height: 100%;
-}
-
-.carousel .control-dots {
-  bottom: 16px !important;
-  margin: 0 !important;
-}
-
-.carousel .control-dots .dot {
-  box-shadow: none !important;
-  background: #ffffff !important;
-  opacity: 0.5;
-}
-
-.carousel .control-dots .dot.selected {
-  opacity: 1;
-}
-
-.glass {
-  background: rgba(255, 255, 255, 0.3); /* Semi-transparent white */
-  border-radius: 15px;
-  backdrop-filter: blur(10px); /* Apply blur */
-  -webkit-backdrop-filter: blur(10px); /* Safari support */
-  border: 1px solid rgba(255, 255, 255, 0.18); /* Optional: light border */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-}
