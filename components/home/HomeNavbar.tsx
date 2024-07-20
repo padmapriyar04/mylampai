@@ -53,37 +53,40 @@ const HomeNavbar = () => {
         <div className="md:flex hidden justify-between bg-[#ffffff90] items-center w-full max-w-[600px] gap-1 pr-2 pl-4 py-2 backdrop-blur-md font-medium rounded-full shadow-sm">
           <Link
             href={"/"}
-            className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full"
+            className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
           >
             Home
           </Link>
           <Link
             href={"/"}
-            className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full"
+            className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
           >
             Community
           </Link>
           <Link
             href={"/"}
-            className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full"
+            className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
           >
             Resources
           </Link>
           <Link
             href={"/"}
-            className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full"
+            className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
           >
             Company
           </Link>
-          <button className="flex items-center bg-[#8C52FF] text-white pl-4 pr-2 py-2 gap-2 rounded-full">
-            Sign In
-            <Image
-              src={"/home/userNavbar.svg"}
-              alt=""
-              height={25}
-              width={25}
-            ></Image>
-          </button>
+
+          <Link href={"/login"}>
+            <button className="flex items-center bg-[#8C52FF] text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105">
+              Sign In
+              <Image
+                src={"/home/userNavbar.svg"}
+                alt=""
+                height={25}
+                width={25}
+              ></Image>
+            </button>
+          </Link>
         </div>
       </div>
     </>

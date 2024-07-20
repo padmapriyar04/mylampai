@@ -2,8 +2,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import NavLinks from '@/components/navbar/NavItems'
-import navData from '@/components/navbar/navLinks.json'
+import NavLinks from '@/app/components/navbar/NavItems'
+import navData from '@/app/components/navbar/navLinks.json'
 import smData from '@/app/data/navsocialicon.json'
 
 export default function Sidebar(props: any) {
