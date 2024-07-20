@@ -1,4 +1,5 @@
 "use client";
+//added
 import { useEffect } from "react";
 import HeroSection from "@/components/home/HeroSection";
 import AboutWize from "@/components/home/AboutWize";
