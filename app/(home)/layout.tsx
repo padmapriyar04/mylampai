@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./../globals.css";
 import { Open_Sans } from "next/font/google";
 import Navbar from "../../components/navbar/Navbar";
-import Flexsidebar from "@/components/Flexsidebar";
+import Flexsidebar from "@/components/misc/Flexsidebar";
 const openSans = Open_Sans({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "MyLampAi - Home",

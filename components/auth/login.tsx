@@ -116,7 +116,7 @@ export default function Login() {
 
         <p className="mt-4 text-center">
           Don't have an account?{" "}
-          <Link href="/components/register" className="text-blue-500 hover:underline">
+          <Link href="/components/auth/register" className="text-blue-500 hover:underline">
             Register
           </Link>
         </p>

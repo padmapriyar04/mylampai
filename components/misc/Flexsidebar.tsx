@@ -1,6 +1,6 @@
 "use client"
 import { useState, useRef, useEffect } from "react";
-import Sidebar from '@/components/Sidebar'
+import Sidebar from '@/components/misc/Sidebar'
 import Image from 'next/image'
 import { usePathname } from "next/navigation";
 

@@ -4,21 +4,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import CountrySelector from "./CountryFlag";
+import CountrySelector from "../misc/CountryFlag";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
-import Globe from "../public/images/Globe.svg";
-import wiZe from "../public/header/wiZe.png";
-import Arrow from "../public/images/Arrow.png";
-import Lock from "../public/images/icons8-lock.svg";
+import Globe from "../../public/images/Globe.svg";
+import wiZe from "../../public/header/wiZe.png";
+import Arrow from "../../public/images/Arrow.png";
+import Lock from "../../public/images/icons8-lock.svg";
 // import BackgroundImage from "../../public/images/background.jpg";
 
 // Import other carousel images here
-import CarouselImage1 from "../public/images/Globe.svg";
-import CarouselImage2 from "../public/images/Globe.svg";
-import CarouselImage3 from "../public/images/Globe.svg";
-import CarouselImage4 from "../public/images/Globe.svg";
+import CarouselImage1 from "../../public/images/Globe.svg";
+import CarouselImage2 from "../../public/images/Globe.svg";
+import CarouselImage3 from "../../public/images/Globe.svg";
+import CarouselImage4 from "../../public/images/Globe.svg";
 
 const SignUp: React.FC = () => {
   const [activeTab, setActiveTab] = useState("student");

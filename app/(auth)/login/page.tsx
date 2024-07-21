@@ -1,4 +1,4 @@
-import Login from "../../../components/newlogin";
+import Login from "../../../components/auth/newlogin";
 
 export default function SignupPage() {
   return (

@@ -155,7 +155,7 @@ export default function Register() {
 
         <p className="mt-4 text-center">
           Don&apos;t have an account?{" "}
-          <Link href="/components/login" className="text-blue-500 hover:underline">
+          <Link href="/components/auth/login" className="text-blue-500 hover:underline">
             Login
           </Link>
         </p>
