@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -38,7 +38,7 @@ export default function Login() {
         // Store user data and token in local storage
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
- 
+
         // Redirect based on role
         if (data.user.role === "admin") {
           router.push("/adminDashboard");
@@ -53,16 +53,18 @@ export default function Login() {
     }
   };
 
-  const socialAction = (action:string)=>{
-    signIn(action,{redirect:false}).then((callback=>{
-      if(callback?.error){
-        alert("Invalid Credientials")
-      }
-      if(callback?.ok && !callback?.error){
-        alert("Logged In")
-      }
-    })).finally(()=>router.push("/studentDashboard"))
-  }
+  const socialAction = (action: string) => {
+    signIn(action, { redirect: false })
+      .then((callback) => {
+        if (callback?.error) {
+          alert("Invalid Credientials");
+        }
+        if (callback?.ok && !callback?.error) {
+          alert("Logged In");
+        }
+      })
+      .finally(() => router.push("/studentDashboard"));
+  };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-900">
@@ -108,15 +110,18 @@ export default function Login() {
 
         <button
           type="button"
-          onClick={()=>socialAction('google')}
+          onClick={() => socialAction("google")}
           className="w-full p-2 mt-4 bg-red-500 text-white rounded hover:bg-red-600"
         >
           Sign in with Google
         </button>
 
         <p className="mt-4 text-center">
-          Don't have an account?{" "}
-          <Link href="/components/auth/register" className="text-blue-500 hover:underline">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/components/auth/register"
+            className="text-blue-500 hover:underline"
+          >
             Register
           </Link>
         </p>
