@@ -120,10 +120,10 @@ body::--webkit-scrollbar {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.3); /* Semi-transparent white */
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 15px;
-  backdrop-filter: blur(10px); /* Apply blur */
-  -webkit-backdrop-filter: blur(10px); /* Safari support */
-  border: 1px solid rgba(255, 255, 255, 0.18); /* Optional: light border */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

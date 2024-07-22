@@ -3,14 +3,14 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import React from "react";
-import Navbar from "../../components/navbar/Navbar";
+import HomeNavbar from "../../components/home/HomeNavbar";
+
 import Flexsidebar from "@/components/misc/Flexsidebar";
 
 import type { Metadata } from "next";
 import "./../globals.css";
 import { Open_Sans } from "next/font/google";
 const openSans = Open_Sans({ subsets: ["latin"] });
-
 
 export const metadata: Metadata = {
   title: "MyLampAi - Home",
@@ -35,18 +35,18 @@ export default function ProtectedLayout({
   }
 
   return (
-      <html lang="en" className="scroll-smooth focus:scroll-auto">
+    <html lang="en" className="scroll-smooth focus:scroll-auto">
       <body className={`${openSans.className} bg-primary-foreground`}>
-      <Navbar />
-      <div className="flex h-full transition-all duration-300 ">
-        {/* Sidebar */}
-        <Flexsidebar/>
-        {/* Main Content */}
-        <div className=" flex-1 protected-layout lg:transition-all lg:duration-300">
-          {children}
+        <HomeNavbar />
+        <div className="flex h-full transition-all duration-300 ">
+          {/* Sidebar */}
+          <Flexsidebar />
+          {/* Main Content */}
+          <div className=" flex-1 protected-layout lg:transition-all lg:duration-300">
+            {children}
+          </div>
         </div>
-      </div>
       </body>
-      </html>
+    </html>
   );
 }

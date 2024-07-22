@@ -6,11 +6,20 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 
-import { Carousel } from "react-responsive-carousel";
+// import { Carousel } from "react-responsive-carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import Globe from "../../public/images/Globe.svg";
-import wiZe from "../../public/header/wiZe.png";
+// import wiZe from "../../public/header/wiZe.png";
 import Arrow from "../../public/images/Arrow.png";
 import GoogleImg from "../../public/images/Google_Icons-09-512.png";
 import Lock from "../../public/images/icons8-lock.svg";
@@ -81,7 +90,7 @@ const LogIn: React.FC = () => {
         if (data.user.role === "admin") {
           router.push("/adminDashboard");
         } else {
-          router.push("/studentDashboard");
+          router.push("/questions");
         }
       } else {
         const errorData = await response.json();
@@ -118,7 +127,6 @@ const LogIn: React.FC = () => {
   };
 
   return (
-    // <div className="bg-purple-200 flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
     <div className="bg-purple-200 flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
       {/* Background Image */}
       {/*<Image*/}
@@ -127,11 +135,11 @@ const LogIn: React.FC = () => {
       {/*  layout="fill"*/}
       {/*  objectFit="cover"*/}
       {/*  quality={100}*/}
-      {/*/>*/}
+      {/*/> */}
 
       {/* Logo at the Top Left Corner */}
       <div className="hidden md:block absolute top-8 left-8 z-10">
-        <Image src={wiZe} alt="wiZe" className="" />
+        {/* <Image src={wiZe} alt="wiZe" className="" /> */}
       </div>
 
       <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 shadow-xl hover:shadow-2xl transition-shadow duration-300 w-11/12 max-w-7xl flex flex-col md:flex-row h-auto md:h-3/4">
@@ -139,55 +147,34 @@ const LogIn: React.FC = () => {
         {/* Left Side with Carousel */}
         <div className="hidden md:block w-full md:w-1/3 bg-purple-500 rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 flex flex-col items-center justify-start mb-4 md:mb-0">
           <Carousel
-            showThumbs={false}
-            showStatus={false}
-            infiniteLoop
-            autoPlay
-            interval={5000}
-            showArrows={false}
+            plugins={[
+              Autoplay({
+                delay: 5000,
+              }),
+            ]}
+            className="w-full h-full"
           >
-            <div>
-              <div className="flex justify-center mt-4">
-                <Image src={Globe} alt="Globe" className="w-4/5" />
-              </div>
-            </div>
-            {/* Add other carousel items here */}
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage1}
-                  alt="Carousel Image 1"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage2}
-                  alt="Carousel Image 2"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage3}
-                  alt="Carousel Image 3"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage4}
-                  alt="Carousel Image 4"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
+            <CarouselContent>
+              {[
+                Globe,
+                CarouselImage1,
+                CarouselImage2,
+                CarouselImage3,
+                CarouselImage4,
+              ].map((img, index) => (
+                <CarouselItem key={index}>
+                  <div className="flex justify-center items-center h-full">
+                    <Image
+                      src={img}
+                      alt={`Carousel Image ${index}`}
+                      className="w-4/5"
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden" />
+            <CarouselNext className="hidden" />
           </Carousel>
         </div>
 
