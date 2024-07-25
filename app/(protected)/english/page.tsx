@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { FaArrowRight } from 'react-icons/fa';
+import Image from 'next/image';
 
 function EnglishPage() {
   const [selectedOption, setSelectedOption] = useState<string>('');
@@ -55,7 +56,7 @@ function EnglishPage() {
                   className={`bg-purple-100 border border-gray-300 hover:bg-white h-[50px] w-[120px] rounded-full inline-flex items-center m-[5px] pl-[10px] cursor-pointer ${selectedOption === option ? 'bg-white' : ''}`}
                   onClick={() => handleOptionChange(option)}
                 >
-                  <img src="/green.png" className="h-[40px] w-[40px] mr-2" />
+                  <Image src="/green.png" className="h-[40px] w-[40px] mr-2" alt='green' width={100} height={100} />
                   <h1 className="text-[15px]">{option}</h1>
                 </div>
               ))}
