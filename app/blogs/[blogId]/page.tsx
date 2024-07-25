@@ -9,46 +9,41 @@ interface Data {
 const whyWizeLinks = [
     {
         id: "allroundassistance",
-        text: "All round assistance",
-    },
-    {
-        id: "practice",
-        text: "Practice",
+        text: "Why Choose WordPress?",
     },
     {
         id: "smartestplatform",
-        text: "Smartest Platform",
-    },
-    {
-        id: "experiencedcounsellors",
-        text: "Experienced Counsellors",
+        text: "WordPress Developer Roadmap",
     },
     {
         id: "ourwinningrecord",
-        text: "Our Winning Record",
+        text: "Conclusion",
     },
 ];
 export default function blogId() {
     const [active, setActive] = useState("allroundassistance");
     return (
         <div>
-            <div className="bg-secondary-400 h-96 w-full text-[#f5f5f5] flex flex-row ">
-                <div className="flex flex-col w-1/2 justify-center items-center">
-                    <span className="text-[15px]">Heading</span>
-                    <span className="">Description</span>
-                    <span className="">Author name</span>
+            <div className="bg-[#8c52af] h-96 w-full text-[#f5f5f5] flex flex-row ">
+                <div className="w-2/3 flex justify-center">
+                    <div className="flex flex-col justify-center w-9/12 gap-4">
+                        <span className="text-[45px] font-semibold">How to Become a WordPress Developer in 8 Steps</span>
+                        <div className="flex flex-row gap-4">
+                            <Image src="/blog/dp.png" alt="dp" width={30} height={30}/>
+                            <span className="text-[20px]">Meghdeep Patnaik</span>
+                        </div>
+                        <span className="text-[20px]">In this article, we will provide a detailed and comprehensive roadmap on how to become a WordPress developer, covering essential skills, tools, and resources.</span>
+                    </div>
                 </div>
-                <div className="w-1/2">
-                    <Image src="/blog/blogimg.webp" alt="img" width={10} height={10}/>
+                <div className="w-1/3 flex justify-center items-center">
+                    <Image src="/blog/instructor.svg" alt="img" width={10} height={10} className="w-10/12" />
                 </div>
 
             </div>
             <div className="flex flex-col items-center mb-4">
-                <div className="max-w-[1300px] h-[100px] flex justify-center items-center w-full gap-4 mb-8">
+                <div className="max-w-[1300px] h-[100px] flex justify-center items-center w-full  mb-8">
                     <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] bg-gradient-to-r from-white to-primary"></div>
-                    <div className="w-full text-3xl md:text-4xl font-medium text-center">
-                        Why Choose&nbsp;<span className="text-[#8C52FF]">wiZ</span>e{" "}
-                    </div>
+                    <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] "></div>            
                     <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] bg-gradient-to-r from-primary to-white"></div>
                 </div>
                 <div className="flex w-full max-w-[1350px] relative">
@@ -66,64 +61,36 @@ export default function blogId() {
                         })}
                     </div>
                     <div className="md:border-l-4 md:border-[#baa1eb] px-6 lg:px-[60px] xl:px-[100px] relative">
-                        <div
-                            id="allroundassistance"
-                            className="pb-[50px] sm:pb-[100px] focus:text-[#8C52FF] sm:min-h-[700px]"
-                        >
-                            <h4 className="pt-4 font-semibold text-[#8C52FF]">
-                                ALL ROUND ASSISTANCE
-                                <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 md:top-0 translate-x-[-14px] translate-y-[-100%] md:translate-y-[-50%]"></div>
-                            </h4>
+                        <div id="allroundassistance" className="pb-[50px] sm:pb-[100px] focus:text-[#8C52FF] sm:min-h-[700px]">  
                             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-                                To make it happen for you
+                                Why Choose WordPress?
                             </div>
                             <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-                                Everything you need, we got it! Shortlisting - yup, documents
-                                editing - yes, application support - yeah, scholarships - yus,
-                                loan & visa - in-house!
+                               Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet nam nobis tenetur vitae placeat inventore, doloremque atque facere molestias doloribus assumenda officiis suscipit hic! Ipsa sit neque eligendi magni explicabo ab, non modi maxime!
+                            </p>
+                        </div>
+                        <div id="smartestplatform" className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]">
+                            <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
+                                WordPress Developer Roadmap (Step-By-Step)
+                            </div>
+                            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus laudantium tenetur, dicta quae qui cum obcaecati rerum sit? Officia iusto explicabo dolores! Est iure quos saepe aliquam magni accusantium voluptates voluptatem incidunt. Eveniet, perferendis.
                             </p>
                             <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
                         </div>
-
-
-
-                        <div
-                            id="smartestplatform"
-                            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
-                        >
-                            <h4 className="pt-4 font-semibold text-[#8C52FF]">
-                                SMARTEST PLATFORM
-                                <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
-                            </h4>
-                            <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-                                100% online for your comfort
-                            </div>
-                            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-                                Reach your counsellor with just a text or a call, track your
-                                entire process in one place, and never miss an update! Our
-                                platform will take care of you!
-                            </p>
-                            <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
-                        </div>
-
                         <div id="ourwinningrecord" className=" sm:min-h-[700px]">
-                            <h4 className="pt-4 font-semibold text-[#8C52FF]">
-                                OUR WINNING RECORD
-                                <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
-                            </h4>
                             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-                                Because you deserve only the Best!
+                                Conclusion
                             </div>
                             <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-                                ESome advices can come only from experience. And we have a lot
-                                of that! Check out our numbers and see for yourselves...
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti ab aspernatur expedita! Provident unde eos a non tempora sit ducimus repellendus officia magnam debitis. Magni ipsam veniam vel est nostrum deleniti consequuntur sunt rem!
                             </p>
-                            <div className="flex flex-wrap justify-center gap-4 min-h-[400px] w-full my-8 rounded-2xl">
+                            {/* <div className="flex flex-wrap justify-center gap-4 min-h-[400px] w-full my-8 rounded-2xl">
                                 <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
                                 <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
                                 <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
                                 <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
