@@ -6,7 +6,7 @@ interface Data {
     id: string;
     text: string;
 }
-const whyWizeLinks = [
+const blogLinks = [
     {
         id: "allroundassistance",
         text: "Why Choose WordPress?",
@@ -23,8 +23,8 @@ const whyWizeLinks = [
 export default function blogId() {
     const [active, setActive] = useState("allroundassistance");
     return (
-        <div>
-            <div className="bg-[#8c52af] h-96 w-full text-[#f5f5f5] flex flex-row ">
+        <div className="flex flex-col gap-4 justify-center items-center">
+            <div className="bg-[#8c52af] h-96 w-[97vw] text-[#f5f5f5] flex flex-row my-4 rounded-lg">
                 <div className="w-2/3 flex justify-center">
                     <div className="flex flex-col justify-center w-9/12 gap-4">
                         <span className="text-[45px] font-semibold">How to Become a WordPress Developer in 8 Steps</span>
@@ -41,14 +41,9 @@ export default function blogId() {
 
             </div>
             <div className="flex flex-col items-center mb-4">
-                <div className="max-w-[1300px] h-[100px] flex justify-center items-center w-full  mb-8">
-                    <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] bg-gradient-to-r from-white to-primary"></div>
-                    <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] "></div>            
-                    <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] bg-gradient-to-r from-primary to-white"></div>
-                </div>
-                <div className="flex w-full max-w-[1350px] relative">
-                    <div className="hidden md:flex flex-col w-full max-w-[300px] pt-[100px] sticky top-0 h-screen text-[#000000BB] px-8 text-lg font-semibold tracking-wide gap-3 ">
-                        {whyWizeLinks.map((item: Data, index) => {
+                <div className="flex w-full max-w-[1450px] relative">
+                    <div className="hidden md:flex flex-col w-full max-w-[300px] pt-[100px] sticky top-0 h-screen text-[#000000BB] px-2 text-lg font-semibold tracking-wide gap-4 ">
+                        {blogLinks.map((item: Data, index) => {
                             return (
                                 <WizeCampLink
                                     key={index}
@@ -61,36 +56,33 @@ export default function blogId() {
                         })}
                     </div>
                     <div className="md:border-l-4 md:border-[#baa1eb] px-6 lg:px-[60px] xl:px-[100px] relative">
-                        <div id="allroundassistance" className="pb-[50px] sm:pb-[100px] focus:text-[#8C52FF] sm:min-h-[700px]">  
+                        <div id="allroundassistance" className="pb-[50px] sm:pb-[100px] focus:text-[#8C52FF] ">  
                             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
                                 Why Choose WordPress?
                             </div>
-                            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
+                            <p className="text-sm sm:text-lg text-[#000000BB] font-medium my-4">
                                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet nam nobis tenetur vitae placeat inventore, doloremque atque facere molestias doloribus assumenda officiis suscipit hic! Ipsa sit neque eligendi magni explicabo ab, non modi maxime!
+                               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Accusantium earum culpa, non corrupti fugit, accusamus animi amet cupiditate illo iste placeat, expedita aut nam eos fugiat! Totam facilis repellat ut ipsam dicta, illum optio sunt accusamus, et tenetur expedita atque possimus? Corrupti ut sed consequuntur sunt, laborum veniam repellat odit nihil perferendis debitis provident maxime assumenda aspernatur quia itaque alias, veritatis accusamus, consectetur deserunt eos voluptate nostrum! Deleniti corrupti amet iure consectetur modi sunt incidunt deserunt ab? Ipsam vitae at eveniet, rem vel possimus dolorum officiis nostrum deleniti minus reprehenderit.
                             </p>
                         </div>
-                        <div id="smartestplatform" className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]">
+                        <div id="smartestplatform" className="pb-[50px] sm:pb-[100px] ">
                             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
                                 WordPress Developer Roadmap (Step-By-Step)
                             </div>
-                            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
+                            <p className="text-sm sm:text-lg text-[#000000BB] font-medium my-4">
                                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus laudantium tenetur, dicta quae qui cum obcaecati rerum sit? Officia iusto explicabo dolores! Est iure quos saepe aliquam magni accusantium voluptates voluptatem incidunt. Eveniet, perferendis.
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis architecto, tempora suscipit quod culpa exercitationem! Aliquam iste sapiente maiores, totam natus quasi dignissimos perferendis iusto animi odio ipsam dolorem dolorum molestiae quo in repellendus similique ipsum optio laborum ea ullam placeat excepturi. Eum totam ipsum similique tenetur dicta repellat architecto consequatur! Corporis facilis illo sapiente sequi debitis pariatur, delectus esse asperiores ipsa, recusandae laudantium iusto! Corporis explicabo, aspernatur debitis quidem mollitia iure pariatur omnis animi maiores, laboriosam eos repellat fuga atque nostrum ducimus nesciunt dolore fugiat asperiores. Labore, incidunt obcaecati!
                             </p>
-                            <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
                         </div>
-                        <div id="ourwinningrecord" className=" sm:min-h-[700px]">
+                        <div id="ourwinningrecord" className=" ">
                             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
                                 Conclusion
                             </div>
-                            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
+                            <p className="text-sm sm:text-lg text-[#000000BB] font-medium my-4">
                                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti ab aspernatur expedita! Provident unde eos a non tempora sit ducimus repellendus officia magnam debitis. Magni ipsam veniam vel est nostrum deleniti consequuntur sunt rem!
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quas quasi suscipit mollitia architecto animi dicta debitis odio praesentium provident excepturi quia nostrum maiores aut, voluptas, aliquam nemo unde commodi cupiditate. Dolorum deserunt culpa, nulla ratione saepe commodi ea hic voluptatibus sit officiis magnam tempore iste tempora ex consectetur quis dolore beatae nobis! Dignissimos odio voluptatibus esse cupiditate iusto non, tempora odit quam. Accusantium cum nihil cumque iusto quam nobis explicabo saepe magni, labore minima, blanditiis ut tempore. Deleniti id ullam cum tempora perspiciatis maxime maiores temporibus perferendis ad illum!
                             </p>
-                            {/* <div className="flex flex-wrap justify-center gap-4 min-h-[400px] w-full my-8 rounded-2xl">
-                                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                            </div> */}
+                            
                         </div>
                     </div>
                 </div>
