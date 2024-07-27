@@ -3,6 +3,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/utils/userStore";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 
@@ -32,6 +33,7 @@ import CarouselImage3 from "../../public/images/Globe.svg";
 import CarouselImage4 from "../../public/images/Globe.svg";
 
 const LogIn: React.FC = () => {
+  const setUser = useUserStore((state) => state.setUser);
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -81,6 +83,7 @@ const LogIn: React.FC = () => {
         const data = await response.json();
 
         // Store user data and token in local storage
+        setUser(data.user, data.token);
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
