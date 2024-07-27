@@ -11,8 +11,6 @@ npm run dev
 ```
 
 4. Open the browser and navigate to the following URL:
-```bash
-http://localhost:3000
-```
+```bash http://localhost:3000 ```
 
 5. You can now view the project and make changes to the code as required.
