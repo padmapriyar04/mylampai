@@ -5,18 +5,9 @@ HOW TO GET STARTED WITH THE PROJECT
 ```bash
     npm install 
 ```
-    or
-```bash
-    yarn install
-```
-
 3. Run the project using the following command:
 ```bash
     npm run dev
-```
-    or
-```bash
-    yarn dev
 ```
 
 4. Open the browser and navigate to the following URL:
