@@ -1,6 +1,9 @@
 HOW TO GET STARTED WITH THE PROJECT
 
-1. Clone the repository
+1. Clone the repository using the following command in your terminal:
+```
+git clone https://github.com/myLamp-AI/mylamp-ai.git
+```
 2. Install the required dependencies using the following command:
 ```
 npm install 
