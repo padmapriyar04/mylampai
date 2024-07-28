@@ -119,9 +119,12 @@ export default function Blogs() {
         <div className="w-full h-full">
             <HomeNavbar />
             <div className="mx-4 lg:mx-8 ">
-                
-            <div className="py-4 text-left my-9 mx-20">
-                    <h1 className="text-xl md:text-2xl font-semibold text-black mb-2">Top Articles to Read</h1>
+
+                <div className="py-4 text-left my-9 mx-20">
+                    <div className=' flex flex-row'>
+                        <div className="text-xl md:text-2xl font-semibold text-black mb-2">Top Articles to</div>
+                         <div className="text-xl md:text-2xl border-3 border-b-purple-500 h-fit font-semibold text-black  mx-3 -mt-2 "> Read   </div>
+                    </div>
                     <h2 className="text-md md:text-lg font-semibold text-gray-500">Stay updated with data science and engineering trends and insights through our curated articles</h2>
                 </div>
                 <div className="flex justify-around items-center mx-20 px-2">
