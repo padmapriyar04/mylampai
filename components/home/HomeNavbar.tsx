@@ -2,9 +2,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useUserStore } from "@/utils/userStore";
 
 const HomeNavbar = () => {
   const [scroll, setScroll] = useState(false);
+  const { user } = useUserStore(); // Get the user from the Zustand store
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
@@ -21,6 +23,21 @@ const HomeNavbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  // Function to get user initials
+
+  const getUserInitials = () => {
+    if (user && user.first_name && user.last_name) {
+      return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
+    }
+    return null;
+  };
+
+  const userInitials = getUserInitials();
+
+  console.log("User data:", user); // Debugging line
+
+  console.log("User initials:", userInitials); // Debugging line
 
   return (
     <>
@@ -58,35 +75,47 @@ const HomeNavbar = () => {
             Home
           </Link>
           <Link
-            href={"/"}
+            href={"/community"}
             className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
           >
             Community
           </Link>
           <Link
-            href={"/"}
+            href={"/resources"}
             className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
           >
             Resources
           </Link>
           <Link
-            href={"/"}
+            href={"/company"}
             className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
           >
             Company
           </Link>
+          {userInitials ? (
+            <div className="flex items-center bg-[#8C52FF] text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105">
+              <span className="font-bold">{userInitials}</span>
 
-          <Link href={"/login"}>
-            <button className="flex items-center bg-[#8C52FF] text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105">
-              Sign In
               <Image
                 src={"/home/userNavbar.svg"}
                 alt=""
                 height={25}
                 width={25}
-              ></Image>
-            </button>
-          </Link>
+              />
+            </div>
+          ) : (
+            <Link href={"/login"}>
+              <button className="flex items-center bg-[#8C52FF] text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105">
+                Sign In
+                <Image
+                  src={"/home/userNavbar.svg"}
+                  alt=""
+                  height={25}
+                  width={25}
+                />
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </>

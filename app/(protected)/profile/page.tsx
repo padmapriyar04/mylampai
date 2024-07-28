@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/utils/userStore";
 import { toast } from "sonner";
 
 interface User {
@@ -12,7 +13,7 @@ interface User {
 }
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useUserStore();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -38,7 +39,7 @@ export default function ProfilePage() {
     };
 
     fetchUser();
-  }, [router]);
+  }, [router, setUser]);
 
   if (loading) {
     return (

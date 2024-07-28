@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "@/prisma/index"; // Adjust the path as per your project structure
+import prisma from "@/prisma/index";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
