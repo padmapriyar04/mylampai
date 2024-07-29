@@ -58,8 +58,7 @@ export const POST = async (req: NextRequest, { params }: { params: { communityId
   } catch (error) {
     console.error('Error sending message to community:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  } finally {
-    // Disconnect Prisma client
+  } finally {   
     await prisma.$disconnect();
   }
 };
