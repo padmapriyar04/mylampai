@@ -20,13 +20,12 @@ const ExpandingCard: React.FC<ExpandingCardProps> = ({
     moreClass
 
 }) => {
-    const [isHovered, setIsHovered] = useState(true);
+    const [hovered, setHovered] = useState(1);
     const [selectedId, setSelectedId] = useState(id);
 
     useEffect(() => {
-        // don't remove this otherwise practise section won't change width
-        setIsHovered(false);
-    }, [isHovered]);
+        setHovered(1);
+    }, [hovered]);
 
     return (
         <>
@@ -66,6 +65,7 @@ const PracticeCoding = () => {
             </p>
             <div className="bg-white w-full my-8 ">
                 <div className="home-exp-card-container flex justify-start flex-col sm:flex-row-reverse items-center rounded-2xl border-2 border-black overflow-hidden bg-red-50" >
+                {/* <div className="flex justify-start flex-col sm:flex-row-reverse items-center rounded-2xl border-2 border-black overflow-hidden bg-red-50" > */}
                     <ExpandingCard
                         id="expandingcard1"
                         title="Coding Practice"
