@@ -12,6 +12,7 @@ import CommunitySection from "@/components/home/Community";
 import Footer from "@/components/home/Footer";
 import HomeSlider from "@/components/home/HomeSlider";
 import HomeNavbar from "@/components/home/HomeNavbar";
+import './home.css';
 
 export default function Page() {
   useEffect(() => {
@@ -21,7 +22,7 @@ export default function Page() {
 
   return (
     <>
-      <main className="h-full bg-[#fff]">
+      <main className="home-page h-full bg-[#fff]">
         <HomeNavbar />
         <HeroSection />
         <AboutWize />

@@ -74,8 +74,7 @@ const HomeNavbar = () => {
           >
             Home
           </Link>
-          <Link
-            href={"/"}
+          <div
             className="hover:bg-primary-foreground focus:bg-primary-foreground group relative transition-all py-2 px-4 rounded-full duration-300 "
           >
             Community
@@ -156,9 +155,8 @@ const HomeNavbar = () => {
                 </div>
               </div>
             </div>
-          </Link>
-          <Link
-            href={"/"}
+          </div>
+          <div
             className="hover:bg-primary-foreground group relative focus:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:transform "
           >
             Resources
@@ -182,9 +180,8 @@ const HomeNavbar = () => {
               <div className="p-2 hover:bg-primary-foreground w-full text-center duration-400 rounded-lg">Handbooks</div>
               <div className="p-2 hover:bg-primary-foreground w-full text-center duration-400 rounded-lg mb-2">Career Blogs</div>
             </div>
-          </Link>
-          <Link
-            href={"/"}
+          </div>
+          <div
             className="hover:bg-primary-foreground focus:bg-primary-foreground relative group transition-all py-2 px-4 rounded-full duration-300 hover:transform "
           >
             Company
@@ -202,7 +199,7 @@ const HomeNavbar = () => {
                 Contact Us
               </Link>
             </div>
-          </Link>
+          </div>
           {userInitials ? (
             <div className="flex items-center bg-[#8C52FF] text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:bg-primary-foreground hover:transform hover:scale-105">
               <span className="font-bold">{userInitials}</span>
