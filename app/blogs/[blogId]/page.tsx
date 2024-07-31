@@ -20,8 +20,9 @@ const blogLinks = [
         text: "Conclusion",
     },
 ];
-export default function blogId() {
+export default function BlogId() {
     const [active, setActive] = useState("allroundassistance");
+
     return (
         <div className="flex flex-col gap-4 justify-center items-center">
             <div className="bg-[#8c52af] h-96 w-[97vw] text-[#f5f5f5] flex flex-row my-4 rounded-lg">
@@ -81,8 +82,7 @@ export default function blogId() {
                             <p className="text-sm sm:text-lg text-[#000000BB] font-medium my-4">
                                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti ab aspernatur expedita! Provident unde eos a non tempora sit ducimus repellendus officia magnam debitis. Magni ipsam veniam vel est nostrum deleniti consequuntur sunt rem!
                                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quas quasi suscipit mollitia architecto animi dicta debitis odio praesentium provident excepturi quia nostrum maiores aut, voluptas, aliquam nemo unde commodi cupiditate. Dolorum deserunt culpa, nulla ratione saepe commodi ea hic voluptatibus sit officiis magnam tempore iste tempora ex consectetur quis dolore beatae nobis! Dignissimos odio voluptatibus esse cupiditate iusto non, tempora odit quam. Accusantium cum nihil cumque iusto quam nobis explicabo saepe magni, labore minima, blanditiis ut tempore. Deleniti id ullam cum tempora perspiciatis maxime maiores temporibus perferendis ad illum!
-                            </p>
-                            
+                            </p> 
                         </div>
                     </div>
                 </div>

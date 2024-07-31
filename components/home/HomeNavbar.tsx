@@ -79,7 +79,7 @@ const HomeNavbar = () => {
           >
             Community
             <div className="max-h-0 flex flex-col items-center overflow-hidden opacity-0 scale-75 transition-all duration-500 group-hover:max-h-screen group-focus:max-h-screen group-hover:opacity-100 group-hover:scale-100 group-focus:flex group-focus:opacity-100 group-focus:scale-100 absolute top-[110%] left-0 bg-[#f9f9f9] w-[180px] rounded-xl shadow-[0px_0px_1px_rgba(0,0,0,0.3)] px-2">
-              <div className="p-2 hover:bg-primary-foreground w-full text-center duration-400 rounded-lg font-normal mt-2"> Smart Community</div>
+              <Link href={"/community"} className="p-2 hover:bg-primary-foreground w-full text-center duration-400 rounded-lg font-normal mt-2"> Smart Community</Link>
               <div className="grid grid-cols-3 place-items-center w-full mb-2">
                 <div className="p-3 rounded-lg hover:bg-primary-foreground duration-400">
                   <svg
