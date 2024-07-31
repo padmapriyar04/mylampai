@@ -84,7 +84,7 @@ export default function HeroSection() {
               <div className="hidden xl:flex flex-col bg-[#f5f5f580] p-4 rounded-2xl max-w-[260px]">
                 <div className="flex justify-between">
                   <div className="flex gap-2">
-                  <div className="p-2 bg-white rounded-full hover:bg-primary-foreground duration-400 w-11 h-11 flex items-center justify-center">
+                    <div className="p-2 bg-white rounded-full hover:bg-primary-foreground duration-400 w-11 h-11 flex items-center justify-center">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="28"
