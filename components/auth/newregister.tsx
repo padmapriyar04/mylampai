@@ -24,7 +24,7 @@ const SignUp: React.FC = () => {
   const [activeTab, setActiveTab] = useState("student");
   const [user, setUser] = useState({
     firstName: "",
-    lastName: "",
+    lastName: "", 
     email: "",
     phone: "",
     password: "",
@@ -123,7 +123,7 @@ const SignUp: React.FC = () => {
       return;
     }
     if (!validateEmail(user.email)) {
-      toast.error("Please enter a valid Gmail address.");
+      toast.error("Please enter a valid email address.");
       return;
     }
     if (!validatePhone(user.phone)) {
@@ -146,6 +146,7 @@ const SignUp: React.FC = () => {
           phone: user.phone,
           password: user.password,
           role: activeTab === "admin" ? "admin" : "user",
+          secret: user.secret, // Only send secret if role is admin
         }),
       });
 

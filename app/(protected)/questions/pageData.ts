@@ -12,7 +12,7 @@ interface SliderOption {
 
 interface Page {
     question: string;
-    options?: Option[] | Option[][];
+    options?: any;
     sliders?: SliderOption[];
     multiSelect?: boolean;
     gridLayout?: boolean;
