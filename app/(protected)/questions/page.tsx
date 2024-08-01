@@ -94,7 +94,7 @@ const QuestionPage: React.FC = () => {
     }
   };
 
-  const renderButton = (option: Option, index: number) => (
+  const renderButton = (option: Option, index: string) => (
     <button
       key={index}
       onClick={() => handleSelection(option.name)}
@@ -162,7 +162,13 @@ const QuestionPage: React.FC = () => {
 
               {currentPage.gridLayout ? (
                 <div className="grid grid-cols-3 gap-4">
-                  {currentPage.options?.map(renderButton)}
+                  {currentPage.options?.flatMap((option, index) =>
+                    Array.isArray(option)
+                      ? option.map((subOption, subIndex) =>
+                          renderButton(subOption, `${index}-${subIndex}`)
+                        )
+                      : renderButton(option, index.toString())
+                  )}
                 </div>
               ) : currentPage.options ? (
                 <div className="space-y-4 flex flex-col items-center">
@@ -173,9 +179,9 @@ const QuestionPage: React.FC = () => {
                     >
                       {Array.isArray(row)
                         ? row.map((option, optionIndex) =>
-                            renderButton(option, optionIndex)
+                            renderButton(option, `${rowIndex}-${optionIndex}`)
                           )
-                        : renderButton(row, rowIndex)}
+                        : renderButton(row, rowIndex.toString())}
                     </div>
                   ))}
                 </div>
