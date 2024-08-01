@@ -23,7 +23,6 @@ export default function Page() {
   return (
     <>
       <main className="home-page h-full bg-[#fff]">
-        <HomeNavbar />
         <HeroSection />
         <AboutWize />
         <WizeCamp />
@@ -33,7 +32,6 @@ export default function Page() {
         <PowerOfWize />
         <RecentAdvances />
         <CommunitySection />
-        <Footer />
       </main>
     </>
   );

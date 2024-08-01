@@ -59,14 +59,14 @@ export default function Footer() {
                         </div>
                     </div>
                     <div className="flex items-center justify-center gap-2 sm:gap-6 pt-4 border-dashed border-t-[3px]">
-                        <Image src={"/home/whatsapp.svg"} width={30} height={30} alt="whatsapp" />
-                        <Image src={"/home/instagram.svg"} width={30} height={30} alt="instagram" />
-                        <Image src={"/home/linkedin.svg"} width={30} height={30} alt="linkedin" />
-                        <Image src={"/home/facebook.svg"} width={30} height={30} alt="facebook" />
-                        <Image src={"/home/youtube.svg"} width={30} height={30} alt="youtube" />
-                        <Image src={"/home/telegram.svg"} width={30} height={30} alt="telegram" />
-                        <Image src={"/home/discord.svg"} width={30} height={30} alt="discord" />
-                        <Image src={"/home/twitter.svg"} width={30} height={30} alt="twitter" />
+                        <Image src={"/social/whatsapp.svg"} width={27} height={27} alt="whatsapp" />
+                        <Image src={"/social/instagram.svg"} width={27} height={27} alt="instagram" />
+                        <Image src={"/social/linkedin.svg"} width={27} height={27} alt="linkedin" />
+                        <Image src={"/social/facebook.svg"} width={27} height={27} alt="facebook" />
+                        <Image src={"/social/youtube.svg"} width={27} height={27} alt="youtube" />
+                        <Image src={"/social/telegram.svg"} width={27} height={27} alt="telegram" />
+                        <Image src={"/social/discord.svg"} width={27} height={27} alt="discord" />
+                        <Image src={"/social/twitter-x.svg"} width={27} height={27} alt="twitter" />
                     </div>
                 </div>
                 <div className="w-full max-w-[642px] flex flex-col justify-center items-start text-white font-medium">
