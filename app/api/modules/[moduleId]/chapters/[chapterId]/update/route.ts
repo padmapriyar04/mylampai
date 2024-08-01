@@ -1,7 +1,7 @@
 // API route for chapter update within a module
 
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/prisma';
+import prisma from '@/lib';
 import { connectToDatabase } from '@/app/helpers/server';
 import jwt from 'jsonwebtoken';
 
@@ -63,16 +63,16 @@ export const PATCH = async (req: NextRequest, { params }: { params: { moduleId: 
         if (!existingChapter) {
             return NextResponse.json({ error: 'Chapter does not exist' }, { status: 404 });
         }
-      
-        const data : ChapterRequest =await req.json();
-        
+
+        const data: ChapterRequest = await req.json();
+
         const updatedChapter = await prisma.chapters.update({
             where: { id: chapterId },
             data: {
-              ...data,
-              Lessons : data.Lessons?.toString()
+                ...data,
+                Lessons: data.Lessons?.toString()
             },
-          });
+        });
 
         return NextResponse.json({ chapter: updatedChapter }, { status: 201 });
     } catch (error) {

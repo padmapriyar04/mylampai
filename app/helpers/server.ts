@@ -1,7 +1,7 @@
-import prisma from "../../prisma/index";
+import prisma from "../../lib/index";
 
 
-export const connectToDatabase = async () =>{
+export const connectToDatabase = async () => {
     try {
         await prisma.$connect();
     } catch (error) {

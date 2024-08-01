@@ -1,6 +1,6 @@
 // API route for chapter update within a module
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/prisma';
+import prisma from '@/lib';
 import { connectToDatabase } from '@/app/helpers/server';
 import jwt from 'jsonwebtoken';
 
@@ -66,8 +66,8 @@ export const DELETE = async (req: NextRequest, { params }: { params: { moduleId:
         // Deleting chapter
         await prisma.chapters.delete({
             where: { id: chapterId },
-          });
-        
+        });
+
 
         return NextResponse.json({ message: "chapter deleted" }, { status: 201 });
     } catch (error) {

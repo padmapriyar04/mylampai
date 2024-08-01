@@ -16,7 +16,7 @@ export default function HeroSection() {
               Get AI- Powered personalised career guidance based on Your
               interests, aptitude, and goals
             </div>
-            <button className="flex items-center justify-between bg-[#8C52FF] rounded-full text-white text-xl md:text-2xl font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 max-w-[232px] md:max-w-[300px] mb-12 lg:ml-14">
+            <button className="flex items-center justify-between bg-[#8C52FF] rounded-full duration-150 hover:scale-[1.02] text-white text-xl md:text-2xl font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 max-w-[232px] md:max-w-[300px] mb-12 lg:ml-14">
               Let&apos;s Get Started
               <Image
                 src={"/home/heroSectionArrow.svg"}

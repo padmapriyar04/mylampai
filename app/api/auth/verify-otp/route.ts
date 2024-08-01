@@ -1,6 +1,6 @@
 // pages/api/auth/verify-otp.ts
 import { NextResponse } from "next/server";
-import prisma from "../../../../prisma/index";
+import prisma from "../../../../lib/index";
 import { connectToDatabase } from "@/app/helpers/server";
 
 export const POST = async (req: Request) => {

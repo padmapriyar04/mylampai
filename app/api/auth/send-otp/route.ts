@@ -1,11 +1,11 @@
 // pages/api/auth/send-otp.ts
-import prisma from "../../../../prisma/index";
+import prisma from "@/lib";
 import bcrypt from "bcrypt";
 import { connectToDatabase } from "@/app/helpers/server";
 import { NextResponse } from "next/server";
-import transporter from "../../../../lib/nodemailer"; // Import your NodeMailer transporter
+import transporter from "@/lib/nodemailer";
 
-export const POST = async (req: Request) => {
+export async function POST(req: Request) {
   try {
     if (req.method !== "POST") {
       return NextResponse.json({ message: "Method Not Allowed" }, { status: 405 });
@@ -67,5 +67,3 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 };
-
-export default POST;

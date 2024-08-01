@@ -1,6 +1,6 @@
 // api to create a lesson within a chapter
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/prisma';
+import prisma from '@/lib';
 import { connectToDatabase } from '@/app/helpers/server';
 import jwt from 'jsonwebtoken';
 
