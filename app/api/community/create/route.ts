@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../prisma/index';
+import prisma from '../../../../lib/index';
 import { connectToDatabase } from '@/app/helpers/server';
 import jwt from 'jsonwebtoken';
 
@@ -43,7 +43,7 @@ export const POST = async (req: NextRequest) => {
     const existingCommunity = await prisma.community.findUnique({
       where: { name },
     });
-    
+
     if (existingCommunity) {
       return NextResponse.json({ error: 'Community already exists' }, { status: 422 });
     }

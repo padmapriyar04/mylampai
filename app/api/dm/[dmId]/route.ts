@@ -1,15 +1,15 @@
 // app/api/dm/[dmId]
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../prisma'; 
+import prisma from '../../../../lib';
 import jwt from 'jsonwebtoken';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:4000'); 
+const socket = io('http://localhost:4000');
 
 export const POST = async (req: NextRequest, { params }: { params: { dmId: string } }) => {
   try {
-   
-    
+
+
     // Extract authorization token from request headers
     const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -28,7 +28,7 @@ export const POST = async (req: NextRequest, { params }: { params: { dmId: strin
 
     // Extract user ID from decoded token
     const { id: userId, email: userEmail, name: userName, role: userRole } = decodedToken;
-   
+
     const user = await prisma.user.findUnique({
       where: { id: params.dmId },
     });
@@ -37,22 +37,22 @@ export const POST = async (req: NextRequest, { params }: { params: { dmId: strin
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    
-    const chatToken= jwt.sign(
+
+    const chatToken = jwt.sign(
       {
         id: userId,
         email: userEmail,
         name: userName,
         role: userRole,
         dmId: user
-     
+
       },
       process.env.JWT_SECRET || 'okokokok',
       { expiresIn: '24h' }
     );
 
 
-    return NextResponse.json({chatToken: chatToken}, { status: 200 });
+    return NextResponse.json({ chatToken: chatToken }, { status: 200 });
   } catch (error) {
     console.error('Error sending message to community:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

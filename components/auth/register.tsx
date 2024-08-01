@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import prisma from "@/prisma";
+import prisma from "@/lib";
 import bcrypt from "bcrypt";
 import { connectToDatabase } from "@/app/helpers/server";
 import Link from "next/link";
@@ -155,7 +155,10 @@ export default function Register() {
 
         <p className="mt-4 text-center">
           Don&apos;t have an account?{" "}
-          <Link href="/components/auth/login" className="text-blue-500 hover:underline">
+          <Link
+            href="/components/auth/login"
+            className="text-blue-500 hover:underline"
+          >
             Login
           </Link>
         </p>

@@ -1,5 +1,5 @@
 // pages/api/auth/send-otp.ts
-import prisma from "../../../../prisma/index";
+import prisma from "../../../../lib/index";
 import bcrypt from "bcrypt";
 import { connectToDatabase } from "@/app/helpers/server";
 import { NextResponse } from "next/server";
