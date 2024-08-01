@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         role: user.role,
       },
       process.env.JWT_SECRET || "okokokok",
-      { expiresIn: "24h" }
+      { expiresIn: "7d" }
     );
 
     // Set token in cookie
