@@ -2,10 +2,10 @@
 import prisma from "@/lib";
 import bcrypt from "bcrypt";
 import { connectToDatabase } from "@/app/helpers/server";
-import { NextRequest, NextResponse } from "next/server";
-import transporter from "@/lib/nodemailer"; 
+import { NextResponse } from "next/server";
+import transporter from "@/lib/nodemailer";
 
-export const POST = async (req: NextRequest) => {
+export async function POST(req: Request) {
   try {
     if (req.method !== "POST") {
       return NextResponse.json({ message: "Method Not Allowed" }, { status: 405 });
@@ -67,5 +67,3 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 };
-
-export default POST;
