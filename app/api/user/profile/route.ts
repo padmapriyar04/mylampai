@@ -4,11 +4,13 @@ import { decodeToken } from "@/utils/jwt";
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
+
   if (!token) {
     return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
   }
 
   const decodedToken = decodeToken(token);
+
   if (!decodedToken) {
     return NextResponse.json({ message: "Invalid token" }, { status: 401 });
   }
@@ -28,7 +30,6 @@ export async function GET(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
-
-  // Return the full user object instead of just userId
+  
   return NextResponse.json(user);
 }
