@@ -3,6 +3,9 @@ import "./../globals.css";
 import { Open_Sans } from "next/font/google";
 import Navbar from "../../components/navbar/Navbar";
 import Flexsidebar from "@/components/misc/Flexsidebar";
+import HomeNavbar from "@/components/home/HomeNavbar";
+import Footer from "@/components/home/Footer";
+
 const openSans = Open_Sans({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "MyLampAi - Home",
@@ -16,16 +19,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
-      <body className={`${openSans.className} bg-primary-foreground`}>
-        <Navbar />
+      <body className={`${openSans.className}`}>
+        <HomeNavbar />
         <div className="flex h-full transition-all duration-300 ">
-          {/* Sidebar */}
           <Flexsidebar />
-          {/* Main Content */}
           <div className=" flex-1 lg:transition-all lg:duration-300">
             {children}
           </div>
         </div>
+        <Footer />
       </body>
     </html>
   );

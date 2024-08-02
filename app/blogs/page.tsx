@@ -1,5 +1,6 @@
 "use client"
 import { useState } from 'react';
+import Image from "next/image"
 import HomeNavbar from "@/components/home/HomeNavbar";
 
 type BlogPost = {
@@ -153,7 +154,9 @@ export default function Blogs() {
                 <div className="w-full h-full flex flex-wrap justify-center items-center gap-10 p-6">
                     {filteredPosts.map((post) => (
                         <div key={post.id} className="bg-white overflow-hidden w-full sm:w-80 md:w-72 lg:w-64 xl:w-96 h-auto lg:h-[32rem] p-4 space-y-4">
-                            <img
+                            <Image
+                                height={100}
+                                width={100}
                                 className="w-full h-48 object-cover mb-4"
                                 src={post.imageUrl}
                                 alt={post.title}
@@ -165,7 +168,9 @@ export default function Blogs() {
                             </div>
                             <h2 className="text-lg md:text-xl font-semibold mb-4">{post.title}</h2>
                             <div className="flex items-center mb-4">
-                                <img
+                                <Image
+                                    height={100}
+                                    width={100}
                                     className="w-10 h-10 rounded-full mr-4"
                                     src={post.dpUrl}
                                     alt={post.author}

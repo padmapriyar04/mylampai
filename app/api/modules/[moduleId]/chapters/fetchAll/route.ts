@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../../../prisma/index';
+import prisma from '../../../../../../lib/index';
 
 export const GET = async (req: NextRequest, { params }: { params: { moduleId: string } }) => {
   const { moduleId } = params;
@@ -12,7 +12,7 @@ export const GET = async (req: NextRequest, { params }: { params: { moduleId: st
     // Fetch all chapters for the specified module ID
     const chapters = await prisma.chapters.findMany({
       where: {
-        chapterId : moduleId,
+        chapterId: moduleId,
       },
       orderBy: {
         id: 'asc', // Order by id or any other criteria as needed

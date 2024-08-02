@@ -1,6 +1,6 @@
 // pages/api/community/getAll.ts
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../prisma';
+import prisma from '../../../../lib';
 import { connectToDatabase } from '@/app/helpers/server';
 
 export const GET = async (req: NextRequest) => {

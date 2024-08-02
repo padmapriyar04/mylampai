@@ -1,7 +1,7 @@
 // pages/api/auth/register.ts
 
 import { NextResponse } from "next/server";
-import prisma from "../../../../prisma/index";
+import prisma from "../../../../lib/index";
 import bcrypt from "bcrypt";
 import { connectToDatabase } from "@/app/helpers/server";
 

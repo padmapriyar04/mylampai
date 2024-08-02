@@ -1,15 +1,15 @@
 // app/api/community/[communityId]/interact.ts
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../../prisma'; 
+import prisma from '../../../../../lib';
 import jwt from 'jsonwebtoken';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:4000'); 
+const socket = io('http://localhost:4000');
 
 export const POST = async (req: NextRequest, { params }: { params: { communityId: string } }) => {
   try {
-   
-    
+
+
     // Extract authorization token from request headers
     const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -28,7 +28,7 @@ export const POST = async (req: NextRequest, { params }: { params: { communityId
 
     // Extract user ID from decoded token
     const { id: userId, email: userEmail, name: userName, role: userRole } = decodedToken;
-   
+
     const community = await prisma.community.findUnique({
       where: { id: params.communityId },
     });
@@ -40,8 +40,8 @@ export const POST = async (req: NextRequest, { params }: { params: { communityId
     if (!community.userIds.includes(userId)) {
       return NextResponse.json({ error: 'User has not joined the community' }, { status: 400 });
     }
-    
-    const chatToken= jwt.sign(
+
+    const chatToken = jwt.sign(
       {
         id: userId,
         email: userEmail,
@@ -54,11 +54,11 @@ export const POST = async (req: NextRequest, { params }: { params: { communityId
     );
 
 
-    return NextResponse.json({chatToken: chatToken}, { status: 200 });
+    return NextResponse.json({ chatToken: chatToken }, { status: 200 });
   } catch (error) {
     console.error('Error sending message to community:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  } finally {   
+  } finally {
     await prisma.$disconnect();
   }
 };

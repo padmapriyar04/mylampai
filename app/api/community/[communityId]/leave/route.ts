@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../../prisma'; // Adjust the path as per your project structure
+import prisma from '../../../../../lib'; // Adjust the path as per your project structure
 import jwt from 'jsonwebtoken';
 
 export const POST = async (req: NextRequest, { params }: { params: { communityId: string } }) => {

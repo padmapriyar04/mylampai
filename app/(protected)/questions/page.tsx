@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-
 import { Slider } from "@/components/ui/slider";
+import pageData from "./pageData";
 
 import {
   Carousel,
@@ -24,121 +24,6 @@ interface Option {
   icon?: string;
 }
 
-interface SliderOption {
-  name: string;
-  min: number;
-  max: number;
-}
-
-interface Page {
-  question: string;
-  options?: Option[] | Option[][];
-  sliders?: SliderOption[];
-  multiSelect?: boolean;
-  gridLayout?: boolean;
-}
-
-const pages: Page[] = [
-  {
-    question: "Where do you want to study?",
-    options: [
-      { name: "India 🇮🇳" },
-      { name: "UK 🇬🇧" },
-      { name: "US 🇺🇸" },
-      { name: "Australia 🇦🇺" },
-      { name: "Canada 🇨🇦" },
-      { name: "Singapore 🇸🇬" },
-      { name: "France 🇫🇷" },
-      { name: "Germany 🇩🇪" },
-      { name: "New Zealand 🇳🇿" },
-    ],
-    multiSelect: false,
-    gridLayout: true,
-  },
-  {
-    question: "What is your preferred area of study?",
-    options: [
-      [
-        { name: "Business and Management 💼" },
-        { name: "Computer Science and IT 💻" },
-      ],
-      [
-        { name: "Engineering ⚙️" },
-        { name: "Social Science 🧑‍🤝‍🧑" },
-        { name: "Architecture 🏛️" },
-      ],
-      [
-        { name: "Professional Studies 👔" },
-        { name: "Hospitality and Tourism 🏨" },
-      ],
-      [
-        { name: "Science 🔬" },
-        { name: "Sports 🏅" },
-        { name: "Fine Arts 🎨" },
-        { name: "Law ⚖️" },
-      ],
-      [
-        { name: "Education 📚" },
-        { name: "Mathematics 🔢" },
-        { name: "Medicine 🩺" },
-      ],
-      [
-        { name: "Journalism and Media 📰" },
-        { name: "Agriculture and Forestry 🌱" },
-      ],
-    ],
-    multiSelect: true,
-    gridLayout: false,
-  },
-  {
-    question: "What degree do you want to pursue?",
-    options: [
-      { name: "12th 🏫" },
-      { name: "Bachelors 🎓" },
-      { name: "Masters 🎓🎓" },
-    ],
-    multiSelect: false,
-    gridLayout: true,
-  },
-  {
-    question: "What is your current education level?",
-    options: [
-      { name: "12th 🏫" },
-      { name: "Bachelors 🎓" },
-      { name: "Masters 🎓🎓" },
-    ],
-    multiSelect: false,
-    gridLayout: true,
-    sliders: [
-      { name: "Marks in %", min: 0, max: 100 },
-      { name: "Backlogs", min: 0, max: 5 },
-    ],
-  },
-  {
-    question: "Which aptitude test did you take?",
-    options: [
-      { name: "GRE 📝" },
-      { name: "GMAT 📊" },
-      { name: "SAT 📚" },
-      { name: "ACT 🧠" },
-    ],
-    multiSelect: false,
-    gridLayout: true,
-    sliders: [{ name: "Score", min: 0, max: 340 }],
-  },
-  {
-    question: "Which English test did you take?",
-    options: [
-      { name: "TOEFL 🗣️" },
-      { name: "IELTS 🌐" },
-      { name: "PTE 🖥️" },
-      { name: "None ❌" },
-    ],
-    multiSelect: false,
-    gridLayout: true,
-  },
-];
-
 const QuestionPage: React.FC = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [answers, setAnswers] = useState<
@@ -146,7 +31,7 @@ const QuestionPage: React.FC = () => {
   >({});
   const router = useRouter();
 
-  const currentPage = pages[currentPageIndex];
+  const currentPage = pageData[currentPageIndex];
 
   const handleSelection = (option: string) => {
     if (currentPage.multiSelect) {
@@ -185,7 +70,7 @@ const QuestionPage: React.FC = () => {
   };
 
   const nextPage = () => {
-    if (currentPageIndex < pages.length - 1) {
+    if (currentPageIndex < pageData.length - 1) {
       setCurrentPageIndex(currentPageIndex + 1);
     } else {
       router.push("/studentDashboard");
@@ -211,7 +96,7 @@ const QuestionPage: React.FC = () => {
 
   const renderButton = (option: Option, index: number) => (
     <button
-      key={option.name}
+      key={index}
       onClick={() => handleSelection(option.name)}
       className={`flex items-center justify-center space-x-2 py-3 px-6 rounded-full transition-all duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105 text-lg ${
         (Array.isArray(answers[currentPageIndex]?.selection) &&
@@ -237,7 +122,7 @@ const QuestionPage: React.FC = () => {
       </div>
 
       <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 shadow-xl hover:shadow-2xl transition-shadow duration-300 w-11/12 max-w-7xl flex flex-col md:flex-row h-auto md:h-3/4">
-        <div className="hidden md:block w-full md:w-1/3 bg-purple-500 rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 flex flex-col items-center justify-start mb-4 md:mb-0">
+        <div className="md:block w-full md:w-1/3 bg-purple-500 rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 flex flex-col items-center justify-start mb-4 md:mb-0">
           <Carousel className="w-full h-full">
             <CarouselContent>
               {[
@@ -338,7 +223,7 @@ const QuestionPage: React.FC = () => {
             <button
               onClick={() =>
                 setCurrentPageIndex((prev) =>
-                  prev < pages.length - 1 ? prev + 1 : prev
+                  prev < pageData.length - 1 ? prev + 1 : prev
                 )
               }
               className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-colors duration-300"
@@ -354,7 +239,7 @@ const QuestionPage: React.FC = () => {
                   : "hover:bg-purple-600"
               }`}
             >
-              {currentPageIndex === pages.length - 1 ? "Finish" : "Next"}
+              {currentPageIndex === pageData.length - 1 ? "Finish" : "Next"}
             </button>
           </div>
         </div>

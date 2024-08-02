@@ -21,9 +21,10 @@ export default function ProfilePage() {
     const fetchUser = async () => {
       try {
         const response = await fetch("/api/user/profile");
+
         if (response.ok) {
           const userData: User = await response.json();
-          setUser(userData);
+          setUser(userData, "");
         } else if (response.status === 404) {
           toast.error("User not found. Please try logging in again.");
           router.push("/login");
