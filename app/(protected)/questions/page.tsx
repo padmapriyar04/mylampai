@@ -6,7 +6,6 @@
 // import { motion, AnimatePresence } from "framer-motion";
 // import { Slider } from "@/components/ui/slider";
 // import pageData from "./pageData";
-
 // import {
 //   Carousel,
 //   CarouselContent,
@@ -23,10 +22,6 @@
 //   name: string;
 //   icon?: string;
 // }
-
-const QuestionPage: React.FC = () => {
-  return <div>hi</div>;
-};
 
 // const QuestionPage: React.FC = () => {
 //   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -254,4 +249,8 @@ const QuestionPage: React.FC = () => {
 
 // export default QuestionPage;
 
+
+const QuestionPage: React.FC = () => {
+  return <div>hi</div>;
+};
 export default QuestionPage;

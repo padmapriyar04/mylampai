@@ -2,6 +2,7 @@ import Image from "next/image";
 import ImageGrid from "./ImageGrid";
 
 export default function PowerOfWize() {
+  
   return (
     <>
       <div className="flex flex-col  md:flex-row md:justify-between w-full max-w-[1300px] m-auto gap-4 ">

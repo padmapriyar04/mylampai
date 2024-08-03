@@ -19,13 +19,10 @@ export async function POST(req: Request) {
 
     await connectToDatabase();
 
-    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // Calculate expiry time for OTP (e.g., valid for 15 minutes)
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-    // Find or create the user
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
@@ -36,7 +33,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Save OTP to database
     try {
       await prisma.oTP.create({
         data: {
@@ -47,7 +43,6 @@ export async function POST(req: Request) {
         },
       });
 
-      // Send OTP via email using the transporter
       const info = await transporter.sendMail({
         from: process.env.EMAIL_USER, // Sender address (your Gmail)
         to: email, // Recipient's email
