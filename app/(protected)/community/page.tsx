@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import Exdata from "@/app/data/Excommunity.json";
 import Alldata from "@/app/data/Allcommunity.json";
 import Carousel from "../../../components/community/NewCarousel";
+
+
 export default function Community() {
   const ExdataLen = Exdata.length;
   const AlldataLen = Alldata.length;
