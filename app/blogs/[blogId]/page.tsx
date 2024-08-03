@@ -1,9 +1,17 @@
-import React from 'react';
+
+"use client"
+import React, {useState} from 'react';
 import HomeNavbar from './bloghomebar';
 import { FaHome } from "react-icons/fa";
 import Image from 'next/image';
+import Read from './readmore';
 
 export default function BlogId() {
+    const [showMore, setShowMore] = useState(false);
+
+    const handleReadMore = () => {
+        setShowMore(!showMore);
+    };
     return (
         <div className='w-full min-h-[100vh] bg-[#000000] flex flex-col'>
             <div className='w-full h-fit border-b-[2px] border-b-white fixed top-0 left-0 z-10'>
@@ -56,9 +64,16 @@ export default function BlogId() {
             <div className='w-full px-8 md:px-32 py-4 -mt-6'>
                 <hr className='border-white' />
                 <div className='text-center text-white mt-4'>
-                    <a href='/more-blogs'>Read More</a>
+                       <button
+                        onClick={handleReadMore}
+                        className='mt-4 bg-[#8C52FF] text-white py-2 px-4 rounded-lg'>
+                        Read More
+                    </button>
                 </div>
             </div>
+            {showMore && (
+                <Read/>
+            )}
         </div>
     );
 }
