@@ -12,9 +12,7 @@ import Globe from "../../public/images/Globe.svg";
 import wiZe from "../../public/header/wiZe.png";
 import Arrow from "../../public/images/Arrow.png";
 import Lock from "../../public/images/icons8-lock.svg";
-// import BackgroundImage from "../../public/images/background.jpg";
 
-// Import other carousel images here
 import CarouselImage1 from "../../public/images/Globe.svg";
 import CarouselImage2 from "../../public/images/Globe.svg";
 import CarouselImage3 from "../../public/images/Globe.svg";

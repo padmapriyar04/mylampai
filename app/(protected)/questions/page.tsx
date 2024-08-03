@@ -24,10 +24,6 @@
 //   icon?: string;
 // }
 
-const QuestionPage: React.FC = () => {
-  return <div>hi</div>;
-};
-
 // const QuestionPage: React.FC = () => {
 //   const [currentPageIndex, setCurrentPageIndex] = useState(0);
 //   const [answers, setAnswers] = useState<
@@ -254,4 +250,8 @@ const QuestionPage: React.FC = () => {
 
 // export default QuestionPage;
 
+
+const QuestionPage: React.FC = () => {
+  return <div>hi</div>;
+};
 export default QuestionPage;

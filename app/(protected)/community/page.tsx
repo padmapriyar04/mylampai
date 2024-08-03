@@ -1,13 +1,11 @@
 "use client";
-
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Carousel from "../../../components/community/NewCarousel";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import socket from '@/utils/socket';
+import socket from "@/utils/socket";
 
-// Define the Community and Message types
 interface Community {
   id: string;
   createdAt: string;
@@ -21,18 +19,18 @@ interface Community {
 
 interface Message {
   id: string;
-  first_name:string;
+  first_name: string;
   content: string;
   createdAt: string;
   seenIds: string[];
   communityId: string;
   senderId: string;
-  sender:sender;
+  sender: sender;
 }
 
-interface sender{
-  first_name:string;
-  id:string;
+interface sender {
+  first_name: string;
+  id: string;
 }
 
 export default function Community() {
@@ -44,13 +42,15 @@ export default function Community() {
   const [userId, setUserId] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
-  const [leftRoom, setLeftRoom]=useState<string>("no");
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
+    null,
+);
+  const [leftRoom, setLeftRoom] = useState<string>("no");
 
-  const toggleHeading = (text: string , communityId: string) => {
+  const toggleHeading = (text: string, communityId: string) => {
     setSelectedCommunityId(communityId);
     setMessageHeading(text);
-    socket.emit('check-join', { communityId });
+    socket.emit("check-join", { communityId });
   };
 
   const handleSmScreen = () => {
@@ -61,59 +61,58 @@ export default function Community() {
     setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
   };
 
-  const crossCheck= async (communityId : string)=>{
-    try{
-    const response = await fetch(`/api/community/${communityId}/crosscheck`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
-      },
-    });
-    if (response.ok) {
-      const data= await response.json();
-      console.log("dats:",data.message);
-      if(data.message=='No'){
-        setLeftRoom("yes");
+  const crossCheck = async (communityId: string) => {
+    try {
+      const response = await fetch(`/api/community/${communityId}/crosscheck`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("dats:", data.message);
+        if (data.message == "No") {
+          setLeftRoom("yes");
+        }
+        await fetchCommunities();
+      } else {
+        console.error("Error joining community:", response.statusText);
       }
-      await fetchCommunities();
-    } else {
-      console.error("Error joining community:", response.statusText);
+    } catch (error) {
+      console.error("Error joining community:", error);
     }
-  } catch (error) {
-    console.error("Error joining community:", error);
-  }
-  }
-  
-  useEffect(()=>{
-     if(selectedCommunityId !== null){
+  };
+
+  useEffect(() => {
+    if (selectedCommunityId !== null) {
       crossCheck(selectedCommunityId);
-     }
-  },[selectedCommunityId]);
-
-    useEffect(() => {
-      if (selectedCommunityId !== null) {
-          const handleNewMessages = (newMessages: Message[]) => {
-              // Check if the data is a single message or an array
-              if (Array.isArray(newMessages)) {
-                  setMessages(newMessages);
-              } else {
-                  
-                  setMessages(prevMessages => [...prevMessages, newMessages]);
-              }
-          };
-  
-          socket.on('receive-message-community', handleNewMessages);
-          socket.emit('fetch-community-messages', { communityId: selectedCommunityId });
-          console.log("Message",messages)
-  
-          // Cleanup on component unmount or when selectedCommunityId changes
-          return () => {
-              socket.off('receive-message-community', handleNewMessages);
-          };
-      }
+    }
   }, [selectedCommunityId]);
-  
 
+  useEffect(() => {
+    if (selectedCommunityId !== null) {
+      const handleNewMessages = (newMessages: Message[]) => {
+        // Check if the data is a single message or an array
+        if (Array.isArray(newMessages)) {
+          setMessages(newMessages);
+        } else {
+          setMessages((prevMessages) => [...prevMessages, newMessages]);
+        }
+      };
+
+      socket.on("receive-message-community", handleNewMessages);
+      socket.emit("fetch-community-messages", {
+        communityId: selectedCommunityId,
+      });
+      console.log("Message", messages);
+
+      // Cleanup on component unmount or when selectedCommunityId changes
+      return () => {
+        socket.off("receive-message-community", handleNewMessages);
+      };
+    }
+  }, [selectedCommunityId]);
 
   useEffect(() => {
     checkScreenSize();
@@ -155,9 +154,9 @@ export default function Community() {
         },
       });
       if (response.ok) {
-        socket.emit('join-room', { communityId });
+        socket.emit("join-room", { communityId });
         setMessages([]);
-       // socket.emit('fetch-community-messages',  { communityId });
+        // socket.emit('fetch-community-messages',  { communityId });
         setLeftRoom("no");
         toast.success("Joined to the community");
         await fetchCommunities();
@@ -178,7 +177,7 @@ export default function Community() {
         },
       });
       if (response.ok) {
-        socket.emit('leave-room', { communityId });
+        socket.emit("leave-room", { communityId });
         await fetchCommunities();
         setLeftRoom("yes");
         toast.success("Left Community successfully");
@@ -194,14 +193,14 @@ export default function Community() {
   const handleChangeText = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setText(value);
-    socket.emit('message',value);
+    socket.emit("message", value);
   };
 
   const sendText = () => {
-    if (text !== '') {
-      const communityId= selectedCommunityId;
-      socket.emit('message', { message: text , community: communityId});
-      setText('');
+    if (text !== "") {
+      const communityId = selectedCommunityId;
+      socket.emit("message", { message: text, community: communityId });
+      setText("");
     }
   };
 
@@ -244,7 +243,7 @@ export default function Community() {
                   key={community.id}
                   className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
                   onClick={() => {
-                    toggleHeading(community.name , community.id);
+                    toggleHeading(community.name, community.id);
                     handleSmScreen();
                   }}
                 >
@@ -302,7 +301,6 @@ export default function Community() {
             smScreen ? "flex" : "hidden"
           } md:flex flex-col md:h-full w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
         >
-          
           <div className="flex flex-row bg-[#8c52ff] w-full h-16 rounded-lg items-center justify-between">
             <div
               className="rounded-full flex justify-center items-center md:hidden"
@@ -351,48 +349,54 @@ export default function Community() {
               </div>
             </div>
           </div>
-          {leftRoom==="no"?
-          (
+          {leftRoom === "no" ? (
             <div className="flex flex-col h-full">
-          <div className="flex flex-grow flex-col p-4 overflow-auto">
-          {messages.length > 0 &&
-            messages.map((message) => (
-              <div key={message.id} className="mb-2 p-2 bg-gray-100 rounded-lg">
-                <p>{message.content}   - <span className="text-blue-800 font-serif size-5 ">{message.sender?.first_name || 'Unknown sender'}</span> </p>
+              <div className="flex flex-grow flex-col p-4 overflow-auto">
+                {messages.length > 0 &&
+                  messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className="mb-2 p-2 bg-gray-100 rounded-lg"
+                    >
+                      <p>
+                        {message.content} -{" "}
+                        <span className="text-blue-800 font-serif size-5 ">
+                          {message.sender?.first_name || "Unknown sender"}
+                        </span>{" "}
+                      </p>
+                    </div>
+                  ))}
               </div>
-            ))}
-        </div>
-        
-          <div className="flex justify-center p-3">
-            <div className="relative w-full md:w-[65vw]">
-              <input
-                type="text"
-                className="pl-10 pr-4 py-2 w-full border rounded-lg bg-[#D9D9D9]"
-                placeholder="text"
-                value={text}
-                onChange={handleChangeText}
-              />
-              <button
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                onClick={sendText}
-              >
-                Send
-              </button>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none justify-between w-full">
-                <Image
-                  src="/community/textplussign.svg"
-                  alt="search"
-                  width={25}
-                  height={25}
-                />
+
+              <div className="flex justify-center p-3">
+                <div className="relative w-full md:w-[65vw]">
+                  <input
+                    type="text"
+                    className="pl-10 pr-4 py-2 w-full border rounded-lg bg-[#D9D9D9]"
+                    placeholder="text"
+                    value={text}
+                    onChange={handleChangeText}
+                  />
+                  <button
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                    onClick={sendText}
+                  >
+                    Send
+                  </button>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none justify-between w-full">
+                    <Image
+                      src="/community/textplussign.svg"
+                      alt="search"
+                      width={25}
+                      height={25}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          </div>
-        )
-        :
-         ( <div>Join the community</div>)
-         }
+          ) : (
+            <div>Join the community</div>
+          )}
         </div>
       </div>
       <Toaster />
