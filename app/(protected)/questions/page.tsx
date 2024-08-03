@@ -6,7 +6,6 @@
 // import { motion, AnimatePresence } from "framer-motion";
 // import { Slider } from "@/components/ui/slider";
 // import pageData from "./pageData";
-
 // import {
 //   Carousel,
 //   CarouselContent,

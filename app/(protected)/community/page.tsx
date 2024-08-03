@@ -44,7 +44,7 @@ export default function Community() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
     null,
-);
+  );
   const [leftRoom, setLeftRoom] = useState<string>("no");
 
   const toggleHeading = (text: string, communityId: string) => {
@@ -60,31 +60,33 @@ export default function Community() {
   const checkScreenSize = () => {
     setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
   };
-
-  const crossCheck = async (communityId: string) => {
-    try {
-      const response = await fetch(`/api/community/${communityId}/crosscheck`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("dats:", data.message);
-        if (data.message == "No") {
-          setLeftRoom("yes");
-        }
-        await fetchCommunities();
-      } else {
-        console.error("Error joining community:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error joining community:", error);
-    }
-  };
-
   useEffect(() => {
+    const crossCheck = async (communityId: string) => {
+      try {
+        const response = await fetch(
+          `/api/community/${communityId}/crosscheck`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
+            },
+          },
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log("dats:", data.message);
+          if (data.message == "No") {
+            setLeftRoom("yes");
+          }
+          await fetchCommunities();
+        } else {
+          console.error("Error joining community:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error joining community:", error);
+      }
+    };
+
     if (selectedCommunityId !== null) {
       crossCheck(selectedCommunityId);
     }
@@ -112,7 +114,7 @@ export default function Community() {
         socket.off("receive-message-community", handleNewMessages);
       };
     }
-  }, [selectedCommunityId]);
+  }, [messages, selectedCommunityId]);
 
   useEffect(() => {
     checkScreenSize();
