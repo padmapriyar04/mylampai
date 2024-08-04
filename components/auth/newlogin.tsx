@@ -107,7 +107,7 @@ const LogIn: React.FC = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signIn("google", { callbackUrl: "/" });
+      const result = await signIn("google");
       if (result?.error) {
         console.error("Google sign-in error:", result.error);
         toast.error("Google sign-in failed. Please try again.");
