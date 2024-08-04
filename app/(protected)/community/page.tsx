@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import Carousel from "../../../components/community/NewCarousel";
+import Carousel from "@/components/community/NewCarousel";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import socket from "@/utils/socket";

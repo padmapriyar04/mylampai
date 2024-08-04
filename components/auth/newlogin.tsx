@@ -119,13 +119,11 @@ const LogIn: React.FC = () => {
   };
 
   const sendOTP = async () => {
-    // Implement OTP sending logic here
     setOtpSent(true);
     toast.success("OTP sent!");
   };
 
   const verifyOTP = async () => {
-    // Implement OTP verification logic here
     toast.success("OTP verified!");
   };
 
