@@ -6,6 +6,7 @@ const carouselItems = [
   { id: 3, title: 'Resource 3', description: 'Description for Resource 3', image: '/blog/instructor.svg' },
   { id: 4, title: 'Resource 4', description: 'Description for Resource 4', image: '/blog/instructor.svg '},
   { id: 5, title: 'Resource 5', description: 'Description for Resource 5', image: '/blog/instructor.svg' },
+  { id: 5, title: 'Resource 5', description: 'Description for Resource 5', image: '/blog/instructor.svg' },
   // Add more items if needed
 ];
 
@@ -22,11 +23,12 @@ const Carousel = () => {
   }, [numberOfItems, itemsToShow]);
 
   return (
-    <div className='relative w-full px-20'>
+    <div className='relative w-full px-20 text-2xl'>
+        <div className=' w-full p-4  text-3xl font-semibold text-[#8C52FF]'>Suggested Resources  </div>
       <div className='relative w-full overflow-hidden flex justify-center'>
         <div className='flex transition-transform duration-500' style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}>
           {carouselItems.map((item) => (
-            <div key={item.id} className='flex-none w-[calc(100% / 4)] p-4'>
+            <div key={item.id} className='flex-none w-[calc(100% / 4)] shadow-xl p-4'>
               <div className='bg-white shadow-xl rounded-sm overflow-hidden flex flex-col items-center'>
                 <img src={item.image} alt={item.title} className='w-full rounded-lg max-w-[300px] h-48 object-cover mb-3' />
                 <div className='p-4 text-center'>
