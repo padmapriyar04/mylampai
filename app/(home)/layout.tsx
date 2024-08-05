@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import "./../globals.css";
 import { Open_Sans } from "next/font/google";
-import Navbar from "../../components/navbar/Navbar";
 import Flexsidebar from "@/components/misc/Flexsidebar";
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/home/Footer";
+import { Toaster } from "sonner";
 
 const openSans = Open_Sans({ subsets: ["latin"] });
 export const metadata: Metadata = {
@@ -27,6 +27,7 @@ export default function RootLayout({
             {children}
           </div>
         </div>
+        <Toaster/>
         <Footer />
       </body>
     </html>

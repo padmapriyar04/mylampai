@@ -117,6 +117,7 @@ io.on('connection', (socket) => {
                 const savedMessage = await prisma.message.create({
                     data: {
                         content: messageContent,
+                        type: "text",
                         sender: { connect: { id: senderId } },
                         community: { connect: { id: communityId } }
                     },
@@ -163,6 +164,83 @@ io.on('connection', (socket) => {
             console.log(`User ${socket.user.dmId.name} is not connected.`);
         }
     });
+    socket.on("send-image", async (data) => {
+        const { image, selectedCommunityId } = data;
+        const senderId = socket.user?.id;
+        try {
+          const savedMessage = await prisma.message.create({
+            data: {
+                content: image,
+                type: "image",
+                sender: { connect: { id: senderId } },
+                community: { connect: { id: selectedCommunityId } }
+            },
+            include: {
+                sender: true,
+                community: true, 
+            }
+          });
+    
+        
+        io.to(selectedCommunityId).emit('receive-message-community', savedMessage);
+          //socket.to(room).emit('receive-message', { type: 'image', image: savedImage.imageUrl });
+          
+        } catch (error) {
+          console.error("Error saving image to database:", error);
+        }
+      });
+    socket.on("send-video", async (data) => {
+        const { videoUrl, selectedCommunityId } = data;
+        const senderId = socket.user?.id;
+        try {
+          const savedMessage = await prisma.message.create({
+            data: {
+                content: videoUrl,
+                type: "video",
+                sender: { connect: { id: senderId } },
+                community: { connect: { id: selectedCommunityId } }
+            },
+            include: {
+                sender: true,
+                community: true, 
+            }
+          });
+    
+        
+        io.to(selectedCommunityId).emit('receive-message-community', savedMessage);
+        
+        } catch (error) {
+          console.error("Error saving video to database:", error);
+        }
+      });
+    
+      socket.on("send-document", async (data) => {
+        const { documentUrl, selectedCommunityId } = data;
+        console.log("document");
+        const senderId = socket.user?.id;
+        try {
+            const savedMessage = await prisma.message.create({
+              data: {
+                  content: documentUrl,
+                  type: "document",
+                  sender: { connect: { id: senderId } },
+                  community: { connect: { id: selectedCommunityId } }
+              },
+              include: {
+                  sender: true,
+                  community: true, 
+              }
+            });
+      
+          
+          io.to(selectedCommunityId).emit('receive-message-community', savedMessage);
+       
+    
+          console.log(`Only Document saved and emitted to room`);
+        } catch (error) {
+          console.error("Error saving document to database:", error);
+        }
+      });
 
     // Emitting messages to clients
     socket.on('fetch-community-messages', async ({ communityId }) => {
@@ -174,6 +252,7 @@ io.on('connection', (socket) => {
                 select: {
                     id: true,
                     content: true,
+                    type: true,
                     createdAt: true,
                     seenIds: true,
                     communityId: true,
@@ -186,7 +265,7 @@ io.on('connection', (socket) => {
                     }
                 }
             });
-            console.log(messages[0]);
+            console.log(messages);
             socket.emit('receive-message-community', messages);
         } catch (error) {
             console.error('Error fetching community messages:', error);

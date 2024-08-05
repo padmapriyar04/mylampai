@@ -107,7 +107,7 @@ const LogIn: React.FC = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signIn("google", { callbackUrl: "/" });
+      const result = await signIn("google");
       if (result?.error) {
         console.error("Google sign-in error:", result.error);
         toast.error("Google sign-in failed. Please try again.");
@@ -131,16 +131,7 @@ const LogIn: React.FC = () => {
 
   return (
     <div className="bg-purple-200 flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
-      {/* Background Image */}
-      {/*<Image*/}
-      {/*  src={BackgroundImage}*/}
-      {/*  alt="Background"*/}
-      {/*  layout="fill"*/}
-      {/*  objectFit="cover"*/}
-      {/*  quality={100}*/}
-      {/*/> */}
 
-      {/* Logo at the Top Left Corner */}
       <div className="hidden md:block absolute top-8 left-8 z-10">
         {/* <Image src={wiZe} alt="wiZe" className="" /> */}
       </div>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Input from "./Input";
 import CountrySelector from "../misc/CountryFlag";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -12,9 +13,7 @@ import Globe from "../../public/images/Globe.svg";
 import wiZe from "../../public/header/wiZe.png";
 import Arrow from "../../public/images/Arrow.png";
 import Lock from "../../public/images/icons8-lock.svg";
-// import BackgroundImage from "../../public/images/background.jpg";
 
-// Import other carousel images here
 import CarouselImage1 from "../../public/images/Globe.svg";
 import CarouselImage2 from "../../public/images/Globe.svg";
 import CarouselImage3 from "../../public/images/Globe.svg";
@@ -44,6 +43,7 @@ const SignUp: React.FC = () => {
       ...prevUser,
       [name]: value,
     }));
+    console.log(value);
   };
 
   const validateEmail = (email: string) => {
@@ -166,23 +166,8 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="bg-purple-200 flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
-      {/* Background Image */}
-      {/*<Image*/}
-      {/*  src={BackgroundImage}*/}
-      {/*  alt="Background"*/}
-      {/*  layout="fill"*/}
-      {/*  objectFit="cover"*/}
-      {/*  quality={100}*/}
-      {/*/>*/}
-
-      {/* Logo at the Top Left Corner */}
-      <div className="hidden md:block absolute top-8 left-8 z-10">
-        <Image src={wiZe} alt="wiZe" className="" />
-      </div>
-
-      <div className="w-11/12 max-w-7xl z-10">
-        {/* Tabs moved above the main container */}
+    <div className="bg-primary-foreground flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
+      {/* <div className="w-11/12 max-w-7xl z-10">
         <div className="flex justify-start mb-4">
           <div className="space-x-4 font-semibold">
             <button
@@ -207,11 +192,10 @@ const SignUp: React.FC = () => {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="glass bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 shadow-xl hover:shadow-2xl transition-shadow duration-300 w-11/12 max-w-7xl flex flex-col md:flex-row h-auto md:h-3/4 z-20">
-        {/* Left Side with Carousel */}
-        <div className="hidden md:block w-full md:w-1/3 bg-purple-500 rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 flex flex-col items-center justify-between mb-4 md:mb-0 relative">
+      <div className="bg-[#fcfcfc] rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-3 w-full max-w-5xl flex flex-col md:flex-row min-h-[600px] shadow-md">
+        <div className="md:block w-full md:max-w-[350px] bg-purple-500 rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-4 flex flex-col items-center justify-between mb-4 md:mb-0 relative">
           <Carousel
             showThumbs={false}
             showStatus={false}
@@ -266,90 +250,78 @@ const SignUp: React.FC = () => {
           </Carousel>
         </div>
 
-        <div className="w-full md:w-2/3 p-4 md:p-12 flex flex-col justify-center">
-          <div className="text-gray-400 font-semibold">Hey Champ!</div>
-          <div className="text-gray-700 text-4xl font-semibold mb-2">
-            Create your wiZe Account
+        <div className="w-full p-4 md:p-6 flex flex-col justify-center">
+          <div className="text-popover-foreground mb-4 flex flex-col">
+            <div className="text-[#555] text-sm mb-1">Hey Champ!</div>
+            <div className="font-semibold text-[#333] text-2xl ">
+              Create your wiZe Account
+              <div className="h-[1px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full "></div>
+            </div>
           </div>
-          <hr className="border-t border-gray-300 mb-4 md:mb-8 w-3/4" />
 
           <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="flex flex-col md:flex-row md:space-x-4">
-              <input
-                type="text"
+            <div className="flex flex-col md:flex-row gap-4">
+              <Input
                 name="firstName"
                 placeholder="First Name"
+                type="text"
                 value={user.firstName}
                 onChange={handleChange}
-                className="w-full md:w-1/2 p-2 border-2  bg-white border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
               />
-              <input
-                type="text"
+              <Input
                 name="lastName"
                 placeholder="Last Name"
+                type="text"
                 value={user.lastName}
                 onChange={handleChange}
-                className="w-full md:w-1/2 p-2 border-2 bg-white border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
               />
             </div>
 
-            <input
-              type="email"
+            <Input
               name="email"
               placeholder="Email"
+              type="email"
               value={user.email}
               onChange={handleChange}
-              className="w-full p-2 border-2 bg-white border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
             />
 
             <div className="flex flex-col md:flex-row md:space-x-4">
-              <div className="flex items-center w-full md:w-1/4 p-2 border-2 border-purple-100 rounded-xl mb-4 md:mb-0 bg-white">
+              <div className="flex items-center justify-evenly w-full max-w-[150px] border-2 rounded-md mb-4 md:mb-0">
                 <CountrySelector />
               </div>
-              <input
-                type="tel"
+
+              <Input
                 name="phone"
                 placeholder="Phone Number"
+                type="phone"
                 value={user.phone}
                 onChange={handleChange}
-                className="w-full md:w-3/4 p-2 border-2 border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
               />
             </div>
 
             <div className="flex flex-col md:flex-row md:space-x-4 items-center">
-              <input
-                type="password"
+              <Input
                 name="password"
                 placeholder="Password"
+                type="password"
                 value={user.password}
                 onChange={handleChange}
-                className="w-full md:w-1/2 p-2 border-2 border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
               />
-              <div className="relative w-full md:w-1/2 mt-4 md:mt-0">
+              <div className="relative w-full mt-4 md:mt-0">
                 <input
                   type="text"
                   placeholder="Enter OTP"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="w-full p-2 pl-3 pr-24 border-2 border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
+                  className="w-full p-2 pl-3 pr-24 border-2 outline-none focus:border-primary-foreground rounded-md text-black placeholder:text-gray-400 font-semibold hover:border-primary-foreground transition-all duration-300"
                 />
-                {otpSent ? (
-                  <button
-                    type="button"
-                    onClick={verifyOTP}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-500 text-white p-1 rounded-xl text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
-                  >
-                    Verify OTP
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={sendOTP}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-purple-500 text-white p-1 rounded-xl text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
-                  >
-                    Send OTP
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={otpSent ? verifyOTP : sendOTP}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-white py-1 px-3 rounded-md text-sm font-medium transition-all duration-200"
+                >
+                  {otpSent ? "Verify OTP" : "Send OTP"}
+                </button>
               </div>
             </div>
 
@@ -360,30 +332,30 @@ const SignUp: React.FC = () => {
                 placeholder="Secret Key"
                 value={user.secret}
                 onChange={handleChange}
-                className="w-full p-2 border-2 border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
+                className="w-full p-2 border-2 bg-primary-foreground focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
               />
             )}
 
-            <div className="flex items-center space-x-2 mt-4">
+            <div className="flex items-center space-x-2 mt-8">
               <input
                 type="checkbox"
                 checked={agreeToTerms}
                 onChange={(e) => setAgreeToTerms(e.target.checked)}
-                className="form-checkbox h-4 w-4 text-purple-600 transition duration-150 ease-in-out"
+                className="form-checkbox h-6 w-6 accent-primary transition duration-150 ease-in-out"
               />
-              <span className="text-gray-500 text-xs font-semibold">
+              <span className="text-gray-500 text-xs font-medium">
                 All your information is collected, stored, and processed as per
                 our data processing guidelines. By signing up on wiZe, you agree
                 to our{" "}
                 <Link
-                  href="/privacy-policy"
+                  href="/privacypolicy"
                   className="text-purple-500 hover:text-purple-700 transition-colors duration-300"
                 >
                   Privacy Policy
                 </Link>{" "}
                 and{" "}
                 <Link
-                  href="/terms-of-use"
+                  href="/termsandconditions"
                   className="text-purple-500 hover:text-purple-700 transition-colors duration-300"
                 >
                   Terms of Use
@@ -393,19 +365,16 @@ const SignUp: React.FC = () => {
             </div>
 
             <div className="flex justify-between items-center mt-10">
-              <div className="text-gray-500">
-                <span>Already have an account?</span>{" "}
-                <Link
-                  href="/login"
-                  className="text-purple-500 text-sm font-semibold hover:text-purple-700 transition-colors duration-300"
-                >
+              <div className="text-gray-400">
+                <span className="text-sm">Already have an account?</span>{" "}
+                <Link href="/login" className="text-primary font-semibold">
                   Login
                 </Link>
               </div>
               <div className="flex space-x-4">
                 <button
                   type="submit"
-                  className="bg-purple-500 text-white px-4 py-2 rounded-6xl flex items-center space-x-2 md:shadow transition-all duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
+                  className="bg-primary text-white pl-4 pr-2 py-2 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200"
                 >
                   <span>Sign Up</span>
                   <Image src={Arrow} alt="Sign Up Icon" className="w-6 h-6" />

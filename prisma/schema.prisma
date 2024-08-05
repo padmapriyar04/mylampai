@@ -10,6 +10,9 @@ datasource db {
 model User {
   id               String          @id @default(auto()) @map("_id") @db.ObjectId
   email            String?         @unique
+  name             String?
+  emailVerified    DateTime?
+  image            String?
   first_name       String?
   last_name        String?
   phone            String?
@@ -26,6 +29,7 @@ model User {
   sentmessages     Directmessage[] @relation("SenderUser")
   receivedMessages Directmessage[] @relation("ReceiverUser")
   otps             OTP[]
+  sessions         Session[]
 }
 
 model OTP {
@@ -55,6 +59,22 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String   @id @default(auto()) @map("_id") @db.ObjectId
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model UserInfo {
@@ -119,15 +139,19 @@ model Community {
 }
 
 model Message {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  content     String
-  createdAt   DateTime  @default(now())
-  seenIds     String[]  @db.ObjectId
-  seen        User[]    @relation("Seen", fields: [seenIds], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  type      String
+  createdAt DateTime @default(now())
+
+  seenIds String[] @db.ObjectId
+  seen    User[]   @relation("Seen", fields: [seenIds], references: [id])
+
   communityId String    @db.ObjectId
   community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  senderId    String    @db.ObjectId
-  sender      User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  senderId String @db.ObjectId
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
 }
 
 model Directmessage {
