@@ -1,8 +1,7 @@
 import React from 'react';
 import Footer from '@/components/home/Footer';
 import { FaThumbsUp, FaShare, FaDownload } from 'react-icons/fa';
-
-
+import Carousel from "./crousal";
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 
 export default function Read() {
@@ -25,7 +24,7 @@ export default function Read() {
                         <li>Lorem Ipsum</li>
                         <li>Lorem Ipsum</li>
                     </ul>
-                    <div className='border-[1.6px] my-2 border-b-black w-[49%]  mx-auto'></div>
+                    <div className='border-[1.6px] my-2 border-b-black w-[49%] mx-auto'></div>
                     <div className="flex justify-center space-x-4 mt-3 w-full">
                         <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#8C52FF]">
                             <FaFacebookF size={20} color='black' />
@@ -41,7 +40,6 @@ export default function Read() {
                         </a>
                     </div>
                 </div>
-
 
                 {/* Main Content Area */}
                 <div className="w-[60%] px-6 lg:px-[60px] xl:px-[100px] my-8 bg-[#FFFFFF] relative">
@@ -72,11 +70,12 @@ export default function Read() {
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quas quasi suscipit mollitia architecto animi dicta debitis odio praesentium provident excepturi quia nostrum maiores aut, voluptas, aliquam nemo unde commodi cupiditate. Dolorum deserunt culpa, nulla ratione saepe commodi ea hic voluptatibus sit officiis magnam tempore iste tempora ex consectetur quis dolore beatae nobis! Dignissimos odio voluptatibus esse cupiditate iusto non, tempora odit quam. Accusantium cum nihil cumque iusto quam nobis explicabo saepe magni, labore minima, blanditiis ut tempore. Deleniti id ullam cum tempora perspiciatis maxime maiores temporibus perferendis ad illum!
                         </p>
                     </div>
+                    
                 </div>
 
                 {/* Right Sidebar */}
-                <div className="w-[20%]  hidden md:block p-4 my-10 mx-4">
-                    <div className=" text-lg mb-4 font-semibold text-[#8C52FF] shadow-lg py-2">Featured Content :</div>
+                <div className="w-[20%] hidden md:block p-4 my-10 mx-4">
+                    <div className="text-lg mb-4 font-semibold text-[#8C52FF] shadow-lg py-2">Featured Content :</div>
                     <div className="flex items-start mb-4">
                         <img src="/blog/instructor.svg" alt="Title 1" className="w-[28%] mr-4" />
                         <div>
@@ -107,27 +106,27 @@ export default function Read() {
                             </div>
                         </div>
                     </div>
-                    <div className='w-full bg-[#E9DEFF] py-3 px-2 flex justify-center  font-semibold text-[#8C52FF] rounded-xl'>
-                        <div className='flex justify-center items-center items-center mx-8  w-full'>
+                    <div className='w-full bg-[#E9DEFF] py-3 px-2 flex justify-center font-semibold text-[#8C52FF] rounded-xl'>
+                        <div className='flex justify-center items-center mx-8 w-full'>
                             Subscribe to Our Newsletter
                         </div>
                     </div>
 
-                    <div className="flex justify-center items-center w-full  mt-2 p-2 ">
-                        <button className="bg-white text-[#8C52FF]  p-2 w-[20%] flex justify-center">
+                    <div className="flex justify-center items-center w-full mt-2 p-2 ">
+                        <button className="bg-white text-[#8C52FF] p-2 w-[20%] flex justify-center">
                             <FaThumbsUp className="text-lg" />
                         </button>
-                        <button className="bg-white text-[#8C52FF]  p-2 w-[20%] flex justify-center">
+                        <button className="bg-white text-[#8C52FF] p-2 w-[20%] flex justify-center">
                             <FaShare className="text-lg" />
                         </button>
-                        <button className="bg-white text-[#8C52FF]  p-2 w-[20%] flex justify-center">
+                        <button className="bg-white text-[#8C52FF] p-2 w-[20%] flex justify-center">
                             <FaDownload className="text-lg" />
                         </button>
                     </div>
                 </div>
-
             </div>
-
+           
+                        <Carousel />
             {/* Footer */}
             <Footer />
         </div>

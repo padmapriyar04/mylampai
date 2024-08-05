@@ -5,6 +5,8 @@ import HomeNavbar from './bloghomebar';
 import { FaHome } from "react-icons/fa";
 import Image from 'next/image';
 import Read from './readmore';
+import Carousel from "./crousal";
+
 
 export default function BlogId() {
     const [showMore, setShowMore] = useState(false);
@@ -66,7 +68,7 @@ export default function BlogId() {
                 <div className='text-center text-white mt-4'>
                        <button
                         onClick={handleReadMore}
-                        className='mt-4 bg-[#8C52FF] text-white py-2 px-4 rounded-lg'>
+                        className=' text-white py-2 px-4 rounded-lg'>
                         Read More
                     </button>
                 </div>
