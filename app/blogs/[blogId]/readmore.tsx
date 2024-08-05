@@ -1,5 +1,7 @@
 import React from 'react';
 import Footer from '@/components/home/Footer';
+import { FaThumbsUp, FaShare, FaDownload } from 'react-icons/fa';
+
 
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 
@@ -98,13 +100,6 @@ export default function Read() {
                             </div>
                         </div>
                         <div className="flex items-start mb-4">
-                            <img src="/blog/instructor.svg" alt="Title 3" className="w-[28%] mr-4" />
-                            <div className="flex-1">
-                                <h3 className="text-black text-sm">Title 2</h3>
-                                <p className="text-black text-sm">Description for Title 2.</p>
-                            </div>
-                        </div>
-                        <div className="flex items-start mb-4">
                             <img src="/blog/instructor.svg" alt="Title 4" className="w-[28%] mr-4" />
                             <div className="flex-1">
                                 <h3 className="text-black text-sm">Title 2</h3>
@@ -112,11 +107,22 @@ export default function Read() {
                             </div>
                         </div>
                     </div>
+                    <div className='w-full bg-[#E9DEFF] py-3 px-2 flex justify-center  font-semibold text-[#8C52FF] rounded-xl'>
+                        <div className='flex justify-center items-center items-center mx-8  w-full'>
+                            Subscribe to Our Newsletter
+                        </div>
+                    </div>
 
-                    <div className="flex justify-between mt-4 p-3 ">
-                        <button className="bg-white text-red-500 p-2 w-[30%]">Like</button>
-                        <button className="bg-white text-red-500 p-2 w-[30%]">Share</button>
-                        <button className="bg-white text-red-500 p-2 w-[30%]">Download</button>
+                    <div className="flex justify-center items-center w-full  mt-2 p-2 ">
+                        <button className="bg-white text-[#8C52FF]  p-2 w-[20%] flex justify-center">
+                            <FaThumbsUp className="text-lg" />
+                        </button>
+                        <button className="bg-white text-[#8C52FF]  p-2 w-[20%] flex justify-center">
+                            <FaShare className="text-lg" />
+                        </button>
+                        <button className="bg-white text-[#8C52FF]  p-2 w-[20%] flex justify-center">
+                            <FaDownload className="text-lg" />
+                        </button>
                     </div>
                 </div>
 
