@@ -1,19 +1,25 @@
-
-"use client"
-import React, {useState} from 'react';
+"use client";
+import React, { useState, useRef, useEffect } from 'react';
 import HomeNavbar from './bloghomebar';
 import { FaHome } from "react-icons/fa";
 import Image from 'next/image';
 import Read from './readmore';
 import Carousel from "./crousal";
 
-
-export default function BlogId() {
-    const [showMore, setShowMore] = useState(false);
+const BlogId: React.FC = () => {
+    const [showMore, setShowMore] = useState<boolean>(false);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const handleReadMore = () => {
         setShowMore(!showMore);
     };
+
+    useEffect(() => {
+        if (contentRef.current) {
+            contentRef.current.style.maxHeight = showMore ? `${contentRef.current.scrollHeight}px` : '0px';
+        }
+    }, [showMore]);
+
     return (
         <div className='w-full min-h-[100vh] bg-[#000000] flex flex-col'>
             <div className='w-full h-fit border-b-[2px] border-b-white fixed top-0 left-0 z-10'>
@@ -44,10 +50,12 @@ export default function BlogId() {
                     </div>
                     <div className='bg-[#A0A0A0] rounded-xl max-w-[250px] max-h-32 h-20 flex items-center py-3 px-4'>
                         <div className='flex-shrink-0'>
-                            <img
+                            <Image
                                 className='h-12 w-12 rounded-full object-cover bg-red-400'
                                 src='/blog/instructor.svg'
                                 alt='Profile'
+                                width={48}
+                                height={48}
                             />
                         </div>
                         <div className='ml-4'>
@@ -60,22 +68,29 @@ export default function BlogId() {
                     </div>
                 </div>
                 <div className='w-full md:w-[55%] bg-[#D9D9D9] text-black rounded-xl min-h-[350px] h-[60vh] md:h-[60%] flex justify-center items-center my-8 md:my-auto'>
-                ///////
+                    {/* Main Content Area */}
                 </div>
             </div>
             <div className='w-full px-8 md:px-32 py-4 -mt-6'>
                 <hr className='border-white' />
                 <div className='text-center text-white mt-4'>
-                       <button
+                    <button
                         onClick={handleReadMore}
-                        className=' text-white py-2 px-4 rounded-lg'>
+                        className='text-white py-2 px-4 rounded-lg'
+                    >
                         Read More
                     </button>
                 </div>
             </div>
-            {showMore && (
-                <Read/>
-            )}
+            <div
+                ref={contentRef}
+                className={`transition-max-height duration-500 ease-in-out overflow-hidden`}
+                style={{ maxHeight: showMore ? `${contentRef.current?.scrollHeight}px` : '0px' }}
+            >
+                <Read />
+            </div>
         </div>
     );
 }
+
+export default BlogId;
