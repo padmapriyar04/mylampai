@@ -7,7 +7,7 @@ import { CommunityComponent, ResourcesComponent, CompanyComponent } from "./Home
 
 const HomeNavbar = () => {
   const [scroll, setScroll] = useState(false);
-  const { user } = useUserStore(); // Get the user from the Zustand store
+  const { user } = useUserStore(); 
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
