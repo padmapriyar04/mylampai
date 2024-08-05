@@ -13,17 +13,20 @@ export default function Read() {
                         <span className="relative z-10 mb-2">Table of Contents</span>
                         <span className="absolute bottom-0 left-0 w-full h-[1.6px] bg-[#8C52FF]" style={{ width: 'calc(90% - 1rem)', left: '1.5rem' }}></span>
                     </div>
-                    <ul className="list-none txt-sm flex flex-col items-center space-y-4 border-2 border-b-red-400">
+                    <ul className="list-none txt-sm flex flex-col items-center space-y-4">
                         <li>Lorem Ipsum</li>
                         <li>Lorem Ipsum</li>
                         <li>Lorem Ipsum</li>
                         <li>Lorem Ipsum</li>
                         <li>Lorem Ipsum</li>
-                        <li className=''>Lorem Ipsum</li>
+                        <li>Lorem Ipsum</li>
+                        <li>Lorem Ipsum</li>
+                        <li>Lorem Ipsum</li>
                     </ul>
-                    <div className="flex justify-center space-x-4 mt-6 w-full">
+                    <div className='border-[1.6px] my-2 border-b-black w-[49%]  mx-auto'></div>
+                    <div className="flex justify-center space-x-4 mt-3 w-full">
                         <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#8C52FF]">
-                            <FaFacebookF size={20} color='black'  />
+                            <FaFacebookF size={20} color='black' />
                         </a>
                         <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[#8C52FF]">
                             <FaTwitter size={20} color='black' />
@@ -32,7 +35,7 @@ export default function Read() {
                             <FaInstagram size={20} color='black' />
                         </a>
                         <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-[#8C52FF]">
-                            <FaLinkedinIn size={20} color='black'/>
+                            <FaLinkedinIn size={20} color='black' />
                         </a>
                     </div>
                 </div>
@@ -70,10 +73,53 @@ export default function Read() {
                 </div>
 
                 {/* Right Sidebar */}
-                <div className="w-[20%] bg-red-500 hidden md:block p-4">
-                    {/* Sidebar content */}
-                    lhfdiuhvfihvdgi
+                <div className="w-[20%]  hidden md:block p-4 my-10 mx-4">
+                    <div className=" text-lg mb-4 font-semibold text-[#8C52FF] shadow-lg py-2">Featured Content :</div>
+                    <div className="flex items-start mb-4">
+                        <img src="/blog/instructor.svg" alt="Title 1" className="w-[28%] mr-4" />
+                        <div>
+                            <h3 className="text-black text-sm">Title 2</h3>
+                            <p className="text-black text-sm">Description for Title 2.</p>
+                        </div>
+                    </div>
+                    <div className="mb-6">
+                        <div className="flex items-start mb-4">
+                            <img src="/blog/instructor.svg" alt="Title 1" className="w-[28%] mr-4" />
+                            <div className="flex-1">
+                                <h3 className="text-black text-sm">Title 2</h3>
+                                <p className="text-black text-sm">Description for Title 2.</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start mb-4">
+                            <img src="/blog/instructor.svg" alt="Title 2" className="w-[28%] mr-4" />
+                            <div className="flex-1">
+                                <h3 className="text-black text-sm">Title 2</h3>
+                                <p className="text-black text-sm">Description for Title 2.</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start mb-4">
+                            <img src="/blog/instructor.svg" alt="Title 3" className="w-[28%] mr-4" />
+                            <div className="flex-1">
+                                <h3 className="text-black text-sm">Title 2</h3>
+                                <p className="text-black text-sm">Description for Title 2.</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start mb-4">
+                            <img src="/blog/instructor.svg" alt="Title 4" className="w-[28%] mr-4" />
+                            <div className="flex-1">
+                                <h3 className="text-black text-sm">Title 2</h3>
+                                <p className="text-black text-sm">Description for Title 2.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between mt-4 p-3 ">
+                        <button className="bg-white text-red-500 p-2 w-[30%]">Like</button>
+                        <button className="bg-white text-red-500 p-2 w-[30%]">Share</button>
+                        <button className="bg-white text-red-500 p-2 w-[30%]">Download</button>
+                    </div>
                 </div>
+
             </div>
 
             {/* Footer */}
