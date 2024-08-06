@@ -8,24 +8,28 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  email            String?         @unique
-  first_name       String?
-  last_name        String?
-  phone            String?
-  hashedPassword   String?
-  role             String?
-  posts            Modules[]
-  userInfo         UserInfo?
-  accounts         Account[]
-  communityIds     String[]        @db.ObjectId
-  communities      Community[]     @relation(fields: [communityIds], references: [id])
-  seenMessageIds   String[]        @db.ObjectId
-  seenMessages     Message[]       @relation("Seen", fields: [seenMessageIds], references: [id])
-  messages         Message[]
-  sentmessages     Directmessage[] @relation("SenderUser")
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  email          String?   @unique
+  first_name     String?
+  last_name      String?
+  phone          String?
+  hashedPassword String?
+  role           String?
+  posts          Modules[]
+  userInfo       UserInfo?
+  accounts       Account[] 
+
+  communityIds String[]    @db.ObjectId
+  communities  Community[] @relation(fields: [communityIds], references: [id])
+
+  seenMessageIds String[]  @db.ObjectId
+  seenMessages   Message[] @relation("Seen", fields: [seenMessageIds], references: [id])
+
+  messages Message[]
+  sentmessages  Directmessage[] @relation("SenderUser")
+
   receivedMessages Directmessage[] @relation("ReceiverUser")
-  otps             OTP[]
+  otps           OTP[]
 }
 
 model OTP {
@@ -38,7 +42,6 @@ model OTP {
   userId    String?  @db.ObjectId
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
 model Account {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId
   userId            String  @db.ObjectId
@@ -106,43 +109,51 @@ model Lesson {
 }
 
 model Community {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt     DateTime  @default(now())
-  lastmessageAt DateTime  @default(now())
-  name          String    @unique
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt     DateTime @default(now())
+  lastmessageAt DateTime @default(now())
+  name          String   @unique
   description   String?
   isCommunity   Boolean?
-  messagesIds   String?   @db.ObjectId
-  messages      Message[]
-  userIds       String[]  @db.ObjectId
-  users         User[]    @relation(fields: [userIds], references: [id])
+
+  messagesIds String?   @db.ObjectId
+  messages    Message[]
+
+  userIds String[] @db.ObjectId
+  users   User[]   @relation(fields: [userIds], references: [id])
 }
 
 model Message {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  content     String
-  createdAt   DateTime  @default(now())
-  seenIds     String[]  @db.ObjectId
-  seen        User[]    @relation("Seen", fields: [seenIds], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  type      String
+  createdAt DateTime @default(now())
+
+  seenIds String[] @db.ObjectId
+  seen    User[]   @relation("Seen", fields: [seenIds], references: [id])
+
   communityId String    @db.ObjectId
   community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  senderId    String    @db.ObjectId
-  sender      User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  senderId String @db.ObjectId
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
 }
 
 model Directmessage {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  content    String
-  createdAt  DateTime @default(now())
-  seen       Boolean?
-  receiverId String   @db.ObjectId
-  receiver   User     @relation("ReceiverUser", fields: [receiverId], references: [id], onDelete: Cascade)
-  senderId   String   @db.ObjectId
-  sender     User     @relation("SenderUser", fields: [senderId], references: [id], onDelete: Cascade)
-}
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+  seen      Boolean?   
 
+  receiverId String    @db.ObjectId
+  receiver   User      @relation("ReceiverUser", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  senderId String @db.ObjectId
+  sender   User   @relation("SenderUser", fields: [senderId], references: [id], onDelete: Cascade)
+}
 model Blog {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String
   authorName  String
@@ -152,9 +163,9 @@ model Blog {
 }
 
 model Section {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  blogId     String @db.ObjectId
-  subheading String
-  content    String
-  blog       Blog   @relation(fields: [blogId], references: [id])
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  blogId      String
+  subheading  String
+  content     String
+  blog        Blog       @relation(fields: [blogId], references: [id])
 }
