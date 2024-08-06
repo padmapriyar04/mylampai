@@ -64,36 +64,66 @@ export default function Community() {
     setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
   };
 
-  const crossCheck = async (communityId: string) => {
-    try {
-      const response = await fetch(`/api/community/${communityId}/crosscheck`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("dats:", data.message);
-        if (data.message == "No") {
-          setLeftRoom("yes");
-        }
-        await fetchCommunities();
-      } else {
-        console.error("Error joining community:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error joining community:", error);
-    }
-  };
-
+  
   useEffect(() => {
+    const crossCheck = async (communityId: string) => {
+      try {
+        const response = await fetch(`/api/community/${communityId}/crosscheck`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log("dats:", data.message);
+          if (data.message == "No") {
+            setLeftRoom("yes");
+          }
+          await fetchCommunities();
+        } else {
+          console.error("Error joining community:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error joining community:", error);
+      }
+    };
     if (selectedCommunityId !== null) {
       crossCheck(selectedCommunityId);
     }
   }, [selectedCommunityId]);
-
+  
   useEffect(() => {
+    const processMessage = (message: Message) => {
+      console.log(message.type);
+      switch (message.type) {
+        case "image":
+          const ImageUrl = base64ToBlobUrl(message.content, "image/png");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: ImageUrl, type: "image" },
+          ]);
+          break;
+        case "video":
+          const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: VideoUrl, type: "video" },
+          ]);
+          break;
+        case "document":
+          const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: mediaUrl, type: "document" },
+          ]);
+          break;
+        case "text":
+        default:
+          setMessages((prevMessages) => [...prevMessages, message]);
+          break;
+      }
+    };
     if (selectedCommunityId !== null) {
       const handleNewMessages = (newMessages: Message[]) => {
         // Check if the data is a single message or an array
@@ -118,36 +148,6 @@ export default function Community() {
     }
   }, [selectedCommunityId]);
 
-  const processMessage = (message: Message) => {
-    console.log(message.type);
-    switch (message.type) {
-      case "image":
-        const ImageUrl = base64ToBlobUrl(message.content, "image/png");
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...message, content: ImageUrl, type: "image" },
-        ]);
-        break;
-      case "video":
-        const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...message, content: VideoUrl, type: "video" },
-        ]);
-        break;
-      case "document":
-        const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...message, content: mediaUrl, type: "document" },
-        ]);
-        break;
-      case "text":
-      default:
-        setMessages((prevMessages) => [...prevMessages, message]);
-        break;
-    }
-  };
 
   const base64ToBlobUrl = (base64: string, type: string) => {
     const byteCharacters = atob(base64.split(",")[1]);
