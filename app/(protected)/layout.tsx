@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
-import React from "react";
+import { Toaster } from "@/components/ui/sonner";
 import HomeNavbar from "../../components/home/HomeNavbar";
 
 import Flexsidebar from "@/components/misc/Flexsidebar";
@@ -38,6 +38,7 @@ export default function ProtectedLayout({
     <html lang="en" className="scroll-smooth focus:scroll-auto">
       <body className={`${openSans.className} bg-primary-foreground`}>
         <HomeNavbar />
+        <Toaster />
         <div className="flex h-full transition-all duration-300 ">
           {/* Sidebar */}
           <Flexsidebar />

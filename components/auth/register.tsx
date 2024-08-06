@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import prisma from "@/lib";
-import bcrypt from "bcrypt";
-import { connectToDatabase } from "@/app/helpers/server";
+// import prisma from "@/lib";
+// import bcrypt from "bcrypt";
+// import { connectToDatabase } from "@/app/helpers/server";
 import Link from "next/link";
 
 export default function Register() {
