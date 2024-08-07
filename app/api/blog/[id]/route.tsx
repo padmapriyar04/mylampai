@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
-import prisma from "@/lib";
+import prisma from "@/lib/index";
 
-export const GET = async (request: NextRequest) => {
+export async function GET (request: NextRequest) {
   try {
     const id = request.url.split("/blog/")[1];
     const post = await prisma.blog.findFirst({ where: { id } });
@@ -23,6 +23,7 @@ export const PUT = async (request: NextRequest) => {
     const { title, description, authorName, position, sections, image } =
       formDataObj;
     console.log(id);
+
     const post = await prisma.blog.update({
       where: { id },
       data: {
