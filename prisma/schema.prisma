@@ -149,6 +149,9 @@ model Blog {
   position    String
   sections    Section[]
   image       String
+  tags        String[]
+  createdAt   DateTime @default(now())
+
 }
 
 model Section {
