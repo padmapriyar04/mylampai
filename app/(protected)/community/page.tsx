@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import React, { useState, useEffect } from "react";
 import Carousel from "@/components/community/NewCarousel";
-import { toast } from "sonner";
 import socket from "@/utils/socket";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface Community {
   id: string;
@@ -342,59 +342,60 @@ export default function Community() {
               </button>
             </div>
             <div className="w-full gap-3 flex flex-col justify-center">
-              {communities.map((community) => (
-                <div
-                  key={community.id}
-                  className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
-                  onClick={() => {
-                    toggleHeading(community.name, community.id);
-                    handleSmScreen();
-                  }}
-                >
-                  <div className="flex flex-row items-center">
-                    <div className="w-[80px] p-1">
-                      <Image
-                        src="/community/WebDev.svg" // Use a default icon or handle appropriately
-                        alt="img"
-                        height={10}
-                        width={10}
-                        className="w-full"
-                      />
+              {communities &&
+                communities.map((community) => (
+                  <div
+                    key={community.id}
+                    className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
+                    onClick={() => {
+                      toggleHeading(community.name, community.id);
+                      handleSmScreen();
+                    }}
+                  >
+                    <div className="flex flex-row items-center">
+                      <div className="w-[80px] p-1">
+                        <Image
+                          src="/community/WebDev.svg" // Use a default icon or handle appropriately
+                          alt="img"
+                          height={10}
+                          width={10}
+                          className="w-full"
+                        />
+                      </div>
+                      <span className="pl-5">
+                        {capitalizeFirstLetterOfEachWord(community.name)}
+                      </span>
                     </div>
-                    <span className="pl-5">
-                      {capitalizeFirstLetterOfEachWord(community.name)}
-                    </span>
+                    <div>
+                      {community.messagesIds &&
+                        community.messagesIds.length > 0 && (
+                          <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
+                            {community.messagesIds.length}
+                          </div>
+                        )}
+                    </div>
+                    <div>
+                      <button
+                        className="text-sm font-semibold text-red-500 mr-4"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          leaveCommunity(community.id);
+                        }}
+                      >
+                        Leave
+                      </button>
+                      <button
+                        className="text-sm font-semibold text-green-500 mr-4"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          joinCommunity(community.id);
+                        }}
+                      >
+                        Join
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    {community.messagesIds &&
-                      community.messagesIds.length > 0 && (
-                        <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
-                          {community.messagesIds.length}
-                        </div>
-                      )}
-                  </div>
-                  <div>
-                    <button
-                      className="text-sm font-semibold text-red-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        leaveCommunity(community.id);
-                      }}
-                    >
-                      Leave
-                    </button>
-                    <button
-                      className="text-sm font-semibold text-green-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        joinCommunity(community.id);
-                      }}
-                    >
-                      Join
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
@@ -475,7 +476,7 @@ export default function Community() {
                           height={100}
                           src={message.content}
                           alt="Uploaded"
-                          // style={{ maxWidth: "100%", marginTop: "10px" }}
+                          // style={{ maxWidth: "100%", marginTop: "10px" }}jj
                           className="w-full mt-2"
                         />
                       ) : message.type === "video" ? (
