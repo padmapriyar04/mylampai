@@ -12,24 +12,24 @@ interface Data {
 
 const whyWizeLinks = [
   {
-    id: "allroundassistance",
-    text: "All round assistance",
+    id: "allroundguidance",
+    text: "All round guidance",
   },
   {
-    id: "practice",
-    text: "Practice",
+    id: "pathtosuccess",
+    text: "Path To Success",
   },
   {
     id: "smartestplatform",
     text: "Smartest Platform",
   },
   {
-    id: "experiencedcounsellors",
-    text: "Experienced Counsellors",
+    id: "expertsinsights",
+    text: "Experts Insights",
   },
   {
-    id: "ourwinningrecord",
-    text: "Our Winning Record",
+    id: "advancedfeatures",
+    text: "Advanced Features",
   },
 ];
 
@@ -62,20 +62,21 @@ export default function WhyWize() {
           </div>
           <div className="md:border-l-4 md:border-[#baa1eb] px-6 lg:px-[60px] xl:px-[100px] relative">
             <div
-              id="allroundassistance"
+              id="allroundguidance"
               className="pb-[50px] sm:pb-[100px] focus:text-[#8C52FF] sm:min-h-[700px]"
             >
               <h4 className="pt-4 font-semibold text-[#8C52FF]">
-                ALL ROUND ASSISTANCE
+                ALL ROUND GUIDANCE
                 <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 md:top-0 translate-x-[-14px] translate-y-[-100%] md:translate-y-[-50%]"></div>
               </h4>
               <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
                 To make it happen for you
               </div>
               <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-                Everything you need, we got it! Shortlisting - yup, documents
-                editing - yes, application support - yeah, scholarships - yus,
-                loan & visa - in-house!
+                Everything you need, we got it! Career Exploration - yup,
+                Personalized learning - yes, Competitions, hackathons, acads-
+                yeah, projects and practice - yus, CV building and test and
+                Interview prep - in-house AI!
               </p>
               <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
             </div>
@@ -91,29 +92,35 @@ export default function WhyWize() {
                 <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
               </h4>
               <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-                100% online for your comfort
+                100% online and designed for your comfort and engaging learning
+                experience
               </div>
               <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-                Reach your counsellor with just a text or a call, track your
-                entire process in one place, and never miss an update! Our
-                platform will take care of you!
+                From starting your college journey to your placement and even
+                post-college, we provide comprehensive guidance. Just keep
+                showing up and stay engaged, and our AI-powered platform will
+                take care of you!
               </p>
               <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
             </div>
 
             <ExperiencedCounsellors />
 
-            <div id="ourwinningrecord" className=" sm:min-h-[700px]">
+            <div id="advancedfeatures" className=" sm:min-h-[700px]">
               <h4 className="pt-4 font-semibold text-[#8C52FF]">
-                OUR WINNING RECORD
+                ADVANCED FEATURES
                 <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
               </h4>
               <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-                Because you deserve only the Best!
+                Important features that’ll sometimes be your buddy, sometimes
+                your saviour
               </div>
               <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-                ESome advices can come only from experience. And we have a lot
-                of that! Check out our numbers and see for yourselves...
+                Whether it&apos;s an AI-powered smart community that helps you
+                learn and grow with peers in a unique and engaging way, or
+                assessments that aid in self-evaluation, these features will
+                cover all the gaps in your career journey, making your college
+                and career path smooth.
               </p>
               <div className="flex flex-wrap justify-center gap-4 min-h-[400px] w-full my-8 rounded-2xl">
                 <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>

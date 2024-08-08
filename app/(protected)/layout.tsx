@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { Toaster } from "@/components/ui/sonner";
 import HomeNavbar from "../../components/home/HomeNavbar";
+// import Head from "next/head";
 
 import Flexsidebar from "@/components/misc/Flexsidebar";
 

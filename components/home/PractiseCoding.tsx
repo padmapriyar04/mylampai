@@ -14,17 +14,15 @@ const PracticeCards = () => {
         {/* <div className="flex justify-start flex-col sm:flex-row-reverse items-center rounded-2xl border-2 border-[#eee] overflow-hidden bg-red-50" > */}
         <div
           onMouseEnter={() => handleMouseEnter(1)}
-          className={`group w-full border-y-2 sm:border-y-0 cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${
-            expanded === 1
-              ? "bg-[#CBDEF4] sm:max-w-[400px]"
-              : "bg-white sm:max-w-[225px]"
-          }`}
+          className={`group w-full border-y-2 sm:border-y-0 cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${expanded === 1
+            ? "bg-[#CBDEF4] sm:max-w-[400px]"
+            : "bg-white sm:max-w-[225px]"
+            }`}
         >
           <h2 className="text-xl font-semibold">
             <span
-              className={`text-base p-2 rounded-full duration-400 transition-all ${
-                expanded === 1 ? "bg-white" : "bg-[#cbdef4]"
-              }`}
+              className={`text-base p-2 rounded-full duration-400 transition-all ${expanded === 1 ? "bg-white" : "bg-[#cbdef4]"
+                }`}
             >
               &lt;/&gt;
             </span>
@@ -43,17 +41,15 @@ const PracticeCards = () => {
 
         <div
           onMouseEnter={() => handleMouseEnter(2)}
-          className={`group w-full border-y-2 sm:border-y-0 sm:border-x-2 border-[#eee] cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${
-            expanded === 2
-              ? "bg-[#C8BBFF] sm:max-w-[400px]"
-              : "bg-white sm:max-w-[225px]"
-          }`}
+          className={`group w-full border-y-2 sm:border-y-0 sm:border-x-2 border-[#eee] cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${expanded === 2
+            ? "bg-[#C8BBFF] sm:max-w-[400px]"
+            : "bg-white sm:max-w-[225px]"
+            }`}
         >
           <h2 className="text-xl font-semibold">
             <span
-              className={`text-base p-2 rounded-full duration-400 transition-all ${
-                expanded === 2 ? "bg-white" : "bg-[#c8bbff]"
-              }`}
+              className={`text-base p-2 rounded-full duration-400 transition-all ${expanded === 2 ? "bg-white" : "bg-[#c8bbff]"
+                }`}
             >
               &lt;/&gt;
             </span>
@@ -72,17 +68,15 @@ const PracticeCards = () => {
 
         <div
           onMouseEnter={() => handleMouseEnter(3)}
-          className={`group w-full border-y-2 sm:border-y-0 cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${
-            expanded === 3
-              ? "bg-[#fff1cc] sm:max-w-[400px]"
-              : "bg-white sm:max-w-[225px]"
-          }`}
+          className={`group w-full border-y-2 sm:border-y-0 cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${expanded === 3
+            ? "bg-[#fff1cc] sm:max-w-[400px]"
+            : "bg-white sm:max-w-[225px]"
+            }`}
         >
           <h2 className="text-xl font-semibold">
             <span
-              className={`text-base p-2 rounded-full duration-400 transition-all ${
-                expanded === 3 ? "bg-white" : "bg-[#fff1cc]"
-              }`}
+              className={`text-base p-2 rounded-full duration-400 transition-all ${expanded === 3 ? "bg-white" : "bg-[#fff1cc]"
+                }`}
             >
               &lt;/&gt;
             </span>
@@ -105,17 +99,16 @@ const PracticeCards = () => {
 
 const PracticeCoding = () => {
   return (
-    <div id="practice" className="pb-[100px] min-h-screen">
+    <div id="pathtosuccess" className="pb-[100px] min-h-screen">
       <h4 className="pt-4 font-semibold text-[#8C52FF]">
-        PRACTICE
+        PATH TO SUCCESS
         <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
       </h4>
       <div className="text-3xl font-medium mt-8 mb-4">
-        Practice Coding & Ace Hiring Assessments
+        Explore, Learn and Achieve your dream Career
       </div>
       <p className="text-[#000000BB] font-medium my-4">
-        Level up your coding skills by practicing the hiring assessments of your
-        dream companies & ace your placement game!
+        Empowering you to explore a variety of domains, learn new skills in a personalised way, and craft a unique path to success, helping  you uncover your passions and reach your full potential, making your career aspirations a reality.
       </p>
       <PracticeCards />
     </div>

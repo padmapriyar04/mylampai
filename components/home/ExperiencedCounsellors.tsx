@@ -85,18 +85,19 @@ const BulletCard: React.FC<BulletCardProps> = ({ title, description }) => {
 const ExperiencedCounsellors = () => {
   return (
     <>
-      <div id="experiencedcounsellors" className="pb-[100px] min-h-screen">
+      <div id="expertsinsights" className="pb-[100px] min-h-screen">
         <h4 className="pt-4 font-semibold text-primary">
-          EXPERIENCED COUNSELLORS
+          EXPERTS INSIGHTS
           <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
         </h4>
         <div className="text-3xl font-medium mt-8 mb-4">
-          15+ years of expertise, within your reach
+          Expertise of 1,000+ industry professionals and experts at your reach
         </div>
         <p className="text-[#000000BB] font-medium my-4">
-          For every phase of your journey, we&apos;ll get you a specialised,
-          dedicated counsellor! Check out the counsellors & their records
-          yourselves.
+          For every phase of your college and career journey, we&apos;ve got you
+          covered. Our models are trained on extensive quality data and curated
+          insights from experienced industry and subject matter experts, guiding
+          you to your dream path.
         </p>
         <div className="w-full my-8 rounded-2xl shadow-md">
           <Carousel>

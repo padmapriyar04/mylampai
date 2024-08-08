@@ -207,7 +207,7 @@ export default function Footer() {
             </div>
           </div>
           <div className="mt-4 text-2xl text-center mx-auto translate-y-3">
-            Copyright &copy; 2023 myLamp AI - All rights reserved
+            Copyright &copy; 2024 myLamp AI - All rights reserved
             <div className="h-[1px] w-full bg-white"></div>
           </div>
         </div>
