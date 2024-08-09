@@ -60,6 +60,16 @@ const LogIn: React.FC = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!credentials.email || !credentials.password) {
+      toast.error("Please enter both email and password.");
+      return;
+    }
+
+    if (!validateEmail(credentials.email)) {
+      toast.error("Please enter a valid Gmail address.");
+      return;
+    }
+
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",

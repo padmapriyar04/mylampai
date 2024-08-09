@@ -258,7 +258,7 @@
 
 "use client";
 import { useUserStore } from "@/utils/userStore";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -290,41 +290,19 @@ const QuestionPage: React.FC = () => {
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const router = useRouter();
   const currentPage = pageData[currentPageIndex];
-  const { token } = useUserStore();
 
-  const saveUserInfo = async () => {
-    const userInfo = {
-      college: answers[0],
-      degree: answers[1],
-      course: answers[2],
-      graduationYear: answers[3],
-      score: answers[4],
-      domain: answers[5],
-      skills: Object.values(answers[6] || {}),
-      skillLevel: answers[7],
-    };
-
-    try {
-      const response = await fetch("/api/user/update-info", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(userInfo),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("User info updated successfully:", data.user);
-        router.push("/studentDashboard");
-      } else {
-        console.error("Failed to update user info");
-      }
-    } catch (error) {
-      console.error("Error updating user info:", error);
+  // Load answers from localStorage on component mount
+  useEffect(() => {
+    const savedAnswers = localStorage.getItem("questionnaireAnswers");
+    if (savedAnswers) {
+      setAnswers(JSON.parse(savedAnswers));
     }
-  };
+  }, []);
+
+  // Save answers to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("questionnaireAnswers", JSON.stringify(answers));
+  }, [answers]);
 
   const handleSelection = (value: string) => {
     setAnswers((prev) => ({ ...prev, [currentPageIndex]: value }));
@@ -348,7 +326,8 @@ const QuestionPage: React.FC = () => {
     if (currentPageIndex < pageData.length - 1) {
       setCurrentPageIndex(currentPageIndex + 1);
     } else {
-      router.push("/studentDashboard");
+      // Navigate to the answers page instead of saving to DB
+      router.push("/view-answers");
     }
   };
 
