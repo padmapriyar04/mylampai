@@ -257,11 +257,11 @@
 // export default QuestionPage;
 
 "use client";
-import React, { useState } from "react";
+import { useUserStore } from "@/utils/userStore";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -289,8 +289,20 @@ const QuestionPage: React.FC = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const router = useRouter();
-
   const currentPage = pageData[currentPageIndex];
+
+  // Load answers from localStorage on component mount
+  useEffect(() => {
+    const savedAnswers = localStorage.getItem("questionnaireAnswers");
+    if (savedAnswers) {
+      setAnswers(JSON.parse(savedAnswers));
+    }
+  }, []);
+
+  // Save answers to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("questionnaireAnswers", JSON.stringify(answers));
+  }, [answers]);
 
   const handleSelection = (value: string) => {
     setAnswers((prev) => ({ ...prev, [currentPageIndex]: value }));
@@ -314,7 +326,8 @@ const QuestionPage: React.FC = () => {
     if (currentPageIndex < pageData.length - 1) {
       setCurrentPageIndex(currentPageIndex + 1);
     } else {
-      router.push("/studentDashboard");
+      // Navigate to the answers page instead of saving to DB
+      router.push("/view-answers");
     }
   };
 

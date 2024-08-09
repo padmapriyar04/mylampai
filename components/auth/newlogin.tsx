@@ -82,18 +82,29 @@ const LogIn: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
-        // Store user data and token in local storage
-        setUser(data.user, data.token);
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        // Fetch user details immediately after successful login
+        const userResponse = await fetch("/api/user/profile", {
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        });
 
-        toast.success("Login successful!");
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          // Store user data and token in Zustand store
+          setUser(userData, data.token);
+          localStorage.setItem("token", data.token);
 
-        // Redirect based on role
-        if (data.user.role === "admin") {
-          router.push("/adminDashboard");
+          toast.success("Login successful!");
+
+          // Redirect based on role
+          if (userData.role === "admin") {
+            router.push("/adminDashboard");
+          } else {
+            router.push("/questions");
+          }
         } else {
-          router.push("/questions");
+          throw new Error("Failed to fetch user data");
         }
       } else {
         const errorData = await response.json();
@@ -131,7 +142,6 @@ const LogIn: React.FC = () => {
 
   return (
     <div className="bg-purple-200 flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
-
       <div className="hidden md:block absolute top-8 left-8 z-10">
         {/* <Image src={wiZe} alt="wiZe" className="" /> */}
       </div>
