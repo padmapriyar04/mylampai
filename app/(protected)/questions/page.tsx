@@ -257,11 +257,11 @@
 // export default QuestionPage;
 
 "use client";
+import { useUserStore } from "@/utils/userStore";
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -289,8 +289,42 @@ const QuestionPage: React.FC = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const router = useRouter();
-
   const currentPage = pageData[currentPageIndex];
+  const { token } = useUserStore();
+
+  const saveUserInfo = async () => {
+    const userInfo = {
+      college: answers[0],
+      degree: answers[1],
+      course: answers[2],
+      graduationYear: answers[3],
+      score: answers[4],
+      domain: answers[5],
+      skills: Object.values(answers[6] || {}),
+      skillLevel: answers[7],
+    };
+
+    try {
+      const response = await fetch("/api/user/update-info", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(userInfo),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("User info updated successfully:", data.user);
+        router.push("/studentDashboard");
+      } else {
+        console.error("Failed to update user info");
+      }
+    } catch (error) {
+      console.error("Error updating user info:", error);
+    }
+  };
 
   const handleSelection = (value: string) => {
     setAnswers((prev) => ({ ...prev, [currentPageIndex]: value }));
