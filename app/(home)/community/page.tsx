@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import socket from "@/utils/socket";
 import { useUserStore } from "@/utils/userStore";
+import { IoSend } from "react-icons/io5";
 
 // Define the Community and Message types
 interface Community {
@@ -89,6 +90,43 @@ export default function Community() {
     }
   };
 
+  const fetchNormalCommunities = async () => {
+    try {
+      const response = await fetch("/api/community/getAll");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+
+      // Log the full data to verify the structure
+      console.log("Fetched data:", data);
+
+      // Ensure data.communities exists and is an array
+      if (Array.isArray(data.communities)) {
+        // Log the type of each community to check for discrepancies
+        data.communities.forEach((community: Community) => {
+          console.log(`Community comm_type: ${community.comm_type}`);
+        });
+
+        // Filter for normal communities
+        const normal = data.communities.filter(
+          (community: Community) => community.comm_type === "Normal"
+        );
+        console.log("Normal communities:", normal); // Debug statement
+        setNormalCommunities(normal);
+      } else {
+        throw new Error("Invalid data format");
+      }
+    } catch (error) {
+      console.error("Error fetching normal communities:", error);
+      setError("Failed to load communities.");
+    }
+  };
+
+  useEffect(() => {
+    fetchNormalCommunities();
+  }, []);
+
   useEffect(() => {
     const userIdFromLocalStorage = localStorage.getItem("userId");
     if (userIdFromLocalStorage) {
@@ -102,12 +140,15 @@ export default function Community() {
   useEffect(() => {
     const crossCheck = async (communityId: string) => {
       try {
-        const response = await fetch(`/api/community/${communityId}/crosscheck`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
-          },
-        });
+        const response = await fetch(
+          `/api/community/${communityId}/crosscheck`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
+            },
+          }
+        );
         if (response.ok) {
           const data = await response.json();
           console.log("dats:", data.message);
@@ -116,17 +157,16 @@ export default function Community() {
           }
           await fetchCommunities();
         } else {
-          console.error("Error checking community membership:", response.statusText);
+          console.error(
+            "Error checking community membership:",
+            response.statusText
+          );
         }
       } catch (error) {
         console.error("Error checking community membership:", error);
       }
-    } catch (error) {
-      console.error("Error joining community:", error);
-    }
-  };
+    };
 
-  useEffect(() => {
     if (selectedCommunityId !== null) {
       crossCheck(selectedCommunityId);
     }
@@ -195,70 +235,6 @@ export default function Community() {
     const blob = new Blob([byteNumbers], { type });
     return URL.createObjectURL(blob);
   };
-
-  useEffect(() => {
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
-
-  const fetchCommunities = async () => {
-    try {
-      const response = await fetch("/api/community/getAll");
-      const data = await response.json();
-      setCommunities(data.communities);
-    } catch (error) {
-      console.error("Error fetching communities:", error);
-    }
-  };
-
-  const fetchNormalCommunities = async () => {
-    try {
-      const response = await fetch("/api/community/getAll");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-
-      // Log the full data to verify the structure
-      console.log("Fetched data:", data);
-
-      // Ensure data.communities exists and is an array
-      if (Array.isArray(data.communities)) {
-        // Log the type of each community to check for discrepancies
-        data.communities.forEach((community: Community) => {
-          console.log(`Community comm_type: ${community.comm_type}`);
-        });
-
-        // Filter for normal communities
-        const normal = data.communities.filter(
-          (community: Community) => community.comm_type === "Normal"
-        );
-        console.log("Normal communities:", normal); // Debug statement
-        setNormalCommunities(normal);
-      } else {
-        throw new Error("Invalid data format");
-      }
-    } catch (error) {
-      console.error("Error fetching normal communities:", error);
-      setError("Failed to load communities.");
-    }
-  };
-
-  useEffect(() => {
-    fetchNormalCommunities();
-  }, []);
-
-  useEffect(() => {
-    const userIdFromLocalStorage = localStorage.getItem("userId");
-    if (userIdFromLocalStorage) {
-      setUserId(userIdFromLocalStorage);
-      console.log(userIdFromLocalStorage);
-    }
-
-    fetchCommunities();
-  }, []);
 
   const capitalizeFirstLetterOfEachWord = (text: string) => {
     return text.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -394,25 +370,25 @@ export default function Community() {
                     }}
                   >
                     <div>
-                    <button
-                      className="text-sm font-semibold text-red-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        leaveCommunity(community.id);
-                      }}
-                    >
-                      Leave
-                    </button>
-                    <button
-                      className="text-sm font-semibold text-green-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        joinCommunity(community.id);
-                      }}
-                    >
-                      Join
-                    </button>
-                  </div>
+                      <button
+                        className="text-sm font-semibold text-red-500 mr-4"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          leaveCommunity(community.id);
+                        }}
+                      >
+                        Leave
+                      </button>
+                      <button
+                        className="text-sm font-semibold text-green-500 mr-4"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          joinCommunity(community.id);
+                        }}
+                      >
+                        Join
+                      </button>
+                    </div>
                     <div className="flex flex-row items-center flex-grow">
                       <div className="w-10 h-10 p-1">
                         <Image
@@ -436,27 +412,7 @@ export default function Community() {
                         )}
                     </div>
                   </div>
-                  <div>
-                    {community.messagesIds &&
-                      community.messagesIds.length > 0 && (
-                        <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
-                          {community.messagesIds.length}
-                        </div>
-                      )}
-                  </div>
-                  <div>
-                    <button
-                      className="text-sm font-semibold text-green-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        joinCommunity(community.id);
-                      }}
-                    >
-                      Join
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
@@ -584,7 +540,9 @@ export default function Community() {
                     id="file-input"
                     type="file"
                     accept="image/*,video/*,.pdf,.doc,.docx"
-                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                    onChange={(e) =>
+                      setFile(e.target.files ? e.target.files[0] : null)
+                    }
                     className="hidden"
                   />
                   <button
