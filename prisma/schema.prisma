@@ -132,6 +132,7 @@ model Community {
   name          String    @unique
   description   String?
   isCommunity   Boolean?
+  comm_type     String
   messagesIds   String?   @db.ObjectId
   messages      Message[]
   userIds       String[]  @db.ObjectId

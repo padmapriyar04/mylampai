@@ -2,12 +2,45 @@
 
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import Carousel from "@/components/community/NewCarousel";
-import socket from "@/utils/socket";
+import Carousel from "../../../components/community/NewCarousel";
 import { toast } from "sonner";
-import { IoSend } from "react-icons/io5";
+import { Toaster } from "@/components/ui/sonner";
+import socket from "@/utils/socket";
+import { useUserStore } from "@/utils/userStore";
+
+// Define the Community and Message types
+interface Community {
+  id: string;
+  createdAt: string;
+  lastmessageAt: string;
+  name: string;
+  description: string;
+  isCommunity: boolean;
+  messagesIds: any;
+  userIds: string[];
+  comm_type: "Exclusive" | "Normal";
+}
+
+interface Sender {
+  id: string;
+  first_name: string;
+}
+
+interface Message {
+  id: string;
+  type: "image" | "video" | "document" | "text";
+  content: string;
+  createdAt: string;
+  seenIds: string[];
+  communityId: string;
+  senderId: string;
+  sender: Sender;
+}
 
 export default function Community() {
+  const userStore = useUserStore();
+  const [error, setError] = useState<string | null>(null);
+  const token = useUserStore((state) => state.token);
   const [messageHeading, setMessageHeading] = useState<string>("");
   const [icon, setIcon] = useState<string>("");
   const [smScreen, setSmScreen] = useState<boolean>(false);
@@ -16,9 +49,14 @@ export default function Community() {
   const [userId, setUserId] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
+    null
+  );
   const [leftRoom, setLeftRoom] = useState<string>("no");
-  const [file, setFile] = useState<File | null>(null);
+  const [image, setImage] = useState<File | null>(null);
+  const [video, setVideo] = useState<File | null>(null);
+  const [document, setDocument] = useState<File | null>(null);
+  const [normalCommunities, setNormalCommunities] = useState<Community[]>([]);
 
   const toggleHeading = (text: string, communityId: string) => {
     setSelectedCommunityId(communityId);
@@ -83,43 +121,18 @@ export default function Community() {
       } catch (error) {
         console.error("Error checking community membership:", error);
       }
-    };
+    } catch (error) {
+      console.error("Error joining community:", error);
+    }
+  };
+
+  useEffect(() => {
     if (selectedCommunityId !== null) {
       crossCheck(selectedCommunityId);
     }
   }, [selectedCommunityId]);
 
   useEffect(() => {
-    const processMessage = (message: Message) => {
-      console.log(message.type);
-      switch (message.type) {
-        case "image":
-          const ImageUrl = base64ToBlobUrl(message.content, "image/png");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { ...message, content: ImageUrl, type: "image" },
-          ]);
-          break;
-        case "video":
-          const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { ...message, content: VideoUrl, type: "video" },
-          ]);
-          break;
-        case "document":
-          const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { ...message, content: mediaUrl, type: "document" },
-          ]);
-          break;
-        case "text":
-        default:
-          setMessages((prevMessages) => [...prevMessages, message]);
-          break;
-      }
-    };
     if (selectedCommunityId !== null) {
       const handleNewMessages = (newMessages: Message[]) => {
         if (Array.isArray(newMessages)) {
@@ -142,6 +155,37 @@ export default function Community() {
     }
   }, [selectedCommunityId]);
 
+  const processMessage = (message: Message) => {
+    console.log(message.type);
+    switch (message.type) {
+      case "image":
+        const ImageUrl = base64ToBlobUrl(message.content, "image/png");
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { ...message, content: ImageUrl, type: "image" },
+        ]);
+        break;
+      case "video":
+        const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { ...message, content: VideoUrl, type: "video" },
+        ]);
+        break;
+      case "document":
+        const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { ...message, content: mediaUrl, type: "document" },
+        ]);
+        break;
+      case "text":
+      default:
+        setMessages((prevMessages) => [...prevMessages, message]);
+        break;
+    }
+  };
+
   const base64ToBlobUrl = (base64: string, type: string) => {
     const byteCharacters = atob(base64.split(",")[1]);
     const byteNumbers = new Uint8Array(byteCharacters.length);
@@ -152,6 +196,70 @@ export default function Community() {
     return URL.createObjectURL(blob);
   };
 
+  useEffect(() => {
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  const fetchCommunities = async () => {
+    try {
+      const response = await fetch("/api/community/getAll");
+      const data = await response.json();
+      setCommunities(data.communities);
+    } catch (error) {
+      console.error("Error fetching communities:", error);
+    }
+  };
+
+  const fetchNormalCommunities = async () => {
+    try {
+      const response = await fetch("/api/community/getAll");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+
+      // Log the full data to verify the structure
+      console.log("Fetched data:", data);
+
+      // Ensure data.communities exists and is an array
+      if (Array.isArray(data.communities)) {
+        // Log the type of each community to check for discrepancies
+        data.communities.forEach((community: Community) => {
+          console.log(`Community comm_type: ${community.comm_type}`);
+        });
+
+        // Filter for normal communities
+        const normal = data.communities.filter(
+          (community: Community) => community.comm_type === "Normal"
+        );
+        console.log("Normal communities:", normal); // Debug statement
+        setNormalCommunities(normal);
+      } else {
+        throw new Error("Invalid data format");
+      }
+    } catch (error) {
+      console.error("Error fetching normal communities:", error);
+      setError("Failed to load communities.");
+    }
+  };
+
+  useEffect(() => {
+    fetchNormalCommunities();
+  }, []);
+
+  useEffect(() => {
+    const userIdFromLocalStorage = localStorage.getItem("userId");
+    if (userIdFromLocalStorage) {
+      setUserId(userIdFromLocalStorage);
+      console.log(userIdFromLocalStorage);
+    }
+
+    fetchCommunities();
+  }, []);
+
   const capitalizeFirstLetterOfEachWord = (text: string) => {
     return text.replace(/\b\w/g, (char) => char.toUpperCase());
   };
@@ -161,7 +269,7 @@ export default function Community() {
       const response = await fetch(`/api/community/${communityId}/join`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
+          Authorization: `Bearer ${token}`, // Adjust token retrieval as per your setup
         },
       });
       if (response.ok) {
@@ -184,7 +292,7 @@ export default function Community() {
       const response = await fetch(`/api/community/${communityId}/leave`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
+          Authorization: `Bearer ${token}`, // Adjust token retrieval as per your setup
         },
       });
       if (response.ok) {
@@ -328,7 +436,27 @@ export default function Community() {
                         )}
                     </div>
                   </div>
-                ))}
+                  <div>
+                    {community.messagesIds &&
+                      community.messagesIds.length > 0 && (
+                        <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
+                          {community.messagesIds.length}
+                        </div>
+                      )}
+                  </div>
+                  <div>
+                    <button
+                      className="text-sm font-semibold text-green-500 mr-4"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        joinCommunity(community.id);
+                      }}
+                    >
+                      Join
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -404,12 +532,10 @@ export default function Community() {
                           <p>{message.content}</p>
                         </div>
                       ) : message.type === "image" ? (
-                        <Image
-                          width={100}
-                          height={100}
+                        <img
                           src={message.content}
                           alt="Uploaded"
-                          className="w-full mt-2"
+                          style={{ maxWidth: "100%", marginTop: "10px" }}
                         />
                       ) : message.type === "video" ? (
                         <video
@@ -475,6 +601,7 @@ export default function Community() {
           )}
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }

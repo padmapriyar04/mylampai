@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 type CommunityRequest = {
   name: string;
   description?: string;
+  comm_type: 'Exclusive' | 'Normal';
 };
 
 export const POST = async (req: NextRequest) => {
@@ -34,7 +35,7 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const { name, description }: CommunityRequest = await req.json();
+    const { name, description,comm_type }: CommunityRequest = await req.json();
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 422 });
     }
@@ -52,7 +53,8 @@ export const POST = async (req: NextRequest) => {
     const createdCommunity = await prisma.community.create({
       data: {
         name,
-        description
+        description,
+        comm_type,
       },
     });
 
