@@ -1,6 +1,6 @@
 import type { Metadata } from "next";;
 import { Open_Sans } from "next/font/google";
-import "./../globals.css";
+import "../globals.css";
 import AuthProvider from "@/components/auth/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -18,6 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
+
       <body className={`${openSans.className} h-full overflow-hidden`}>
         <Toaster />
         <main className="h-full">

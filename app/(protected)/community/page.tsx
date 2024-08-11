@@ -1,14 +1,17 @@
 "use client";
 
+import Carousel from "@/components/community/NewCarousel";
+import socket from "@/utils/socket";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
-import Carousel from "../../../components/community/NewCarousel";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+<<<<<<< HEAD
 import { Toaster } from "@/components/ui/sonner";
 import socket from "@/utils/socket";
 import { useUserStore } from "@/utils/userStore";
+=======
+>>>>>>> d05dd282dae3ed6e5e88636ec9ce707276c9d36b
 
-// Define the Community and Message types
 interface Community {
   id: string;
   createdAt: string;
@@ -50,7 +53,11 @@ export default function Community() {
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
+<<<<<<< HEAD
     null
+=======
+    null,
+>>>>>>> d05dd282dae3ed6e5e88636ec9ce707276c9d36b
   );
   const [leftRoom, setLeftRoom] = useState<string>("no");
   const [image, setImage] = useState<File | null>(null);
@@ -72,6 +79,7 @@ export default function Community() {
     setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
   };
 
+<<<<<<< HEAD
   const crossCheck = async (communityId: string) => {
     try {
       const response = await fetch(`/api/community/${communityId}/crosscheck`, {
@@ -96,12 +104,73 @@ export default function Community() {
   };
 
   useEffect(() => {
+=======
+  
+  useEffect(() => {
+    const crossCheck = async (communityId: string) => {
+      try {
+        const response = await fetch(`/api/community/${communityId}/crosscheck`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log("dats:", data.message);
+          if (data.message == "No") {
+            setLeftRoom("yes");
+          }
+          await fetchCommunities();
+        } else {
+          console.error("Error joining community:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error joining community:", error);
+      }
+    };
+>>>>>>> d05dd282dae3ed6e5e88636ec9ce707276c9d36b
     if (selectedCommunityId !== null) {
       crossCheck(selectedCommunityId);
     }
   }, [selectedCommunityId]);
+<<<<<<< HEAD
 
   useEffect(() => {
+=======
+  
+  useEffect(() => {
+    const processMessage = (message: Message) => {
+      console.log(message.type);
+      switch (message.type) {
+        case "image":
+          const ImageUrl = base64ToBlobUrl(message.content, "image/png");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: ImageUrl, type: "image" },
+          ]);
+          break;
+        case "video":
+          const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: VideoUrl, type: "video" },
+          ]);
+          break;
+        case "document":
+          const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: mediaUrl, type: "document" },
+          ]);
+          break;
+        case "text":
+        default:
+          setMessages((prevMessages) => [...prevMessages, message]);
+          break;
+      }
+    };
+>>>>>>> d05dd282dae3ed6e5e88636ec9ce707276c9d36b
     if (selectedCommunityId !== null) {
       const handleNewMessages = (newMessages: Message[]) => {
         // Check if the data is a single message or an array
@@ -123,6 +192,7 @@ export default function Community() {
       return () => {
         socket.off("receive-message-community", handleNewMessages);
       };
+<<<<<<< HEAD
     }
   }, [selectedCommunityId]);
 
@@ -156,6 +226,11 @@ export default function Community() {
         break;
     }
   };
+=======
+    }
+  }, [selectedCommunityId]);
+
+>>>>>>> d05dd282dae3ed6e5e88636ec9ce707276c9d36b
 
   const base64ToBlobUrl = (base64: string, type: string) => {
     const byteCharacters = atob(base64.split(",")[1]);
@@ -387,6 +462,7 @@ export default function Community() {
               </button>
             </div>
             <div className="w-full gap-3 flex flex-col justify-center">
+<<<<<<< HEAD
               {normalCommunities.map((community) => (
                 <div
                   key={community.id}
@@ -405,11 +481,62 @@ export default function Community() {
                         width={10}
                         className="w-full"
                       />
+=======
+              {communities &&
+                communities.map((community) => (
+                  <div
+                    key={community.id}
+                    className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
+                    onClick={() => {
+                      toggleHeading(community.name, community.id);
+                      handleSmScreen();
+                    }}
+                  >
+                    <div className="flex flex-row items-center">
+                      <div className="w-[80px] p-1">
+                        <Image
+                          src="/community/WebDev.svg" // Use a default icon or handle appropriately
+                          alt="img"
+                          height={10}
+                          width={10}
+                          className="w-full"
+                        />
+                      </div>
+                      <span className="pl-5">
+                        {capitalizeFirstLetterOfEachWord(community.name)}
+                      </span>
                     </div>
-                    <span className="pl-5">
-                      {capitalizeFirstLetterOfEachWord(community.name)}
-                    </span>
+                    <div>
+                      {community.messagesIds &&
+                        community.messagesIds.length > 0 && (
+                          <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
+                            {community.messagesIds.length}
+                          </div>
+                        )}
+                    </div>
+                    <div>
+                      <button
+                        className="text-sm font-semibold text-red-500 mr-4"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          leaveCommunity(community.id);
+                        }}
+                      >
+                        Leave
+                      </button>
+                      <button
+                        className="text-sm font-semibold text-green-500 mr-4"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          joinCommunity(community.id);
+                        }}
+                      >
+                        Join
+                      </button>
+>>>>>>> d05dd282dae3ed6e5e88636ec9ce707276c9d36b
+                    </div>
                   </div>
+<<<<<<< HEAD
                   <div>
                     {community.messagesIds &&
                       community.messagesIds.length > 0 && (
@@ -431,6 +558,9 @@ export default function Community() {
                   </div>
                 </div>
               ))}
+=======
+                ))}
+>>>>>>> d05dd282dae3ed6e5e88636ec9ce707276c9d36b
             </div>
           </div>
         </div>
@@ -506,10 +636,20 @@ export default function Community() {
                           <p>{message.content}</p>
                         </div>
                       ) : message.type === "image" ? (
+<<<<<<< HEAD
                         <img
                           src={message.content}
                           alt="Uploaded"
                           style={{ maxWidth: "100%", marginTop: "10px" }}
+=======
+                        <Image
+                          width={100}
+                          height={100}
+                          src={message.content}
+                          alt="Uploaded"
+                          // style={{ maxWidth: "100%", marginTop: "10px" }}jj
+                          className="w-full mt-2"
+>>>>>>> d05dd282dae3ed6e5e88636ec9ce707276c9d36b
                         />
                       ) : message.type === "video" ? (
                         <video
@@ -605,7 +745,6 @@ export default function Community() {
           )}
         </div>
       </div>
-      <Toaster />
     </div>
   );
 }

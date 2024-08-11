@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner'
 
 const CreateCommunityForm = () => {
   const router = useRouter();
@@ -26,7 +27,7 @@ const CreateCommunityForm = () => {
 
       if (!response.ok) {
         const errorMessage = await response.json();
-        throw new Error(errorMessage.error || 'Failed to create community');
+        toast.error(errorMessage.error || 'Failed to create community');
       }
 
       const data = await response.json();

@@ -29,7 +29,6 @@ export const authOptions: NextAuthOptions = {
             data: {
               name: profile.name || "",
               email: profile.email,
-              image: profile.image || "",
               role:"user",
             },
           });
@@ -37,7 +36,6 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      // Return a boolean or string to satisfy the Awaitable<string | boolean> return type
       return true;
     },
   },
