@@ -8,7 +8,7 @@ import HomeNavbar from "../../components/home/HomeNavbar";
 import Flexsidebar from "@/components/misc/Flexsidebar";
 
 import type { Metadata } from "next";
-import "./../globals.css";
+import "../globals.css";
 import { Open_Sans } from "next/font/google";
 const openSans = Open_Sans({ subsets: ["latin"] });
 
