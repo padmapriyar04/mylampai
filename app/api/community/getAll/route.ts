@@ -14,7 +14,6 @@ export const GET = async (req: NextRequest) => {
     console.error('Error fetching communities:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   } finally {
-    // Disconnect Prisma client
     await prisma.$disconnect();
   }
 };

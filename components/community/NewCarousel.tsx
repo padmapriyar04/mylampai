@@ -37,7 +37,7 @@ const Carousel = () => {
     const { name, svg, message } = data;
 
     return (
-      <div className="w-full h-full bg-white rounded-2xl shadow-slate-300 shadow-md">
+      <div className="w-[90%] h-[100%] bg-white rounded-2xl shadow-slate-300 shadow-md">
         <div className="rounded-lg h-[60%] relative">
           <Image
             alt={name}
@@ -65,7 +65,7 @@ const Carousel = () => {
           }
         `}
       </style>
-      <div className="flex flex-col gap-3 relative">
+      <div className="flex flex-col gap-3 -ml-0 relative">
         <div className="flex flex-row justify-between">
           <span className="text-base font-semibold">Exclusive Assessments</span>
           <div className="flex flex-row gap-4">
@@ -77,7 +77,7 @@ const Carousel = () => {
             </button>
           </div>
         </div>
-        <div className="carousel-container absolute top-7 ml-2 flex justify-start">
+        <div className="carousel-container absolute top-7 ml-6 flex justify-start">
           <div
             className="carousel flex overflow-x-auto scrollbar-hide w-[90vw] md:w-[34vw] h-[250px]"
             ref={carouselRef}

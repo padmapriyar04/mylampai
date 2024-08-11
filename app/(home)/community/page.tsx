@@ -1,37 +1,11 @@
 "use client";
 
+import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import Carousel from "@/components/community/NewCarousel";
 import socket from "@/utils/socket";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-
-interface Community {
-  id: string;
-  createdAt: string;
-  lastmessageAt: string;
-  name: string;
-  description: string;
-  isCommunity: boolean;
-  messagesIds: any;
-  userIds: string[];
-}
-
-interface Sender {
-  id: string;
-  first_name: string;
-}
-
-interface Message {
-  id: string;
-  type: "image" | "video" | "document" | "text";
-  content: string;
-  createdAt: string;
-  seenIds: string[];
-  communityId: string;
-  senderId: string;
-  sender: Sender;
-}
+import { IoSend } from "react-icons/io5";
 
 export default function Community() {
   const [messageHeading, setMessageHeading] = useState<string>("");
@@ -42,13 +16,9 @@ export default function Community() {
   const [userId, setUserId] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
-    null,
-  );
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
   const [leftRoom, setLeftRoom] = useState<string>("no");
-  const [image, setImage] = useState<File | null>(null);
-  const [video, setVideo] = useState<File | null>(null);
-  const [document, setDocument] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   const toggleHeading = (text: string, communityId: string) => {
     setSelectedCommunityId(communityId);
@@ -64,7 +34,33 @@ export default function Community() {
     setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
   };
 
-  
+  useEffect(() => {
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  const fetchCommunities = async () => {
+    try {
+      const response = await fetch("/api/community/getAll");
+      const data = await response.json();
+      setCommunities(data.communities);
+    } catch (error) {
+      console.error("Error fetching communities:", error);
+    }
+  };
+
+  useEffect(() => {
+    const userIdFromLocalStorage = localStorage.getItem("userId");
+    if (userIdFromLocalStorage) {
+      setUserId(userIdFromLocalStorage);
+      console.log(userIdFromLocalStorage);
+    }
+
+    fetchCommunities();
+  }, []);
+
   useEffect(() => {
     const crossCheck = async (communityId: string) => {
       try {
@@ -77,22 +73,22 @@ export default function Community() {
         if (response.ok) {
           const data = await response.json();
           console.log("dats:", data.message);
-          if (data.message == "No") {
+          if (data.message === "No") {
             setLeftRoom("yes");
           }
           await fetchCommunities();
         } else {
-          console.error("Error joining community:", response.statusText);
+          console.error("Error checking community membership:", response.statusText);
         }
       } catch (error) {
-        console.error("Error joining community:", error);
+        console.error("Error checking community membership:", error);
       }
     };
     if (selectedCommunityId !== null) {
       crossCheck(selectedCommunityId);
     }
   }, [selectedCommunityId]);
-  
+
   useEffect(() => {
     const processMessage = (message: Message) => {
       console.log(message.type);
@@ -126,7 +122,6 @@ export default function Community() {
     };
     if (selectedCommunityId !== null) {
       const handleNewMessages = (newMessages: Message[]) => {
-        // Check if the data is a single message or an array
         if (Array.isArray(newMessages)) {
           newMessages.forEach((message) => {
             processMessage(message);
@@ -141,13 +136,11 @@ export default function Community() {
         communityId: selectedCommunityId,
       });
 
-      // Cleanup on component unmount or when selectedCommunityId changes
       return () => {
         socket.off("receive-message-community", handleNewMessages);
       };
     }
   }, [selectedCommunityId]);
-
 
   const base64ToBlobUrl = (base64: string, type: string) => {
     const byteCharacters = atob(base64.split(",")[1]);
@@ -158,33 +151,6 @@ export default function Community() {
     const blob = new Blob([byteNumbers], { type });
     return URL.createObjectURL(blob);
   };
-
-  useEffect(() => {
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
-
-  const fetchCommunities = async () => {
-    try {
-      const response = await fetch("/api/community/getAll");
-      const data = await response.json();
-      setCommunities(data.communities);
-    } catch (error) {
-      console.error("Error fetching communities:", error);
-    }
-  };
-
-  useEffect(() => {
-    const userIdFromLocalStorage = localStorage.getItem("userId");
-    if (userIdFromLocalStorage) {
-      setUserId(userIdFromLocalStorage);
-      console.log(userIdFromLocalStorage);
-    }
-
-    fetchCommunities();
-  }, []);
 
   const capitalizeFirstLetterOfEachWord = (text: string) => {
     return text.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -244,9 +210,7 @@ export default function Community() {
   const sendText = () => {
     if (text) {
       if (text !== "") {
-        setImage(null);
-        setDocument(null);
-        setVideo(null);
+        setFile(null);
         const communityId = selectedCommunityId;
         socket.emit("message", {
           type: "text",
@@ -256,62 +220,31 @@ export default function Community() {
         setText("");
       }
     }
-    if (document) {
-      console.log(document);
-      setImage(null);
-      setText("");
-      setVideo(null);
+    if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
-        console.log(base64String);
-        socket.emit("send-document", {
-          type: "document",
-          documentUrl: base64String,
-          selectedCommunityId,
+        const fileType = file.type;
+        const socketEvent = fileType.includes("image")
+          ? "send-image"
+          : fileType.includes("video")
+          ? "send-video"
+          : "send-document";
+        socket.emit(socketEvent, {
+          type: socketEvent.split("-")[1],
+          content: base64String,
+          communityId: selectedCommunityId,
         });
-        setDocument(null);
+        setFile(null);
       };
-      reader.readAsDataURL(document);
-    }
-    if (image) {
-      setText("");
-      setDocument(null);
-      setVideo(null);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        socket.emit("send-image", {
-          type: "image",
-          image: base64String,
-          selectedCommunityId,
-        });
-        setImage(null);
-      };
-      reader.readAsDataURL(image);
-    }
-    if (video) {
-      setImage(null);
-      setText("");
-      setDocument(null);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        socket.emit("send-video", {
-          type: "video",
-          videoUrl: base64String,
-          selectedCommunityId,
-        });
-        setVideo(null);
-      };
-      reader.readAsDataURL(video);
+      reader.readAsDataURL(file);
     }
   };
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="bg-[#F1EAFF] w-full h-[90vh] lg:h-[88vh] xl:h-[90vh] flex flex-wrap md:flex-nowrap gap-3">
-        <div className="w-full md:w-2/5 h-full flex flex-col gap-3 pl-4 pt-3 overflow-auto scrollbar-hide overflow-x-hidden">
+    <div className="w-full h-screen flex justify-center overflow-hidden">
+      <div className="bg-[#F1EAFF] w-full h-full flex flex-wrap md:flex-nowrap gap-3">
+        <div className="w-full md:w-85 h-full flex flex-col gap-3 pl-4 pt-3 overflow-hidden ml-20">
           <div className="text-[#737373] font-semibold flex flex-col gap-2.5">
             <div className="font-bold">Hello Raj!</div>
             <span className="text-[#A6A6A6]">
@@ -334,65 +267,65 @@ export default function Community() {
             </div>
           </div>
           <Carousel />
-          <div className="flex flex-col gap-3 overflow-x-clip mt-[250px] mr-2">
-            <div className="flex flex-row justify-between">
+          <div className="flex flex-col items-center gap-3 mt-[250px] overflow-hidden">
+            <div className="flex flex-row justify-between w-full max-w-3xl">
               <span className="text-base font-semibold">All Communities</span>
               <button className="text-sm font-semibold text-[#8c52ff]">
                 See All
               </button>
             </div>
-            <div className="w-full gap-3 flex flex-col justify-center">
+            <div className="w-11/12 max-w-3xl gap-3 flex flex-col justify-center">
               {communities &&
                 communities.map((community) => (
                   <div
                     key={community.id}
-                    className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
+                    className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer shadow-md transition-transform transform hover:scale-105 p-4"
                     onClick={() => {
                       toggleHeading(community.name, community.id);
                       handleSmScreen();
                     }}
                   >
-                    <div className="flex flex-row items-center">
-                      <div className="w-[80px] p-1">
+                    <div>
+                    <button
+                      className="text-sm font-semibold text-red-500 mr-4"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        leaveCommunity(community.id);
+                      }}
+                    >
+                      Leave
+                    </button>
+                    <button
+                      className="text-sm font-semibold text-green-500 mr-4"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        joinCommunity(community.id);
+                      }}
+                    >
+                      Join
+                    </button>
+                  </div>
+                    <div className="flex flex-row items-center flex-grow">
+                      <div className="w-10 h-10 p-1">
                         <Image
                           src="/community/WebDev.svg" // Use a default icon or handle appropriately
                           alt="img"
-                          height={10}
-                          width={10}
+                          height={40}
+                          width={40}
                           className="w-full"
                         />
                       </div>
-                      <span className="pl-5">
+                      <span className="pl-3">
                         {capitalizeFirstLetterOfEachWord(community.name)}
                       </span>
                     </div>
                     <div>
                       {community.messagesIds &&
                         community.messagesIds.length > 0 && (
-                          <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
+                          <div className="w-8 h-8 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
                             {community.messagesIds.length}
                           </div>
                         )}
-                    </div>
-                    <div>
-                      <button
-                        className="text-sm font-semibold text-red-500 mr-4"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          leaveCommunity(community.id);
-                        }}
-                      >
-                        Leave
-                      </button>
-                      <button
-                        className="text-sm font-semibold text-green-500 mr-4"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          joinCommunity(community.id);
-                        }}
-                      >
-                        Join
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -404,7 +337,7 @@ export default function Community() {
             isSmallScreen ? "absolute top-14 h-[90%] w-full ml-0" : ""
           } ${
             smScreen ? "flex" : "hidden"
-          } md:flex flex-col md:h-full w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
+          } md:flex flex-col h-[90%] w-full md:w-1/2 bg-[#fff] rounded-lg m-3 mb-0 justify-end transition-all duration-300 `}
         >
           <div className="flex flex-row bg-[#8c52ff] w-full h-16 rounded-lg items-center justify-between">
             <div
@@ -456,7 +389,7 @@ export default function Community() {
           </div>
           {leftRoom === "no" ? (
             <div className="flex flex-col h-full">
-              <div className="flex flex-grow flex-col p-4 overflow-auto">
+              <div className="flex-grow flex flex-col p-4 overflow-auto">
                 {messages.length > 0 &&
                   messages.map((message) => (
                     <div
@@ -476,7 +409,6 @@ export default function Community() {
                           height={100}
                           src={message.content}
                           alt="Uploaded"
-                          // style={{ maxWidth: "100%", marginTop: "10px" }}jj
                           className="w-full mt-2"
                         />
                       ) : message.type === "video" ? (
@@ -502,69 +434,39 @@ export default function Community() {
                     </div>
                   ))}
               </div>
-
               <div className="flex justify-center p-3">
-                <div className="relative w-full md:w-[65vw]">
+                <div className="relative w-full md:w-[65vw] mb-4">
                   <input
                     type="text"
-                    className="pl-10 pr-4 py-2 w-full border rounded-lg bg-[#D9D9D9]"
-                    placeholder="text"
+                    className="pl-12 pr-16 py-2 w-full border rounded-lg bg-[#E9D9FF] text-gray-700"
+                    placeholder="Enter Message"
                     value={text}
                     onChange={handleChangeText}
                   />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      setImage(e.target.files ? e.target.files[0] : null)
-                    }
-                    style={{
-                      padding: "10px",
-                      width: "calc(100% - 22px)",
-                      marginBottom: "10px",
-                    }}
-                  />
-
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={(e) =>
-                      setVideo(e.target.files ? e.target.files[0] : null)
-                    }
-                    style={{
-                      padding: "10px",
-                      width: "calc(100% - 22px)",
-                      marginBottom: "10px",
-                    }}
-                  />
-
-                  <input
-                    type="file"
-                    accept=".pdf, .doc, .docx"
-                    onChange={(e) =>
-                      setDocument(e.target.files ? e.target.files[0] : null)
-                    }
-                    style={{
-                      padding: "10px",
-                      width: "calc(100% - 22px)",
-                      marginBottom: "10px",
-                    }}
-                  />
-
-                  <button
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                    onClick={sendText}
+                  <label
+                    htmlFor="file-input"
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
                   >
-                    Send
-                  </button>
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none justify-between w-full">
                     <Image
                       src="/community/textplussign.svg"
                       alt="search"
                       width={25}
                       height={25}
                     />
-                  </div>
+                  </label>
+                  <input
+                    id="file-input"
+                    type="file"
+                    accept="image/*,video/*,.pdf,.doc,.docx"
+                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                    className="hidden"
+                  />
+                  <button
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                    onClick={sendText}
+                  >
+                    <IoSend className="text-purple-700 size-6" />
+                  </button>
                 </div>
               </div>
             </div>

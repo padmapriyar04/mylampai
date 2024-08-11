@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/index'; // Adjust the path as per your project structure
 import jwt from 'jsonwebtoken';
@@ -37,7 +36,7 @@ export const POST = async (req: NextRequest, { params }: { params: { communityId
     if (community.userIds.includes(userId)) {
       return NextResponse.json({ message: 'Exists' }, { status: 201 });
     }
- 
+
     return NextResponse.json({ message: 'No' }, { status: 201 });
 
   } catch (error) {

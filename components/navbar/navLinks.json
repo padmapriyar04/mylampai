@@ -48,5 +48,11 @@
         "name": "Community",
         "icon": "/sidebar/community.svg",
         "Link":"/community"
+    },
+    {
+        "name": "AI Interviewer",
+        "icon": "/sidebar/community.svg",
+        "Link":"/interview"
     }
+
 ]
