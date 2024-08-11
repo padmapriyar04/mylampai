@@ -4,10 +4,26 @@ import React, { useState } from 'react';
 import { FaStar } from "react-icons/fa";
 import Exdata from '@/app/data/Excommunity.json';
 import Alldata from '@/app/data/Allcommunity.json'
+
+
+interface Community {
+    id: string;
+    createdAt: string;
+    lastmessageAt: string;
+    name: string;
+    description: string;
+    isCommunity: boolean;
+    messagesIds: any;
+    userIds: string[];
+    type: "Exclusive" | "Normal"; // Added type property
+  }
+
 export default function Community() {
   const ExdataLen = Exdata.length;
   const AlldataLen = Alldata.length;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [exclusiveCommunities, setExclusiveCommunities] = useState<Community[]>([]);
+  const [normalCommunities, setNormalCommunities] = useState<Community[]>([]);
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % ExdataLen);
   };
@@ -18,6 +34,21 @@ export default function Community() {
   const toggleHeading  = (text:string) =>{
     setMessageHeading(text);
   }
+
+  const fetchCommunities = async () => {
+    try {
+      const response = await fetch("/api/community/getAll");
+      const data = await response.json();
+      const exclusive = data.communities.filter((community: Community) => community.type === "Exclusive");
+      
+      const normal = data.communities.filter((community: Community) => community.type === "Normal");
+      setExclusiveCommunities(exclusive);
+      console.log(setExclusiveCommunities);
+      setNormalCommunities(normal);
+    } catch (error) {
+      console.error("Error fetching communities:", error);
+    }
+  };
 
   return (
     <div className="w-full flex justify-center">
@@ -97,7 +128,7 @@ export default function Community() {
                 <Image src="/community/sendicon.svg" alt="send" width={25} height={25} className="mr-3" />
                 </div>
             </div>
-            </div>
+            </div> 
         </div>
 
         </div>

@@ -41,10 +41,10 @@ export default function ProtectedLayout({
         <div className="flex h-full transition-all duration-300 ">
           {/* Sidebar */}
           <Flexsidebar />
-          {/* Main Content */}
-          <div className=" flex-1 protected-layout lg:transition-all lg:duration-300">
-            {children}
-          </div>
+          {/* Main Content */}       
+            <div className=" flex-1 protected-layout lg:transition-all lg:duration-300">
+              {children}
+            </div>
         </div>
       </body>
     </html>

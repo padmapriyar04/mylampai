@@ -23,11 +23,12 @@ export default function RootLayout({
         <HomeNavbar />
         <div className="flex h-full transition-all duration-300 ">
           <Flexsidebar />
+
           <div className=" flex-1 lg:transition-all lg:duration-300">
             {children}
           </div>
         </div>
-        <Toaster/>
+        <Toaster />
         <Footer />
       </body>
     </html>
