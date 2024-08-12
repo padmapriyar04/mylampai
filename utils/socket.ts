@@ -7,4 +7,4 @@ const socket = io('http://localhost:4000', {
     }
 });
 
-export default socket;
+export default socket; 
