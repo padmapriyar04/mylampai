@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiMic, FiSpeaker, FiVideo } from 'react-icons/fi';
 import InterviewPage from "../interviewPage/page"
+import { IoDocumentAttach } from "react-icons/io5";
 
 const UploadResumePage = () => {
   const [resumeFile, setResumeFile] = useState(null);
@@ -22,6 +23,8 @@ const UploadResumePage = () => {
   const audioRef = useRef(null);
   const websocketRef = useRef<WebSocket | null>(null);
   const allDevicesConfigured = isCameraEnabled && isMicEnabled && isSoundEnabled;
+
+
 
 
   useEffect(() => {
@@ -230,14 +233,14 @@ const UploadResumePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-purple-50 flex items-center justify-center w-[100%]">
+    <div className="min-h-screen bg-purple-100 flex items-center justify-center w-[100%]">
       {/* Step 1: Upload Resume */}
       {step === 1 && (
-        <div className="max-w-7xl w-full flex gap-8">
+        <div className="max-w-6xl w-full flex gap-64 ">
           {/* Left Section */}
-          <div className="w-6/10 h-120 flex flex-col items-center justify-end bg-purple-600 text-white rounded-tl-3xl rounded-br-3xl p-10 relative">
-            <div className="absolute inset-0 rounded-tl-3xl rounded-br-3xl overflow-hidden">
-              <img src="/path_to_your_globe_image.svg" alt="Globe" className="w-full h-full object-cover opacity-50" />
+          <div className="w-7/10 h-120 flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
+            <div className="flex justify-center absolute inset-0 rounded-tl-3xl rounded-br-3xl overflow-hidden mt-0">
+              <img src="\images\Globe.svg" alt="Globe" className="w-[80%] h-[80%]" />
             </div>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
@@ -249,95 +252,155 @@ const UploadResumePage = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-1/2 flex flex-col items-center justify-center bg-purple-50">
-            <div className="text-center mb-4">
-              <h3 className="text-3xl font-semibold text-gray-800">Upload your latest CV/Resume</h3>
-            </div>
-            {/* Upload Section */}
-            <div 
-              className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white"
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, setResumeFile)}
-            >
-              <div className="mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-12 w-12 ${resumeFile ? 'text-purple-600' : 'text-gray-300'}`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 3a1 1 0 011 1v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 11.586V4a1 1 0 011-1z"
-                    clipRule="evenodd"
-                  />
-                  <path
-                    fillRule="evenodd"
-                    d="M4 18a2 2 0 012-2h8a2 2 0 012 2H4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+          <div className="w-2/3 flex flex-col items-center justify-center bg-purple-100">
+          <div ><p className='text-xl font-bold text-purple-500 mb-2'>Get Started!</p></div>
+          <div className="flex items-center justify-center mb-2 w-full ml-16 mb-4">
+                {/* Progress Bar */}
+                <div className="relative flex-1">
+                  <div className={`w-8 h-8 ${resumeFile ? 'bg-purple-500' : 'bg-gray-200'} rounded-full flex items-center justify-center`}>
+                    {(resumeFile) ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-300 w-full'} z-0`}></div>
+                </div>
+                {/* Step 2 */}
+                <div className="relative flex-1">
+                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-purple-500' : 'bg-gray-200'} rounded-full flex items-center justify-center`}>
+                    {(jobDescriptionFile || isManualEntry) ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-300 w-full'} z-0`}></div>
+                </div>
+                {/* Step 3 */}
+                <div className="relative flex-1 flex items-center">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  </div>
+                  <div className="absolute top-1/2 left-8 w-full h-0.5 bg-gray-300 z-0"></div>
+                </div>
+                {/* Step 4 */}
+                <div className="relative flex-1 flex items-center">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  </div>
+                </div>
               </div>
-              <p className="text-gray-500 mb-2">Drag & Drop or</p>
-              <label
-                htmlFor="resumeUpload"
-                className="text-gray-500 cursor-pointer"
-              >
-                Click to <span className="font-semibold text-gray-700">Upload Resume</span>
-              </label>
-              <input
-                id="resumeUpload"
-                type="file"
-                accept=".doc,.docx,.pdf"
-                className="hidden"
-                onChange={handleResumeUpload}
-              />
-              <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
-            </div>
+          
 
-            {/* Upload Button */}
-            <button
-              className="bg-purple-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 transition mt-4"
-              onClick={() => triggerFileInput('resumeUpload')}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-              </svg>
-              Upload Resume
-            </button>
+    <div className="text-center mb-12 w-[200%]">
+      <h3 className="text-3xl font-bold text-gray-800">Upload your latest CV/Resume</h3>
+    </div>
+    
+    {/* Upload Section */}
+    <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[420px] max-w-lg h-[360px] text-center">
+    <div className="flex items-center justify-center text-purple-500 mb-5 relative top-0 text-5xl">
+  <IoDocumentAttach />
+     </div>
 
-            {/* Display Uploaded File */}
-            {resumeFile && (
-              <div className="mt-4 text-center text-gray-700">
-                <p>{resumeFile.name} uploaded successfully.</p>
-              </div>
-            )}
+    <div 
+      className="border-dashed border-2 border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center bg-white h-48"
+      onDragOver={handleDragOver}
+      onDrop={(e) => handleDrop(e, setResumeFile)}
+    >
+      <p className="text-gray-500 mb-2">Drag & Drop or</p>
+      <label
+        htmlFor="resumeUpload"
+        className="text-gray-500 cursor-pointer"
+      >
+        Click to <span className="font-semibold text-gray-700">Upload Resume</span>
+      </label>
+      <input
+        id="resumeUpload"
+        type="file"
+        accept=".doc,.docx,.pdf"
+        className="hidden"
+        onChange={handleResumeUpload}
+      />
+      
+      <div className="mb-4 ">
+      
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-12 w-12 ${resumeFile ? 'text-purple-600' : 'text-gray-300'}`}
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M10 3a1 1 0 011 1v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 11.586V4a1 1 0 011-1z"
+            clipRule="evenodd"
+          />
+          <path
+            fillRule="evenodd"
+            d="M4 18a2 2 0 012-2h8a2 2 0 012 2H4z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+      
+      <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
+    </div>
 
-            <div className="mt-8 w-full px-4">
-              <button 
-                className={`w-full font-semibold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-700 cursor-not-allowed'}`}
-                disabled={!resumeFile}
-                onClick={handleNextClick}
-              >
-                Next
-              </button>
-              <button 
-                className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
-                onClick={handleBackClick}
-                disabled={step === 1}
-              >
-                Back
-              </button>
-            </div>
+    {/* Upload Button */}
+    <div className="flex justify-center mt-4">
+  <button
+    className="bg-purple-500 w-80 text-white font-bold py-3 px-3 rounded-xl hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 transition"
+    onClick={() => triggerFileInput('resumeUpload')}
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+    </svg>
+    Upload Resume
+  </button>
+</div>
+
+
+    {/* Display Uploaded File */}
+    {resumeFile && (
+      <div className="mt-6 text-xs text-center text-gray-700">
+        <p>{resumeFile.name} uploaded successfully.</p>
+      </div>
+    )}
+      </div>
+        <div className="mt-8 w-full px-4 flex flex-col items-center">
+        <button 
+          className={`w-[180%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+          disabled={!resumeFile}
+          onClick={handleNextClick}
+        >
+        Next
+        </button>
+        <button 
+          className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
+          onClick={handleBackClick}
+          disabled={step === 1}
+        >
+        Back
+        </button>
+      </div>
+
           </div>
         </div>
       )}
 
       {/* Step 2: Upload Job Description */}
       {step === 2 && (
-        <div className="max-w-6xl w-full flex gap-8">
+        <div className="max-w-6xl w-full flex gap-64 relative top-0">
           {/* Left Section */}
-          <div className="w-[80%] flex flex-col items-center justify-end bg-purple-600 text-white rounded-tl-3xl rounded-br-3xl p-10 relative">
+          <div className="w-7/10 h-[640px] flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
+            <div className="flex justify-center absolute inset-0 rounded-tl-3xl rounded-br-3xl overflow-hidden mt-0">
+              <img src="\images\Globe.svg" alt="Globe" className="w-[80%] h-[80%]" />
+            </div>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
               <p className="mt-2 text-center text-sm leading-relaxed">
@@ -348,9 +411,10 @@ const UploadResumePage = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-1/2 flex flex-col items-center justify-center bg-purple-50">
+          <div className="w-2/3 flex flex-col items-center justfiy-top bg-purple-100">
             <div className="w-full flex flex-col items-center mb-8">
-              <div className="flex items-center justify-center mb-2 w-full">
+            <div ><p className='text-xl font-bold text-purple-500 mb-2'>Get Started!</p></div>
+              <div className="flex items-center justify-center mb-2 w-full ml-16 mb-4">
                 {/* Progress Bar */}
                 <div className="relative flex-1">
                   <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
@@ -387,22 +451,20 @@ const UploadResumePage = () => {
                   </div>
                 </div>
               </div>
-
-              <div className="text-purple-600 font-semibold mt-4">Get Started</div>
             </div>
-
-            <div className="flex flex-col items-center justify-center w-full">
-              <h3 className="text-3xl font-semibold text-gray-800 mb-6">Choose your Interview Profile</h3>
+            <h3 className="text-3xl font-bold text-center text-gray-800 w-[150%] mb-6">Choose your Interview Profile</h3>
+              
+            <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[420px] max-w-lg h-[340px] text-center">
               
               <div className="w-full flex justify-center mb-6">
                 <button 
-                  className={`px-6 py-2 font-semibold ${!isManualEntry ? 'text-white bg-purple-600' : 'text-purple-600 bg-gray-100'} rounded-l-lg focus:outline-none`}
+                  className={`px-6 py-2 font-semibold ${!isManualEntry ? 'text-white bg-purple-600' : 'text-purple-600 bg-gray-100'} rounded-lg focus:outline-none`}
                   onClick={handleUploadJDToggle}
                 >
                   Upload JD
                 </button>
                 <button 
-                  className={`px-6 py-2 font-semibold ${isManualEntry ? 'text-white bg-purple-600' : 'text-purple-600 bg-gray-100'} rounded-r-lg focus:outline-none`}
+                  className={`px-6 py-2 font-semibold ${isManualEntry ? 'text-white bg-purple-600' : 'text-purple-600 bg-gray-100'} rounded-lg focus:outline-none`}
                   onClick={handleManualEntryToggle}
                 >
                   Fill Manually
@@ -475,9 +537,10 @@ const UploadResumePage = () => {
                 </div>
               )}
 
-              <div className="mt-8 w-full px-4">
+              <div className="mt-14 w-full px-4 flex flex-col items-center">
                 <button 
-                  className={`w-full font-semibold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-300 text-gray-700 cursor-not-allowed'}`}
+                  className={`w-[180%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ?'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                  
                   disabled={!jobDescriptionFile && !(isManualEntry && manualJobDescription)}
                   onClick={handleNextClick}
                 >
@@ -497,9 +560,9 @@ const UploadResumePage = () => {
 
       {/* Step 3: Configure Devices */}
       {step === 3 && (
-        <div className="max-w-6xl w-full flex gap-8">
+        <div className="max-w-6xl w-full flex gap-64">
           {/* Left Section */}
-          <div className="w-1/2 flex flex-col items-center justify-center bg-purple-600 text-white rounded-tl-3xl rounded-br-3xl p-10 relative">
+          <div className="w-7/10 h-120 flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
             <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-56 mb-6"></video>
             <div className="flex justify-between w-full text-sm mb-48">
               <span className="flex items-center">
@@ -515,7 +578,7 @@ const UploadResumePage = () => {
                 Default - Web Cam
               </span>
             </div>
-            <p className="text-center text-sm leading-relaxed">
+            <p className="text-center text-lg font-bold leading-relaxed">
               Take the wiZe AI mock Interview
             </p>
             <p className="text-center text-sm mt-2 leading-relaxed">
@@ -525,14 +588,17 @@ const UploadResumePage = () => {
           </div>
 
           {/* Right Section */}
+          <div className="w-3/4 flex flex-col items-center justify-top bg-purple-100">
+          <div className="w-[150%] flex text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
+          </div>
+          <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-full max-w-lg h-[360px] text-center">
           {!isMicTestEnabled && !isSoundTesting && (
-            <div className="w-1/2 flex flex-col items-center justify-center bg-purple-50">
-              <div className="w-full text-center mb-8">
-                <h2 className="text-3xl font-semibold text-gray-800">Ready to join? Configure Devices</h2>
-              </div>
+            <div className="w-full flex flex-col items-center justify-center">
+              
 
-              <div className="w-full max-w-md flex flex-col gap-4">
-                <div className="flex items-center justify-between">
+              <div className="w-full max-w-md flex flex-col  gap-12 justify-evenly">
+                <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-3 border-black rounded-2xl">
                   <span className="flex items-center gap-2">
                     <FiVideo className="h-6 w-6" />
                     Enable Camera
@@ -544,7 +610,7 @@ const UploadResumePage = () => {
                     onChange={handleCameraToggle}
                   />
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-3 border-black rounded-2xl">
                   <span className="flex items-center gap-2">
                     <FiMic className="h-6 w-6" />
                     Enable Microphone
@@ -556,7 +622,7 @@ const UploadResumePage = () => {
                     onChange={handleMicToggle}
                   />
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-3 border-black rounded-2xl">
                   <span className="flex items-center gap-2">
                     <FiSpeaker className="h-6 w-6" />
                     Enable Speaker
@@ -569,27 +635,12 @@ const UploadResumePage = () => {
                   />
                 </div>
               </div>
-
-              <div className="mt-8 w-full px-4">
-                <button 
-                  className={`w-full font-semibold py-3 rounded-lg ${allDevicesConfigured ? 'bg-black text-white hover:bg-gray-800' : 'bg-gray-400 text-gray-700 cursor-not-allowed'}`}
-                  disabled={!allDevicesConfigured}
-                  onClick={handleNextClick}
-                >
-                  Next
-                </button>
-                <button 
-                  className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
-                  onClick={() => setStep(step - 1)}
-                >
-                  Back
-                </button>
-              </div>
             </div>
+            
           )}
 
           {isMicTestEnabled && (
-            <div className="w-1/2 flex flex-col items-center justify-center bg-purple-50">
+            <div className="w-full h-full flex flex-col items-center justify-center">
               <div className="w-full px-4">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your microphone</h2>
                 <div className="text-center mb-4">
@@ -616,7 +667,7 @@ const UploadResumePage = () => {
           )}
 
           {isSoundTesting && (
-            <div className="w-1/2 flex flex-col items-center justify-center bg-purple-50">
+            <div className="w-full h-[95%] flex flex-col items-center justify-center rounder-2xl">
               <div className="w-full px-4">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your speakers</h2>
                 <div className="text-center mb-4">
@@ -640,7 +691,26 @@ const UploadResumePage = () => {
                 </button>
               </div>
             </div>
+            
           )}
+        </div>
+        <div className="mt-14 w-full px-4 flex flex-col items-center">
+                <button 
+                  className={`w-[180%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                  disabled={!allDevicesConfigured}
+                  onClick={handleNextClick}
+                >
+                  Next
+                </button>
+                <button 
+                  className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
+                  onClick={() => setStep(step - 1)}
+                >
+                  Back
+                </button>
+              </div>
+        </div>
+        
         </div>
       )}
     </div>
