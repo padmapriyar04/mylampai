@@ -126,7 +126,7 @@ const InterviewComponent = () => {
     const file = event.target.files[0];
     if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
       setResumeFile(file);
-
+  
       const reader = new FileReader();
       reader.onload = (event) => {
         const binaryData = event.target.result;
@@ -140,8 +140,10 @@ const InterviewComponent = () => {
       reader.readAsArrayBuffer(file);
     } else {
       alert("Please upload a valid DOC, DOCX, or PDF file.");
+      setResumeFile(null); 
     }
   };
+  
 
   const handleJobDescriptionUpload = (event) => {
     const file = event.target.files[0];
@@ -542,7 +544,7 @@ useEffect(() => {
           <div className="flex items-center justify-center mb-2 w-full ml-32 mb-4">
                 {/* Progress Bar */}
                 <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${resumeFile ? 'bg-purple-500' : 'bg-gray-200'} rounded-full flex items-center justify-center`}>
+                  <div className={`w-8 h-8 ${resumeFile ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
                     {(resumeFile) ? (
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
@@ -551,11 +553,11 @@ useEffect(() => {
                       <div className="w-3 h-3 bg-white rounded-full"></div>
                     )}
                   </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-300 w-full'} z-0`}></div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-400 w-full'} z-0`}></div>
                 </div>
                 {/* Step 2 */}
                 <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-purple-500' : 'bg-gray-200'} rounded-full flex items-center justify-center`}>
+                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
                     {(jobDescriptionFile || isManualEntry) ? (
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
@@ -564,11 +566,11 @@ useEffect(() => {
                       <div className="w-3 h-3 bg-white rounded-full"></div>
                     )}
                   </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-300 w-full'} z-0`}></div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-400 w-full'} z-0`}></div>
                 </div>
                 {/* Step 3 */}
                 <div className="relative flex-1 flex items-center">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
                     <div className="w-3 h-3 bg-white rounded-full"></div>
                   </div>
                 </div>
@@ -708,7 +710,7 @@ useEffect(() => {
                 </div>
                 {/* Step 2 */}
                 <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? "bg-purple-500" : "bg-gray-200"} rounded-full flex items-center justify-center`}>
+                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? "bg-purple-500" : "bg-gray-400"} rounded-full flex items-center justify-center`}>
                     {(jobDescriptionFile || isManualEntry) ? (
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                         <path
@@ -721,15 +723,14 @@ useEffect(() => {
                       <div className="w-3 h-3 bg-white rounded-full"></div>
                     )}
                   </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? "bg-purple-500 w-full" : "bg-gray-300 w-full"} z-0`}></div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? "bg-purple-500 w-full" : "bg-gray-400 w-full"} z-0`}></div>
                 </div>
                 {/* Step 3 */}
                 <div className="relative flex-1 flex items-center">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
                     <div className="w-3 h-3 bg-white rounded-full"></div>
                   </div>
                 </div>
-                {/* Step 4 */}
               </div>
             </div>
             <h3 className="text-3xl font-bold text-center text-gray-800 w-[150%] mb-6">Choose your Interview Profile</h3>
@@ -862,7 +863,7 @@ useEffect(() => {
                 </div>
                 {/* Step 2 */}
                 <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-purple-500' : 'bg-gray-200'} rounded-full flex items-center justify-center`}>
+                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
                     {(jobDescriptionFile || isManualEntry) ? (
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
@@ -871,11 +872,11 @@ useEffect(() => {
                       <div className="w-3 h-3 bg-white rounded-full"></div>
                     )}
                   </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-300 w-full'} z-0`}></div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-400 w-full'} z-0`}></div>
                 </div>
                 {/* Step 3 */}
                 <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${allDevicesConfigured ? 'bg-purple-500' : 'bg-gray-200'} rounded-full flex items-center justify-center`}>
+                  <div className={`w-8 h-8 ${allDevicesConfigured ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
                     {(allDevicesConfigured) ? (
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
