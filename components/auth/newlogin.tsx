@@ -297,19 +297,19 @@ const AuthForm: React.FC = () => {
           </Carousel>
         </div>
 
-        <div className="w-full p-4 md:p-6 flex flex-col justify-center">
+        <div className="w-full p-4 md:p-6 flex flex-col justify-start">
           {isSignUp ? (
             <>
-              <div className="text-popover-foreground mb-4 flex flex-col">
+              <div className="text-popover-foreground  flex flex-col">
                 <div className="text-[#555] text-sm mb-1">Hey Champ!</div>
-                <div className="font-semibold text-[#333] text-2xl ">
+                <div className="font-semibold text-[#333] text-2xl mb-4 ">
                   Create your wiZe Account
-                  <div className="h-[1px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full "></div>
+                  <div className="h-[1px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full mt-3 "></div>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmitSignUp} className="space-y-3">
-                <div className="flex flex-col md:flex-row gap-4">
+              <form onSubmit={handleSubmitSignUp} className="space-y-8">
+                <div className="flex flex-col md:flex-row gap-2 ">
                   <Input
                     name="firstName"
                     placeholder="First Name"
@@ -334,7 +334,7 @@ const AuthForm: React.FC = () => {
                   onChange={handleChange}
                 />
 
-                <div className="flex flex-col md:flex-row md:space-x-4">
+                <div className="flex flex-col mt-4 md:flex-row md:space-x-4 ">
                   <div className="flex items-center justify-evenly w-full max-w-[150px] border-2 rounded-md mb-4 md:mb-0">
                     <CountrySelector />
                   </div>
@@ -348,7 +348,7 @@ const AuthForm: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex flex-col md:flex-row md:space-x-4 items-center">
+                <div className="flex flex-col md:flex-row md:space-x-4 items-center mt-4">
                   <Input
                     name="password"
                     placeholder="Password"
@@ -385,14 +385,14 @@ const AuthForm: React.FC = () => {
                   />
                 )}
 
-                <div className="flex items-center space-x-2 mt-8">
+                <div className="flex items-center space-x-2 mt-6">
                   <input
                     type="checkbox"
                     checked={agreeToTerms}
                     onChange={(e) => setAgreeToTerms(e.target.checked)}
-                    className="form-checkbox h-6 w-6 accent-primary transition duration-150 ease-in-out"
+                    className="form-checkbox h-12 w-12 accent-primary transition duration-150 ease-in-out mb-10 "
                   />
-                  <span className="text-gray-500 text-xs font-medium">
+                  <span className="text-gray-800 text-l font-medium">
                     All your information is collected, stored, and processed as per
                     our data processing guidelines. By signing up on wiZe, you agree
                     to our{" "}
@@ -413,20 +413,20 @@ const AuthForm: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center mt-10">
-                  <div className="text-gray-400">
-                    <span className="text-sm">Already have an account?</span>{" "}
+                <div className="flex justify-between items-center mt-10 ml-8">
+                  <div className="text-gray-500 font-semibold">
+                    <span className="text-sm">Already have an account? </span>{" "}
                     <button
                       onClick={() => setIsSignUp(false)}
                       className="text-primary font-semibold"
                     >
-                      Login
+                      Sign In
                     </button>
                   </div>
-                  <div className="flex space-x-4">
+                  <div className="flex space-x-6 mr-8 mb-1">
                     <button
                       type="submit"
-                      className="bg-primary text-white pl-4 pr-2 py-2 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200"
+                      className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl"
                     >
                       <span>Sign Up</span>
                       <Image src={Arrow} alt="Sign Up Icon" className="w-6 h-6" />
@@ -439,32 +439,32 @@ const AuthForm: React.FC = () => {
             <>
               <div className="">
                 <div className="text-gray-400 font-semibold">Hey Champ!</div>
-                <div className="text-gray-700 text-4xl font-semibold mb-2">
+                <div className="text-gray-600 text-2xl font-semibold mb-3">
                   Welcome Back to wiZe!
                 </div>
-                <hr className="border-t border-gray-300 mb-4" />
+                <div className="h-[1px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full  "></div>
               </div>
 
               <button
                 type="button"
-                className="flex items-center justify-center w-full bg-white text-gray-400 md:shadow p-2 border-2 rounded-xl space-x-2 mb-4 font-semibold transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
+                className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2 mb-8 mt-5 font-semibold transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105 text-lg"
                 onClick={handleGoogleSignIn}
               >
                 <Image src={GoogleImg} alt="Google" className="w-6 h-6" />
-                <span className="text-gray-500 font-semibold">
+                <span className="text-gray-600 font-bold">
                   Login with Google
                 </span>
               </button>
 
               <div className="flex items-center justify-center mb-4">
                 <div className="w-1/3 border-b border-gray-300 mr-4"></div>
-                <span className="text-gray-500 text-center text-sm">
+                <span className="text-gray-400 font-bold text-center text-sm">
                   Or login with email
                 </span>
-                <div className="w-1/3 border-b border-gray-300 ml-4"></div>
+                <div className="w-1/3 border-b border-gray-300 ml-4 "></div>
               </div>
 
-              <form onSubmit={handleSubmitLogin} className="space-y-3">
+              <form onSubmit={handleSubmitLogin} className="space-y-10 mt-4">
                 <div>
                   <input
                     type="email"
@@ -472,13 +472,12 @@ const AuthForm: React.FC = () => {
                     placeholder="Email"
                     value={credentials.email}
                     onChange={handleCredentialsChange}
-                    className="w-full p-2 border-2 border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300
-                    "
+                   className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                   />
                   <Link
                     href="#"
                     onClick={() => setIsOtpLogin(!isOtpLogin)}
-                    className="text-blue-500 font-semibold text-left ml-5 hover:text-blue-700 transition-colors duration-300"
+                    className="text-blue-500 font-semibold text-left ml-5 hover:text-blue-700 transition-colors duration-300 "
                   >
                     {isOtpLogin ? "Login with Password" : "Login via OTP"}
                   </Link>
@@ -491,8 +490,7 @@ const AuthForm: React.FC = () => {
                       placeholder="Enter OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
-                      className="w-full p-2 pl-3 pr-24 border-2 border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300
-                    "
+                      className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
                     <div className="flex items-center">
                       <Image
@@ -533,10 +531,9 @@ const AuthForm: React.FC = () => {
                       placeholder="Password"
                       value={credentials.password}
                       onChange={handleCredentialsChange}
-                      className="w-full p-2 border-2 border-purple-100 focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300
-                    "
+                     className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
-                    <div className="flex items-center">
+                    <div className="flex items-center mt-3">
                       <Image
                         src={Lock}
                         alt="Image beside Forgot password"
@@ -552,7 +549,7 @@ const AuthForm: React.FC = () => {
                   </div>
                 )}
 
-                <div className="flex justify-between items-center mt-10">
+                <div className="flex justify-between items-center mt-16">
                   <div className="text-gray-500">
                     <span>Don&apos;t have an account?</span>{" "}
                     <button
@@ -565,7 +562,7 @@ const AuthForm: React.FC = () => {
                   <div className="flex space-x-4">
                     <button
                       type="submit"
-                      className="bg-purple-500 text-white px-4 py-2 rounded-6xl flex items-center space-x-2 md:shadow transition-all duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
+                      className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl mr-11"
                     >
                       <span>Log In</span>
                       <Image src={Arrow} alt="Sign Up Icon" className="w-6 h-6" />
