@@ -520,12 +520,12 @@ useEffect(() => {
 
 
   return (
-    <div className="min-h-screen bg-purple-100 flex items-center justify-center w-[100%]">
+    <div className="min-h-[92vh] bg-purple-100 flex items-center justify-center w-[100%]">
       {/* Step 1: Upload Resume */}
       {step === 1 && (
-        <div className="max-w-6xl w-full flex gap-64 ">
+        <div className="max-w-6xl w-full flex gap-64">
           {/* Left Section */}
-          <div className="w-7/10 h-120 flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
+          <div className="w-7/10 h-[80vh] w-[45vw] flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
             <div className="flex justify-center absolute inset-0 rounded-tl-3xl rounded-br-3xl overflow-hidden mt-0">
               <img src="\images\Globe.svg" alt="Globe" className="w-[80%] h-[80%]" />
             </div>
@@ -578,12 +578,12 @@ useEffect(() => {
 
           
 
-    <div className="text-center mb-12 w-[200%]">
+    <div className="text-center mb-8 w-[200%]">
       <h3 className="text-3xl font-bold text-gray-800">Upload your latest CV/Resume</h3>
     </div>
     
     {/* Upload Section */}
-    <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[420px] max-w-lg h-[360px] text-center">
+    <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[43vh] text-center">
     <div className="flex items-center justify-center text-purple-500 mb-5 relative top-0 text-5xl">
   <IoDocumentAttach />
      </div>
@@ -676,9 +676,9 @@ useEffect(() => {
 
       {/* Step 2: Upload Job Description */}
       {step === 2 && (
-        <div className="max-w-6xl w-full flex gap-64 relative top-0">
+        <div className="max-w-6xl w-full flex gap-64 relative">
           {/* Left Section */}
-          <div className="w-7/10 h-[640px] flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
+          <div className="w-7/10 h-[80vh] w-[45vw] flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
             <div className="flex justify-center absolute inset-0 rounded-tl-3xl rounded-br-3xl overflow-hidden mt-0">
               <img src="\images\Globe.svg" alt="Globe" className="w-[80%] h-[80%]" />
             </div>
@@ -691,10 +691,10 @@ useEffect(() => {
           </div>
 
           {/* Right Section */}
-          <div className="w-2/3 flex flex-col items-center justfiy-top bg-purple-100">
-            <div className="w-full flex flex-col items-center mb-8">
-            <div ><p className='text-xl font-bold text-purple-500 mb-2'>Get Started!</p></div>
-              <div className="flex items-center justify-center mb-2 w-full ml-32 mb-4">
+          <div className="w-3/4 flex flex-col items-center justfiy-top bg-purple-100">
+            <div className="w-full flex flex-col items-center mb-2">
+            <div ><p className='text-xl font-bold text-purple-500'>Get Started!</p></div>
+              <div className="flex items-center justify-center w-full ml-32">
                 {/* Progress Bar */}
                 <div className="relative flex-1">
                   <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
@@ -733,9 +733,9 @@ useEffect(() => {
                 </div>
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-center text-gray-800 w-[150%] mb-6">Choose your Interview Profile</h3>
+            <h3 className="text-3xl font-bold text-center text-gray-800 w-[150%] mb-8">Choose your Interview Profile</h3>
               
-            <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[420px] max-w-lg h-[340px] text-center">
+            <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[43vh] text-center">
               
               <div className="w-full flex justify-center mb-6">
                 <button 
@@ -803,9 +803,9 @@ useEffect(() => {
                 </div>
               )}
 
-              <div className="mt-14 w-full px-4 flex flex-col items-center">
+              <div className="mt-8 w-full px-4 flex flex-col items-center">
                 <button 
-                  className={`w-[180%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ?'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                  className={`w-[220%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition  mt-6 ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ?'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
                   
                   disabled={!jobDescriptionFile && !(isManualEntry && manualJobDescription)}
                   onClick={handleNextClick}
@@ -825,7 +825,7 @@ useEffect(() => {
       {step === 3 && (
         <div className="max-w-6xl w-full flex gap-64">
           {/* Left Section */}
-          <div className="w-7/10 h-120 flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
+          <div className="w-7/10 h-[80vh] w-[45vw] flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
             <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-56 mb-6"></video>
             <div className="flex justify-between w-full text-sm mb-48">
               <span className="flex items-center">
@@ -851,6 +851,7 @@ useEffect(() => {
 
           {/* Right Section */}
           <div className="w-3/4 flex flex-col items-center justify-top bg-purple-100">
+          <div ><p className='text-xl font-bold text-purple-500'>Get Started!</p></div>
           <div className="flex items-center justify-center mb-2 w-full ml-32 mb-4">
                 {/* Progress Bar */}
                 <div className="relative flex-1">
@@ -890,7 +891,7 @@ useEffect(() => {
           <div className="w-[150%] flex justify-center text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
           </div>
-          <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-full max-w-lg h-[360px] text-center">
+          <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[43vh] text-center">
           {!isMicTestEnabled && !isSoundTesting && (
             <div className="w-full flex flex-col items-center justify-center">
               
@@ -982,7 +983,7 @@ useEffect(() => {
             
           )}
         </div>
-        <div className="mt-14 w-full px-4 flex flex-col items-center">
+        <div className="mt-8 w-full px-4 flex flex-col items-center">
                 <button 
                   className={`w-[180%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
                   disabled={!allDevicesConfigured}
