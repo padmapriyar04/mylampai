@@ -225,6 +225,7 @@ const UploadResumePage = () => {
       setIsSoundTesting(false);
     }
   };
+  
 
 
 
@@ -287,12 +288,6 @@ const UploadResumePage = () => {
                     <div className="w-3 h-3 bg-white rounded-full"></div>
                   </div>
                   <div className="absolute top-1/2 left-8 w-full h-0.5 bg-gray-300 z-0"></div>
-                </div>
-                {/* Step 4 */}
-                <div className="relative flex-1 flex items-center">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  </div>
                 </div>
               </div>
           
@@ -442,14 +437,8 @@ const UploadResumePage = () => {
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                     <div className="w-3 h-3 bg-white rounded-full"></div>
                   </div>
-                  <div className="absolute top-1/2 left-8 w-full h-0.5 bg-gray-300 z-0"></div>
                 </div>
                 {/* Step 4 */}
-                <div className="relative flex-1 flex items-center">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  </div>
-                </div>
               </div>
             </div>
             <h3 className="text-3xl font-bold text-center text-gray-800 w-[150%] mb-6">Choose your Interview Profile</h3>
@@ -589,7 +578,43 @@ const UploadResumePage = () => {
 
           {/* Right Section */}
           <div className="w-3/4 flex flex-col items-center justify-top bg-purple-100">
-          <div className="w-[150%] flex text-center mb-8">
+          <div className="flex items-center justify-center mb-2 w-full ml-24 mb-4">
+                {/* Progress Bar */}
+                <div className="relative flex-1">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-purple-500 w-full z-0`}></div>
+                </div>
+                {/* Step 2 */}
+                <div className="relative flex-1">
+                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-purple-500' : 'bg-gray-200'} rounded-full flex items-center justify-center`}>
+                    {(jobDescriptionFile || isManualEntry) ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-300 w-full'} z-0`}></div>
+                </div>
+                {/* Step 3 */}
+                <div className="relative flex-1">
+                  <div className={`w-8 h-8 ${allDevicesConfigured ? 'bg-purple-500' : 'bg-gray-200'} rounded-full flex items-center justify-center`}>
+                    {(allDevicesConfigured) ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                </div>
+                </div>
+          <div className="w-[150%] flex justify-center text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
           </div>
           <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-full max-w-lg h-[360px] text-center">
@@ -597,7 +622,7 @@ const UploadResumePage = () => {
             <div className="w-full flex flex-col items-center justify-center">
               
 
-              <div className="w-full max-w-md flex flex-col  gap-12 justify-evenly">
+              <div className="w-full max-w-md flex-col flex gap-4 justify-evenly pt-8">
                 <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-3 border-black rounded-2xl">
                   <span className="flex items-center gap-2">
                     <FiVideo className="h-6 w-6" />
@@ -605,7 +630,7 @@ const UploadResumePage = () => {
                   </span>
                   <input 
                     type="checkbox" 
-                    className="form-checkbox h-6 w-6 text-purple-600"
+                    className="form-checkbox h-6 w-6 text-purple-600 "
                     checked={isCameraEnabled}
                     onChange={handleCameraToggle}
                   />
@@ -649,15 +674,15 @@ const UploadResumePage = () => {
                 </div>
                 <audio ref={audioRef} src="/path_to_audio_file.mp3" className="hidden"></audio>
                 <div className="relative mb-4">
-                  <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                  <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
                     <option>Default - External Speaker</option>
                     <option>Default - Internal Speaker</option>
                     <option>Bluetooth Speaker</option>
                   </select>
                 </div>
-                <p className="text-sm text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
+                <p className="text-lg font-semibold text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
                 <button 
-                  className="bg-purple-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 transition"
+                  className="bg-purple-500 text-white font-bold py-4 px-4 rounded-xl hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 transition w-64"
                   onClick={handleMicTestConfirmation}
                 >
                   My mic is working
@@ -672,19 +697,19 @@ const UploadResumePage = () => {
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your speakers</h2>
                 <div className="text-center mb-4">
                   <img src="/path_to_your_image.svg" alt="wiZe AI" className="mx-auto mb-2" />
-                  <p className="text-gray-600">You should hear a sound</p>
+                  <p className="text-gray-600">WizeAI is speaking</p>
                 </div>
                 <audio ref={audioRef} src="/path_to_audio_file.mp3" className="hidden" autoPlay></audio>
                 <div className="relative mb-4">
-                  <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                  <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
                     <option>Default - External Speaker</option>
                     <option>Default - Internal Speaker</option>
                     <option>Bluetooth Speaker</option>
                   </select>
                 </div>
-                <p className="text-sm text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
+                <p className="text-lg font-semibold text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
                 <button 
-                  className="bg-purple-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 transition"
+                 className="bg-purple-500 text-white font-bold py-4 px-4 rounded-xl hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 transition w-64"
                   onClick={handleSoundConfirmation}
                 >
                   I can hear the sound
