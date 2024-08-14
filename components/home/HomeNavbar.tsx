@@ -12,9 +12,9 @@ import {
   ResourcesComponent,
   CompanyComponent,
 } from "./HomeNavbarComponents";
-import { parse } from "cookie"; // Import parse from the cookie package
+import { parse } from "cookie"; 
 import { toast } from "sonner";
-import { getCookie } from "@/utils/cookieUtils"; // Import cookie utilities
+import { getCookie } from "@/utils/cookieUtils"; 
 
 const HomeNavbar = () => {
   const [scroll, setScroll] = useState(false);
@@ -45,9 +45,9 @@ const HomeNavbar = () => {
     const fetchUserData = () => {
       const userData = getCookie("user"); // Use getCookie to retrieve user data
       if (userData) {
-        setUser(JSON.parse(userData));
+        setUser(JSON.parse(userData), "");
       } else {
-        setUser(null);
+        setUser(null, "");
       }
       setLoading(false);
     };
@@ -72,7 +72,6 @@ const HomeNavbar = () => {
       </Link>
 
       {user ? (
-        // Logged-in Navbar
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 border border-purple-500 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md">
             <SlBell className="text-purple-500" />
@@ -87,7 +86,6 @@ const HomeNavbar = () => {
           </div>
         </div>
       ) : (
-        // Logged-out Navbar
         <div className="md:flex hidden justify-between bg-[#ffffff90] items-center w-full max-w-[600px] gap-1 pr-2 pl-4 py-2 h-[40px] backdrop-blur-md font-medium rounded-full shadow-sm">
           <Link href={"/"} className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105">
             Home

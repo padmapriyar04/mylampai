@@ -36,7 +36,7 @@ export default function RootLayout({
               {children}
             </div>
           </div>
-          {!user && <Footer />} 
+          <Footer />
         </div>
         <Toaster />
       </body>
