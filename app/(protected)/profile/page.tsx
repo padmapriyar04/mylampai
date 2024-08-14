@@ -13,7 +13,7 @@ interface User {
 }
 
 export default function ProfilePage() {
-  const { user, setUser } = useUserStore();
+  const { user, token, setUser } = useUserStore();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -24,7 +24,7 @@ export default function ProfilePage() {
 
         if (response.ok) {
           const userData: User = await response.json();
-          setUser(userData, "");
+          setUser(userData, token);
         } else if (response.status === 404) {
           toast.error("User not found. Please try logging in again.");
           router.push("/login");

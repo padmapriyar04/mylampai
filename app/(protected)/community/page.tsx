@@ -58,13 +58,14 @@ export default function Community() {
   const [document, setDocument] = useState<File | null>(null);
   const socket = useMemo(
     () =>
-      io("http://localhost:4000", {
+      io("https://mylamp-server.onrender.com", {
         withCredentials: true,
         query: { token: token },
       }),
     [token],
   );
-  console.log("socket is here : ", socket);
+
+  console.log("token", token)
 
   const toggleHeading = (text: string, communityId: string) => {
     setSelectedCommunityId(communityId);
@@ -187,6 +188,7 @@ export default function Community() {
       const response = await fetch("/api/community/getAll");
       const data = await response.json();
       setCommunities(data.communities);
+      console.log("data",data)
     } catch (error) {
       console.error("Error fetching communities:", error);
     }
@@ -358,7 +360,7 @@ export default function Community() {
               </button>
             </div>
             <div className="w-full gap-3 flex flex-col justify-center">
-              {communities.map((community) => (
+              {communities && communities.map((community) => (
                 <div
                   key={community.id}
                   className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
