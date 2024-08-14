@@ -12,7 +12,7 @@ import CommunitySection from "@/components/home/Community";
 import Footer from "@/components/home/Footer";
 import HomeSlider from "@/components/home/HomeSlider";
 import HomeNavbar from "@/components/home/HomeNavbar";
-import './home.css';
+import "./home.css";
 
 export default function Page() {
   useEffect(() => {

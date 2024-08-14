@@ -153,7 +153,7 @@ export default function HeroSection() {
             ></Image>
           </div>
         </div>
-        <InfiniteLogoSlide />
+        {/* <InfiniteLogoSlide /> */}
         <div className="text-center text-2xl text-[#1C4980] font-semibold pt-1 pb-3">
           Data from Top Institutes
         </div>
