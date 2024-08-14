@@ -60,11 +60,52 @@ export default function WizeCamp() {
             </button>
           </div>
         </div>
-        <div className="hidden sm:flex w-full flex-wrap items-center justify-center gap-4 min-h-[500px] max-w-[516px] ">
-          <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white"></div>
-          <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white"></div>
-          <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white"></div>
-          <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white"></div>
+        <div className="hidden sm:flex w-full flex-wrap items-center justify-center gap-4 min-h-[500px] max-w-[516px] relative ">
+          <div className="absolute top-1/2 right-1/2 w-[82px] h-[82px] bg-white translate-x-1/2 -translate-y-1/2 rounded-full">
+          <Image
+              src="./home/wizecamp/avatar.svg"
+              width={100}
+              height={100}
+              alt="wizecamp"
+              className="w-full"
+            ></Image>
+          </div>
+          <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white overflow-hidden">
+            <Image
+              src="./home/wizecamp/1.svg"
+              width={100}
+              height={100}
+              alt="wizecamp"
+              className="w-full"
+            ></Image>
+          </div>
+          <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white overflow-hidden">
+            <Image
+              src="./home/wizecamp/4.svg"
+              width={100}
+              height={100}
+              alt="wizecamp"
+              className="w-full"
+            ></Image>
+          </div>
+          <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white overflow-hidden">
+            <Image
+              src="./home/wizecamp/3.svg"
+              width={100}
+              height={100}
+              alt="wizecamp"
+              className="w-full"
+            ></Image>
+          </div>
+          <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white overflow-hidden">
+            <Image
+              src="./home/wizecamp/2.svg"
+              width={100}
+              height={100}
+              alt="wizecamp"
+              className="w-full"
+            ></Image>
+          </div>
         </div>
       </div>
     </>
