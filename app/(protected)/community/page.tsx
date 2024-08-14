@@ -6,8 +6,8 @@ import Carousel from "../../../components/community/NewCarousel";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 //import socket from '@/utils/socket';
-import { io, Socket } from 'socket.io-client'
-import { useUserStore } from '@/utils/userStore';
+import { io, Socket } from "socket.io-client";
+import { useUserStore } from "@/utils/userStore";
 
 // Define the Community and Message types
 interface Community {
@@ -37,12 +37,10 @@ interface Message {
   sender: Sender;
 }
 
-
 export default function Community() {
-
   const userStore = useUserStore();
-  const token = useUserStore(state => state.token); 
-  const user = useUserStore(state => state.user); 
+  const token = useUserStore((state) => state.token);
+  const user = useUserStore((state) => state.user);
   const [messageHeading, setMessageHeading] = useState<string>("");
   const [icon, setIcon] = useState<string>("");
   const [smScreen, setSmScreen] = useState<boolean>(false);
@@ -51,21 +49,27 @@ export default function Community() {
   const [userId, setUserId] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
-  const [leftRoom, setLeftRoom]=useState<string>("no");
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
+    null,
+  );
+  const [leftRoom, setLeftRoom] = useState<string>("no");
   const [image, setImage] = useState<File | null>(null);
   const [video, setVideo] = useState<File | null>(null);
   const [document, setDocument] = useState<File | null>(null);
-  const socket = useMemo(() => io("http://localhost:4000",{
-    withCredentials: true,
-    query: { token: token }
-  }), []);
-  console.log("socket is here : ",socket);
+  const socket = useMemo(
+    () =>
+      io("http://localhost:4000", {
+        withCredentials: true,
+        query: { token: token },
+      }),
+    [token],
+  );
+  console.log("socket is here : ", socket);
 
-  const toggleHeading = (text: string , communityId: string) => {
+  const toggleHeading = (text: string, communityId: string) => {
     setSelectedCommunityId(communityId);
     setMessageHeading(text);
-    socket.emit('check-join', { communityId });
+    socket.emit("check-join", { communityId });
   };
 
   const handleSmScreen = () => {
@@ -76,100 +80,96 @@ export default function Community() {
     setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
   };
 
-  const crossCheck= async (communityId : string)=>{
-    try{
-    const response = await fetch(`/api/community/${communityId}/crosscheck`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`, // Adjust token retrieval as per your setup
-      },
-    });
-    if (response.ok) {
-      const data= await response.json();
-      console.log("dats:",data.message);
-      if(data.message=='No'){
-        setLeftRoom("yes");
+  const crossCheck = async (communityId: string) => {
+    try {
+      const response = await fetch(`/api/community/${communityId}/crosscheck`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // Adjust token retrieval as per your setup
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log("dats:", data.message);
+        if (data.message == "No") {
+          setLeftRoom("yes");
+        }
+        await fetchCommunities();
+      } else {
+        console.error("Error joining community:", response.statusText);
       }
-      await fetchCommunities();
-    } else {
-      console.error("Error joining community:", response.statusText);
+    } catch (error) {
+      console.error("Error joining community:", error);
     }
-  } catch (error) {
-    console.error("Error joining community:", error);
-  }
-  }
-  
-  useEffect(()=>{
-     if(selectedCommunityId !== null){
-      crossCheck(selectedCommunityId);
-     }
-  },[selectedCommunityId]);
+  };
 
   useEffect(() => {
-      if (selectedCommunityId !== null) {
-          const handleNewMessages = (newMessages: Message[]) => {
-              // Check if the data is a single message or an array
-              if (Array.isArray(newMessages)) {
-                  newMessages.forEach((message)=>{
-                    processMessage(message);
-                  });
-                  
-              } else {
-                  
-                processMessage(newMessages);
-              }
-          };
-    
-         
-          socket.on('receive-message-community', handleNewMessages);
-          socket.emit('fetch-community-messages', { communityId: selectedCommunityId });
-  
-          // Cleanup on component unmount or when selectedCommunityId changes
-          return () => {
-              socket.off('receive-message-community', handleNewMessages);
-          };
-      }
+    if (selectedCommunityId !== null) {
+      crossCheck(selectedCommunityId);
+    }
   }, [selectedCommunityId]);
-  
+
+  useEffect(() => {
+    if (selectedCommunityId !== null) {
+      const handleNewMessages = (newMessages: Message[]) => {
+        // Check if the data is a single message or an array
+        if (Array.isArray(newMessages)) {
+          newMessages.forEach((message) => {
+            processMessage(message);
+          });
+        } else {
+          processMessage(newMessages);
+        }
+      };
+
+      socket.on("receive-message-community", handleNewMessages);
+      socket.emit("fetch-community-messages", {
+        communityId: selectedCommunityId,
+      });
+
+      // Cleanup on component unmount or when selectedCommunityId changes
+      return () => {
+        socket.off("receive-message-community", handleNewMessages);
+      };
+    }
+  }, [selectedCommunityId]);
+
   const processMessage = (message: Message) => {
     console.log(message.type);
     switch (message.type) {
       case "image":
-        const ImageUrl = base64ToBlobUrl(message.content, 'image/png');
-        setMessages(prevMessages => [
+        const ImageUrl = base64ToBlobUrl(message.content, "image/png");
+        setMessages((prevMessages) => [
           ...prevMessages,
-          { ...message, content: ImageUrl, type: 'image' }
+          { ...message, content: ImageUrl, type: "image" },
         ]);
         break;
       case "video":
-        const VideoUrl = base64ToBlobUrl(message.content, 'video/mp4');
-        setMessages(prevMessages => [
+        const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
+        setMessages((prevMessages) => [
           ...prevMessages,
-          { ...message, content: VideoUrl, type: 'video' }
+          { ...message, content: VideoUrl, type: "video" },
         ]);
         break;
       case "document":
-        const mediaUrl = base64ToBlobUrl(message.content, 'application/pdf');
-        setMessages(prevMessages => [
+        const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
+        setMessages((prevMessages) => [
           ...prevMessages,
-          { ...message, content: mediaUrl, type: 'document' }
+          { ...message, content: mediaUrl, type: "document" },
         ]);
         break;
       case "text":
       default:
-        setMessages(prevMessages => [
-          ...prevMessages,
-          message
-        ]);
+        setMessages((prevMessages) => [...prevMessages, message]);
         break;
-      }
     }
+  };
 
   const base64ToBlobUrl = (base64: string, type: string) => {
-    const byteCharacters = atob(base64.split(',')[1]);
+    const byteCharacters = atob(base64.split(",")[1]);
     const byteNumbers = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const blob = new Blob([byteNumbers], { type });
     return URL.createObjectURL(blob);
@@ -215,9 +215,9 @@ export default function Community() {
         },
       });
       if (response.ok) {
-        socket.emit('join-room', { communityId });
+        socket.emit("join-room", { communityId });
         setMessages([]);
-        socket.emit('fetch-community-messages',  { communityId });
+        socket.emit("fetch-community-messages", { communityId });
         setLeftRoom("no");
         toast.success("Joined to the community");
         await fetchCommunities();
@@ -238,7 +238,7 @@ export default function Community() {
         },
       });
       if (response.ok) {
-        socket.emit('leave-room', { communityId });
+        socket.emit("leave-room", { communityId });
         await fetchCommunities();
         setLeftRoom("yes");
         toast.success("Left Community successfully");
@@ -254,59 +254,74 @@ export default function Community() {
   const handleChangeText = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setText(value);
-    socket.emit('message',value);
+    socket.emit("message", value);
   };
 
   const sendText = () => {
-  if(text){
-    if (text !== '') {
-      setImage(null);
-      setDocument(null);
-      setVideo(null);
-      const communityId= selectedCommunityId;
-      socket.emit('message', { type: 'text', message: text , community: communityId});
-      setText('');
+    if (text) {
+      if (text !== "") {
+        setImage(null);
+        setDocument(null);
+        setVideo(null);
+        const communityId = selectedCommunityId;
+        socket.emit("message", {
+          type: "text",
+          message: text,
+          community: communityId,
+        });
+        setText("");
+      }
     }
-  }
-  if (document) {
-    console.log(document);
-    setImage(null);
-    setText('');
-    setVideo(null);
-    const reader = new FileReader();
-    reader.onloadend = () => {
+    if (document) {
+      console.log(document);
+      setImage(null);
+      setText("");
+      setVideo(null);
+      const reader = new FileReader();
+      reader.onloadend = () => {
         const base64String = reader.result as string;
         console.log(base64String);
-        socket.emit('send-document', { type: 'document', documentUrl: base64String, selectedCommunityId });
+        socket.emit("send-document", {
+          type: "document",
+          documentUrl: base64String,
+          selectedCommunityId,
+        });
         setDocument(null);
-    };
-    reader.readAsDataURL(document);
-  }
-  if (image) {
-    setText('');
-    setDocument(null);
-    setVideo(null);
-    const reader = new FileReader();
-    reader.onloadend = () => {
+      };
+      reader.readAsDataURL(document);
+    }
+    if (image) {
+      setText("");
+      setDocument(null);
+      setVideo(null);
+      const reader = new FileReader();
+      reader.onloadend = () => {
         const base64String = reader.result as string;
-        socket.emit("send-image", { type: 'image', image: base64String, selectedCommunityId });
+        socket.emit("send-image", {
+          type: "image",
+          image: base64String,
+          selectedCommunityId,
+        });
         setImage(null);
-    };
-    reader.readAsDataURL(image);
-  }
-  if (video) {
-    setImage(null);
-    setText('');
-    setDocument(null);
-    const reader = new FileReader();
-    reader.onloadend = () => {
+      };
+      reader.readAsDataURL(image);
+    }
+    if (video) {
+      setImage(null);
+      setText("");
+      setDocument(null);
+      const reader = new FileReader();
+      reader.onloadend = () => {
         const base64String = reader.result as string;
-        socket.emit('send-video', { type: 'video', videoUrl: base64String, selectedCommunityId });
+        socket.emit("send-video", {
+          type: "video",
+          videoUrl: base64String,
+          selectedCommunityId,
+        });
         setVideo(null);
-    };
-    reader.readAsDataURL(video);
-}
-
+      };
+      reader.readAsDataURL(video);
+    }
   };
 
   return (
@@ -348,7 +363,7 @@ export default function Community() {
                   key={community.id}
                   className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
                   onClick={() => {
-                    toggleHeading(community.name , community.id);
+                    toggleHeading(community.name, community.id);
                     handleSmScreen();
                   }}
                 >
@@ -406,7 +421,6 @@ export default function Community() {
             smScreen ? "flex" : "hidden"
           } md:flex flex-col md:h-full w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
         >
-          
           <div className="flex flex-row bg-[#8c52ff] w-full h-16 rounded-lg items-center justify-between">
             <div
               className="rounded-full flex justify-center items-center md:hidden"
@@ -455,87 +469,120 @@ export default function Community() {
               </div>
             </div>
           </div>
-          {leftRoom==="no"?
-          (
+          {leftRoom === "no" ? (
             <div className="flex flex-col h-full">
-          <div className="flex flex-grow flex-col p-4 overflow-auto">
-          {messages.length > 0 &&
-            messages.map((message) => (
-              <div key={message.id} className="mb-2 p-2 bg-gray-100 rounded-lg">
-                <p className="text-blue-800 font-serif size-5 ">{message.sender.first_name}</p>
-               {message.type === "text" ? (
-                               <div><p >{message.content}</p></div>
-                            ) : message.type === 'image' ? (
-                                <img src={message.content} alt="Uploaded" style={{ maxWidth: '100%', marginTop: '10px' }} />
-                            ) : message.type === 'video' ? (
-                              <video controls style={{ maxWidth: '100%', marginTop: '10px' }}>
-                                    <source src={message.content} type="video/mp4" />
-                                    Your browser does not support the video tag.
-                                </video>
-                            ) : message.type === 'document' ? (
-                                <a href={message.content} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: '10px' }}>
-                                    Open Document
-                                </a>
-                            ) : message.content}
+              <div className="flex flex-grow flex-col p-4 overflow-auto">
+                {messages.length > 0 &&
+                  messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className="mb-2 p-2 bg-gray-100 rounded-lg"
+                    >
+                      <p className="text-blue-800 font-serif size-5 ">
+                        {message.sender.first_name}
+                      </p>
+                      {message.type === "text" ? (
+                        <div>
+                          <p>{message.content}</p>
+                        </div>
+                      ) : message.type === "image" ? (
+                        <img
+                          src={message.content}
+                          alt="Uploaded"
+                          style={{ maxWidth: "100%", marginTop: "10px" }}
+                        />
+                      ) : message.type === "video" ? (
+                        <video
+                          controls
+                          style={{ maxWidth: "100%", marginTop: "10px" }}
+                        >
+                          <source src={message.content} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : message.type === "document" ? (
+                        <a
+                          href={message.content}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ display: "block", marginTop: "10px" }}
+                        >
+                          Open Document
+                        </a>
+                      ) : (
+                        message.content
+                      )}
+                    </div>
+                  ))}
               </div>
-            ))}
-        </div>
-        
-          <div className="flex justify-center p-3">
-            <div className="relative w-full md:w-[65vw]">
-              <input
-                type="text"
-                className="pl-10 pr-4 py-2 w-full border rounded-lg bg-[#D9D9D9]"
-                placeholder="text"
-                value={text}
-                onChange={handleChangeText}
-              />
-              <input
+
+              <div className="flex justify-center p-3">
+                <div className="relative w-full md:w-[65vw]">
+                  <input
+                    type="text"
+                    className="pl-10 pr-4 py-2 w-full border rounded-lg bg-[#D9D9D9]"
+                    placeholder="text"
+                    value={text}
+                    onChange={handleChangeText}
+                  />
+                  <input
                     type="file"
                     accept="image/*"
-                    onChange={e => setImage(e.target.files ? e.target.files[0] : null)}
-                    style={{ padding: '10px', width: 'calc(100% - 22px)', marginBottom: '10px' }}
-                />
-                           
-              <input
+                    onChange={(e) =>
+                      setImage(e.target.files ? e.target.files[0] : null)
+                    }
+                    style={{
+                      padding: "10px",
+                      width: "calc(100% - 22px)",
+                      marginBottom: "10px",
+                    }}
+                  />
+
+                  <input
                     type="file"
                     accept="video/*"
-                    onChange={e => setVideo(e.target.files ? e.target.files[0] : null)}
-                    style={{ padding: '10px', width: 'calc(100% - 22px)', marginBottom: '10px' }}
-                />
-                
-               
-                <input
+                    onChange={(e) =>
+                      setVideo(e.target.files ? e.target.files[0] : null)
+                    }
+                    style={{
+                      padding: "10px",
+                      width: "calc(100% - 22px)",
+                      marginBottom: "10px",
+                    }}
+                  />
+
+                  <input
                     type="file"
                     accept=".pdf, .doc, .docx"
-                    onChange={e => setDocument(e.target.files ? e.target.files[0] : null)}
-                    style={{ padding: '10px', width: 'calc(100% - 22px)', marginBottom: '10px' }}
-                />
-                
-            
+                    onChange={(e) =>
+                      setDocument(e.target.files ? e.target.files[0] : null)
+                    }
+                    style={{
+                      padding: "10px",
+                      width: "calc(100% - 22px)",
+                      marginBottom: "10px",
+                    }}
+                  />
 
-              
-              <button
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                onClick={sendText}
-              >
-                Send
-              </button>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none justify-between w-full">
-                <Image
-                  src="/community/textplussign.svg"
-                  alt="search"
-                  width={25}
-                  height={25}
-                />
+                  <button
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                    onClick={sendText}
+                  >
+                    Send
+                  </button>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none justify-between w-full">
+                    <Image
+                      src="/community/textplussign.svg"
+                      alt="search"
+                      width={25}
+                      height={25}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          </div>
-        )
-        :
-         ( <div>Join the community</div>)
-         }
+          ) : (
+            <div>Join the community</div>
+          )}
         </div>
       </div>
       <Toaster />
