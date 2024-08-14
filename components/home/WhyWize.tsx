@@ -4,6 +4,7 @@ import PracticeCoding from "./PractiseCoding";
 // import Image from "next/image"
 import WizeCampLink from "./WizeCampLink";
 import { useState } from "react";
+import Image from "next/image";
 
 interface Data {
   id: string;
@@ -116,10 +117,18 @@ export default function WhyWize() {
                 of that! Check out our numbers and see for yourselves...
               </p>
               <div className="flex flex-wrap justify-center gap-4 min-h-[400px] w-full my-8 rounded-2xl">
-                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
+                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                  <Image src="./home/whywize/4.svg" alt="winningrecord" width={100} height={100} className="w-full"></Image>
+                </div>
+                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                  <Image src="./home/whywize/2.svg" alt="winningrecord" width={100} height={100} className="w-full"></Image>
+                </div>
+                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                  <Image src="./home/whywize/3.svg" alt="winningrecord" width={100} height={100} className="w-full"></Image>
+                </div>
+                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                  <Image src="./home/whywize/1.svg" alt="winningrecord" width={100} height={100} className="w-full"></Image>
+                </div>
               </div>
             </div>
           </div>
