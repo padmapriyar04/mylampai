@@ -1,28 +1,23 @@
-// pages/api/blogs/[id].js
+
 import { PrismaClient } from '@prisma/client';
-
+import { NextRequest, NextResponse } from "next/server";
 const prisma = new PrismaClient();
+export const GET = async (req: NextRequest, res: NextResponse) => {
+  const id = req.url.split("/blog/")[1];
+  try {
+    const post = await prisma.blog.findUnique({
+      where: { id },
+      include: {
+        sections: true,
+      },
+    });
 
-export default async function handler(req:any, res:any) {
-  const { id } = req.query;
-
-  if (req.method === 'GET') {
-    // Fetch a single blog by ID
-    try {
-      const post = await prisma.blog.findUnique({
-        where: { id },
-        include: {
-          sections: true,
-        },
-      });
-
-      if (!post) {
-        return res.status(404).json({ error: 'Post not found' });
-      }
-
-      res.status(200).json(post);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch post' });
+    if (!post) {
+      return NextResponse.json({ message: "Post not found" }, { status: 404 });
     }
+    return NextResponse.json({ message: "Success", post }, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({ message: "Error", err }, { status: 500 });
   } 
-}
+};
+
