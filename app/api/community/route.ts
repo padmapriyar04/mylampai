@@ -1,6 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../lib/index';
-import { connectToDatabase } from '@/app/helpers/server';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib";
+
+export const GET = async (req: NextRequest) => {
+  try {
+    const communities = await prisma.community.findMany();
+    return NextResponse.json({ communities });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+};
+
+
+
 import jwt from 'jsonwebtoken';
 
 type CommunityRequest = {
@@ -40,7 +54,6 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: 'Name is required' }, { status: 422 });
     }
 
-    await connectToDatabase();
     const existingCommunity = await prisma.community.findUnique({
       where: { name },
     });

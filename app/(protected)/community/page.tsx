@@ -1,14 +1,11 @@
 "use client";
-
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
-import Carousel from "../../../components/community/NewCarousel";
-import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
-import socket from "@/utils/socket";
 import { useUserStore } from "@/utils/userStore";
+import ExclusiveCommunity from "@/components/community/ExclusiveCommunity";
+import socket from "@/utils/socket";
+import { toast } from "sonner";
 
-// Define the Community and Message types
 interface Community {
   id: string;
   createdAt: string;
@@ -38,9 +35,7 @@ interface Message {
 }
 
 export default function Community() {
-  const userStore = useUserStore();
-  const [error, setError] = useState<string | null>(null);
-  const token = useUserStore((state) => state.token);
+  const { token } = useUserStore();
   const [messageHeading, setMessageHeading] = useState<string>("");
   const [icon, setIcon] = useState<string>("");
   const [smScreen, setSmScreen] = useState<boolean>(false);
@@ -49,14 +44,14 @@ export default function Community() {
   const [userId, setUserId] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
-    null
-  );
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
   const [leftRoom, setLeftRoom] = useState<string>("no");
   const [image, setImage] = useState<File | null>(null);
   const [video, setVideo] = useState<File | null>(null);
   const [document, setDocument] = useState<File | null>(null);
-  const [normalCommunities, setNormalCommunities] = useState<Community[]>([]);
+  const [exclusiveCommunities, setExclusiveCommunities] = useState<Community[]>(
+    []
+  );
 
   const toggleHeading = (text: string, communityId: string) => {
     setSelectedCommunityId(communityId);
@@ -176,53 +171,23 @@ export default function Community() {
 
   const fetchCommunities = async () => {
     try {
-      const response = await fetch("/api/community/getAll");
+      const response = await fetch("/api/community");
       const data = await response.json();
+
+      const exclusiveCommunities = data.communities.filter(
+        (community: Community) => community.comm_type === "Exclusive"
+      );
+
       setCommunities(data.communities);
+      setExclusiveCommunities(exclusiveCommunities);
     } catch (error) {
       console.error("Error fetching communities:", error);
     }
   };
 
-  const fetchNormalCommunities = async () => {
-    try {
-      const response = await fetch("/api/community/getAll");
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-
-      // Log the full data to verify the structure
-      console.log("Fetched data:", data);
-
-      // Ensure data.communities exists and is an array
-      if (Array.isArray(data.communities)) {
-        // Log the type of each community to check for discrepancies
-        data.communities.forEach((community: Community) => {
-          console.log(`Community comm_type: ${community.comm_type}`);
-        });
-
-        // Filter for normal communities
-        const normal = data.communities.filter(
-          (community: Community) => community.comm_type === "Normal"
-        );
-        console.log("Normal communities:", normal); // Debug statement
-        setNormalCommunities(normal);
-      } else {
-        throw new Error("Invalid data format");
-      }
-    } catch (error) {
-      console.error("Error fetching normal communities:", error);
-      setError("Failed to load communities.");
-    }
-  };
-
-  useEffect(() => {
-    fetchNormalCommunities();
-  }, []);
-
   useEffect(() => {
     const userIdFromLocalStorage = localStorage.getItem("userId");
+
     if (userIdFromLocalStorage) {
       setUserId(userIdFromLocalStorage);
       console.log(userIdFromLocalStorage);
@@ -378,7 +343,9 @@ export default function Community() {
               </div>
             </div>
           </div>
-          <Carousel />
+
+          <ExclusiveCommunity exclusiveCommunities={exclusiveCommunities} />
+
           <div className="flex flex-col gap-3 overflow-x-clip mt-[250px] mr-2">
             <div className="flex flex-row justify-between">
               <span className="text-base font-semibold">All Communities</span>
@@ -387,50 +354,53 @@ export default function Community() {
               </button>
             </div>
             <div className="w-full gap-3 flex flex-col justify-center">
-              {normalCommunities.map((community) => (
-                <div
-                  key={community.id}
-                  className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
-                  onClick={() => {
-                    toggleHeading(community.name, community.id);
-                    handleSmScreen();
-                  }}
-                >
-                  <div className="flex flex-row items-center">
-                    <div className="w-[80px] p-1">
-                      <Image
-                        src="/community/WebDev.svg" // Use a default icon or handle appropriately
-                        alt="img"
-                        height={10}
-                        width={10}
-                        className="w-full"
-                      />
-                    </div>
-                    <span className="pl-5">
-                      {capitalizeFirstLetterOfEachWord(community.name)}
-                    </span>
-                  </div>
-                  <div>
-                    {community.messagesIds &&
-                      community.messagesIds.length > 0 && (
-                        <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
-                          {community.messagesIds.length}
-                        </div>
-                      )}
-                  </div>
-                  <div>
-                    <button
-                      className="text-sm font-semibold text-green-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        joinCommunity(community.id);
+              {communities.map(
+                (community, index) =>
+                  community.comm_type == "Normal" && (
+                    <div
+                      key={index}
+                      className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
+                      onClick={() => {
+                        toggleHeading(community.name, community.id);
+                        handleSmScreen();
                       }}
                     >
-                      Join
-                    </button>
-                  </div>
-                </div>
-              ))}
+                      <div className="flex flex-row items-center">
+                        <div className="w-[80px] p-1">
+                          <Image
+                            src="/community/WebDev.svg" // Use a default icon or handle appropriately
+                            alt="img"
+                            height={10}
+                            width={10}
+                            className="w-full"
+                          />
+                        </div>
+                        <span className="pl-5">
+                          {capitalizeFirstLetterOfEachWord(community.name)}
+                        </span>
+                      </div>
+                      <div>
+                        {community.messagesIds &&
+                          community.messagesIds.length > 0 && (
+                            <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
+                              {community.messagesIds.length}
+                            </div>
+                          )}
+                      </div>
+                      <div>
+                        <button
+                          className="text-sm font-semibold text-green-500 mr-4"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            joinCommunity(community.id);
+                          }}
+                        >
+                          Join
+                        </button>
+                      </div>
+                    </div>
+                  )
+              )}
             </div>
           </div>
         </div>
@@ -439,7 +409,7 @@ export default function Community() {
             isSmallScreen ? "absolute top-14 h-[90%] w-full ml-0" : ""
           } ${
             smScreen ? "flex" : "hidden"
-          } md:flex flex-col md:h-full w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
+          } sm:flex flex-col md:h-full w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
         >
           <div className="flex flex-row bg-[#8c52ff] w-full h-16 rounded-lg items-center justify-between">
             <div
@@ -506,10 +476,12 @@ export default function Community() {
                           <p>{message.content}</p>
                         </div>
                       ) : message.type === "image" ? (
-                        <img
-                          src={message.content}
+                        <Image
+                          src={"/home/profile.jpg"}
+                          width={100}
+                          height={100}
                           alt="Uploaded"
-                          style={{ maxWidth: "100%", marginTop: "10px" }}
+                          className="w-auto"
                         />
                       ) : message.type === "video" ? (
                         <video
@@ -605,7 +577,6 @@ export default function Community() {
           )}
         </div>
       </div>
-      <Toaster />
     </div>
   );
 }

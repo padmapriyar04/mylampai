@@ -67,8 +67,8 @@ const HomeNavbar = () => {
 
   return (
     <div className={`flex justify-between items-center gap-4 ${!scroll ? "bg-primary-foreground" : "bg-[#ffffff20]"} backdrop-blur-sm transition px-8 py-2 sticky top-0 w-full z-50 h-[64px]`}>
-      <Link href={"/"} className="grid place-items-center max-w-[120px] w-full">
-        <Image src={"/home/logo.svg"} height={100} width={110} alt="logo" className="w-[120px] drop-shadow-md" />
+      <Link href={"/"} className="grid place-items-center max-w-[180px] w-full">
+        <Image src={"/home/logo.svg"} height={100} width={180} alt="logo" className="w-[180px] drop-shadow-md" />
       </Link>
 
       {user ? (
