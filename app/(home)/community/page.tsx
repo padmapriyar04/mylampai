@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 //import socket from '@/utils/socket';
 import { io, Socket } from 'socket.io-client'
 import { useUserStore } from '@/utils/userStore';
+import { IoSend } from "react-icons/io5";
 
 // Define the Community and Message types
 interface Community {
@@ -310,18 +311,18 @@ export default function Community() {
   };
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="bg-[#F1EAFF] w-full h-[90vh] lg:h-[88vh] xl:h-[90vh] flex flex-wrap md:flex-nowrap gap-3">
-        <div className="w-full md:w-2/5 h-full flex flex-col gap-3 pl-4 pt-3 overflow-auto scrollbar-hide overflow-x-hidden">
+    <div className="w-full h-[90vh] flex justify-center">
+      <div className="bg-[#F1EAFF] w-full h-[90vh] lg:h-[88vh] xl:h-[92vh] flex flex-wrap md:flex-nowrap gap-3">
+        <div className="w-full md:w-2/5 h-full flex flex-col gap-3 pl-4 pt-3 overflow-auto scrollbar-hide overflow-x-hidden ml-20">
           <div className="text-[#737373] font-semibold flex flex-col gap-2.5">
-            <div className="font-bold">Hello Raj!</div>
-            <span className="text-[#A6A6A6]">
+            <div className=" text-2xl font-bold">Hello Raj!</div>
+            <span className="text-[#A6A6A6] text-md">
               Learn with your peers to maximize learning
             </span>
             <div className="relative">
               <input
                 type="text"
-                className="pl-10 pr-4 py-2 w-11/12 border rounded-lg"
+                className="pl-10 pr-4 py-2 w-full border rounded-lg "
                 placeholder="Search Problems"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -343,60 +344,64 @@ export default function Community() {
               </button>
             </div>
             <div className="w-full gap-3 flex flex-col justify-center">
-              {communities.map((community) => (
-                <div
-                  key={community.id}
-                  className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
-                  onClick={() => {
-                    toggleHeading(community.name , community.id);
-                    handleSmScreen();
-                  }}
-                >
-                  <div className="flex flex-row items-center">
-                    <div className="w-[80px] p-1">
-                      <Image
-                        src="/community/WebDev.svg" // Use a default icon or handle appropriately
-                        alt="img"
-                        height={10}
-                        width={10}
-                        className="w-full"
-                      />
-                    </div>
-                    <span className="pl-5">
-                      {capitalizeFirstLetterOfEachWord(community.name)}
-                    </span>
-                  </div>
-                  <div>
-                    {community.messagesIds &&
-                      community.messagesIds.length > 0 && (
-                        <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
-                          {community.messagesIds.length}
-                        </div>
-                      )}
-                  </div>
-                  <div>
-                    <button
-                      className="text-sm font-semibold text-red-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        leaveCommunity(community.id);
-                      }}
-                    >
-                      Leave
-                    </button>
-                    <button
-                      className="text-sm font-semibold text-green-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        joinCommunity(community.id);
-                      }}
-                    >
-                      Join
-                    </button>
-                  </div>
-                </div>
-              ))}
+  {Array.isArray(communities) && communities.length > 0 ? (
+    communities.map((community) => (
+      <div
+        key={community.id}
+        className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
+        onClick={() => {
+          toggleHeading(community.name, community.id);
+          handleSmScreen();
+        }}
+      >
+        <div className="flex flex-row items-center">
+          <div className="w-[80px] p-1">
+            <Image
+              src="/community/WebDev.svg" // Use a default icon or handle appropriately
+              alt="img"
+              height={10}
+              width={10}
+              className="w-full"
+            />
+          </div>
+          <span className="pl-5">
+            {capitalizeFirstLetterOfEachWord(community.name)}
+          </span>
+        </div>
+        <div>
+          {community.messagesIds && community.messagesIds.length > 0 && (
+            <div className="w-10 h-10 rounded-full bg-[#8c52ff] text-lg flex justify-center items-center text-[#fff] mr-3">
+              {community.messagesIds.length}
             </div>
+          )}
+        </div>
+        <div>
+          <button
+            className="text-sm font-semibold text-red-500 mr-4"
+            onClick={(e) => {
+              e.stopPropagation();
+              leaveCommunity(community.id);
+            }}
+          >
+            Leave
+          </button>
+          <button
+            className="text-sm font-semibold text-green-500 mr-4"
+            onClick={(e) => {
+              e.stopPropagation();
+              joinCommunity(community.id);
+            }}
+          >
+            Join
+          </button>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p>No communities available.</p>
+  )}
+</div>
+
           </div>
         </div>
         <div
@@ -407,7 +412,7 @@ export default function Community() {
           } md:flex flex-col md:h-full w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
         >
           
-          <div className="flex flex-row bg-[#8c52ff] w-full h-16 rounded-lg items-center justify-between">
+          <div className="flex flex-row bg-[#8c52ff] w-full h-24 rounded-lg items-center justify-between">
             <div
               className="rounded-full flex justify-center items-center md:hidden"
               onClick={handleSmScreen}
@@ -485,48 +490,32 @@ export default function Community() {
             <div className="relative w-full md:w-[65vw]">
               <input
                 type="text"
-                className="pl-10 pr-4 py-2 w-full border rounded-lg bg-[#D9D9D9]"
-                placeholder="text"
+                className="pl-14 pr-4 py-4 w-full border rounded-lg bg-[#D9D9D9]"
+                placeholder="Type your message"
                 value={text}
                 onChange={handleChangeText}
+                
               />
-              <input
+              <button
+                className="absolute  top-7 transform -translate-y-1/2 text-4xl text-purple-500 right-4"
+                onClick={sendText}
+              >
+                <IoSend />
+              </button>
+              
+              <input className="bg-purple-500 absolute top-4 left-4 w-8 opacity-0"
                     type="file"
                     accept="image/*"
                     onChange={e => setImage(e.target.files ? e.target.files[0] : null)}
-                    style={{ padding: '10px', width: 'calc(100% - 22px)', marginBottom: '10px' }}
-                />
-                           
-              <input
-                    type="file"
-                    accept="video/*"
-                    onChange={e => setVideo(e.target.files ? e.target.files[0] : null)}
-                    style={{ padding: '10px', width: 'calc(100% - 22px)', marginBottom: '10px' }}
+                    // style={{ padding: '10px', width: 'calc(100% - 22px)', marginBottom: '10px' }}
                 />
                 
-               
-                <input
-                    type="file"
-                    accept=".pdf, .doc, .docx"
-                    onChange={e => setDocument(e.target.files ? e.target.files[0] : null)}
-                    style={{ padding: '10px', width: 'calc(100% - 22px)', marginBottom: '10px' }}
-                />
-                
-            
-
-              
-              <button
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                onClick={sendText}
-              >
-                Send
-              </button>
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none justify-between w-full">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none justify-between w-full">
                 <Image
                   src="/community/textplussign.svg"
                   alt="search"
-                  width={25}
-                  height={25}
+                  width={35}
+                  height={35}
                 />
               </div>
             </div>

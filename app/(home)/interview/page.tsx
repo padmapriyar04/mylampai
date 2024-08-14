@@ -583,7 +583,7 @@ useEffect(() => {
     </div>
     
     {/* Upload Section */}
-    <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[43vh] text-center">
+    <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[41vh] text-center">
     <div className="flex items-center justify-center text-purple-500 mb-5 relative top-0 text-5xl">
   <IoDocumentAttach />
      </div>
@@ -633,7 +633,7 @@ useEffect(() => {
     </div>
 
     {/* Upload Button */}
-    <div className="flex justify-center mt-4">
+    <div className="flex justify-center mt-2">
   <button
     className="bg-purple-500 w-80 text-white font-bold py-3 px-3 rounded-xl hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 transition"
     onClick={() => triggerFileInput('resumeUpload')}
@@ -648,7 +648,7 @@ useEffect(() => {
 
     {/* Display Uploaded File */}
     {resumeFile && (
-      <div className="mt-6 text-xs text-center text-gray-700">
+      <div className="mt-4 text-xs text-center text-gray-700">
         <p>{resumeFile.name} uploaded successfully.</p>
       </div>
     )}
@@ -735,7 +735,7 @@ useEffect(() => {
             </div>
             <h3 className="text-3xl font-bold text-center text-gray-800 w-[150%] mb-8">Choose your Interview Profile</h3>
               
-            <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[43vh] text-center">
+            <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[41vh] text-center">
               
               <div className="w-full flex justify-center mb-6">
                 <button 
@@ -753,7 +753,7 @@ useEffect(() => {
               </div>
 
               {isManualEntry ? (
-                <div className="w-full p-4 bg-white rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center">
+                <div className="w-full p-4 bg-white rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center mb-8">
                   <textarea
                     className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
                     placeholder="Write or paste here complete job details (Word limit 1000 words)"
@@ -769,13 +769,13 @@ useEffect(() => {
                       </option>
                       <option value="a">a</option>
                       <option value="b">b</option>
-                      <option value="cd">cd</option>
+                      <option value="c">cd</option>
                     </select>
                   </div>
                 </div>
               ) : (
-                <div className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white" onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, setJobDescriptionFile)}>
-                  <div className="mb-4">
+                <div className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white " onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, setJobDescriptionFile)}>
+                  <div className="mb-8">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className={`h-12 w-12 ${jobDescriptionFile ? "text-purple-600" : "text-gray-300"}`}
@@ -802,7 +802,6 @@ useEffect(() => {
                   <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
                 </div>
               )}
-
               <div className="mt-8 w-full px-4 flex flex-col items-center">
                 <button 
                   className={`w-[220%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition  mt-6 ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ?'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
@@ -891,7 +890,7 @@ useEffect(() => {
           <div className="w-[150%] flex justify-center text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
           </div>
-          <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[43vh] text-center">
+          <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[41vh] text-center">
           {!isMicTestEnabled && !isSoundTesting && (
             <div className="w-full flex flex-col items-center justify-center">
               
