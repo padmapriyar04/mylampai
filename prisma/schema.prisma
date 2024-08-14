@@ -159,16 +159,13 @@ model Blog {
   authorName  String
   position    String
   sections    Section[]
-  image       String
   tags        String[]
-  createdAt   DateTime @default(now())
-
 }
 
 model Section {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  blogId      String
-  subheading  String
-  content     String
-  blog        Blog       @relation(fields: [blogId], references: [id])
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  blogId     String
+  subheading String
+  content    String
+  blog       Blog   @relation(fields: [blogId], references: [id])
 }
