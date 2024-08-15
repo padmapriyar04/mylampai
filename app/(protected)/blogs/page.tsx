@@ -1,16 +1,19 @@
-"use client";
-import { useState } from 'react';
+"use client"
+import { useRouter } from 'next/navigation'
 import Image from "next/image";
 async function getPost() {
     const response = await fetch(`http://localhost:3000/api/blogs`, {
         method: "GET"
     });
     return response.json();
-
 }
 export default async function BlogList() {
-    const blogPosts = await getPost();
-    console.log(blogPosts);
+    const router = useRouter();
+    const handleClick = ({id}) => {
+        router.push(`/blogs/${id}`); 
+      };
+    const post = await getPost();
+    const blogPosts = post.posts;
     return (
         <div className="w-full h-full">
             <div className="mx-4 lg:mx-8 ">
@@ -57,13 +60,14 @@ export default async function BlogList() {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-500 text-sm">{post.createdAt}</span>
-                                <button className="bg-purple-500 text-white px-3 py-1 rounded">Read More</button>
+                                <button onClick={() => handleClick(post.id)} className="bg-purple-500 text-white px-3 py-1 rounded">Read More </button>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
         </div>
+       
     );
 }
 

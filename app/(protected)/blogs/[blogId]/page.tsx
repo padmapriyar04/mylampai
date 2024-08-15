@@ -4,7 +4,7 @@ import HomeNavbar from './bloghomebar';
 import { FaHome } from "react-icons/fa";
 import Image from 'next/image';
 import Read from './readmore';
-import Carousel from "./crousal";
+
 
 const BlogId: React.FC = () => {
     const [showMore, setShowMore] = useState<boolean>(false);
@@ -23,7 +23,6 @@ const BlogId: React.FC = () => {
     return (
         <div className='w-full min-h-[100vh] bg-[#000000] flex flex-col'>
             <div className='w-full h-fit border-b-[2px] border-b-white fixed top-0 left-0 z-10'>
-                <HomeNavbar />
             </div>
             <div className='w-full flex-1 text-white flex flex-col md:flex-row justify-between mt-[4rem] px-8 md:px-32 py-16'>
                 <div className='text-white w-full md:w-[40%] flex flex-col gap-4 bg-black mx-2 p-4 rounded-xl'>
