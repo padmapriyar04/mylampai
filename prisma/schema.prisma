@@ -158,6 +158,8 @@ model Blog {
   description String
   authorName  String
   position    String
+  readtime    String
+  createdAt   DateTime @default(now())
   sections    Section[]
   tags        String[]
 }

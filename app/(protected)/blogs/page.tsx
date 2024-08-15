@@ -96,7 +96,6 @@ const allTopics = Array.from(new Set(blogPosts.flatMap(post => post.topics)));
 export default function Blogs() {
     const [filter, setFilter] = useState<'Most Viewed' | 'Latest' | null>(null);
     const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-
     const filteredPosts = blogPosts.slice().sort((a, b) => {
         if (filter === 'Most Viewed') {
             return parseInt(b.readers) - parseInt(a.readers);
@@ -118,9 +117,7 @@ export default function Blogs() {
 
     return (
         <div className="w-full h-full">
-            <HomeNavbar />
             <div className="mx-4 lg:mx-8 ">
-
                 <div className="py-4 text-left my-9 mx-20">
                     <div className=' flex flex-row'>
                         <div className="text-xl md:text-2xl font-semibold text-black mb-2">Top Articles to</div>
@@ -141,7 +138,6 @@ export default function Blogs() {
                         </select>
                         <select
                             value={selectedTopic || ''}
-                            onChange={handleTopicChange}
                             className=" p-2 rounded-lg border-gray-300 border-[1.5px]"
                         >
                             <option value="" className=' '>All Topics</option>

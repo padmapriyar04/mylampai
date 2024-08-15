@@ -7,6 +7,7 @@ export default function NewBlog() {
     description: '',
     authorName: '',
     position: '',
+    readtime:' ',
     sections: [{ subheading: '', content: '' }],
     tags: '',
   });
@@ -56,6 +57,7 @@ export default function NewBlog() {
         description: '',
         authorName: '',
         position: '',
+        readtime:' ',
         sections: [{ subheading: '', content: '' }],
         tags: '',
       });
@@ -83,6 +85,10 @@ export default function NewBlog() {
         <div>
           <label>Author Position</label>
           <input type="text" name="position" value={formData.position} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Reading Time</label>
+          <input type="text" name="readtime" value={formData.readtime} onChange={handleChange} required />
         </div>
         <div>
           <label>Tags</label>
