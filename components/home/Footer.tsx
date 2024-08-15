@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="bg-white w-full rounded-2xl py-4 px-8 shadow-br">
           <div className="flex items-center justify-between sm:px-4 text-2xl font-bold text-[#00000090] border-dashed border-b-[3px] pb-4">
             <Image
-              className="w-[100px] sm:w-[180px]"
+              className="w-[100px] h-auto sm:w-[180px]"
               src="/home/logo.svg"
               height={100}
               width={180}
@@ -16,7 +16,7 @@ export default function Footer() {
             />{" "}
             by
             <Image
-              className="w-[100px] sm:w-[300px]"
+              className="w-[100px] h-auto sm:w-[300px]"
               src="/home/myLampAI.svg"
               height={100}
               width={300}
@@ -30,7 +30,7 @@ export default function Footer() {
               </h3>
               <div className="flex gap-4 items-center text-[#00000090] text-[0.9rem] ">
                 <Image
-                  className="max-w-[25px]"
+                  className="max-w-[25px] w-full h-auto"
                   src={"/home/mail.svg"}
                   height={30}
                   width={30}
@@ -43,7 +43,7 @@ export default function Footer() {
               </div>
               <div className="flex gap-4 items-center text-[#00000090] text-[0.9rem] ">
                 <Image
-                  className="max-w-[25px]"
+                  className="max-w-[25px] w-full h-auto"
                   src={"/home/phone.svg"}
                   height={30}
                   width={30}
@@ -56,7 +56,7 @@ export default function Footer() {
               </div>
               <div className="flex gap-4 items-center text-[#00000090] text-[0.9rem] ">
                 <Image
-                  className="max-w-[25px]"
+                  className="max-w-[25px] w-full h-auto"
                   src={"/home/location.svg"}
                   height={30}
                   width={30}

@@ -162,7 +162,7 @@ const ReviewCard = ({
     >
         <Image
           className="rounded-full h-[100px] w-auto m-auto"
-          width="32"
+          width="100"
           height="100"
           alt=""
           src={img}
@@ -176,8 +176,8 @@ export function InfiniteLogoSlide() {
     <>
       <div className="relative flex h-[180px] w-full max-w-[calc(100vw-18px)] flex-col items-center justify-center overflow-hidden rounded-lg border">
         <Marquee className="[--duration:20s]">
-          {firstRow.map((review) => (
-            <ReviewCard key={review.username} {...review} />
+          {firstRow.map((review, index) => (
+            <ReviewCard key={index} {...review} />
           ))}
         </Marquee>
         <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-primary-foreground to-transparent dark:from-background"></div>

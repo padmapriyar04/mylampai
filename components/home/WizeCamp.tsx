@@ -10,7 +10,7 @@ export default function WizeCamp() {
             alt="logo"
             width={100}
             height={100}
-            className="w-[150px] mt-6 mb-2"
+            className="w-[150px] h-auto mt-6 mb-2"
           ></Image>
           <p className="text-sm font-bold">PRESENTS</p>
           <Image
@@ -18,7 +18,7 @@ export default function WizeCamp() {
             alt="wizeCamp"
             width={200}
             height={500}
-            className="max-w-[450px] w-full"
+            className="max-w-[450px] h-auto w-full"
           ></Image>
           <p className="text-white text-right w-full max-w-[500px] font-bold tracking-widest">
             A CAREER BOOTCAMP
@@ -67,7 +67,7 @@ export default function WizeCamp() {
               width={100}
               height={100}
               alt="wizecamp"
-              className="w-full"
+              className="w-full h-auto"
             ></Image>
           </div>
           <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white overflow-hidden">
@@ -76,7 +76,7 @@ export default function WizeCamp() {
               width={100}
               height={100}
               alt="wizecamp"
-              className="w-full"
+              className="w-full h-auto"
             ></Image>
           </div>
           <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white overflow-hidden">
@@ -85,7 +85,7 @@ export default function WizeCamp() {
               width={100}
               height={100}
               alt="wizecamp"
-              className="w-full"
+              className="w-full h-auto"
             ></Image>
           </div>
           <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white overflow-hidden">
@@ -94,7 +94,7 @@ export default function WizeCamp() {
               width={100}
               height={100}
               alt="wizecamp"
-              className="w-full"
+              className="w-full h-auto"
             ></Image>
           </div>
           <div className="w-full max-w-[250px] min-h-[242px] rounded-lg bg-white overflow-hidden">
@@ -103,8 +103,8 @@ export default function WizeCamp() {
               width={100}
               height={100}
               alt="wizecamp"
-              className="w-full"
-            ></Image>
+              className="w-full h-auto"
+            ></Image> 
           </div>
         </div>
       </div>

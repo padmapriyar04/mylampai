@@ -1,5 +1,4 @@
 import Image from "next/image";
-import ImageGrid from "./ImageGrid";
 
 export default function PowerOfWize() {
   return (

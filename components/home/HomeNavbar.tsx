@@ -71,7 +71,7 @@ const HomeNavbar = () => {
           height={100}
           width={180}
           alt="logo"
-          className="w-full drop-shadow-md"
+          className="w-full h-auto drop-shadow-md"
         />
       </Link>
 

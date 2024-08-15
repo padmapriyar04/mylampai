@@ -42,9 +42,9 @@ function RecentAdvancesCard({
         <Image
           src={imageUrl}
           height={100}
-          width={100}
+          width={500}
           alt="blog image"
-          className="w-full"
+          className="w-full h-auto"
         />
         <h3 className="font-semibold text-lg  px-4 pt-4">{title}</h3>
         <p className="text-sm text-[#00000090] px-4 pb-4">{description}</p>
@@ -53,7 +53,7 @@ function RecentAdvancesCard({
           width={200}
           height={200}
           alt="arrow"
-          className=" absolute w-8 bottom-2 right-2 shadow-lg rounded-full"
+          className="h-auto absolute w-8 bottom-2 right-2 shadow-lg rounded-full"
         ></Image>
       </div>
     </>

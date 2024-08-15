@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface User {
@@ -12,11 +12,11 @@ interface User {
 interface UserState {
   user: User | null;
   token: string | null;
-  setUser: (user: User | null, token: string) => void;
+  setUser: (user: User | null, token: string | null) => void;
   clearUser: () => void;
 }
 
-export const useUserStore = create<UserState>()(
+const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       user: null,
@@ -29,3 +29,5 @@ export const useUserStore = create<UserState>()(
     }
   )
 );
+
+export { useUserStore };
