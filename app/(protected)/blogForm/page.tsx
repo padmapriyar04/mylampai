@@ -7,7 +7,7 @@ export default function NewBlog() {
     description: '',
     authorName: '',
     position: '',
-    readtime:' ',
+    readtime:'',
     sections: [{ subheading: '', content: '' }],
     tags: '',
   });
@@ -57,7 +57,7 @@ export default function NewBlog() {
         description: '',
         authorName: '',
         position: '',
-        readtime:' ',
+        readtime:'',
         sections: [{ subheading: '', content: '' }],
         tags: '',
       });

@@ -16,7 +16,7 @@ export const GET = async (request: NextRequest, res: NextResponse) => {
 };
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
-  const { title, description, authorName, position, sections, tags } = await req.json();
+  const { title, description, authorName, position,readtime, sections, tags } = await req.json();
   try {
     const post = await prisma.blog.create({
       data: {
@@ -24,6 +24,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         description,
         authorName,
         position,
+        readtime,
         tags,
         sections: {
           create: sections.map((section: any) => ({
