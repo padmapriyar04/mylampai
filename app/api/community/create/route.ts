@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 type CommunityRequest = {
   name: string;
   description?: string;
-  comm_type: 'Exclusive' | 'Normal';
+  comm_type: 'exclusive' | 'normal';
 };
 
 export const POST = async (req: NextRequest) => {

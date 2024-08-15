@@ -11,7 +11,7 @@ interface Community {
   isCommunity: boolean;
   messagesIds: any[];
   userIds: string[];
-  comm_type: "Exclusive" | "Normal"; // Adjusted property name
+  comm_type: "exclusive" | "normal"; // Adjusted property name
 }
 
 const Carousel = () => {
@@ -58,7 +58,7 @@ const Carousel = () => {
         });
 
         // Filter for exclusive communities
-        const exclusive = data.communities.filter((community: Community) => community.comm_type === "Exclusive");
+        const exclusive = data.communities.filter((community: Community) => community.comm_type === "exclusive");
         console.log("Exclusive communities:", exclusive); // Debug statement
         setExclusiveCommunities(exclusive);
       } else {
@@ -80,13 +80,13 @@ const Carousel = () => {
     return (
       <div className="w-[90%] h-[100%] bg-white rounded-2xl shadow-slate-300 shadow-md">
         <div className="rounded-lg h-[60%] relative">
-          <Image
+          {/* <Image
             alt={name}
             layout="fill"
             objectFit="cover"
             src={svg}
             className="rounded-lg"
-          />
+          /> */}
         </div>
         <p className="font-bold text-xl h-auto w-[50%] mt-3 ml-5 flex items-center text-ellipsis">{name}</p>
       </div>

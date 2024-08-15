@@ -18,7 +18,7 @@ interface Community {
   isCommunity: boolean;
   messagesIds: any;
   userIds: string[];
-  comm_type: "Exclusive" | "Normal";
+  comm_type: "exclusive" | "normal";
 }
 
 interface Sender {
@@ -204,7 +204,7 @@ export default function Community() {
 
         // Filter for normal communities
         const normal = data.communities.filter(
-          (community: Community) => community.comm_type === "Normal"
+          (community: Community) => community.comm_type === "normal"
         );
         console.log("Normal communities:", normal); // Debug statement
         setNormalCommunities(normal);
