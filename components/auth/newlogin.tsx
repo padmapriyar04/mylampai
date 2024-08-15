@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 import Input from "./Input";
 import CountrySelector from "../misc/CountryFlag";
 import { Carousel } from "react-responsive-carousel";

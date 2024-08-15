@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useUserStore } from "@/utils/userStore";
 import ExclusiveCommunity from "@/components/community/ExclusiveCommunity";
@@ -38,13 +38,13 @@ export default function Community() {
   const { token } = useUserStore();
   const [messageHeading, setMessageHeading] = useState<string>("");
   const [icon, setIcon] = useState<string>("");
-  const [smScreen, setSmScreen] = useState<boolean>(false);
-  const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
   const [communities, setCommunities] = useState<Community[]>([]);
   const [userId, setUserId] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
+    null
+  );
   const [leftRoom, setLeftRoom] = useState<string>("no");
   const [image, setImage] = useState<File | null>(null);
   const [video, setVideo] = useState<File | null>(null);
@@ -59,99 +59,6 @@ export default function Community() {
     socket.emit("check-join", { communityId });
   };
 
-  const handleSmScreen = () => {
-    setSmScreen(!smScreen);
-  };
-
-  const checkScreenSize = () => {
-    setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
-  };
-
-  const crossCheck = async (communityId: string) => {
-    try {
-      const response = await fetch(`/api/community/${communityId}/crosscheck`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`, // Adjust token retrieval as per your setup
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log("dats:", data.message);
-        if (data.message == "No") {
-          setLeftRoom("yes");
-        }
-        await fetchCommunities();
-      } else {
-        console.error("Error joining community:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error joining community:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedCommunityId !== null) {
-      crossCheck(selectedCommunityId);
-    }
-  }, [selectedCommunityId]);
-
-  useEffect(() => {
-    if (selectedCommunityId !== null) {
-      const handleNewMessages = (newMessages: Message[]) => {
-        // Check if the data is a single message or an array
-        if (Array.isArray(newMessages)) {
-          newMessages.forEach((message) => {
-            processMessage(message);
-          });
-        } else {
-          processMessage(newMessages);
-        }
-      };
-
-      socket.on("receive-message-community", handleNewMessages);
-      socket.emit("fetch-community-messages", {
-        communityId: selectedCommunityId,
-      });
-
-      // Cleanup on component unmount or when selectedCommunityId changes
-      return () => {
-        socket.off("receive-message-community", handleNewMessages);
-      };
-    }
-  }, [selectedCommunityId]);
-
-  const processMessage = (message: Message) => {
-    console.log(message.type);
-    switch (message.type) {
-      case "image":
-        const ImageUrl = base64ToBlobUrl(message.content, "image/png");
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...message, content: ImageUrl, type: "image" },
-        ]);
-        break;
-      case "video":
-        const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...message, content: VideoUrl, type: "video" },
-        ]);
-        break;
-      case "document":
-        const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...message, content: mediaUrl, type: "document" },
-        ]);
-        break;
-      case "text":
-      default:
-        setMessages((prevMessages) => [...prevMessages, message]);
-        break;
-    }
-  };
-
   const base64ToBlobUrl = (base64: string, type: string) => {
     const byteCharacters = atob(base64.split(",")[1]);
     const byteNumbers = new Uint8Array(byteCharacters.length);
@@ -161,13 +68,6 @@ export default function Community() {
     const blob = new Blob([byteNumbers], { type });
     return URL.createObjectURL(blob);
   };
-
-  useEffect(() => {
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
 
   const fetchCommunities = async () => {
     try {
@@ -184,17 +84,6 @@ export default function Community() {
       console.error("Error fetching communities:", error);
     }
   };
-
-  useEffect(() => {
-    const userIdFromLocalStorage = localStorage.getItem("userId");
-
-    if (userIdFromLocalStorage) {
-      setUserId(userIdFromLocalStorage);
-      console.log(userIdFromLocalStorage);
-    }
-
-    fetchCommunities();
-  }, []);
 
   const capitalizeFirstLetterOfEachWord = (text: string) => {
     return text.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -214,7 +103,6 @@ export default function Community() {
         socket.emit("fetch-community-messages", { communityId });
         setLeftRoom("no");
         toast.success("Joined to the community");
-        await fetchCommunities();
       } else {
         console.error("Error joining community:", response.statusText);
       }
@@ -318,6 +206,105 @@ export default function Community() {
     }
   };
 
+  useEffect(() => {
+    const crossCheck = async (communityId: string) => {
+      try {
+        const response = await fetch(
+          `/api/community/${communityId}/crosscheck`,
+          {
+            mode: "no-cors",
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log("dats:", data.message);
+          if (data.message == "No") {
+            setLeftRoom("yes");
+          }
+        } else {
+          console.error("Error joining community:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error joining community:", error);
+      }
+    };
+
+    if (selectedCommunityId !== null) {
+      crossCheck(selectedCommunityId);
+    }
+  }, [selectedCommunityId, token]);
+
+  useEffect(() => {
+    const processMessage = (message: Message) => {
+      console.log(message.type);
+      switch (message.type) {
+        case "image":
+          const ImageUrl = base64ToBlobUrl(message.content, "image/png");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: ImageUrl, type: "image" },
+          ]);
+          break;
+        case "video":
+          const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: VideoUrl, type: "video" },
+          ]);
+          break;
+        case "document":
+          const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { ...message, content: mediaUrl, type: "document" },
+          ]);
+          break;
+        case "text":
+        default:
+          setMessages((prevMessages) => [...prevMessages, message]);
+          break;
+      }
+    };
+
+    if (selectedCommunityId !== null) {
+      const handleNewMessages = (newMessages: Message[]) => {
+        // Check if the data is a single message or an array
+        if (Array.isArray(newMessages)) {
+          newMessages.forEach((message) => {
+            processMessage(message);
+          });
+        } else {
+          processMessage(newMessages);
+        }
+      };
+
+      socket.on("receive-message-community", handleNewMessages);
+      socket.emit("fetch-community-messages", {
+        communityId: selectedCommunityId,
+      });
+
+      // Cleanup on component unmount or when selectedCommunityId changes
+      return () => {
+        socket.off("receive-message-community", handleNewMessages);
+      };
+    }
+  }, [selectedCommunityId]);
+
+  useEffect(() => {
+    const userIdFromLocalStorage = localStorage.getItem("userId");
+
+    if (userIdFromLocalStorage) {
+      setUserId(userIdFromLocalStorage);
+      console.log(userIdFromLocalStorage);
+    }
+
+    fetchCommunities();
+  }, []);
+
   return (
     <div className="w-full flex justify-center">
       <div className="bg-[#F1EAFF] w-full h-[90vh] lg:h-[88vh] xl:h-[90vh] flex flex-wrap md:flex-nowrap gap-3">
@@ -362,7 +349,6 @@ export default function Community() {
                       className="w-full h-20 bg-[#fff] flex flex-row text-md font-bold justify-between items-center rounded-lg cursor-pointer"
                       onClick={() => {
                         toggleHeading(community.name, community.id);
-                        handleSmScreen();
                       }}
                     >
                       <div className="flex flex-row items-center">
@@ -375,8 +361,8 @@ export default function Community() {
                             className="w-full"
                           />
                         </div>
-                        <span className="pl-5">
-                          {capitalizeFirstLetterOfEachWord(community.name)}
+                        <span className="pl-5 capitalize">
+                          {community.name}
                         </span>
                       </div>
                       <div>
@@ -404,18 +390,9 @@ export default function Community() {
             </div>
           </div>
         </div>
-        <div
-          className={`${
-            isSmallScreen ? "absolute top-14 h-[90%] w-full ml-0" : ""
-          } ${
-            smScreen ? "flex" : "hidden"
-          } sm:flex flex-col md:h-full w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
-        >
+        <div className={`h-[90%] w-full ml-0 flex flex-col md:h-full sm:w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}>
           <div className="flex flex-row bg-[#8c52ff] w-full h-16 rounded-lg items-center justify-between">
-            <div
-              className="rounded-full flex justify-center items-center md:hidden"
-              onClick={handleSmScreen}
-            >
+            <div className="rounded-full flex justify-center items-center md:hidden">
               <Image
                 src="/community/backarrow-white.png"
                 alt="img"
