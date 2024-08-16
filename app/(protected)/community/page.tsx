@@ -36,20 +36,19 @@ interface Message {
 
 export default function Community() {
   const { token } = useUserStore();
+  
   const [messageHeading, setMessageHeading] = useState<string>("");
   const [communities, setCommunities] = useState<Community[]>([]);
-  const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
-    null,
-  );
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
   const [leftRoom, setLeftRoom] = useState<boolean>(false);
+  
+  const [text, setText] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [video, setVideo] = useState<File | null>(null);
   const [document, setDocument] = useState<File | null>(null);
-  const [exclusiveCommunities, setExclusiveCommunities] = useState<Community[]>(
-    [],
-  );
+  
+  const [exclusiveCommunities, setExclusiveCommunities] = useState<Community[]>([]);
 
   const toggleHeading = (name: string, communityId: string) => {
     setSelectedCommunityId(communityId);
@@ -148,7 +147,6 @@ export default function Community() {
       }
     }
     if (document) {
-      console.log(document);
       setImage(null);
       setText("");
       setVideo(null);
