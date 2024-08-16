@@ -2,23 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from 'jsonwebtoken';
 import prisma from "@/lib";
 
+type CommunityRequest = {
+  name: string;
+  description?: string;
+  comm_type: 'exclusive' | 'normal';
+};
+
 export const GET = async (req: NextRequest) => {
   try {
     const communities = await prisma.community.findMany();
     return NextResponse.json({ communities });
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
     );
   }
-};
-
-
-type CommunityRequest = {
-  name: string;
-  description?: string;
-  comm_type: 'Exclusive' | 'Normal';
 };
 
 export const POST = async (req: NextRequest) => {
@@ -43,7 +43,8 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const { name, description,comm_type }: CommunityRequest = await req.json();
+    const { name, description, comm_type }: CommunityRequest = await req.json();
+    
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 422 });
     }
@@ -55,13 +56,17 @@ export const POST = async (req: NextRequest) => {
     if (existingCommunity) {
       return NextResponse.json({ error: 'Community already exists' }, { status: 422 });
     }
+    
+    if (!comm_type) {
+      return NextResponse.json({error: 'Community type ("normal" or "exclusive") is required'}, {status: 422})
+    }
 
     const createdCommunity = await prisma.community.create({
       data: {
         name,
         description,
-        comm_type,
-      },
+        comm_type
+      }
     });
 
     return NextResponse.json({ community: createdCommunity }, { status: 201 });

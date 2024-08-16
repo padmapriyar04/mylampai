@@ -9,7 +9,8 @@ import Input from "./Input";
 import CountrySelector from "../misc/CountryFlag";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { setCookie } from "@/utils/cookieUtils"; // Import cookie utilities
+import { setCookie } from "@/utils/cookieUtils"; 
+import { useUserStore } from "@/utils/userStore";
 
 import Globe from "../../public/images/Globe.svg";
 import Arrow from "../../public/images/Arrow.png";
@@ -22,6 +23,7 @@ import CarouselImage3 from "../../public/images/Globe.svg";
 import CarouselImage4 from "../../public/images/Globe.svg";
 
 const AuthForm: React.FC = () => {
+  const { setUserData } = useUserStore();
   const [isSignUp, setIsSignUp] = useState(true);
   const [activeTab, setActiveTab] = useState("student");
   const [user, setUser] = useState({
@@ -205,14 +207,17 @@ const AuthForm: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
+      
+        console.log(data)
 
         // Store user data and token in cookies
         setCookie("token", data.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
 
         toast.success("Login successful!");
+        
+        setUserData(data.user, data.token);
 
-        // Redirect based on role
         if (data.user.role === "admin") {
           router.push("/adminDashboard");
         } else {

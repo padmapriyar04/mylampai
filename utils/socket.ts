@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const socket = io('https://mylamp-server.onrender.com', {
+const socket = io('wss://localhost:4000/', {
     withCredentials: true,
     query: {
         token: typeof window !== 'undefined' ? localStorage.getItem('token') : null

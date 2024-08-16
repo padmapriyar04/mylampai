@@ -12,7 +12,7 @@ interface Community {
   isCommunity: boolean;
   messagesIds: any;
   userIds: string[];
-  comm_type: "Exclusive" | "Normal";
+  comm_type: "exclusive" | "normal";
 }
 interface ExclusiveCommunityProps {
   exclusiveCommunities: Community[];
@@ -68,17 +68,6 @@ const ExclusiveCommunity: React.FC<ExclusiveCommunityProps> = ({
 
   return (
     <>
-      <style>
-        {`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-          .scrollbar-hide {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-          }
-        `}
-      </style>
       <div className="flex flex-col gap-3 ml-0 relative">
         <div className="flex flex-row justify-between">
           <span className="text-base font-semibold">Exclusive Communities</span>

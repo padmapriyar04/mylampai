@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import InterviewPage from "../interviewPage/page";
 import { IoDocumentAttach } from "react-icons/io5";
-import AudioToText from "./Recording";
+import AudioToText from "./recording";
 import { FiMic, FiSpeaker, FiVideo, FiMessageSquare, FiVolume2, FiChevronDown } from "react-icons/fi";
 import useInterviewStore from './store';
 
