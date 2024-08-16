@@ -7,6 +7,7 @@ import { useUserStore } from "@/utils/userStore";
 import { SlBell } from "react-icons/sl";
 import { FiUser } from "react-icons/fi";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
+import useRouterStore from "../navbar/useRouteStore";
 import {
   CommunityComponent,
   ResourcesComponent,
@@ -15,6 +16,7 @@ import {
 import { getCookie } from "@/utils/cookieUtils";
 
 const HomeNavbar = () => {
+  const {bears} = useRouterStore()
   const [scroll, setScroll] = useState(false);
   const { user, setUser } = useUserStore((state) => ({
     user: state.user,
@@ -59,6 +61,8 @@ const HomeNavbar = () => {
 
   const userInitials = getUserInitials();
 
+
+  if (bears)
   return (
     <div
       className={`flex justify-between items-center gap-4 ${

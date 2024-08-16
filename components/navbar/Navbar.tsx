@@ -2,13 +2,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import useRouteStore from "./useRouteStore"
 
 const Navbar = () => {
   const pathname = usePathname();
+  const {bears} = useRouteStore();
+
+  console.log("Im loki")
 
   return (
     <>
-      {pathname !== "/" && (
+      {pathname !== "/" && bears && (
         <nav className="p-3 flex z-50 bg-white sticky top-0 justify-between items-center shadow">
           <div>
             <Link href="/" className="">
