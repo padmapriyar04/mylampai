@@ -1,8 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import InterviewPage from "../interviewPage/page"
+import InterviewPage from "../interviewPage/page";
 import { IoDocumentAttach } from "react-icons/io5";
-
 import AudioToText from "./Recording";
 import { FiMic, FiSpeaker, FiVideo, FiMessageSquare, FiVolume2, FiChevronDown } from "react-icons/fi";
 import useInterviewStore from './store';
@@ -60,12 +59,13 @@ const InterviewComponent = () => {
 
       websocketRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === "cv_uploaded") {
-          console.log("CV uploaded:", data.message);
-          setCvText(data.cv_text);
-        } else if (data.type === "jd_analyzed") {
-          console.log("Job description analyzed:", data.message);
-          setJD(data.job_description);
+       if (data.type === "cv_uploaded") {
+    console.log("CV uploaded:", data.message);
+    setCvText(data.cv_text);  // Update the state with CV text
+  } else if (data.type === "jd_analyzed") {
+    console.log("Job description analyzed:", data.message);
+    setJD(data.job_description);  // Update the state with JD text
+  
         } else if (data.type === "interview_question") {
           console.log("Interview question received:", data.question);
           setChatMessages((prevMessages) => [...prevMessages, { user: "Interviewer", message: data.question }]);
@@ -149,8 +149,6 @@ const InterviewComponent = () => {
       setResumeFile(null); 
     }
   };
-  
-
 
   const handleJobDescriptionUpload = (event) => {
     const file = event.target.files[0];
@@ -228,6 +226,7 @@ const InterviewComponent = () => {
       stopTestSound();  // Stop the test sound if speaker is disabled
     }
   };
+
   const playTestSound = () => {
     if (audioRef.current) {
       console.log("Playing sound");  // Debug log
@@ -239,80 +238,66 @@ const InterviewComponent = () => {
       });
     }
   };
-  
-  
+
   const stopTestSound = () => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
   };
-  
-  
 
   const handleMicTestConfirmation = () => {
     setIsMicTestEnabled(false);
     setIsMicEnabled(true); // Ensure the microphone is marked as enabled after the test
     stopMicrophoneTest(); // Stop the microphone test after confirmation
   };
-  
-  
 
   const handleSoundConfirmation = () => {
     stopTestSound();  // Stop the sound after confirmation
     setIsSoundEnabled(true);
     setIsSoundTesting(false);
   };
-  
 
- // Microphone Test Functions
-const startMicrophoneTest = () => {
-  navigator.mediaDevices.getUserMedia({ audio: true })
-    .then((stream) => {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const analyser = audioContext.createAnalyser();
-      const microphone = audioContext.createMediaStreamSource(stream);
-      microphone.connect(analyser);
-      
-      analyser.fftSize = 256;
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-      
-      audioContextRef.current = audioContext;
-      analyserRef.current = analyser;
-      dataArrayRef.current = dataArray;
-      setMicActive(true);
-      updateVolume();
-    })
-    .catch((err) => {
-      console.error("Error accessing microphone: ", err);
-      alert("Unable to access microphone: " + err.message);
-    });
-};
-
-const updateVolume = () => {
-  analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-  const volume = dataArrayRef.current.reduce((a, b) => a + b) / dataArrayRef.current.length;
-  setVolume(volume);
-  rafIdRef.current = requestAnimationFrame(updateVolume);
-};
-
-const stopMicrophoneTest = () => {
-  cancelAnimationFrame(rafIdRef.current);
-  if (audioContextRef.current) {
-    audioContextRef.current.close();
-  }
-  setMicActive(false);
-  setVolume(0);
-};
-
-useEffect(() => {
-  return () => {
-    stopMicrophoneTest();
+  // Microphone Test Functions
+  const startMicrophoneTest = () => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+        
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        
+        audioContextRef.current = audioContext;
+        analyserRef.current = analyser;
+        dataArrayRef.current = dataArray;
+        setMicActive(true);
+        updateVolume();
+      })
+      .catch((err) => {
+        console.error("Error accessing microphone: ", err);
+        alert("Unable to access microphone: " + err.message);
+      });
   };
-}, []);
 
+  const updateVolume = () => {
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+    const volume = dataArrayRef.current.reduce((a, b) => a + b) / dataArrayRef.current.length;
+    setVolume(volume);
+    rafIdRef.current = requestAnimationFrame(updateVolume);
+  };
 
+  const stopMicrophoneTest = () => {
+    cancelAnimationFrame(rafIdRef.current);
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+    }
+    setMicActive(false);
+    setVolume(0);
+  };
 
   useEffect(() => {
     return () => {
@@ -340,7 +325,6 @@ useEffect(() => {
       setStep(step + 1);
     }
   };
-  
 
   const handleBackClick = () => {
     if (step > 1) {
@@ -384,6 +368,10 @@ useEffect(() => {
 
   const [activeTab, setActiveTab] = useState('conversation');
   
+  if (!isMounted) {
+    // Optionally, return a loading indicator or an empty fragment
+    return null;
+  }
 
   if (isInterviewStarted) {
     return (
@@ -409,7 +397,7 @@ useEffect(() => {
         </nav>
   
         {/* Main Content */}
-        <div className="flex-1 flex justify-center items-center bg-gray-100 overflow-hidden h-screen">
+        <div className="flex-1 flex justify-center items-center flex-col sm:flex-row bg-gray-100 overflow-hidden h-screen">
           <video
             ref={videoRef}
             className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75"
@@ -522,7 +510,6 @@ useEffect(() => {
     );
   }
 
-
   return (
     <div className="min-h-[92vh] bg-purple-100 flex items-center justify-center w-[100%]">
       {/* Step 1: Upload Resume */}
@@ -622,7 +609,7 @@ useEffect(() => {
         >
           <path
             fillRule="evenodd"
-            d="M10 3a1 1 0 011 1v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 11.586V4a1 1 0 011-1z"
+            d="M10 3a1 1 0 011 1v7.586l1.293-1.293a1 1 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 11.586V4a1 1 0 011-1z"
             clipRule="evenodd"
           />
           <path
@@ -1004,7 +991,7 @@ useEffect(() => {
       )}
     </div>
     )
-  );
+  
 };
 
 export default InterviewComponent;
