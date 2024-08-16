@@ -37,15 +37,13 @@ interface Message {
 export default function Community() {
   const { token } = useUserStore();
   const [messageHeading, setMessageHeading] = useState<string>("");
-  const [icon, setIcon] = useState<string>("");
   const [communities, setCommunities] = useState<Community[]>([]);
-  const [userId, setUserId] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
     null,
   );
-  const [leftRoom, setLeftRoom] = useState<string>("no");
+  const [leftRoom, setLeftRoom] = useState<boolean>(false);
   const [image, setImage] = useState<File | null>(null);
   const [video, setVideo] = useState<File | null>(null);
   const [document, setDocument] = useState<File | null>(null);
@@ -53,9 +51,9 @@ export default function Community() {
     [],
   );
 
-  const toggleHeading = (text: string, communityId: string) => {
+  const toggleHeading = (name: string, communityId: string) => {
     setSelectedCommunityId(communityId);
-    setMessageHeading(text);
+    setMessageHeading(name);
     socket.emit("check-join", { communityId });
   };
 
@@ -74,7 +72,6 @@ export default function Community() {
       const response = await fetch("/api/community");
       const data = await response.json();
 
-      console.log(data);
       const exclusiveCommunities = data.communities.filter(
         (community: Community) => community.comm_type === "exclusive",
       );
@@ -83,10 +80,6 @@ export default function Community() {
     } catch (error) {
       console.error("Error fetching communities:", error);
     }
-  };
-
-  const capitalizeFirstLetterOfEachWord = (text: string) => {
-    return text.replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
   const joinCommunity = async (communityId: string) => {
@@ -101,7 +94,7 @@ export default function Community() {
         socket.emit("join-room", { communityId });
         setMessages([]);
         socket.emit("fetch-community-messages", { communityId });
-        setLeftRoom("no");
+        setLeftRoom(false);
         toast.success("Joined to the community");
       } else {
         console.error("Error joining community:", response.statusText);
@@ -121,15 +114,13 @@ export default function Community() {
       });
       if (response.ok) {
         socket.emit("leave-room", { communityId });
-        await fetchCommunities();
-        setLeftRoom("yes");
+        setLeftRoom(true);
         toast.success("Left Community successfully");
       } else {
-        console.error("Error leaving community:", response.statusText);
-        toast.error("Error leaving community:");
+        toast.error("Error leaving community");
       }
     } catch (error) {
-      console.error("Error leaving community:", error);
+      toast.error("Error leaving community");
     }
   };
 
@@ -139,9 +130,11 @@ export default function Community() {
     socket.emit("message", value);
   };
 
-  const sendText = () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
     if (text) {
-      if (text !== "") {
+      if (text.trim() !== "") {
         setImage(null);
         setDocument(null);
         setVideo(null);
@@ -173,6 +166,7 @@ export default function Community() {
       reader.readAsDataURL(document);
     }
     if (image) {
+      console.log(image)
       setText("");
       setDocument(null);
       setVideo(null);
@@ -219,17 +213,16 @@ export default function Community() {
           },
         );
         const data = await response.json();
-        console.log("data", data);
         if (response.ok) {
-          console.log("dats:", data);
-          if (data.message == "No") {
-            setLeftRoom("yes");
+          toast.info(data.message);
+          if (data.exists == false) {
+            setLeftRoom(true);
+          } else {
+            setLeftRoom(false);
           }
-        } else {
-          console.error("Error joining community:", response.statusText);
         }
       } catch (error) {
-        console.error("Error joining community:", error);
+        toast.error("Error getting Info");
       }
     };
 
@@ -240,7 +233,7 @@ export default function Community() {
 
   useEffect(() => {
     const processMessage = (message: Message) => {
-      console.log(message.type);
+      console.log("message type", message.type);
       switch (message.type) {
         case "image":
           const ImageUrl = base64ToBlobUrl(message.content, "image/png");
@@ -287,7 +280,6 @@ export default function Community() {
         communityId: selectedCommunityId,
       });
 
-      // Cleanup on component unmount or when selectedCommunityId changes
       return () => {
         socket.off("receive-message-community", handleNewMessages);
       };
@@ -295,13 +287,6 @@ export default function Community() {
   }, [selectedCommunityId]);
 
   useEffect(() => {
-    const userIdFromLocalStorage = localStorage.getItem("userId");
-
-    if (userIdFromLocalStorage) {
-      setUserId(userIdFromLocalStorage);
-      console.log(userIdFromLocalStorage);
-    }
-
     fetchCommunities();
   }, []);
 
@@ -354,7 +339,7 @@ export default function Community() {
                       <div className="flex flex-row items-center">
                         <div className="w-[80px] p-1">
                           <Image
-                            src="/community/WebDev.svg" // Use a default icon or handle appropriately
+                            src="/community/WebDev.svg"
                             alt="img"
                             height={10}
                             width={10}
@@ -373,17 +358,16 @@ export default function Community() {
                             </div>
                           )}
                       </div>
-                      <div>
-                        <button
-                          className="text-sm font-semibold text-green-500 mr-4"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            joinCommunity(community.id);
-                          }}
-                        >
-                          Join
-                        </button>
-                      </div>
+
+                      <button
+                        className="text-sm font-semibold text-green-500 mr-4"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          joinCommunity(community.id);
+                        }}
+                      >
+                        Join
+                      </button>
                     </div>
                   ),
               )}
@@ -406,7 +390,7 @@ export default function Community() {
             <div className="flex flex-row gap-14 items-center pl-10">
               <div className="w-12 h-12 bg-[#fff] rounded-full flex justify-center items-center">
                 <Image
-                  src={icon}
+                  src={"/community/WebDev.svg"}
                   alt="img"
                   height={10}
                   width={10}
@@ -438,7 +422,7 @@ export default function Community() {
               </div>
             </div>
           </div>
-          {leftRoom === "no" ? (
+          {leftRoom === false ? (
             <div className="flex flex-col h-full">
               <div className="flex flex-grow flex-col p-4 overflow-auto">
                 {messages.length > 0 &&
@@ -487,10 +471,10 @@ export default function Community() {
               </div>
 
               <div className="flex justify-center p-3">
-                <div className="relative w-full md:w-[65vw]">
+              <form onSubmit={handleSubmit} className="relative w-full md:w-[65vw]">
                   <input
                     type="text"
-                    className="pl-10 pr-4 py-2 w-full border rounded-lg bg-[#D9D9D9]"
+                    className="px-4 py-2 w-full rounded-full border-[#999999] border-2 "
                     placeholder="text"
                     value={text}
                     onChange={handleChangeText}
@@ -501,11 +485,7 @@ export default function Community() {
                     onChange={(e) =>
                       setImage(e.target.files ? e.target.files[0] : null)
                     }
-                    style={{
-                      padding: "10px",
-                      width: "calc(100% - 22px)",
-                      marginBottom: "10px",
-                    }}
+                    className="p-2 w-full"
                   />
 
                   <input
@@ -514,11 +494,7 @@ export default function Community() {
                     onChange={(e) =>
                       setVideo(e.target.files ? e.target.files[0] : null)
                     }
-                    style={{
-                      padding: "10px",
-                      width: "calc(100% - 22px)",
-                      marginBottom: "10px",
-                    }}
+                    className="p-2 w-full"
                   />
 
                   <input
@@ -527,28 +503,24 @@ export default function Community() {
                     onChange={(e) =>
                       setDocument(e.target.files ? e.target.files[0] : null)
                     }
-                    style={{
-                      padding: "10px",
-                      width: "calc(100% - 22px)",
-                      marginBottom: "10px",
-                    }}
+                    className="p-2 w-full"
                   />
 
                   <button
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                    onClick={sendText}
+                    className=" bg-green-600 py-2 px-4 rounded-full text-white font-bold"
+                    type="submit"
                   >
                     Send
                   </button>
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none justify-between w-full">
+                  {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none justify-between w-full">
                     <Image
                       src="/community/textplussign.svg"
                       alt="search"
                       width={25}
                       height={25}
                     />
-                  </div>
-                </div>
+                  </div> */}
+                </form>
               </div>
             </div>
           ) : (
