@@ -1,19 +1,18 @@
-// Import necessary modules and components
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 
 import AudioToText from "./Recording";
 import { FiMic, FiSpeaker, FiVideo, FiMessageSquare, FiVolume2, FiChevronDown } from "react-icons/fi";
-
-import {
-  useLocalStorageState,
-} from './LocalStorageUtils';
-
+import useInterviewStore from './store';
 
 const InterviewComponent = () => {
-  const [resumeFile, setResumeFile] = useLocalStorageState('resumeFile', null);
-  const [jobDescriptionFile, setJobDescriptionFile] = useLocalStorageState('jobDescriptionFile', null);
-  
+  // Track whether the component has mounted
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Zustand store usage
+  const { resumeFile, setResumeFile, jobDescriptionFile, setJobDescriptionFile } = useInterviewStore();
+
+  // Other state variables
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState('');
@@ -44,42 +43,49 @@ const InterviewComponent = () => {
 
   const allDevicesConfigured = isCameraEnabled && isMicEnabled && isSoundEnabled;
 
+  // Mark the component as mounted on the client side
   useEffect(() => {
-    websocketRef.current = new WebSocket("wss://ai-interviewer-c476.onrender.com/ws");
-
-    websocketRef.current.onopen = () => {
-      console.log("WebSocket connection opened");
-    };
-
-    websocketRef.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "cv_uploaded") {
-        console.log("CV uploaded:", data.message);
-        setCvText(data.cv_text);
-      } else if (data.type === "jd_analyzed") {
-        console.log("Job description analyzed:", data.message);
-        setJD(data.job_description);
-      } else if (data.type === "interview_question") {
-        console.log("Interview question received:", data.question);
-        setChatMessages((prevMessages) => [...prevMessages, { user: "Interviewer", message: data.question }]);
-        setTextToSpeak(data.question); // Update the text to be spoken
-      } else if (data.type === "interview_end") {
-        console.log("Interview ended:", data.message);
-        setChatMessages((prevMessages) => [...prevMessages, { user: "System", message: data.message }]);
-      } else if (data.type === "analysis") {
-        console.log("Analysis result received:", data.result);
-        setChatMessages((prevMessages) => [...prevMessages, { user: "Analysis", message: JSON.stringify(data.result) }]);
-      }
-    };
-
-    websocketRef.current.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    websocketRef.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+    setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      websocketRef.current = new WebSocket("wss://ai-interviewer-c476.onrender.com/ws");
+
+      websocketRef.current.onopen = () => {
+        console.log("WebSocket connection opened");
+      };
+
+      websocketRef.current.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "cv_uploaded") {
+          console.log("CV uploaded:", data.message);
+          setCvText(data.cv_text);
+        } else if (data.type === "jd_analyzed") {
+          console.log("Job description analyzed:", data.message);
+          setJD(data.job_description);
+        } else if (data.type === "interview_question") {
+          console.log("Interview question received:", data.question);
+          setChatMessages((prevMessages) => [...prevMessages, { user: "Interviewer", message: data.question }]);
+          setTextToSpeak(data.question); // Update the text to be spoken
+        } else if (data.type === "interview_end") {
+          console.log("Interview ended:", data.message);
+          setChatMessages((prevMessages) => [...prevMessages, { user: "System", message: data.message }]);
+        } else if (data.type === "analysis") {
+          console.log("Analysis result received:", data.result);
+          setChatMessages((prevMessages) => [...prevMessages, { user: "Analysis", message: JSON.stringify(data.result) }]);
+        }
+      };
+
+      websocketRef.current.onclose = () => {
+        console.log("WebSocket connection closed");
+      };
+
+      websocketRef.current.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+    }
+  }, [isMounted]);
 
   const handleSendMessage = (message) => {
     if (message.trim() !== "") {
@@ -140,6 +146,7 @@ const InterviewComponent = () => {
       alert("Please upload a valid DOC, DOCX, or PDF file.");
     }
   };
+
 
   const handleJobDescriptionUpload = (event) => {
     const file = event.target.files[0];
@@ -368,15 +375,12 @@ useEffect(() => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-
-    
   };
 
   const [activeTab, setActiveTab] = useState('conversation');
   
 
   if (isInterviewStarted) {
-   
     return (
       <div className="min-h-screen flex flex-col relative">
         {/* Navbar */}
@@ -515,6 +519,7 @@ useEffect(() => {
 
 
   return (
+    isMounted && (
     <div className="min-h-screen bg-purple-50 flex items-center justify-center w-[100%]">
       {/* Step 1: Upload Resume */}
       {step === 1 && (
@@ -888,6 +893,7 @@ useEffect(() => {
         </div>
       )}
     </div>
+    )
   );
 };
 
