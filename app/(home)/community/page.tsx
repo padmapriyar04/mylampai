@@ -322,15 +322,15 @@ export default function Community() {
             <div className="relative">
               <input
                 type="text"
-                className="pl-10 pr-4 py-2 w-full border rounded-lg "
+                className="pl-12 pr-4 py-4 w-full border text-lg rounded-lg "
                 placeholder="Search Problems"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Image
                   src="/community/search-lens.svg"
                   alt="search"
-                  width={25}
-                  height={25}
+                  width={30}
+                  height={30}
                 />
               </div>
             </div>

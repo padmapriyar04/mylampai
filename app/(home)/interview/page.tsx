@@ -755,7 +755,7 @@ useEffect(() => {
               {isManualEntry ? (
                 <div className="w-full p-4 bg-white rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center mb-8">
                   <textarea
-                    className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
+                    className="w-full h-28 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
                     placeholder="Write or paste here complete job details (Word limit 1000 words)"
                     maxLength={1000}
                     value={manualJobDescription}
