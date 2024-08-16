@@ -93,8 +93,8 @@ const InterviewPage = ({ websocketRef }) => {
       {/* Prompt Box */}
       {isChatOpen && (
         <div className="absolute top-20 right-6 bg-white border border-gray-300 shadow-lg rounded-lg w-96 h-1/2 flex flex-col">
-          <div className="flex justify-between items-center bg-purple-600 text-white p-4 rounded-t-lg">
-            <span className="font-semibold text-lg">Prompt Box</span>
+          <div className="flex justify-between items-center bg-purple-600 text-white p-4 rounded-lg">
+            <span className="font-bold text-lg">Prompt Box</span>
             <button
               onClick={() => setIsChatOpen(false)}
               className="text-white text-2xl"

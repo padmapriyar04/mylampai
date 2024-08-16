@@ -68,7 +68,18 @@ const ExclusiveCommunity: React.FC<ExclusiveCommunityProps> = ({
 
   return (
     <>
-      <div className="flex flex-col gap-3 -ml-0 relative">
+      <style>
+        {`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+          }
+        `}
+      </style>
+      <div className="flex flex-col gap-3 ml-0 relative">
         <div className="flex flex-row justify-between">
           <span className="text-base font-semibold">Exclusive Communities</span>
           <div className="flex flex-row gap-4">
@@ -98,7 +109,7 @@ const ExclusiveCommunity: React.FC<ExclusiveCommunityProps> = ({
                 )
               )
             ) : (
-              <div className="flex items-center justify-center w-full h-full text-gray-500">
+              <div className="flex justify-center items-center w-full h-full text-gray-500">
                 No exclusive communities available
               </div>
             )}

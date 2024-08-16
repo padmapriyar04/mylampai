@@ -298,7 +298,7 @@ const AuthForm: React.FC = () => {
           </Carousel>
         </div>
 
-        <div className="w-full p-4 md:p-6 flex flex-col justify-start">
+        <div className="w-full h-[80vh] p-4 md:p-6 flex flex-col justify-evenly">
           {isSignUp ? (
             <>
               <div className="text-popover-foreground  flex flex-col">
@@ -478,7 +478,7 @@ const AuthForm: React.FC = () => {
                   <Link
                     href="#"
                     onClick={() => setIsOtpLogin(!isOtpLogin)}
-                    className="text-blue-500 font-semibold text-left ml-5 hover:text-blue-700 transition-colors duration-300 "
+                    className="text-blue-500 font-semibold text-le hover:text-blue-700 transition-colors duration-300 "
                   >
                     {isOtpLogin ? "Login with Password" : "Login via OTP"}
                   </Link>
@@ -501,7 +501,7 @@ const AuthForm: React.FC = () => {
                       />
                       <Link
                         href="/forgot-password"
-                        className="text-blue-500 font-semibold text-left ml-1 hover:text-blue-700 transition-colors duration-300"
+                        className="text-blue-500 font-semibold text-left hover:text-blue-700 transition-colors duration-300"
                       >
                         Didn&apos;t Receive OTP yet?
                       </Link>
