@@ -21,7 +21,6 @@ export default function RootLayout({
       <body className={`${openSans.className} h-full overflow-hidden`}>
         <Toaster />
         <main className="h-full">
-          
           <AuthProvider>{children}</AuthProvider>
         </main>
       </body>

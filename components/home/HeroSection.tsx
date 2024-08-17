@@ -23,7 +23,7 @@ export default function HeroSection() {
                 height={45}
                 width={45}
                 alt=""
-                className="w-8 md:w-10"
+                className="w-8 h-auto md:w-10"
               ></Image>
             </button>
             <div className="flex gap-4 ">
@@ -32,7 +32,6 @@ export default function HeroSection() {
                   <div className="bg-[#f5f5f5] rounded-2xl p-3 min-h-16 w-full">
                     <h1 className="flex items-center gap-2 font-semibold">
                       <Image
-                        className=""
                         src={"/home/HSecMentorship.svg"}
                         alt=""
                         height={30}
@@ -48,7 +47,6 @@ export default function HeroSection() {
                   <div className="bg-[#f5f5f5] rounded-2xl p-3 min-h-16 w-full">
                     <h1 className="flex items-center gap-2 font-semibold">
                       <Image
-                        className=""
                         src={"/home/HSecResources.svg"}
                         alt=""
                         height={30}
@@ -68,7 +66,7 @@ export default function HeroSection() {
                     alt=""
                     height={20}
                     width={20}
-                    className="w-[100px] mr-4"
+                    className="w-[100px] h-auto mr-4"
                   />
                   <div>
                     <h1 className="flex items-center gap-2 font-semibold">
@@ -126,7 +124,7 @@ export default function HeroSection() {
                     width={100}
                     height={100}
                     alt="box"
-                    className="w-8 mx-2"
+                    className="w-8 h-auto mx-2"
                   />
                 </div>
                 <div className="w-full h-[2px] bg-white my-4"></div>
@@ -149,7 +147,7 @@ export default function HeroSection() {
               alt="HeroSection"
               width={100}
               height={100}
-              className="w-full bg-[#f5f5f5] min-h-[552px] rounded-2xl py-2 px-5"
+              className="w-full h-auto bg-[#f5f5f5] min-h-[552px] rounded-2xl py-2 px-5"
             ></Image>
           </div>
         </div>

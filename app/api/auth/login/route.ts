@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib"; // Adjust path as per your project setup
+import prisma from "@/lib";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -7,12 +7,10 @@ export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
   try {
-    // Connect to database and find user by email
     const user = await prisma.user.findFirst({
       where: { email },
     });
 
-    // If user doesn't exist or password is incorrect
     if (
       !user ||
       !user.hashedPassword ||
@@ -24,7 +22,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       {
         id: user.id,
@@ -50,7 +47,6 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
-    // Set the JWT token in an HttpOnly cookie
     response.headers.append(
       "Set-Cookie",
       `token=${token}; HttpOnly; Path=/; Max-Age=86400;`

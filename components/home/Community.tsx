@@ -12,7 +12,7 @@ export default function CommunitySection() {
                     <button className="bg-[#8C52FF] hover:bg-primary-foreground hover:text-[#8c52ff] hover:shadow-md rounded-2xl text-primary-foreground font-semibold py-2 px-4 transition-all  border-2 border-[#8c52ff] sm:px-16 ">Join Our <br />AI-Powered Community</button>
                 </div>
                 <div className="sm:h-[300px] max-w-[500px]">
-                    <Image src="/home/community.svg" height={100} width={100} alt="community" className="w-full sm:translate-y-[-40%]"/>
+                    <Image src="/home/community.svg" height={300} width={500} alt="community" className="w-full h-auto sm:translate-y-[-40%]"/>
                 </div>
             </div>
         </>

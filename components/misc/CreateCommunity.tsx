@@ -16,7 +16,7 @@ const CreateCommunityForm = () => {
       // Retrieve JWT token from headers
       const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
 
-      const response = await fetch('/api/community/create', {
+      const response = await fetch('/api/community', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

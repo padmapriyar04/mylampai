@@ -16,7 +16,7 @@ const Input: React.FC<InputProps> = ({name, type, placeholder, value, onChange})
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full px-3 py-2 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 focus:border-primary-foreground hover:border-primary-foreground transition-all duration-300"
+        className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
       />
     </>
   );

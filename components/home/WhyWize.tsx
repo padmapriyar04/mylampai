@@ -1,7 +1,7 @@
 "use client";
 import ExperiencedCounsellors from "./ExperiencedCounsellors";
 import PracticeCoding from "./PractiseCoding";
-// import Image from "next/image"
+import Image from "next/image"
 import WizeCampLink from "./WizeCampLink";
 import { useState } from "react";
 
@@ -106,27 +106,31 @@ export default function WhyWize() {
 
             <ExperiencedCounsellors />
 
-            <div id="advancedfeatures" className=" sm:min-h-[700px]">
+            <div id="ourwinningrecord" className=" sm:min-h-[700px]">
               <h4 className="pt-4 font-semibold text-[#8C52FF]">
-                ADVANCED FEATURES
+                OUR WINNING RECORD
                 <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
               </h4>
               <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-                Important features that’ll sometimes be your buddy, sometimes
-                your saviour
+                Because you deserve only the Best!
               </div>
               <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-                Whether it&apos;s an AI-powered smart community that helps you
-                learn and grow with peers in a unique and engaging way, or
-                assessments that aid in self-evaluation, these features will
-                cover all the gaps in your career journey, making your college
-                and career path smooth.
+                ESome advices can come only from experience. And we have a lot
+                of that! Check out our numbers and see for yourselves...
               </p>
               <div className="flex flex-wrap justify-center gap-4 min-h-[400px] w-full my-8 rounded-2xl">
-                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
-                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] rounded-2xl border-2 border-[#8C52FF90] drop-shadow-md shadow-[#8C52FF30] min-h-[200px]"></div>
+                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                  <Image src="./home/whywize/4.svg" alt="winningrecord" width={100} height={100} className="w-full h-auto"></Image>
+                </div>
+                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                  <Image src="./home/whywize/2.svg" alt="winningrecord" width={100} height={100} className="w-full h-auto"></Image>
+                </div>
+                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                  <Image src="./home/whywize/3.svg" alt="winningrecord" width={100} height={100} className="w-full h-auto"></Image>
+                </div>
+                <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[400px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                  <Image src="./home/whywize/1.svg" alt="winningrecord" width={100} height={100} className="w-full h-auto"></Image>
+                </div>
               </div>
             </div>
           </div>

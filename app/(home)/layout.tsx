@@ -1,5 +1,3 @@
-// app/layout.tsx
-
 "use client";
 
 import "./../globals.css";
@@ -21,18 +19,24 @@ export default function RootLayout({
   const { user } = useUserStore();
   const pathname = usePathname(); // Get the current path
 
+  // Determine whether to hide the sidebar and/or the navbar
+  const hideSidebar = pathname === '/interview' || pathname === '/interviewPage';
+  const hideNavbar = pathname === '/interviewPage'; // Only hide the navbar for /interviewPage
+
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
       <body className={`${openSans.className}`}>
-        <HomeNavbar />
-        <div className="flex flex-col min-h-screen bg-cover transition-all duration-300 ">
+        {/* Conditionally render HomeNavbar */}
+        {!hideNavbar && <HomeNavbar />}
+        <div className="flex flex-col min-h-screen bg-cover transition-all duration-300">
           <div className="flex flex-1">
-            {pathname !== '/interview' && <Flexsidebar />}
-            <div className={`flex-1 lg:transition-all lg:duration-300 ${pathname === '/example' ? 'ml-0' : 'ml-0'}`}>
+            {/* Conditionally render Flexsidebar */}
+            {!hideSidebar && <Flexsidebar />}
+            <div className={`flex-1 lg:transition-all lg:duration-300`}>
               {children}
             </div>
           </div>
-          {!user && <Footer />} 
+          <Footer />
         </div>
         <Toaster />
       </body>

@@ -18,19 +18,19 @@ interface CounsellorCardProps {
 const carouselData = [
   {
     name: "Fiona Claudia",
-    image: "/home/profile.png",
+    image: "/home/profile.jpg",
     experience: "22k+ students counselled",
     ranking: "Lead Counsellor",
   },
   {
     name: "Fiona Claudia",
-    image: "/home/profile.png",
+    image: "/home/profile.jpg",
     experience: "22k+ students counselled",
     ranking: "Lead Counsellor",
   },
   {
     name: "Fiona Claudia",
-    image: "/home/profile.png",
+    image: "/home/profile.jpg",
     experience: "22k+ students counselled",
     ranking: "Lead Counsellor",
   },
@@ -46,7 +46,7 @@ const CounsellorCard: React.FC<CounsellorCardProps> = ({
     <div className="w-full max-w-[260px] flex flex-col items-center bg-white rounded-xl overflow-hidden shadow-lg">
       <div className="w-full h-24 bg-primary flex items-center justify-center"></div>
       <Image
-        src={"/home/profile.png"}
+        src={image}
         alt="profile"
         width={200}
         height={200}
@@ -114,24 +114,6 @@ const ExperiencedCounsellors = () => {
               ))}
             </CarouselContent>
           </Carousel>
-          {/* <CounsellorCard
-              name="Fiona Claudia"
-              image="/home/profile.jpg"
-              experience="22k+ students counselled"
-              ranking="Lead Counsellor"
-            />
-            <CounsellorCard
-              name="Fiona Claudia"
-              image="/home/profile.jpg"
-              experience="22k+ students counselled"
-              ranking="Lead Counsellor"
-            />
-            <CounsellorCard
-              name="Fiona Claudia"
-              image="/home/profile.jpg"
-              experience="22k+ students counselled"
-              ranking="Lead Counsellor"
-            /> */}
           <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground py-8 px-4">
             <BulletCard title="10k+" description="Successful Premium Admits" />
             <BulletCard title="10k+" description="Successful Premium Admits" />

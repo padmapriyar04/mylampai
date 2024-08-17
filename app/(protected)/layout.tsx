@@ -41,7 +41,7 @@ export default function ProtectedLayout({
         <HomeNavbar />
         <Toaster />
         <div className="flex h-full transition-all duration-300 ">
-          <Flexsidebar />
+          {/* <Flexsidebar /> */}
           <div className=" flex-1 protected-layout lg:transition-all lg:duration-300">
             {children}
           </div>
