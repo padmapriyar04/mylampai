@@ -4,15 +4,8 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "@/utils/userStore";
 import { toast } from "sonner";
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role?: string;
-}
-
 export default function ProfilePage() {
-  const { userData, token, setUserData } = useUserStore();
+  const { userData, token } = useUserStore();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -23,7 +16,6 @@ export default function ProfilePage() {
         if (response.ok) {
           const data = await response.json();
           console.log("userData", data);
-          setUserData(userData, token);
         } else if (response.status === 404) {
           toast.error("User not found. Please try logging in again.");
           router.push("/login");
@@ -33,13 +25,12 @@ export default function ProfilePage() {
       } catch (error) {
         console.error("Error fetching user:", error);
         toast.error("Failed to load user data. Please try again later.");
-      } finally {
         setLoading(false);
       }
     };
 
     fetchUser();
-  }, [router, token, setUserData]);
+  }, [ token, router ]);
 
   if (loading) {
     return (
