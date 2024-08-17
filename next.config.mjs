@@ -2,7 +2,7 @@
 const nextConfig = {
   output: "standalone",
   images: {
-    domains: ["http://localhost:3000", "https://fonts.googleapis.com"],
+    domains: ["http://localhost:3000"],
     remotePatterns: [
       {
         protocol: "https",

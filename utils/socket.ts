@@ -13,7 +13,7 @@ const userStorage: UserStorage | null = typeof window !== 'undefined'
 
 const token: string | null = userStorage?.state?.token || null;
 
-const socket: Socket = io('wss://localhost:4000/', {
+const socket: Socket = io('https://mylamp-server.onrender.com/', {
     withCredentials: true,
     query: {
         token: token || '',
