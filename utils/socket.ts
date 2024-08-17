@@ -13,7 +13,7 @@ const userStorage: UserStorage | null = typeof window !== 'undefined'
 
 const token: string | null = userStorage?.state?.token || null;
 
-const socket: Socket = io('wss://localhost:4000/', {
+const socket: Socket = io('http://localhost:4000/', {
     withCredentials: true,
     query: {
         token: token || '',

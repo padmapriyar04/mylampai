@@ -60,14 +60,6 @@ export default function Community() {
     socket.emit("check-join", { communityId });
   };
 
-  const handleSmScreen = () => {
-    setSmScreen(!smScreen);
-  };
-
-  const checkScreenSize = () => {
-    setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
-  };
-
   const fetchCommunities = async () => {
     try {
       const response = await fetch("/api/community");
@@ -232,6 +224,16 @@ export default function Community() {
     }
   }, [selectedCommunityId, token]);
 
+  const base64ToBlobUrl = (base64: string, type: string) => {
+    const byteCharacters = atob(base64.split(",")[1]);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const blob = new Blob([byteNumbers], { type });
+    return URL.createObjectURL(blob);
+  };
+
   useEffect(() => {
     const processMessage = (message: Message) => {
       console.log("message type", message.type);
@@ -380,7 +382,6 @@ export default function Community() {
           <div className="flex flex-row bg-[#8c52ff] w-full h-16 rounded-lg items-center justify-between">
             <div
               className="rounded-full flex justify-center items-center md:hidden"
-              onClick={handleSmScreen}
             >
               <Image
                 src="/community/backarrow-white.png"
