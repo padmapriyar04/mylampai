@@ -12,12 +12,14 @@ import {
   ResourcesComponent,
   CompanyComponent,
 } from "./HomeNavbarComponents";
+import { useRouter } from "next/navigation";
 
 const HomeNavbar = () => {
   const { bears } = useRouterStore();
   const [scroll, setScroll] = useState(false);
-  const { userData, setUserData } = useUserStore();
+  const { userData, setUserData ,clearUser } = useUserStore();
   const [initials, setInitials] = useState("");
+  const router = useRouter();
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
@@ -26,6 +28,23 @@ const HomeNavbar = () => {
       setScroll(false);
     }
   };
+
+  const handleLogout = async () =>{
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+      if (response.ok) {
+        clearUser();
+        console.log("Logged out successfully");
+        router.push("/")
+      } else {
+        console.error("Logout failed:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  }
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -87,6 +106,7 @@ const HomeNavbar = () => {
               <span className="text-black">{initials}</span>
               <FiUser className="text-purple-500" />
             </Link>
+            <button onClick={handleLogout} >Logout</button>
             <div className="flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md">
               <span className="text-black">Menu</span>
               <BsFillMenuButtonWideFill className="text-purple-500" />
