@@ -1,11 +1,15 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
-import { useUserStore } from "@/utils/userStore";
-import ExclusiveCommunity from "@/components/community/ExclusiveCommunity";
-import socket from "@/utils/socket";
-import { toast } from "sonner";
 
+import Image from "next/image";
+import React, { useState, useEffect } from "react";
+// import Carousel from "../../../components/community/NewCarousel";
+import ExclusiveCommunity from "@/components/community/ExclusiveCommunity";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+import socket from "@/utils/socket";
+import { useUserStore } from "@/utils/userStore";
+
+// Define the Community and Message types
 interface Community {
   id: string;
   createdAt: string;
@@ -56,16 +60,6 @@ export default function Community() {
     socket.emit("check-join", { communityId });
   };
 
-  const base64ToBlobUrl = (base64: string, type: string) => {
-    const byteCharacters = atob(base64.split(",")[1]);
-    const byteNumbers = new Uint8Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const blob = new Blob([byteNumbers], { type });
-    return URL.createObjectURL(blob);
-  };
-
   const fetchCommunities = async () => {
     try {
       const response = await fetch("/api/community");
@@ -95,6 +89,7 @@ export default function Community() {
         socket.emit("fetch-community-messages", { communityId });
         setLeftRoom(false);
         toast.success("Joined to the community");
+        await fetchCommunities();
       } else {
         console.error("Error joining community:", response.statusText);
       }
@@ -210,8 +205,8 @@ export default function Community() {
             },
           },
         );
-        const data = await response.json();
         if (response.ok) {
+        const data = await response.json();
           toast.info(data.message);
           if (data.exists == false) {
             setLeftRoom(true);
@@ -228,6 +223,16 @@ export default function Community() {
       crossCheck(selectedCommunityId);
     }
   }, [selectedCommunityId, token]);
+
+  const base64ToBlobUrl = (base64: string, type: string) => {
+    const byteCharacters = atob(base64.split(",")[1]);
+    const byteNumbers = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const blob = new Blob([byteNumbers], { type });
+    return URL.createObjectURL(blob);
+  };
 
   useEffect(() => {
     const processMessage = (message: Message) => {
@@ -313,9 +318,8 @@ export default function Community() {
               </div>
             </div>
           </div>
-
+          {/* <Carousel /> */}
           <ExclusiveCommunity exclusiveCommunities={exclusiveCommunities} />
-
           <div className="flex flex-col gap-3 overflow-x-clip mt-[250px] mr-2">
             <div className="flex flex-row justify-between">
               <span className="text-base font-semibold">All Communities</span>
@@ -376,7 +380,9 @@ export default function Community() {
           className={`h-[90%] w-full ml-0 flex flex-col md:h-full sm:w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
         >
           <div className="flex flex-row bg-[#8c52ff] w-full h-16 rounded-lg items-center justify-between">
-            <div className="rounded-full flex justify-center items-center md:hidden">
+            <div
+              className="rounded-full flex justify-center items-center md:hidden"
+            >
               <Image
                 src="/community/backarrow-white.png"
                 alt="img"
@@ -438,11 +444,11 @@ export default function Community() {
                         </div>
                       ) : message.type === "image" ? (
                         <Image
-                          src={"/home/profile.jpg"}
+                          src={message.content}
+                          alt="Uploaded"
+                          className="w-full h-auto"
                           width={100}
                           height={100}
-                          alt="Uploaded"
-                          className="w-auto"
                         />
                       ) : message.type === "video" ? (
                         <video
@@ -526,6 +532,7 @@ export default function Community() {
           )}
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }
