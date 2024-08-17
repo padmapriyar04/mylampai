@@ -7,13 +7,12 @@ import { toast } from "sonner";
 interface User {
   id: string;
   email: string;
-  first_name?: string;
-  last_name?: string;
+  name: string;
   role?: string;
 }
 
 export default function ProfilePage() {
-  const { user, setUser } = useUserStore();
+  const { userData, token, setUserData } = useUserStore();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -21,10 +20,10 @@ export default function ProfilePage() {
     const fetchUser = async () => {
       try {
         const response = await fetch("/api/user/profile");
-
         if (response.ok) {
-          const userData: User = await response.json();
-          setUser(userData, "");
+          const data = await response.json();
+          console.log("userData", data);
+          setUserData(userData, token);
         } else if (response.status === 404) {
           toast.error("User not found. Please try logging in again.");
           router.push("/login");
@@ -40,7 +39,7 @@ export default function ProfilePage() {
     };
 
     fetchUser();
-  }, [router, setUser]);
+  }, [router, token, setUserData]);
 
   if (loading) {
     return (
@@ -50,7 +49,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) {
+  if (!userData) {
     return (
       <div className="flex justify-center items-center h-screen">
         User not found
@@ -65,11 +64,11 @@ export default function ProfilePage() {
           Welcome to Your Profile
         </h1>
         <p className="text-xl text-gray-700 mb-2">
-          Hello, {user.first_name} {user.last_name}!
+          Hello, {userData.name}
         </p>
-        <p className="text-md text-gray-600">Email: {user.email}</p>
-        <p className="text-md text-gray-600">Role: {user.role}</p>
-        <p className="text-md text-gray-600">User ID: {user.id}</p>
+        <p className="text-md text-gray-600">Email: {userData.email}</p>
+        <p className="text-md text-gray-600">Role: {userData.role}</p>
+        <p className="text-md text-gray-600">User ID: {userData.id}</p>
       </div>
     </div>
   );

@@ -9,7 +9,8 @@ import Input from "./Input";
 import CountrySelector from "../misc/CountryFlag";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { setCookie } from "@/utils/cookieUtils"; // Import cookie utilities
+import { setCookie } from "@/utils/cookieUtils"; 
+import { useUserStore } from "@/utils/userStore";
 
 import Globe from "../../public/images/Globe.svg";
 import Arrow from "../../public/images/Arrow.png";
@@ -22,6 +23,7 @@ import CarouselImage3 from "../../public/images/Globe.svg";
 import CarouselImage4 from "../../public/images/Globe.svg";
 
 const AuthForm: React.FC = () => {
+  const { setUserData } = useUserStore();
   const [isSignUp, setIsSignUp] = useState(true);
   const [activeTab, setActiveTab] = useState("student");
   const [user, setUser] = useState({
@@ -205,14 +207,17 @@ const AuthForm: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
+      
+        console.log(data)
 
         // Store user data and token in cookies
         setCookie("token", data.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
 
         toast.success("Login successful!");
+        
+        setUserData(data.user, data.token);
 
-        // Redirect based on role
         if (data.user.role === "admin") {
           router.push("/adminDashboard");
         } else {
@@ -298,7 +303,7 @@ const AuthForm: React.FC = () => {
           </Carousel>
         </div>
 
-        <div className="w-full p-4 md:p-6 flex flex-col justify-start">
+        <div className="w-full h-[80vh] p-4 md:p-6 flex flex-col justify-evenly">
           {isSignUp ? (
             <>
               <div className="text-popover-foreground  flex flex-col">
@@ -478,7 +483,7 @@ const AuthForm: React.FC = () => {
                   <Link
                     href="#"
                     onClick={() => setIsOtpLogin(!isOtpLogin)}
-                    className="text-blue-500 font-semibold text-left ml-5 hover:text-blue-700 transition-colors duration-300 "
+                    className="text-blue-500 font-semibold text-le hover:text-blue-700 transition-colors duration-300 "
                   >
                     {isOtpLogin ? "Login with Password" : "Login via OTP"}
                   </Link>
@@ -501,7 +506,7 @@ const AuthForm: React.FC = () => {
                       />
                       <Link
                         href="/forgot-password"
-                        className="text-blue-500 font-semibold text-left ml-1 hover:text-blue-700 transition-colors duration-300"
+                        className="text-blue-500 font-semibold text-left hover:text-blue-700 transition-colors duration-300"
                       >
                         Didn&apos;t Receive OTP yet?
                       </Link>
