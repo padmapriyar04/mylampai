@@ -12,7 +12,7 @@ interface Community {
   isCommunity: boolean;
   messagesIds: any;
   userIds: string[];
-  comm_type: "Exclusive" | "Normal";
+  comm_type: "exclusive" | "normal";
 }
 interface ExclusiveCommunityProps {
   exclusiveCommunities: Community[];
