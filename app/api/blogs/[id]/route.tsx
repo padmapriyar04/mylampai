@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from "next/server";
 const prisma = new PrismaClient();
 export const GET = async (req: NextRequest, res: NextResponse) => {
-  const id = req.url.split("/blog/")[1];
+  const id = req.url.split("/blogs/")[1];
   try {
     const post = await prisma.blog.findUnique({
       where: { id },

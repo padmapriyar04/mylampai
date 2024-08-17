@@ -9,11 +9,13 @@ async function getPost() {
 }
 export default async function BlogList() {
     const router = useRouter();
-    const handleClick = ({id}) => {
-        router.push(`/blogs/${id}`); 
-      };
-    const post = await getPost();
-    const blogPosts = post.posts;
+    // const handleClick = ({id}) => {
+    //     console.log(id);
+    //     router.push(`/blogs/${id}`); 
+    //   };
+    const Post = await getPost();
+    const blogPosts = Post.posts;
+    console.log(blogPosts);
     return (
         <div className="w-full h-full">
             <div className="mx-4 lg:mx-8 ">
@@ -60,7 +62,7 @@ export default async function BlogList() {
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-500 text-sm">{post.createdAt}</span>
-                                <button onClick={() => handleClick(post.id)} className="bg-purple-500 text-white px-3 py-1 rounded">Read More </button>
+                                <button className="bg-purple-500 text-white px-3 py-1 rounded">Read More </button>
                             </div>
                         </div>
                     ))}

@@ -1,25 +1,18 @@
-"use client";
+"use client"
 import React, { useState, useRef, useEffect } from 'react';
-import HomeNavbar from './bloghomebar';
 import { FaHome } from "react-icons/fa";
 import Image from 'next/image';
 import Read from './readmore';
-
-
-const BlogId: React.FC = () => {
-    const [showMore, setShowMore] = useState<boolean>(false);
-    const contentRef = useRef<HTMLDivElement>(null);
-
-    const handleReadMore = () => {
-        setShowMore(!showMore);
-    };
-
-    useEffect(() => {
-        if (contentRef.current) {
-            contentRef.current.style.maxHeight = showMore ? `${contentRef.current.scrollHeight}px` : '0px';
-        }
-    }, [showMore]);
-
+async function getPost(id) {
+    const response = await fetch(`http://localhost:3000/api/blogs/${id}`, {
+        method: "GET"
+    });
+    return response.json();
+}
+export default async function BlogId({ params }) {
+    const id = params.blogId;
+    const Post = await getPost(id);
+    const blogPosts = Post.post;
     return (
         <div className='w-full min-h-[100vh] bg-[#000000] flex flex-col'>
             <div className='w-full h-fit border-b-[2px] border-b-white fixed top-0 left-0 z-10'>
@@ -41,10 +34,10 @@ const BlogId: React.FC = () => {
                         </div>
                     </div>
                     <div className='my-4'>
-                        <div className='gap-2 text-5xl my-3'>Lorem ipsum dolor sit amet</div>
+                        <div className='gap-2 text-5xl my-3'>{blogPosts.title}</div>
                         <div className='flex flex-row gap-4 text-md font-[250] text-[#A0A0A0]'>
-                            <div>Published: 10/10/24</div>
-                            <div>Read Time: 5 Minutes</div>
+                            <div>Published: {blogPosts.createAt}</div>
+                            <div>Read Time: {blogPosts.readtime}</div>
                         </div>
                     </div>
                     <div className='bg-[#A0A0A0] rounded-xl max-w-[250px] max-h-32 h-20 flex items-center py-3 px-4'>
@@ -58,12 +51,12 @@ const BlogId: React.FC = () => {
                             />
                         </div>
                         <div className='ml-4'>
-                            <div className='text-lg text-black'>John Doe</div>
-                            <div className='text-sm text-gray-600'>Author Qualification</div>
+                            <div className='text-lg text-black'>{blogPosts.authorName}</div>
+                            <div className='text-sm text-gray-600'>{blogPosts.position}</div>
                         </div>
                     </div>
                     <div className='my-2'>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        {blogPosts.description}
                     </div>
                 </div>
                 <div className='w-full md:w-[55%] bg-[#D9D9D9] text-black rounded-xl min-h-[350px] h-[60vh] md:h-[60%] flex justify-center items-center my-8 md:my-auto'>
@@ -74,22 +67,20 @@ const BlogId: React.FC = () => {
                 <hr className='border-white' />
                 <div className='text-center text-white mt-4'>
                     <button
-                        onClick={handleReadMore}
+
                         className='text-white py-2 px-4 rounded-lg'
                     >
                         Read More
                     </button>
                 </div>
             </div>
-            <div
+            {/* <div
                 ref={contentRef}
                 className={`transition-max-height duration-500 ease-in-out overflow-hidden`}
                 style={{ maxHeight: showMore ? `${contentRef.current?.scrollHeight}px` : '0px' }}
             >
                 <Read />
-            </div>
+            </div> */}
         </div>
     );
 }
-
-export default BlogId;
