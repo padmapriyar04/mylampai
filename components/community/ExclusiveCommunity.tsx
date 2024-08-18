@@ -2,6 +2,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Image from "next/image";
+import {
+  Carousel,
+  CarouselItem,
+  CarouselContent,
+} from "@/components/ui/carousel";
 
 interface Community {
   id: string;
@@ -18,92 +23,63 @@ interface ExclusiveCommunityProps {
   exclusiveCommunities: Community[];
 }
 
-const ExclusiveCommunity: React.FC<ExclusiveCommunityProps> = ({
-  exclusiveCommunities,
-}) => {
-  const carouselRef = useRef<HTMLDivElement>(null);
-  // const [exclusiveCommunities, setExclusiveCommunities] = useState<Community[]>([]);
-  const [error, setError] = useState<string | null>(null);
+const CardComponent = ({ data }: { data: Community }) => {
+  const { name } = data;
 
-  const scrollLeft = () => {
-    if (carouselRef.current) {
-      const cardWidth = carouselRef.current.clientWidth / 2; // Width of one card
-      carouselRef.current.scrollBy({
-        left: -cardWidth,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const scrollRight = () => {
-    if (carouselRef.current) {
-      const cardWidth = carouselRef.current.clientWidth / 2; // Width of one card
-      carouselRef.current.scrollBy({
-        left: cardWidth,
-        behavior: "smooth",
-      });
-    }
-  };
-  
-  const CardComponent = ({ data }: { data: Community }) => {
-    const { name, description } = data;
-
-    return (
-      <div className="w-[90%] h-[100%] bg-white rounded-2xl shadow-slate-300 shadow-md">
-        <div className="rounded-lg h-[60%] relative">
+  return (
+    <CarouselItem className="basis-1/2">
+      <div className="bg-white rounded-2xl h-full overflow-hidden">
+        <div className="h-[180px] relative">
           <Image
-            alt={name}
-            width={100}
-            height={100}
+            alt={name}  
+            width={1000}
+            height={1000}
             src={"/home/profile.jpg"}
-            className="rounded-lg w-full"
+            className="rounded-lg h-full w-auto object-cover"
           />
-        </div>
-        <p className="font-bold text-xl h-auto w-[50%] mt-3 ml-5 flex items-center text-ellipsis">
+        </div>  
+        <p className="font-semibold text-lg text-[#111] h-auto py-2 px-4 flex items-center">
           {name}
         </p>
       </div>
-    );
-  };
+    </CarouselItem>
+  );
+};
+
+const ExclusiveCommunity: React.FC<ExclusiveCommunityProps> = ({
+  exclusiveCommunities,
+}) => {
+
 
   return (
     <>
-      <div className="flex flex-col gap-3 ml-0 relative">
+      <div className="flex flex-col gap-4 relative">
         <div className="flex flex-row justify-between">
-          <span className="text-base font-semibold">Exclusive Communities</span>
+          <span className="text-xl font-semibold">Exclusive Communities</span>
           <div className="flex flex-row gap-4">
-            <button onClick={scrollLeft}>
+            <button >
               <FaChevronLeft />
             </button>
-            <button onClick={scrollRight}>
+            <button >
               <FaChevronRight />
             </button>
           </div>
         </div>
-        {error && <div className="text-red-500">{error}</div>}
-        <div className="carousel-container absolute top-7 ml-2 flex justify-start">
-          <div
-            className="carousel flex overflow-x-auto scrollbar-hide w-[90vw] md:w-[34vw] h-[250px]"
-            ref={carouselRef}
-          >
-            {exclusiveCommunities.length ? (
-              exclusiveCommunities.map(
+        {exclusiveCommunities.length ? (
+          <Carousel>
+            <CarouselContent className="min-h-[250px]">
+              {exclusiveCommunities.map(
                 (community: Community, index: number) => (
-                  <div
-                    key={index}
-                    className="flex-shrink-0 w-1/2 md:w-1/2 h-full p-2 snap-start"
-                  >
-                    <CardComponent data={community} />
-                  </div>
-                )
-              )
-            ) : (
-              <div className="flex justify-center items-center w-full h-full text-gray-500">
-                No exclusive communities available
-              </div>
-            )}
+                  <CardComponent data={community} key={index} />
+                ),
+              )}
+            </CarouselContent>
+          </Carousel>
+        ) : (
+          <div className="flex justify-center items-center w-full h-full text-gray-500">
+            No exclusive communities available
           </div>
-        </div>
+        )}
       </div>
     </>
   );
