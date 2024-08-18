@@ -38,6 +38,7 @@ interface Message {
 export default function Community() {
   const { userData, token } = useUserStore();
   let lastDate: string | null = null;
+  let lastUser: string | null = null;
   const [messageHeading, setMessageHeading] = useState<string>("");
   const [communities, setCommunities] = useState<Community[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -371,6 +372,10 @@ export default function Community() {
                   const showDate = lastDate !== date;
                   lastDate = date;
 
+                  const senderId = message.sender.id;
+                  const showSender = senderId !== lastUser;
+                  lastUser = senderId;
+
                   return (
                     <>
                       {showDate && (
@@ -386,7 +391,17 @@ export default function Community() {
                       <div
                         className={`px-4 py-2 flex gap-2 hover:bg-[#fafafa]`}
                       >
-                        <div className="min-w-12 h-12 rounded-lg bg-[url('/home/profile.jpg')] bg-cover bg-center"></div>
+                        <div className="max-w-12 w-full h-12 rounded-lg">
+                          {showSender && (
+                            <Image
+                              src={"/home/profile.jpg"}
+                              alt="user"
+                              width={100}
+                              height={100}
+                              className="bg-cover"
+                            />
+                          )}
+                        </div>
                         <div>
                           <div className="text-primary font-semibold text-lg gap-x-3 uppercase flex items-center ">
                             <div>
