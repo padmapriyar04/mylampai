@@ -42,7 +42,7 @@ const Carousel = () => {
       <div className="flex flex-col gap-3">
         <div className="flex flex-row justify-between">
           <span className="text-base font-semibold">Exclusive Assessments</span>
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row gap-0">
             <button onClick={handlePrev} disabled={!canGoPrev} className={`${!canGoPrev?"opacity-40 cursor-not-allowed":""}`}><Image src="/practice/lfarw.svg" alt="img" width={10} height={10} /></button>
             <button onClick={handleNext} disabled={!canGoNext} className={`${!canGoNext?"opacity-40 cursor-not-allowed":""}`}><Image src="/practice/rfarw.svg" alt="img" width={10} height={10} /></button>
           </div>
@@ -53,10 +53,10 @@ const Carousel = () => {
               ? "block"
               : "hidden"
             }`}>
-              <div className="bg-[#fff] rounded-lg h-full ">
+              <div className="bg-[#fff] rounded-lg md:w-[12vw] lg:w-auto h-auto flex flex-col text-center">
                 <div ><Image src={Exdata[index].svg} className="w-full" alt="item" height={100} width={100}/></div>
-                <div className="text-md font-bold h-16 flex flex-row justify-around pt-3">
-                  <div className="w-3/5">{Exdata[index].name}</div>
+                <div className="text-[1vw] font-bold h-16 flex flex-row justify-around pt-3">
+                  <div className="w-2/4 relative">{Exdata[index].name}</div>
                 </div>
               </div>
             </div>

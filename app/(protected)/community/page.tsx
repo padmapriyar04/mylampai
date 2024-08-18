@@ -1,9 +1,8 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+
 import Image from "next/image";
-import { useUserStore } from "@/utils/userStore";
-import ExclusiveCommunity from "@/components/community/ExclusiveCommunity";
-import socket from "@/utils/socket";
+import React, { useState, useEffect, useMemo } from "react";
+import Carousel from "../../../components/community/MyCarousel";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 //import socket from '@/utils/socket';
@@ -11,6 +10,7 @@ import { io, Socket } from 'socket.io-client'
 import { useUserStore } from '@/utils/userStore';
 import { IoSend } from "react-icons/io5";
 
+// Define the Community and Message types
 interface Community {
   id: string;
   createdAt: string;
@@ -20,7 +20,6 @@ interface Community {
   isCommunity: boolean;
   messagesIds: any;
   userIds: string[];
-  comm_type: "Exclusive" | "Normal";
 }
 
 interface Sender {
@@ -39,56 +38,170 @@ interface Message {
   sender: Sender;
 }
 
+
 export default function Community() {
-  const { token } = useUserStore();
+
+  const userStore = useUserStore();
+  const token = useUserStore(state => state.token); 
+  const user = useUserStore(state => state.user); 
   const [messageHeading, setMessageHeading] = useState<string>("");
   const [icon, setIcon] = useState<string>("");
+  const [smScreen, setSmScreen] = useState<boolean>(false);
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
   const [communities, setCommunities] = useState<Community[]>([]);
   const [userId, setUserId] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(
-    null
-  );
-  const [leftRoom, setLeftRoom] = useState<string>("no");
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
+  const [leftRoom, setLeftRoom]=useState<string>("no");
   const [image, setImage] = useState<File | null>(null);
   const [video, setVideo] = useState<File | null>(null);
   const [document, setDocument] = useState<File | null>(null);
-  const [exclusiveCommunities, setExclusiveCommunities] = useState<Community[]>(
-    []
-  );
+  const socket = useMemo(() => io("http://localhost:4000",{
+    withCredentials: true,
+    query: { token: token }
+  }), []);
+  console.log("socket is here : ",socket);
 
-  const toggleHeading = (text: string, communityId: string) => {
+  const toggleHeading = (text: string , communityId: string) => {
     setSelectedCommunityId(communityId);
     setMessageHeading(text);
-    socket.emit("check-join", { communityId });
+    socket.emit('check-join', { communityId });
   };
 
+  const handleSmScreen = () => {
+    setSmScreen(!smScreen);
+  };
+
+  const checkScreenSize = () => {
+    setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
+  };
+
+  const crossCheck= async (communityId : string)=>{
+    try{
+    const response = await fetch(`/api/community/${communityId}/crosscheck`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`, // Adjust token retrieval as per your setup
+      },
+    });
+    if (response.ok) {
+      const data= await response.json();
+      console.log("dats:",data.message);
+      if(data.message=='No'){
+        setLeftRoom("yes");
+      }
+      await fetchCommunities();
+    } else {
+      console.error("Error joining community:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error joining community:", error);
+  }
+  }
+  
+  useEffect(()=>{
+     if(selectedCommunityId !== null){
+      crossCheck(selectedCommunityId);
+     }
+  },[selectedCommunityId]);
+
+  useEffect(() => {
+      if (selectedCommunityId !== null) {
+          const handleNewMessages = (newMessages: Message[]) => {
+              // Check if the data is a single message or an array
+              if (Array.isArray(newMessages)) {
+                  newMessages.forEach((message)=>{
+                    processMessage(message);
+                  });
+                  
+              } else {
+                  
+                processMessage(newMessages);
+              }
+          };
+    
+         
+          socket.on('receive-message-community', handleNewMessages);
+          socket.emit('fetch-community-messages', { communityId: selectedCommunityId });
+  
+          // Cleanup on component unmount or when selectedCommunityId changes
+          return () => {
+              socket.off('receive-message-community', handleNewMessages);
+          };
+      }
+  }, [selectedCommunityId]);
+  
+  const processMessage = (message: Message) => {
+    console.log(message.type);
+    switch (message.type) {
+      case "image":
+        const ImageUrl = base64ToBlobUrl(message.content, 'image/png');
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { ...message, content: ImageUrl, type: 'image' }
+        ]);
+        break;
+      case "video":
+        const VideoUrl = base64ToBlobUrl(message.content, 'video/mp4');
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { ...message, content: VideoUrl, type: 'video' }
+        ]);
+        break;
+      case "document":
+        const mediaUrl = base64ToBlobUrl(message.content, 'application/pdf');
+        setMessages(prevMessages => [
+          ...prevMessages,
+          { ...message, content: mediaUrl, type: 'document' }
+        ]);
+        break;
+      case "text":
+      default:
+        setMessages(prevMessages => [
+          ...prevMessages,
+          message
+        ]);
+        break;
+      }
+    }
+
   const base64ToBlobUrl = (base64: string, type: string) => {
-    const byteCharacters = atob(base64.split(",")[1]);
+    const byteCharacters = atob(base64.split(',')[1]);
     const byteNumbers = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const blob = new Blob([byteNumbers], { type });
     return URL.createObjectURL(blob);
   };
 
+  useEffect(() => {
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   const fetchCommunities = async () => {
     try {
-      const response = await fetch("/api/community");
+      const response = await fetch("/api/community/getAll");
       const data = await response.json();
-
-      const exclusiveCommunities = data.communities.filter(
-        (community: Community) => community.comm_type === "Exclusive"
-      );
-
       setCommunities(data.communities);
-      setExclusiveCommunities(exclusiveCommunities);
     } catch (error) {
       console.error("Error fetching communities:", error);
     }
   };
+
+  useEffect(() => {
+    const userIdFromLocalStorage = user?.id;
+    if (userIdFromLocalStorage) {
+      setUserId(userIdFromLocalStorage);
+      console.log(userIdFromLocalStorage);
+    }
+
+    fetchCommunities();
+  }, []);
 
   const capitalizeFirstLetterOfEachWord = (text: string) => {
     return text.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -99,15 +212,16 @@ export default function Community() {
       const response = await fetch(`/api/community/${communityId}/join`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // Adjust token retrieval as per your setup
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
         },
       });
       if (response.ok) {
-        socket.emit("join-room", { communityId });
+        socket.emit('join-room', { communityId });
         setMessages([]);
-        socket.emit("fetch-community-messages", { communityId });
+        socket.emit('fetch-community-messages',  { communityId });
         setLeftRoom("no");
         toast.success("Joined to the community");
+        await fetchCommunities();
       } else {
         console.error("Error joining community:", response.statusText);
       }
@@ -121,11 +235,11 @@ export default function Community() {
       const response = await fetch(`/api/community/${communityId}/leave`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // Adjust token retrieval as per your setup
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust token retrieval as per your setup
         },
       });
       if (response.ok) {
-        socket.emit("leave-room", { communityId });
+        socket.emit('leave-room', { communityId });
         await fetchCommunities();
         setLeftRoom("yes");
         toast.success("Left Community successfully");
@@ -141,204 +255,88 @@ export default function Community() {
   const handleChangeText = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setText(value);
-    socket.emit("message", value);
+    socket.emit('message',value);
   };
 
   const sendText = () => {
-    if (text) {
-      if (text !== "") {
-        setImage(null);
-        setDocument(null);
-        setVideo(null);
-        const communityId = selectedCommunityId;
-        socket.emit("message", {
-          type: "text",
-          message: text,
-          community: communityId,
-        });
-        setText("");
-      }
-    }
-    if (document) {
-      console.log(document);
+  if(text){
+    if (text !== '') {
       setImage(null);
-      setText("");
+      setDocument(null);
       setVideo(null);
-      const reader = new FileReader();
-      reader.onloadend = () => {
+      const communityId= selectedCommunityId;
+      socket.emit('message', { type: 'text', message: text , community: communityId});
+      setText('');
+    }
+  }
+  if (document) {
+    console.log(document);
+    setImage(null);
+    setText('');
+    setVideo(null);
+    const reader = new FileReader();
+    reader.onloadend = () => {
         const base64String = reader.result as string;
         console.log(base64String);
-        socket.emit("send-document", {
-          type: "document",
-          documentUrl: base64String,
-          selectedCommunityId,
-        });
+        socket.emit('send-document', { type: 'document', documentUrl: base64String, selectedCommunityId });
         setDocument(null);
-      };
-      reader.readAsDataURL(document);
-    }
-    if (image) {
-      setText("");
-      setDocument(null);
-      setVideo(null);
-      const reader = new FileReader();
-      reader.onloadend = () => {
+    };
+    reader.readAsDataURL(document);
+  }
+  if (image) {
+    setText('');
+    setDocument(null);
+    setVideo(null);
+    const reader = new FileReader();
+    reader.onloadend = () => {
         const base64String = reader.result as string;
-        socket.emit("send-image", {
-          type: "image",
-          image: base64String,
-          selectedCommunityId,
-        });
+        socket.emit("send-image", { type: 'image', image: base64String, selectedCommunityId });
         setImage(null);
-      };
-      reader.readAsDataURL(image);
-    }
-    if (video) {
-      setImage(null);
-      setText("");
-      setDocument(null);
-      const reader = new FileReader();
-      reader.onloadend = () => {
+    };
+    reader.readAsDataURL(image);
+  }
+  if (video) {
+    setImage(null);
+    setText('');
+    setDocument(null);
+    const reader = new FileReader();
+    reader.onloadend = () => {
         const base64String = reader.result as string;
-        socket.emit("send-video", {
-          type: "video",
-          videoUrl: base64String,
-          selectedCommunityId,
-        });
+        socket.emit('send-video', { type: 'video', videoUrl: base64String, selectedCommunityId });
         setVideo(null);
-      };
-      reader.readAsDataURL(video);
-    }
+    };
+    reader.readAsDataURL(video);
+}
+
   };
 
-  useEffect(() => {
-    const crossCheck = async (communityId: string) => {
-      try {
-        const response = await fetch(
-          `/api/community/${communityId}/crosscheck`,
-          {
-            mode: "no-cors",
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          console.log("dats:", data.message);
-          if (data.message == "No") {
-            setLeftRoom("yes");
-          }
-        } else {
-          console.error("Error joining community:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error joining community:", error);
-      }
-    };
-
-    if (selectedCommunityId !== null) {
-      crossCheck(selectedCommunityId);
-    }
-  }, [selectedCommunityId, token]);
-
-  useEffect(() => {
-    const processMessage = (message: Message) => {
-      console.log(message.type);
-      switch (message.type) {
-        case "image":
-          const ImageUrl = base64ToBlobUrl(message.content, "image/png");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { ...message, content: ImageUrl, type: "image" },
-          ]);
-          break;
-        case "video":
-          const VideoUrl = base64ToBlobUrl(message.content, "video/mp4");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { ...message, content: VideoUrl, type: "video" },
-          ]);
-          break;
-        case "document":
-          const mediaUrl = base64ToBlobUrl(message.content, "application/pdf");
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            { ...message, content: mediaUrl, type: "document" },
-          ]);
-          break;
-        case "text":
-        default:
-          setMessages((prevMessages) => [...prevMessages, message]);
-          break;
-      }
-    };
-
-    if (selectedCommunityId !== null) {
-      const handleNewMessages = (newMessages: Message[]) => {
-        // Check if the data is a single message or an array
-        if (Array.isArray(newMessages)) {
-          newMessages.forEach((message) => {
-            processMessage(message);
-          });
-        } else {
-          processMessage(newMessages);
-        }
-      };
-
-      socket.on("receive-message-community", handleNewMessages);
-      socket.emit("fetch-community-messages", {
-        communityId: selectedCommunityId,
-      });
-
-      // Cleanup on component unmount or when selectedCommunityId changes
-      return () => {
-        socket.off("receive-message-community", handleNewMessages);
-      };
-    }
-  }, [selectedCommunityId]);
-
-  useEffect(() => {
-    const userIdFromLocalStorage = localStorage.getItem("userId");
-
-    if (userIdFromLocalStorage) {
-      setUserId(userIdFromLocalStorage);
-      console.log(userIdFromLocalStorage);
-    }
-
-    fetchCommunities();
-  }, []);
-
   return (
-    <div className="w-full h-[90vh] flex justify-center">
-      <div className="bg-[#F1EAFF] w-full h-[90vh] lg:h-[88vh] xl:h-[92vh] flex flex-wrap md:flex-nowrap gap-3">
-        <div className="w-full md:w-2/5 h-full flex flex-col gap-3 pl-4 pt-3 overflow-auto scrollbar-hide overflow-x-hidden ml-20">
-          <div className="text-[#737373] font-semibold flex flex-col gap-2.5">
-            <div className=" text-2xl font-bold">Hello Raj!</div>
-            <span className="text-[#A6A6A6] text-md">
+    <div className="w-full  h-[calc(100vh-4rem)] flex justify-center">
+      <div className="bg-[#F1EAFF] w-full h-[90vh]  flex flex-wrap gap-3">
+        <div className="max-w-full md:w-[30%] lg:w-[35%] xl:w-[40%] h-full flex flex-col gap-3 pl-4 pt-3 overflow-auto scrollbar-hide overflow-x-hidden relative lg:left-16 md:left-64">
+          <div className="text-[#737373] font-semibold flex flex-col gap-1">
+            <div className=" text-[1.7vw] font-bold">Hello Raj!</div>
+            <span className="text-[#A6A6A6] text-[1.2vw]">
               Learn with your peers to maximize learning
             </span>
             <div className="relative">
               <input
                 type="text"
-                className="pl-12 pr-4 py-4 w-full border text-lg rounded-lg "
+                className="pl-12 pr-4 py-4 w-full lg:h-[7vh] xl:h-[5vh] 2xl:h-[5vh] border text-[1vw] rounded-lg "
                 placeholder="Search Problems"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Image
                   src="/community/search-lens.svg"
                   alt="search"
-                  width={30}
-                  height={30}
+                  width={25}
+                  height={25}
                 />
               </div>
             </div>
           </div>
-
-          <ExclusiveCommunity exclusiveCommunities={exclusiveCommunities} />
-
-          <div className="flex flex-col gap-3 overflow-x-clip mt-[250px] mr-2">
+          <Carousel />
+          <div className="flex flex-col gap-3 overflow-x-clip mt-0 mr-2">
             <div className="flex flex-row justify-between">
               <span className="text-base font-semibold">All Communities</span>
               <button className="text-sm font-semibold text-[#8c52ff]">
@@ -407,11 +405,13 @@ export default function Community() {
           </div>
         </div>
         <div
-          className={`${
-            isSmallScreen ? "absolute top-14 h-[90%] w-full ml-0" : ""
+          className={
+            `${
+            isSmallScreen ? "absolute top-14 h-[90%] w-full ml-16" : ""
           } ${
             smScreen ? "flex" : "hidden"
-          } md:flex flex-col md:h-full w-3/5 bg-[#fff] rounded-lg m-3 mb-0`}
+          } md:flex md:w-[40%] lg:w-[53%] flex-col h-[90vh] xl:w-[51%] 2xl:w-[52.5%] bg-[#fff] rounded-lg lg:ml-20 mb-0 md:ml-64`
+        }
         >
           
           <div className="flex flex-row bg-[#8c52ff] w-full h-24 rounded-lg items-center justify-between">
@@ -462,52 +462,28 @@ export default function Community() {
               </div>
             </div>
           </div>
-          {leftRoom === "no" ? (
+          {leftRoom==="no"?
+          (
             <div className="flex flex-col h-full">
-              <div className="flex flex-grow flex-col p-4 overflow-auto">
-                {messages.length > 0 &&
-                  messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className="mb-2 p-2 bg-gray-100 rounded-lg"
-                    >
-                      <p className="text-blue-800 font-serif size-5 ">
-                        {message.sender.first_name}
-                      </p>
-                      {message.type === "text" ? (
-                        <div>
-                          <p>{message.content}</p>
-                        </div>
-                      ) : message.type === "image" ? (
-                        <Image
-                          src={"/home/profile.jpg"}
-                          width={100}
-                          height={100}
-                          alt="Uploaded"
-                          className="w-auto"
-                        />
-                      ) : message.type === "video" ? (
-                        <video
-                          controls
-                          style={{ maxWidth: "100%", marginTop: "10px" }}
-                        >
-                          <source src={message.content} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
-                      ) : message.type === "document" ? (
-                        <a
-                          href={message.content}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ display: "block", marginTop: "10px" }}
-                        >
-                          Open Document
-                        </a>
-                      ) : (
-                        message.content
-                      )}
-                    </div>
-                  ))}
+          <div className="flex flex-grow flex-col p-4 overflow-auto">
+          {messages.length > 0 &&
+            messages.map((message) => (
+              <div key={message.id} className="mb-2 p-2 bg-gray-100 rounded-lg">
+                <p className="text-blue-800 font-serif size-5 ">{message.sender.first_name}</p>
+               {message.type === "text" ? (
+                               <div><p >{message.content}</p></div>
+                            ) : message.type === 'image' ? (
+                                <img src={message.content} alt="Uploaded" style={{ maxWidth: '100%', marginTop: '10px' }} />
+                            ) : message.type === 'video' ? (
+                              <video controls style={{ maxWidth: '100%', marginTop: '10px' }}>
+                                    <source src={message.content} type="video/mp4" />
+                                    Your browser does not support the video tag.
+                                </video>
+                            ) : message.type === 'document' ? (
+                                <a href={message.content} target="_blank" rel="noopener noreferrer" style={{ display: 'block', marginTop: '10px' }}>
+                                    Open Document
+                                </a>
+                            ) : message.content}
               </div>
             ))}
         </div>
@@ -545,11 +521,15 @@ export default function Community() {
                 />
               </div>
             </div>
-          ) : (
-            <div>Join the community</div>
-          )}
+          </div>
+          </div>
+        )
+        :
+         ( <div>Join the community</div>)
+         }
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }
