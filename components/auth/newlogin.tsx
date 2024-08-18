@@ -164,7 +164,7 @@ const AuthForm: React.FC = () => {
         const userData = await res.json();
         setCookie("user", JSON.stringify(userData.user), 7); // Set cookie for 7 days
         toast.success("Registration successful!");
-        router.push("/login");
+        router.push("/questions");
       } else {
         const errorData = await res.json();
         toast.error(errorData.error || "Registration failed");

@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import InterviewPage from "../interviewPage/page";
 import { IoDocumentAttach } from "react-icons/io5";
 import AudioToText from "./Recording";
 import { toast } from 'sonner';
@@ -11,13 +10,8 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { FaRegFileAlt } from "react-icons/fa";
 
 const InterviewComponent = () => {
-  // Track whether the component has mounted
   const [isMounted, setIsMounted] = useState(false);
-
-  // Zustand store usage
   const { resumeFile, setResumeFile, jobDescriptionFile, setJobDescriptionFile } = useInterviewStore();
-
-  // Other state variables
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState('');
@@ -36,7 +30,7 @@ const InterviewComponent = () => {
   const [audioTextInputs, setAudioTextInputs] = useState([]);
   const videoRef = useRef(null);
   const audioRef = useRef(null);
-  const websocketRef = useRef(null);
+ 
   const [textToSpeak, setTextToSpeak] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [micActive, setMicActive] = useState(false);
@@ -45,21 +39,37 @@ const InterviewComponent = () => {
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
   const rafIdRef = useRef(null);
+  
 
   const allDevicesConfigured = isCameraEnabled && isMicEnabled && isSoundEnabled;
 
-  // Mark the component as mounted on the client side
+  const websocketRef = useRef<WebSocket | null>(null);
+
+
+  const waitForSocketConnection = (socket) => {
+    return new Promise((resolve) => {
+      if (socket.readyState === WebSocket.OPEN) {
+        resolve();
+      } else {
+        socket.onopen = () => {
+          console.log("WebSocket connection opened");
+          resolve();
+        };
+      }
+    });
+  };
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    if (isMounted) {
+    if (isMounted && !websocketRef.current) {
       websocketRef.current = new WebSocket("wss://ai-interviewer-c476.onrender.com/ws");
 
-      websocketRef.current.onopen = () => {
-        console.log("WebSocket connection opened");
-      };
+      waitForSocketConnection(websocketRef.current).then(() => {
+        console.log("WebSocket is ready to send messages");
+      });
 
       websocketRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -74,7 +84,7 @@ const InterviewComponent = () => {
         } else if (data.type === "interview_question") {
           console.log("Interview question received:", data.question);
           setChatMessages((prevMessages) => [...prevMessages, { user: "Interviewer", message: data.question }]);
-          setTextToSpeak(data.question); // Update the text to be spoken
+          setTextToSpeak(data.question);
         } else if (data.type === "interview_end") {
           console.log("Interview ended:", data.message);
           setChatMessages((prevMessages) => [...prevMessages, { user: "System", message: data.message }]);
@@ -100,7 +110,6 @@ const InterviewComponent = () => {
       websocketRef.current?.send(JSON.stringify({ type: "answer", answer: message }));
     }
   };
-
   const handleTextSubmit = (text) => {
     setAudioTextInputs((prevInputs) => [...prevInputs, text]); // Store the audio-to-text input
     websocketRef.current?.send(
@@ -112,10 +121,15 @@ const InterviewComponent = () => {
     setChatMessages((prevMessages) => [...prevMessages, { user: "You", message: text }]);
   };
 
+  const handleUploadJDToggle = () => {
+    setIsManualEntry(false);
+    setManualJobDescription("");
+  };
+
   const handleSpeak = () => {
     if (!textToSpeak) return;
 
-    console.log("Speak function called with text:", textToSpeak); // Check if this is triggered
+    console.log("Speak function called with text:", textToSpeak);
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     setIsSpeaking(true);
 
@@ -128,25 +142,34 @@ const InterviewComponent = () => {
 
   useEffect(() => {
     if (textToSpeak) {
-      console.log("Text to Speak:", textToSpeak); // Confirm the state is updated
+      console.log("Text to Speak:", textToSpeak);
       handleSpeak();
     }
   }, [textToSpeak]);
 
-  const handleResumeUpload = (event) => {
+  const handleResumeUpload = async (event) => {
     const file = event.target.files[0];
     if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
       setResumeFile(file);
 
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         const binaryData = event.target.result;
+        console.log("Resume binary data:", binaryData); // Debugging log
+
+        await waitForSocketConnection(websocketRef.current); // Ensure WebSocket is ready
         websocketRef.current?.send(
           JSON.stringify({
             type: "upload_cv",
             cv_data: Array.from(new Uint8Array(binaryData)),
           })
         );
+        setCvText("Uploaded");
+
+        // Check if JD is also uploaded
+        if (JD) {
+          startInterview();
+        }
       };
       reader.readAsArrayBuffer(file);
     } else {
@@ -155,20 +178,29 @@ const InterviewComponent = () => {
     }
   };
 
-  const handleJobDescriptionUpload = (event) => {
+  const handleJobDescriptionUpload = async (event) => {
     const file = event.target.files[0];
     if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
       setJobDescriptionFile(file);
 
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         const binaryData = event.target.result;
+        console.log("JD binary data:", binaryData); // Debugging log
+
+        await waitForSocketConnection(websocketRef.current); // Ensure WebSocket is ready
         websocketRef.current?.send(
           JSON.stringify({
             type: "analyze_jd",
             job_description: Array.from(new Uint8Array(binaryData)),
           })
         );
+        setJD("Uploaded");
+
+        // Check if CV is also uploaded
+        if (cvText) {
+          startInterview();
+        }
       };
       reader.readAsArrayBuffer(file);
     } else {
@@ -176,25 +208,51 @@ const InterviewComponent = () => {
     }
   };
 
+  const startInterview = () => {
+    if (cvText && JD) {
+        console.log('Starting interview with:', { cvText, JD });
+        waitForSocketConnection(websocketRef.current).then(() => {
+            console.log('WebSocket is ready to send start_interview');
+            websocketRef.current?.send(
+                JSON.stringify({
+                    type: "start_interview",
+                    pdf_text: cvText, // Use actual cvText
+                    job_description: JD, // Use actual JD
+                })
+            );
+            setIsInterviewStarted(true);  // Set interview started state
+        }).catch(err => {
+            console.error('Failed to start interview:', err);
+        });
+    } else {
+        console.error("CV or JD not uploaded, cannot start interview.");
+    }
+};
+
+
+
+  const handleNextClick = () => {
+    if (step === 3 && allDevicesConfigured) {
+      if (!cvText || !JD) {
+        alert("Please upload both the CV and Job Description before starting the interview.");
+        return;
+      }
+      startInterview();
+    } else {
+      setStep(step + 1);
+    }
+  };
+
+
+
+  const handleBackClick = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
   const handleDragOver = (event) => {
     event.preventDefault(); // Prevent default behavior to allow dropping
-  };
-
-  const triggerFileInput = (inputId) => {
-    document.getElementById(inputId)?.click();
-
-    websocketRef.current?.send(
-      JSON.stringify({
-        type: "start_interview",
-        pdf_text: cvText,
-        job_description: JD,
-      })
-    );
-  };
-
-  const handleUploadJDToggle = () => {
-    setIsManualEntry(false);
-    setManualJobDescription("");
   };
 
   const handleManualEntryToggle = () => {
@@ -202,8 +260,53 @@ const InterviewComponent = () => {
     setJobDescriptionFile(null);
   };
 
-  const handleJobProfileSelect = (event) => {
-    setSelectedJobProfile(event.target.value);
+
+  const triggerFileInput = (inputId) => {
+    // Trigger the file input click
+    document.getElementById(inputId)?.click();
+
+    // Check if both CV and Job Description are uploaded
+    if (cvText && JD) {
+        // Start the interview and set the state
+        startInterview();
+    } else {
+        console.error("CV or JD not uploaded, cannot start the interview.");
+    }
+};
+
+
+
+
+  useEffect(() => {
+    const timerInterval = setInterval(() => {
+      setTimeRemaining((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, []);
+
+  useEffect(() => {
+    if ((isCameraEnabled || isInterviewStarted) && videoRef.current) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((stream) => {
+          console.log("Camera enabled: Stream acquired");
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        })
+        .catch((err) => {
+          console.error("Error accessing camera:", err);
+          alert("Unable to access camera: " + err.message);
+        });
+    } else if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  }, [isCameraEnabled, isInterviewStarted]);
+
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
   const handleCameraToggle = () => {
@@ -212,30 +315,29 @@ const InterviewComponent = () => {
 
   const handleMicToggle = (e) => {
     if (e.target.checked) {
-      startMicrophoneTest(); // Start the microphone test when enabled
+      startMicrophoneTest();
       setIsMicTestEnabled(true);
     } else {
       setIsMicEnabled(false);
-      stopMicrophoneTest(); // Stop the microphone test when disabled
+      stopMicrophoneTest();
     }
   };
-
 
   const handleSoundToggle = (e) => {
     setIsSoundEnabled(e.target.checked);
     if (e.target.checked) {
       setIsSoundTesting(true);
-      playTestSound();  // Add this function to start playing the test sound
+      playTestSound();
     } else {
       setIsSoundTesting(false);
-      stopTestSound();  // Stop the test sound if speaker is disabled
+      stopTestSound();
     }
   };
 
   const playTestSound = () => {
     if (audioRef.current) {
-      console.log("Playing sound");  // Debug log
-      audioRef.current.src = "/sounds/audio.mp3"; // Ensure the correct path is set
+      console.log("Playing sound");
+      audioRef.current.src = "/sounds/audio.mp3";
       audioRef.current.play().then(() => {
         console.log("Sound started successfully");
       }).catch((error) => {
@@ -253,17 +355,16 @@ const InterviewComponent = () => {
 
   const handleMicTestConfirmation = () => {
     setIsMicTestEnabled(false);
-    setIsMicEnabled(true); // Ensure the microphone is marked as enabled after the test
-    stopMicrophoneTest(); // Stop the microphone test after confirmation
+    setIsMicEnabled(true);
+    stopMicrophoneTest();
   };
 
   const handleSoundConfirmation = () => {
-    stopTestSound();  // Stop the sound after confirmation
+    stopTestSound();
     setIsSoundEnabled(true);
     setIsSoundTesting(false);
   };
 
-  // Microphone Test Functions
   const startMicrophoneTest = () => {
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then((stream) => {
@@ -310,71 +411,9 @@ const InterviewComponent = () => {
     };
   }, []);
 
-  const handleNextClick = () => {
-    if (step === 3 && allDevicesConfigured) {
-      websocketRef.current?.send(
-        JSON.stringify({
-          type: "start_interview",
-          pdf_text: cvText,
-          job_description: JD,
-        })
-      );
-
-      const statusElement = document.getElementById("status");
-      if (statusElement) {
-        statusElement.innerText = "Interview started!";
-      }
-
-      setIsInterviewStarted(true);
-    } else {
-      setStep(step + 1);
-    }
-  };
-
-  const handleBackClick = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    }
-  };
-
-  // Countdown logic
-  useEffect(() => {
-    const timerInterval = setInterval(() => {
-      setTimeRemaining((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timerInterval);
-  }, []);
-
-  useEffect(() => {
-    if ((isCameraEnabled || isInterviewStarted) && videoRef.current) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          console.log("Camera enabled: Stream acquired");
-          videoRef.current.srcObject = stream;
-          videoRef.current.play(); // Ensure the video is playing
-        })
-        .catch((err) => {
-          console.error("Error accessing camera:", err);
-          alert("Unable to access camera: " + err.message);
-        });
-    } else if (videoRef.current) {
-      videoRef.current.srcObject = null; // Stop the video when camera is disabled or interview ends
-    }
-  }, [isCameraEnabled, isInterviewStarted]);
-
-  // Format the time remaining as MM:SS
-  const formatTime = (timeInSeconds) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  };
-
   const [activeTab, setActiveTab] = useState('conversation');
 
   if (!isMounted) {
-    // Optionally, return a loading indicator or an empty fragment
     return null;
   }
 
