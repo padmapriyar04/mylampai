@@ -4,30 +4,29 @@ import { persist } from "zustand/middleware";
 interface User {
   id: string;
   email: string;
-  first_name?: string;
-  last_name?: string;
+  name: string;
   role?: string;
 }
 
 interface UserState {
-  user: User | null;
+  userData: User | null;
   token: string | null;
-  setUser: (user: User | null, token: string | null) => void;
+  setUserData: (userData: User | null, token: string | null) => void;
   clearUser: () => void;
 }
 
 const useUserStore = create<UserState>()(
   persist(
     (set) => ({
-      user: null,
+      userData: null,
       token: null,
-      setUser: (user, token) => set({ user, token }),
-      clearUser: () => set({ user: null, token: null }),
+      setUserData: (userData, token) => set({ userData, token }),
+      clearUser: () => set({ userData: null, token: null }),
     }),
     {
       name: "user-storage",
-    }
-  )
+    },
+  ),
 );
 
 export { useUserStore };

@@ -1,15 +1,12 @@
-// app/(protected)/layout.tsx
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { Toaster } from "@/components/ui/sonner";
-import HomeNavbar from "../../components/home/HomeNavbar";
-// import Head from "next/head";
-
+import HomeNavbar from "@/components/home/HomeNavbar";
 import Flexsidebar from "@/components/misc/Flexsidebar";
 
 import type { Metadata } from "next";
-import "./../globals.css";
+import "../globals.css";
 import { Open_Sans } from "next/font/google";
 const openSans = Open_Sans({ subsets: ["latin"] });
 
@@ -17,6 +14,7 @@ export const metadata: Metadata = {
   title: "MyLampAi - Home",
   description: "MyLampAi - Home Page",
 };
+
 export default function ProtectedLayout({
   children,
 }: {
@@ -30,7 +28,9 @@ export default function ProtectedLayout({
   }
 
   try {
-    jwt.verify(token?.value || "", process.env.JWT_SECRET || "okokokok");
+    if (token.value)
+      jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
+    else redirect("/login");
   } catch (error) {
     redirect("/login");
   }

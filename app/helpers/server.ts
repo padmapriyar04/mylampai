@@ -1,4 +1,4 @@
-import prisma from "@/lib/index";
+import prisma from "@/lib";
 
 
 export const connectToDatabase = async () => {
