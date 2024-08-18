@@ -20,7 +20,7 @@ export default function NewBlog() {
     });
   };
 
-  const handleSectionChange = (index:any, e:any) => {
+  const handleSectionChange = (index:number, e: any) => {
     const { name, value } = e.target;
     const sections = [...formData.sections];
     sections[index][name] = value;
