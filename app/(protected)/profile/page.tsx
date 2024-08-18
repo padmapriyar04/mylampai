@@ -1,24 +1,24 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/utils/userStore";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
-  const { userData, token } = useUserStore();
+  const { userData } = useUserStore();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await fetch("/api/user/profile");
+
         if (response.ok) {
           const data = await response.json();
           console.log("userData", data);
         } else if (response.status === 404) {
-          toast.error("User not found. Please try logging in again.");
-          router.push("/login");
+          toast.error("User not found. Try logging in again.");
         } else {
           throw new Error("Failed to fetch user data");
         }
@@ -28,9 +28,8 @@ export default function ProfilePage() {
         setLoading(false);
       }
     };
-
-    fetchUser();
-  }, [ token, router ]);
+    if (!userData) fetchUser();
+  }, [userData]);
 
   if (loading) {
     return (
@@ -54,9 +53,7 @@ export default function ProfilePage() {
         <h1 className="text-3xl font-bold mb-4 text-purple-600">
           Welcome to Your Profile
         </h1>
-        <p className="text-xl text-gray-700 mb-2">
-          Hello, {userData.name}
-        </p>
+        <p className="text-xl text-gray-700 mb-2">Hello, {userData.name}</p>
         <p className="text-md text-gray-600">Email: {userData.email}</p>
         <p className="text-md text-gray-600">Role: {userData.role}</p>
         <p className="text-md text-gray-600">User ID: {userData.id}</p>
