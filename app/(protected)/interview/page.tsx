@@ -437,7 +437,7 @@ const InterviewComponent = () => {
         </nav>
   
         {/* Main Content */}
-        <div className="flex-1 flex justify-center items-center bg-gray-100 overflow-hidden h-screen">
+        <div className="flex-1 flex justify-center items-center flex-col sm:flex-row bg-gray-100 overflow-hidden h-screen">
           <video
             ref={videoRef}
             className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75"

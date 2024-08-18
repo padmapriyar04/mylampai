@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -9,30 +9,24 @@ import Input from "./Input";
 import CountrySelector from "../misc/CountryFlag";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { setCookie } from "@/utils/cookieUtils"; // Import cookie utilities
-
-import Globe from "../../public/images/Globe.svg";
+import { setCookie } from "@/utils/cookieUtils";
+import { useUserStore } from "@/utils/userStore";
 import Arrow from "../../public/images/Arrow.png";
 import Lock from "../../public/images/icons8-lock.svg";
 import GoogleImg from "../../public/images/Google_Icons-09-512.png";
 
-import CarouselImage1 from "../../public/images/Globe.svg";
-import CarouselImage2 from "../../public/images/Globe.svg";
-import CarouselImage3 from "../../public/images/Globe.svg";
-import CarouselImage4 from "../../public/images/Globe.svg";
-
 const AuthForm: React.FC = () => {
+  const { userData, setUserData } = useUserStore();
   const [isSignUp, setIsSignUp] = useState(true);
-  const [activeTab, setActiveTab] = useState("student");
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
     password: "",
-    role: "user",
-    secret: "",
+    role: "user"
   });
+  
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
@@ -45,13 +39,13 @@ const AuthForm: React.FC = () => {
 
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
     setUser((prevUser) => ({
       ...prevUser,
-      [name]: value,
+      [name]: value.trim(),
     }));
-    console.log(value);
   };
 
   const handleCredentialsChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -159,10 +153,10 @@ const AuthForm: React.FC = () => {
           email: user.email,
           first_name: user.firstName,
           last_name: user.lastName,
+          name: `${user.firstName} ${user.lastName}`,
           phone: user.phone,
           password: user.password,
-          role: activeTab === "admin" ? "admin" : "user",
-          secret: user.secret, // Only send secret if role is admin
+          role: "user"
         }),
       });
 
@@ -206,13 +200,16 @@ const AuthForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
+        console.log(data);
+
         // Store user data and token in cookies
         setCookie("token", data.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
 
         toast.success("Login successful!");
 
-        // Redirect based on role
+        setUserData(data.user, data.token);
+
         if (data.user.role === "admin") {
           router.push("/adminDashboard");
         } else {
@@ -240,6 +237,13 @@ const AuthForm: React.FC = () => {
       toast.error("An error occurred during Google sign-in");
     }
   };
+  
+  useEffect(()=> {
+    if (userData) {
+      toast.success("Already Logged In");
+      router.push("/")
+    }
+  }, [router, userData])
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
@@ -252,48 +256,26 @@ const AuthForm: React.FC = () => {
             autoPlay
             interval={5000}
             showArrows={false}
+            showIndicators={false}
             className="w-full h-full flex flex-col justify-between"
           >
-            <div>
-              <div className="flex justify-center mt-4">
-                <Image src={Globe} alt="Globe" className="w-4/5" />
-              </div>
+            <div className="flex justify-center items-center h-full">
+              <Image
+                src={"/images/Globe.svg"}
+                alt="Carousel Image 1"
+                className="w-4/5"
+                width={100}
+                height={100}
+              />
             </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage1}
-                  alt="Carousel Image 1"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage2}
-                  alt="Carousel Image 2"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage3}
-                  alt="Carousel Image 3"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage4}
-                  alt="Carousel Image 4"
-                  className="w-4/5"
-                />
-              </div>
+            <div className="flex justify-center items-center h-full">
+              <Image
+                src={"/images/Globe.svg"}
+                alt="Carousel Image 1"
+                className="w-4/5"
+                width={100}
+                height={100}
+              />
             </div>
           </Carousel>
         </div>
@@ -375,17 +357,6 @@ const AuthForm: React.FC = () => {
                   </div>
                 </div>
 
-                {activeTab === "admin" && (
-                  <input
-                    type="password"
-                    name="secret"
-                    placeholder="Secret Key"
-                    value={user.secret}
-                    onChange={handleChange}
-                    className="w-full p-2 border-2 bg-primary-foreground focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
-                  />
-                )}
-
                 <div className="flex items-center space-x-2 mt-6">
                   <input
                     type="checkbox"
@@ -394,9 +365,9 @@ const AuthForm: React.FC = () => {
                     className="form-checkbox h-12 w-12 accent-primary transition duration-150 ease-in-out mb-10 "
                   />
                   <span className="text-gray-800 text-l font-medium">
-                    All your information is collected, stored, and processed as per
-                    our data processing guidelines. By signing up on wiZe, you agree
-                    to our{" "}
+                    All your information is collected, stored, and processed as
+                    per our data processing guidelines. By signing up on wiZe,
+                    you agree to our{" "}
                     <Link
                       href="/privacypolicy"
                       className="text-purple-500 hover:text-purple-700 transition-colors duration-300"
@@ -430,7 +401,11 @@ const AuthForm: React.FC = () => {
                       className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl"
                     >
                       <span>Sign Up</span>
-                      <Image src={Arrow} alt="Sign Up Icon" className="w-6 h-6" />
+                      <Image
+                        src={Arrow}
+                        alt="Sign Up Icon"
+                        className="w-6 h-6"
+                      />
                     </button>
                   </div>
                 </div>
@@ -473,7 +448,7 @@ const AuthForm: React.FC = () => {
                     placeholder="Email"
                     value={credentials.email}
                     onChange={handleCredentialsChange}
-                   className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
+                    className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                   />
                   <Link
                     href="#"
@@ -532,7 +507,7 @@ const AuthForm: React.FC = () => {
                       placeholder="Password"
                       value={credentials.password}
                       onChange={handleCredentialsChange}
-                     className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
+                      className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
                     <div className="flex items-center mt-3">
                       <Image
@@ -566,7 +541,11 @@ const AuthForm: React.FC = () => {
                       className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl mr-11"
                     >
                       <span>Log In</span>
-                      <Image src={Arrow} alt="Sign Up Icon" className="w-6 h-6" />
+                      <Image
+                        src={Arrow}
+                        alt="Sign Up Icon"
+                        className="w-6 h-6"
+                      />
                     </button>
                   </div>
                 </div>

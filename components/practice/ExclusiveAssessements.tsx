@@ -69,17 +69,6 @@ const ExclusiveAssessements = (props: { exclusiveAssements: ExclusiveAssementsTy
 
 	return (
 		<div>
-			<style>
-				{`
-          			.no-scrollbar::-webkit-scrollbar {
-            		display: none;
-          			}
-          		    .no-scrollbar {
-            		-ms-overflow-style: none; /* IE and Edge */
-            		scrollbar-width: none; /* Firefox */
-          			}
-                `}
-			</style>
 			<div className="flex justify-between">
 				<div className="font-bold text-lg">Exclusive Assessments</div>
 				<div className="flex gap-4">
