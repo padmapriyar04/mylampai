@@ -577,6 +577,7 @@ const isResumeUploaded = !!resumeFile;
       {step === 1 && (
         <div className="max-w-[1200px] md:gap-4 w-full flex flex-col md:flex-row justify-between ">
           {/* Left Section */}
+          
           <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
             <Image src={"/images/Globe.svg"} className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
