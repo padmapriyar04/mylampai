@@ -34,6 +34,7 @@ export default function ProtectedLayout({
   } catch (error) {
     redirect("/login");
   }
+  
 
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
