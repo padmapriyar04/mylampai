@@ -1,12 +1,7 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Image from "next/image";
-import {
-  Carousel,
-  CarouselItem,
-  CarouselContent,
-} from "@/components/ui/carousel";
 
 interface Community {
   id: string;
@@ -19,67 +14,90 @@ interface Community {
   userIds: string[];
   comm_type: "exclusive" | "normal";
 }
+
 interface ExclusiveCommunityProps {
   exclusiveCommunities: Community[];
 }
 
-const CardComponent = ({ data }: { data: Community }) => {
-  const { name } = data;
-
-  return (
-    <CarouselItem className="basis-1/2">
-      <div className="bg-white rounded-2xl h-full overflow-hidden">
-        <div className="h-[180px] relative">
-          <Image
-            alt={name}  
-            width={1000}
-            height={1000}
-            src={"/home/profile.jpg"}
-            className="rounded-lg h-full w-auto object-cover"
-          />
-        </div>  
-        <p className="font-semibold text-lg text-[#111] h-auto py-2 px-4 flex items-center">
-          {name}
-        </p>
-      </div>
-    </CarouselItem>
-  );
-};
-
 const ExclusiveCommunity: React.FC<ExclusiveCommunityProps> = ({
   exclusiveCommunities,
 }) => {
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
+  const scrollLeft = () => {
+    if (carouselRef.current) {
+      const cardWidth = carouselRef.current.clientWidth / 2;
+      carouselRef.current.scrollBy({
+        left: -cardWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (carouselRef.current) {
+      const cardWidth = carouselRef.current.clientWidth / 2;
+      carouselRef.current.scrollBy({
+        left: cardWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const CardComponent = ({ data }: { data: Community }) => {
+    const { name, description } = data;
+
+    return (
+      <div className="w-[90%] h-[100%] bg-white rounded-2xl shadow-md p-4">
+        <div className="rounded-lg h-[60%] relative">
+          <Image
+            alt={name}
+            width={100}
+            height={100}
+            src={"/home/profile.jpg"} // Ensure this path is correct
+            className="rounded-lg w-full"
+          />
+        </div>
+        <p className="font-bold text-xl mt-3 flex items-center">
+          {name}
+        </p>
+        <p className="text-gray-600 mt-2">{description}</p>
+      </div>
+    );
+  };
 
   return (
     <>
-      <div className="flex flex-col gap-4 relative">
-        <div className="flex flex-row justify-between">
-          <span className="text-xl font-semibold">Exclusive Communities</span>
+      <div className="flex flex-col gap-3 ml-0 relative">
+        <div className="flex flex-row justify-between items-center">
+          <span className="text-base font-semibold">Exclusive Communities</span>
           <div className="flex flex-row gap-4">
-            <button >
+            <button onClick={scrollLeft} aria-label="Scroll Left">
               <FaChevronLeft />
             </button>
-            <button >
+            <button onClick={scrollRight} aria-label="Scroll Right">
               <FaChevronRight />
             </button>
           </div>
         </div>
-        {exclusiveCommunities.length ? (
-          <Carousel>
-            <CarouselContent className="min-h-[250px]">
-              {exclusiveCommunities.map(
-                (community: Community, index: number) => (
-                  <CardComponent data={community} key={index} />
-                ),
-              )}
-            </CarouselContent>
-          </Carousel>
-        ) : (
-          <div className="flex justify-center items-center w-full h-full text-gray-500">
-            No exclusive communities available
-          </div>
-        )}
+        {error && <div className="text-red-500">{error}</div>}
+        <div className="carousel-container flex overflow-x-auto scrollbar-hide">
+          {exclusiveCommunities.length ? (
+            exclusiveCommunities.map((community) => (
+              <div
+                key={community.id} // Use unique identifier from Community
+                className="flex-shrink-0 w-1/2 md:w-1/2 h-full p-2 snap-start"
+              >
+                <CardComponent data={community} />
+              </div>
+            ))
+          ) : (
+            <div className="flex justify-center items-center w-full h-full text-gray-500">
+              No exclusive communities available
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
