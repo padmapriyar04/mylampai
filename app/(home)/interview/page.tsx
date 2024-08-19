@@ -4,6 +4,9 @@ import { IoDocumentAttach } from "react-icons/io5";
 import AudioToText from "./recording";
 import { FiMic, FiSpeaker, FiVideo, FiMessageSquare } from "react-icons/fi";
 import useInterviewStore from './store';
+import Image from "next/image"
+import { IoCloudUploadOutline } from "react-icons/io5";
+import { FaRegFileAlt } from "react-icons/fa";
 
 const InterviewComponent = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -69,14 +72,14 @@ const InterviewComponent = () => {
 
       websocketRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log("Message received: ", data);
-
         if (data.type === "cv_uploaded") {
+          toast.success("CV uploaded Successfully")
           console.log("CV uploaded:", data.message);
-          setCvText(data.cv_text);
+          setCvText(data.cv_text);  // Update the state with CV text
         } else if (data.type === "jd_analyzed") {
           console.log("Job description analyzed:", data.message);
-          setJD(data.job_description);
+          setJD(data.job_description);  // Update the state with JD text
+
         } else if (data.type === "interview_question") {
           console.log("Interview question received:", data.question);
           setChatMessages((prevMessages) => [...prevMessages, { user: "Interviewer", message: data.question }]);
@@ -462,7 +465,7 @@ const InterviewComponent = () => {
             </button>
           </div>
         </nav>
-  
+
         {/* Main Content */}
         <div className="flex-1 flex justify-center items-center bg-gray-100 overflow-hidden h-screen">
           <video
@@ -475,7 +478,7 @@ const InterviewComponent = () => {
 
         {/* Microphone enabled: Display AudioToText */}
         {isMicEnabled && <AudioToText onTextSubmit={handleTextSubmit} />} {/* Display when mic is enabled */}
-  
+
         {/* Prompt Box */}
         {isChatOpen && (
           <div className="absolute top-20 right-6 bg-white border border-gray-300 shadow-lg rounded-lg w-96 h-1/2 flex flex-col">
@@ -485,7 +488,7 @@ const InterviewComponent = () => {
                 &times;
               </button>
             </div>
-  
+
             {/* Tabs for switching between sections */}
             <div className="flex border-b border-gray-300">
               <button
@@ -501,7 +504,7 @@ const InterviewComponent = () => {
                 Audio-to-Text
               </button>
             </div>
-  
+
             {/* Content Sections */}
             <div className="flex-1 overflow-y-auto p-4">
               {activeTab === 'conversation' && (
@@ -526,14 +529,14 @@ const InterviewComponent = () => {
                 </div>
               )}
             </div>
-  
+
             {/* Input and Buttons Container */}
             <div className="p-4 bg-gray-100 border-t border-gray-300">
               <input
                 id="answerInput"
                 type="text"
                 placeholder="Type your answer here"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:outline-none mb-2"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none mb-2"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     const answer = e.target.value;
@@ -545,7 +548,7 @@ const InterviewComponent = () => {
               <div className="flex justify-between">
                 <button
                   id="sendAnswerButton"
-                  className="bg-purple-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 transition"
+                  className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition"
                   onClick={() => {
                     const answer = document.getElementById("answerInput").value;
                     if (answer) {
@@ -578,15 +581,13 @@ const InterviewComponent = () => {
   }
 
   return (
-    <div className="min-h-[92vh] bg-purple-100 flex items-center justify-center w-[100%]">
+    <div className="h-[calc(100vh-4rem)] bg-primary-foreground flex items-center justify-center w-full border-t-2 border-[#eeeeee]">
       {/* Step 1: Upload Resume */}
       {step === 1 && (
-        <div className="max-w-6xl w-full flex gap-64">
+        <div className="max-w-[1200px] gap-4 w-full flex justify-between ">
           {/* Left Section */}
-          <div className="w-7/10 h-[80vh] w-[45vw] flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
-            <div className="flex justify-center absolute inset-0 rounded-tl-3xl rounded-br-3xl overflow-hidden mt-0">
-              <img src="\images\Globe.svg" alt="Globe" className="w-[80%] h-[80%]" />
-            </div>
+          <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+            <Image src={"/images/Globe.svg" } className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
               <p className="mt-2 text-center text-sm leading-relaxed">
@@ -596,137 +597,113 @@ const InterviewComponent = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-2/3 flex flex-col items-center justify-center bg-purple-100">
-          <div ><p className='text-xl font-bold text-purple-500 mb-2'>Get Started!</p></div>
-         
-          <div className="flex items-center justify-center mb-2 w-full ml-32 mb-4">
-                {/* Progress Bar */}
-                <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${resumeFile ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                    {(resumeFile) ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-400 w-full'} z-0`}></div>
-                </div>
-                {/* Step 2 */}
-                <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                    {(jobDescriptionFile || isManualEntry) ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-400 w-full'} z-0`}></div>
-                </div>
-                {/* Step 3 */}
-                <div className="relative flex-1 flex items-center">
-                  <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+          <div className="w-full max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground">
+            <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
+
+            <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
+              {/* Progress Bar */}
+              <div className="relative flex-1">
+                <div className={`w-8 h-8 ${resumeFile ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                  {(resumeFile) ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
                     <div className="w-3 h-3 bg-white rounded-full"></div>
-                  </div>
+                  )}
+                </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              </div>
+              {/* Step 2 */}
+              <div className="relative flex-1">
+                <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                  {(jobDescriptionFile || isManualEntry) ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  )}
+                </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              </div>
+              {/* Step 3 */}
+              <div className="relative  flex items-center">
+                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
                 </div>
               </div>
-
-          
-
-    <div className="text-center mb-8 w-[200%]">
-      <h3 className="text-3xl font-bold text-gray-800">Upload your latest CV/Resume</h3>
-    </div>
-    
-    {/* Upload Section */}
-    <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[41vh] text-center">
-    <div className="flex items-center justify-center text-purple-500 mb-5 relative top-0 text-5xl">
-  <IoDocumentAttach />
-     </div>
-
-    <div 
-      className="border-dashed border-2 border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center bg-white h-48"
-      onDragOver={handleDragOver}
-      onDrop={(e) => handleDrop(e, setResumeFile)}
-    >
-      <p className="text-gray-500 mb-2">Drag & Drop or</p>
-      <label
-        htmlFor="resumeUpload"
-        className="text-gray-500 cursor-pointer"
-      >
-        Click to <span className="font-semibold text-gray-700">Upload Resume</span>
-      </label>
-      <input
-        id="resumeUpload"
-        type="file"
-        accept=".doc,.docx,.pdf"
-        className="hidden"
-        onChange={handleResumeUpload}
-      />
-      
-      <div className="mb-4 ">
-      
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className={`h-12 w-12 ${resumeFile ? 'text-purple-600' : 'text-gray-300'}`}
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 3a1 1 0 011 1v7.586l1.293-1.293a1 1 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 11.586V4a1 1 0 011-1z"
-            clipRule="evenodd"
-          />
-          <path
-            fillRule="evenodd"
-            d="M4 18a2 2 0 012-2h8a2 2 0 012 2H4z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
-      
-      <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
-    </div>
-
-    {/* Upload Button */}
-    <div className="flex justify-center mt-2">
-  <button
-    className="bg-purple-500 w-80 text-white font-bold py-3 px-3 rounded-xl hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 transition"
-    onClick={() => triggerFileInput('resumeUpload')}
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
-      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-    </svg>
-    Upload Resume
-  </button>
-</div>
+            </div>
 
 
-    {/* Display Uploaded File */}
-    {resumeFile && (
-      <div className="mt-4 text-xs text-center text-gray-700">
-        <p>{resumeFile.name} uploaded successfully.</p>
-      </div>
-    )}
-      </div>
-        <div className="mt-8 w-full px-4 flex flex-col items-center">
-        <button 
-          className={`w-[180%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
-          disabled={!resumeFile}
-          onClick={handleNextClick}
-        >
-        Next
-        </button>
-        <button 
-          className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
-          onClick={handleBackClick}
-          disabled={step === 1}
-        >
-        Back
-        </button>
-      </div>
+
+            <div className="text-center mb-6 mt-3 w-[100%]">
+              <h3 className="text-sm xl:text-2xl font-bold text-gray-800">Upload your latest CV/Resume</h3>
+            </div>
+
+            {/* Upload Section */}
+            <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center">
+              <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-[2vw]">
+                <IoDocumentAttach />
+              </div>
+
+              <div
+                className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white "
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, setResumeFile)}
+              >
+                <p className="text-gray-500 mt-2 text-sm">Drag & Drop or</p>
+                <label
+                  htmlFor="resumeUpload"
+                  className="text-gray-500 cursor-pointer text-sm"
+                >
+                  Click to <span className="font-semibold text-gray-700 ">Upload Resume</span>
+                </label>
+                <input
+                  id="resumeUpload"
+                  type="file"
+                  accept=".doc,.docx,.pdf"
+                  className="hidden"
+                  onChange={handleResumeUpload}
+                />
+
+                <div className="text-4xl mt-3 text-gray-300">
+                <IoCloudUploadOutline />
+                </div>
+
+                <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
+              </div>
+
+              {/* Upload Button */}
+              <div className="flex justify-center mt-2">
+                <button
+                  className="bg-primary md:text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"
+                  onClick={() => triggerFileInput('resumeUpload')}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                  </svg>
+                  Upload Resume
+                </button>
+              </div>
+
+            </div>
+            <div className="mt-8 w-full px-4 flex flex-col items-center">
+              <button
+                className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                disabled={!resumeFile}
+                onClick={handleNextClick}
+              >
+                Next
+              </button>
+              <button
+                className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
+                onClick={handleBackClick}
+                disabled={step === 1}
+              >
+                Back
+              </button>
+            </div>
 
           </div>
         </div>
@@ -734,76 +711,70 @@ const InterviewComponent = () => {
 
       {/* Step 2: Upload Job Description */}
       {step === 2 && (
-        <div className="max-w-6xl w-full flex gap-64 relative">
+        <div className="max-w-[1200px] gap-4 w-full flex justify-between ">
           {/* Left Section */}
-          <div className="w-7/10 h-[80vh] w-[45vw] flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
-            <div className="flex justify-center absolute inset-0 rounded-tl-3xl rounded-br-3xl overflow-hidden mt-0">
-              <img src="\images\Globe.svg" alt="Globe" className="w-[80%] h-[80%]" />
-            </div>
+          <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+            <Image src={"/images/Globe.svg" } className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
               <p className="mt-2 text-center text-sm leading-relaxed">
-                You'll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
+                You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
               </p>
             </div>
           </div>
 
           {/* Right Section */}
-          <div className="w-3/4 flex flex-col items-center justfiy-top bg-purple-100">
+          <div className="w-full max-w-[700px] h-full  flex flex-col items-center justify-center bg-primary-foreground">
             <div className="w-full flex flex-col items-center mb-2">
-            <div ><p className='text-xl font-bold text-purple-500'>Get Started!</p></div>
-              <div className="flex items-center justify-center w-full ml-32">
-                {/* Progress Bar */}
-                <div className="relative flex-1">
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+            <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
+            <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
+              {/* Progress Bar */}
+              <div className="relative flex-1">
+                <div className={`w-8 h-8 ${resumeFile ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                  {(resumeFile) ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                        clipRule="evenodd"
-                      />
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
                     </svg>
-                  </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-purple-500 w-full z-0`}></div>
-                </div>
-                {/* Step 2 */}
-                <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? "bg-purple-500" : "bg-gray-400"} rounded-full flex items-center justify-center`}>
-                    {(jobDescriptionFile || isManualEntry) ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    ) : (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? "bg-purple-500 w-full" : "bg-gray-400 w-full"} z-0`}></div>
-                </div>
-                {/* Step 3 */}
-                <div className="relative flex-1 flex items-center">
-                  <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                  ) : (
                     <div className="w-3 h-3 bg-white rounded-full"></div>
-                  </div>
+                  )}
+                </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              </div>
+              {/* Step 2 */}
+              <div className="relative flex-1">
+                <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                  {(jobDescriptionFile || isManualEntry) ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  )}
+                </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              </div>
+              {/* Step 3 */}
+              <div className="relative  flex items-center">
+                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
                 </div>
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-center text-gray-800 w-[150%] mb-8">Choose your Interview Profile</h3>
-              
-            <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[41vh] text-center">
-              
+            </div>
+            <h3 className="text-sm xl:text-2xl mb-6 font-bold text-gray-800">Choose your Interview Profile</h3>
+
+            <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center">
+
               <div className="w-full flex justify-center mb-6">
-                <button 
-                  className={`px-6 py-2 font-semibold ${!isManualEntry ? 'text-white bg-purple-600' : 'text-purple-600 bg-gray-100'} rounded-lg focus:outline-none`}
+                <button
+                  className={`px-6 py-2 font-semibold ${!isManualEntry ? 'text-white bg-primary' : 'text-primary bg-gray-100'} rounded-lg focus:outline-none`}
                   onClick={handleUploadJDToggle}
                 >
                   Upload JD
                 </button>
-                <button 
-                  className={`px-6 py-2 font-semibold ${isManualEntry ? 'text-white bg-purple-600' : 'text-purple-600 bg-gray-100'} rounded-lg focus:outline-none`}
+                <button
+                  className={`px-6 py-2 font-semibold ${isManualEntry ? 'text-white bg-primary' : 'text-primaary bg-gray-100'} rounded-lg focus:outline-none`}
                   onClick={handleManualEntryToggle}
                 >
                   Fill Manually
@@ -832,25 +803,9 @@ const InterviewComponent = () => {
              
               ) : (
                 <div className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white " onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, setJobDescriptionFile)}>
-                  <div className="mb-8">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className={`h-12 w-12 ${jobDescriptionFile ? "text-purple-600" : "text-gray-300"}`}
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 3a1 1 0 011 1v7.586l1.293-1.293a1 1 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 11.586V4a1 1 0 011-1z"
-                        clipRule="evenodd"
-                      />
-                      <path
-                        fillRule="evenodd"
-                        d="M4 18a2 2 0 012-2h8a2 2 0 012 2H4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
+                  <div className="text-4xl mb-3 text-gray-300">
+                <IoCloudUploadOutline />
+                </div>
                   <p className="text-gray-500 mb-2">Drag & Drop or</p>
                   <label htmlFor="jobDescriptionUpload" className="text-gray-500 cursor-pointer">
                     Click to <span className="font-semibold text-gray-700">Upload Job Description</span>
@@ -859,10 +814,11 @@ const InterviewComponent = () => {
                   <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
                 </div>
               )}
-              <div className="mt-8 w-full px-4 flex flex-col items-center">
-                <button 
-                  className={`w-[220%] h-[70px] text-lg font-bold py-3 rounded-lg focus:ring-4 focus:ring-gray-200 transition  mt-6 ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ?'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
-                  
+              
+            </div>
+            <div className="mt-8 w-full px-4 flex flex-col items-center">
+                <button
+                  className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
                   disabled={!jobDescriptionFile && !(isManualEntry && manualJobDescription)}
                   onClick={handleNextClick}
                 >
@@ -872,18 +828,17 @@ const InterviewComponent = () => {
                   Back
                 </button>
               </div>
-            </div>
           </div>
         </div>
       )}
 
       {/* Step 3: Configure Devices */}
       {step === 3 && (
-        <div className="max-w-6xl w-full flex gap-64">
+        <div className="max-w-[1200px] gap-6 w-full flex justify-between ">
           {/* Left Section */}
-          <div className="w-7/10 h-[80vh] w-[45vw] flex flex-col items-center justify-end bg-purple-500 text-white rounded-3xl  p-10 relative">
-            <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-56 mb-6"></video>
-            <div className="flex justify-between w-full text-sm mb-48">
+          <div className="w-full max-w-[450px] max-h-[580px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+            <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-56 mb-2"></video>
+            <div className="flex justify-between w-full text-sm mb-32">
               <span className="flex items-center">
                 <FiMic className="w-5 h-5 mr-1" />
                 Default - External Mic
@@ -906,163 +861,158 @@ const InterviewComponent = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-3/4 flex flex-col items-center justify-top bg-purple-100">
-          <div ><p className='text-xl font-bold text-purple-500'>Get Started!</p></div>
-          <div className="flex items-center justify-center mb-2 w-full ml-32 mb-4">
-                {/* Progress Bar */}
-                <div className="relative flex-1">
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+          <div className="w-3/4 flex flex-col items-center justify-center bg-primary-foreground">
+            <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
+            <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
+              {/* Progress Bar */}
+              <div className="relative flex-1">
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-primary w-full z-0`}></div>
+              </div>
+              {/* Step 2 */}
+              <div className="relative flex-1">
+                <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                  {(jobDescriptionFile || isManualEntry) ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
                     </svg>
-                  </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-purple-500 w-full z-0`}></div>
+                  ) : (
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  )}
                 </div>
-                {/* Step 2 */}
-                <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                    {(jobDescriptionFile || isManualEntry) ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-purple-500 w-full' : 'bg-gray-400 w-full'} z-0`}></div>
-                </div>
-                {/* Step 3 */}
-                <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${allDevicesConfigured ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                    {(allDevicesConfigured) ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                </div>
-                </div>
-          <div className="w-[150%] flex justify-center text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
-          </div>
-          <div className="bg-white pt-4 pl-8 pr-8 rounded-3xl w-[25vw] max-w-lg h-[41vh] text-center">
-          {!isMicTestEnabled && !isSoundTesting && (
-            <div className="w-full flex flex-col items-center justify-center">
-              
-
-              <div className="w-full max-w-md flex-col flex gap-4 justify-evenly pt-8">
-                <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-3 border-black rounded-2xl">
-                  <span className="flex items-center gap-2">
-                    <FiVideo className="h-6 w-6" />
-                    Enable Camera
-                  </span>
-                  <input 
-                    type="checkbox" 
-                    className="form-checkbox h-6 w-6 text-purple-600 "
-                    checked={isCameraEnabled}
-                    onChange={handleCameraToggle}
-                  />
-                </div>
-                <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-3 border-black rounded-2xl">
-                  <span className="flex items-center gap-2">
-                    <FiMic className="h-6 w-6" />
-                    Enable Microphone
-                  </span>
-                  <input type="checkbox" className="form-checkbox h-6 w-6 text-purple-600" checked={isMicEnabled} onChange={handleMicToggle} />
-                </div>
-                <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-3 border-black rounded-2xl">
-                  <span className="flex items-center gap-2">
-                    <FiSpeaker className="h-6 w-6" />
-                    Enable Speaker
-                  </span>
-                  <input type="checkbox" className="form-checkbox h-6 w-6 text-purple-600" checked={isSoundEnabled} onChange={handleSoundToggle} />
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              </div>
+              {/* Step 3 */}
+              <div className="relative">
+                <div className={`w-8 h-8 ${allDevicesConfigured ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                  {(allDevicesConfigured) ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  )}
                 </div>
               </div>
             </div>
-            
-          )}
+            <div className="w-full flex justify-center text-center mt-4 mb-6">
+              <h2 className="text-sm xl:text-2xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
+            </div>
+            <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center">
+              {!isMicTestEnabled && !isSoundTesting && (
+                <div className="w-full flex flex-col items-center justify-center">
 
-          {isMicTestEnabled && (
-            <div className="w-full h-full flex flex-col items-center justify-center">
-              <div className="w-full px-4">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your microphone</h2>
-                <div className="text-center mb-4">
-                  <img src="/path_to_your_image.svg" alt="wiZe AI" className="mx-auto mb-2" />
-                  <p className="text-gray-600">You're audible</p>
+
+                  <div className="w-full max-w-md flex-col flex gap-4 justify-evenly py-4">
+                    <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-dashed border-2 border-gray-400 rounded-2xl">
+                      <span className="flex items-center gap-2">
+                        <FiVideo className="h-6 w-6" />
+                        Enable Camera
+                      </span>
+                      <input
+                        type="checkbox"
+                        className="form-checkbox h-6 w-6 text-purple-600 "
+                        checked={isCameraEnabled}
+                        onChange={handleCameraToggle}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-dashed border-2 border-gray-400 rounded-2xl">
+                      <span className="flex items-center gap-2">
+                        <FiMic className="h-6 w-6" />
+                        Enable Microphone
+                      </span>
+                      <input type="checkbox" className="form-checkbox h-6 w-6 text-purple-600" checked={isMicEnabled} onChange={handleMicToggle} />
+                    </div>
+                    <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-dashed border-2 border-gray-400 rounded-2xl">
+                      <span className="flex items-center gap-2">
+                        <FiSpeaker className="h-6 w-6" />
+                        Enable Speaker
+                      </span>
+                      <input type="checkbox" className="form-checkbox h-6 w-6 text-purple-600" checked={isSoundEnabled} onChange={handleSoundToggle} />
+                    </div>
+                  </div>
                 </div>
-                <audio ref={audioRef} src="/path_to_audio_file.mp3" className="hidden"></audio>
-                <div className="relative mb-4">
-                  <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
-                    <option>Default - External Speaker</option>
-                    <option>Default - Internal Speaker</option>
-                    <option>Bluetooth Speaker</option>
-                  </select>
+
+              )}
+
+              {isMicTestEnabled && (
+                <div className="w-full h-full flex flex-col items-center justify-center">
+                  <div className="w-full px-4">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your microphone</h2>
+                    <div className="text-center mb-4">
+                      <img src="/path_to_your_image.svg" alt="wiZe AI" className="mx-auto mb-2" />
+                      <p className="text-gray-600">You're audible</p>
+                    </div>
+                    <audio ref={audioRef} src="/path_to_audio_file.mp3" className="hidden"></audio>
+                    <div className="relative mb-4">
+                      <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
+                        <option>Default - External Speaker</option>
+                        <option>Default - Internal Speaker</option>
+                        <option>Bluetooth Speaker</option>
+                      </select>
+                    </div>
+                    <p className="text-lg font-semibold text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
+                    <button
+                      className="bg-primary text-white font-bold py-4 px-4 rounded-xl hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition w-64"
+                      onClick={handleMicTestConfirmation}
+                    >
+                      My mic is working
+                    </button>
+                  </div>
                 </div>
-                <p className="text-lg font-semibold text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
-                <button 
-                  className="bg-purple-500 text-white font-bold py-4 px-4 rounded-xl hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 transition w-64"
-                  onClick={handleMicTestConfirmation}
+              )}
+
+              {isSoundTesting && (
+                <div className="w-full h-[95%] flex flex-col items-center justify-center rounder-2xl">
+                  <div className="w-full px-4">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your speakers</h2>
+                    <div className="text-center mb-4">
+                      <img src="/path_to_your_image.svg" alt="wiZe AI" className="mx-auto mb-2" />
+                      <p className="text-gray-600">WizeAI is speaking</p>
+                    </div>
+                    <audio ref={audioRef} src="/path_to_audio_file.mp3" className="hidden" autoPlay></audio>
+                    <div className="relative mb-4">
+                      <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
+                        <option>Default - External Speaker</option>
+                        <option>Default - Internal Speaker</option>
+                        <option>Bluetooth Speaker</option>
+                      </select>
+                    </div>
+                    <p className="text-lg font-semibold text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
+                    <button
+                      className="bg-primary text-white font-bold py-4 px-4 rounded-xl hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition w-64"
+                      onClick={handleSoundConfirmation}
+                    >
+                      I can hear the sound
+                    </button>
+                  </div>
+                </div>
+
+              )}
+            </div>
+            <div className="mt-8 w-full px-4 flex flex-col items-center">
+                <button
+                  className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                  disabled={!allDevicesConfigured}
+                  onClick={handleNextClick}
                 >
-                  My mic is working
+                  Next
                 </button>
-              </div>
-            </div>
-          )}
-
-          {isSoundTesting && (
-            <div className="w-full h-[95%] flex flex-col items-center justify-center rounder-2xl">
-              <div className="w-full px-4">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your speakers</h2>
-                <div className="text-center mb-4">
-                  <img src="/path_to_your_image.svg" alt="wiZe AI" className="mx-auto mb-2" />
-                  <p className="text-gray-600">WizeAI is speaking</p>
-                </div>
-                <audio ref={audioRef} src="/path_to_audio_file.mp3" className="hidden" autoPlay></audio>
-                <div className="relative mb-4">
-                  <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
-                    <option>Default - External Speaker</option>
-                    <option>Default - Internal Speaker</option>
-                    <option>Bluetooth Speaker</option>
-                  </select>
-                </div>
-                <p className="text-lg font-semibold text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
-                <button 
-                 className="bg-purple-500 text-white font-bold py-4 px-4 rounded-xl hover:bg-purple-600 focus:ring-4 focus:ring-purple-300 transition w-64"
-                  onClick={handleSoundConfirmation}
-                >
-                  I can hear the sound
-                </button>
-              </div>
-            </div>
-            
-          )}
-        </div>
-        <div className="mt-8 w-full px-4 flex flex-col items-center">
-        <button
-  className="bg-purple-500 w-80 text-white font-bold py-3 px-3 rounded-xl hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 transition"
-  onClick={() => triggerFileInput('startInterview')}
->
-  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
-    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-  </svg>
-  Start Interview
-</button>
-
-
-
-                <button className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition" onClick={() => setStep(step - 1)}>
+                <button className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition" onClick={handleBackClick}>
                   Back
                 </button>
               </div>
-        </div>
-        
+          </div>
+
         </div>
       )}
     </div>
-    )
-  
+  )
+
 };
 
 export default InterviewComponent;
