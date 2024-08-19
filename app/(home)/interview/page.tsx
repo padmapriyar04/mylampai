@@ -7,6 +7,7 @@ import useInterviewStore from './store';
 import Image from "next/image"
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { FaRegFileAlt } from "react-icons/fa";
+import { toast } from 'sonner';
 
 const InterviewComponent = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -146,36 +147,83 @@ const InterviewComponent = () => {
     }
   }, [textToSpeak]);
 
-  const handleResumeUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-      setResumeFile(file);
 
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const binaryData = event.target.result;
-        console.log("Resume binary data:", binaryData); // Debugging log
 
-        await waitForSocketConnection(websocketRef.current); // Ensure WebSocket is ready
-        websocketRef.current?.send(
-          JSON.stringify({
-            type: "upload_cv",
-            cv_data: Array.from(new Uint8Array(binaryData)),
-          })
-        );
-        setCvText("Uploaded");
 
-        // Check if JD is also uploaded
-        if (JD) {
-          startInterview();
+const handleDrop = (event, setFile) => {
+    // Prevent the default behavior (Prevent file from being opened in the browser)
+    event.preventDefault();
+    
+    // Get the files from the drop event
+    const files = event.dataTransfer?.files;
+    
+    if (files && files.length > 0) {
+        const file = files[0];
+        
+        if (file && (file.type === "application/pdf" || 
+                     file.type === "application/msword" || 
+                     file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+            // Update the state with the file
+            setFile(file);
+
+            // Optionally, you can trigger the file upload process here
+            // For example, you could call handleResumeUpload with the file
+            handleResumeUpload({ target: { files: [file] } });
+        } else {
+            alert("Please upload a valid DOC, DOCX, or PDF file.");
         }
-      };
-      reader.readAsArrayBuffer(file);
-    } else {
-      alert("Please upload a valid DOC, DOCX, or PDF file.");
-      setResumeFile(null);
     }
-  };
+};
+
+// Make sure you define handleResumeUpload in a way that can handle file input
+const handleResumeUpload = async (event) => {
+    const file = event.target?.files?.[0];
+    
+    if (file && (file.type === "application/pdf" || 
+                 file.type === "application/msword" || 
+                 file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+
+        setResumeFile(file); // Set the resume file state
+        const reader = new FileReader();
+        
+        reader.onload = async (e) => {
+            const binaryData = e.target?.result;
+            console.log("Resume binary data:", binaryData); // Debugging log
+
+            if (binaryData) {
+                // Ensure WebSocket is ready
+                await waitForSocketConnection(websocketRef.current);
+
+                // Send the binary data via WebSocket
+                websocketRef.current?.send(
+                    JSON.stringify({
+                        type: "upload_cv",
+                        cv_data: Array.from(new Uint8Array(binaryData)),
+                    })
+                );
+
+                setCvText("Uploaded");
+
+                // Check if JD is also uploaded before starting the interview
+                if (JD) {
+                    startInterview();
+                }
+            }
+        };
+
+        reader.readAsArrayBuffer(file);
+    } else {
+        alert("Please upload a valid DOC, DOCX, or PDF file.");
+        setResumeFile(null);
+        setCvText(""); // Optionally reset CV text
+    }
+};
+
+
+const isResumeUploaded = !!resumeFile; 
+
+
+
 
   const handleJobDescriptionUpload = async (event) => {
     const file = event.target.files[0];
@@ -251,7 +299,8 @@ const InterviewComponent = () => {
   };
 
   const handleDragOver = (event) => {
-    event.preventDefault(); // Prevent default behavior to allow dropping
+    event.preventDefault();
+    event.stopPropagation(); // Prevent default behavior to allow dropping
   };
 
   const handleManualEntryToggle = () => {
@@ -581,12 +630,12 @@ const InterviewComponent = () => {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] bg-primary-foreground flex items-center justify-center w-full border-t-2 border-[#eeeeee]">
+    <div className="md:h-[calc(100vh-4rem)] h-[130vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
       {/* Step 1: Upload Resume */}
       {step === 1 && (
-        <div className="max-w-[1200px] gap-4 w-full flex justify-between ">
+        <div className="max-w-[1200px] md:gap-4 w-full flex flex-col md:flex-row justify-between ">
           {/* Left Section */}
-          <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+          <div className="w-full max-w-[90vw] md:max-w-[350px] lg:max-w-[450px] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative ml-[5vw] mr-[5vw] md:ml-8 xl:ml-0">
             <Image src={"/images/Globe.svg" } className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
@@ -597,22 +646,22 @@ const InterviewComponent = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-full max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground">
+          <div className="w-full md:max-w-[500px] max-h-full lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
 
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
               {/* Progress Bar */}
               <div className="relative flex-1">
-                <div className={`w-8 h-8 ${resumeFile ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                  {(resumeFile) ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  )}
-                </div>
-                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              <div className={`w-8 h-8 ${isResumeUploaded ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+            {isResumeUploaded ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                </svg>
+            ) : (
+                <div className="w-3 h-3 bg-white rounded-full"></div>
+            )}
+        </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
               </div>
               {/* Step 2 */}
               <div className="relative flex-1">
@@ -638,11 +687,11 @@ const InterviewComponent = () => {
 
 
             <div className="text-center mb-6 mt-3 w-[100%]">
-              <h3 className="text-sm xl:text-2xl font-bold text-gray-800">Upload your latest CV/Resume</h3>
+              <h3 className="text-2xl font-bold text-gray-800">Upload your latest CV/Resume</h3>
             </div>
 
             {/* Upload Section */}
-            <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center">
+            <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
               <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-[2vw]">
                 <IoDocumentAttach />
               </div>
@@ -677,7 +726,7 @@ const InterviewComponent = () => {
               {/* Upload Button */}
               <div className="flex justify-center mt-2">
                 <button
-                  className="bg-primary md:text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"
+                  className="bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"
                   onClick={() => triggerFileInput('resumeUpload')}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -690,7 +739,7 @@ const InterviewComponent = () => {
             </div>
             <div className="mt-8 w-full px-4 flex flex-col items-center">
               <button
-                className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
                 disabled={!resumeFile}
                 onClick={handleNextClick}
               >
@@ -711,9 +760,9 @@ const InterviewComponent = () => {
 
       {/* Step 2: Upload Job Description */}
       {step === 2 && (
-        <div className="max-w-[1200px] gap-4 w-full flex justify-between ">
+        <div className="max-w-[1200px] gap-4 w-full flex flex-col md:flex-row justify-between ">
           {/* Left Section */}
-          <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+          <div className="w-full max-w-[90vw] md:max-w-[350px] lg:max-w-[450px] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative ml-[5vw] mr-[5vw] md:ml-8 xl:ml-0">
             <Image src={"/images/Globe.svg" } className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
@@ -724,7 +773,7 @@ const InterviewComponent = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-full max-w-[700px] h-full  flex flex-col items-center justify-center bg-primary-foreground">
+          <div className="w-full md:max-w-[500px]  lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div className="w-full flex flex-col items-center mb-2">
             <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
@@ -739,7 +788,7 @@ const InterviewComponent = () => {
                     <div className="w-3 h-3 bg-white rounded-full"></div>
                   )}
                 </div>
-                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
               </div>
               {/* Step 2 */}
               <div className="relative flex-1">
@@ -762,9 +811,9 @@ const InterviewComponent = () => {
               </div>
             </div>
             </div>
-            <h3 className="text-sm xl:text-2xl mb-6 font-bold text-gray-800">Choose your Interview Profile</h3>
+            <h3 className="text-2xl mb-6 font-bold text-gray-800">Choose your Interview Profile</h3>
 
-            <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center">
+            <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
 
               <div className="w-full flex justify-center mb-6">
                 <button
@@ -818,7 +867,8 @@ const InterviewComponent = () => {
             </div>
             <div className="mt-8 w-full px-4 flex flex-col items-center">
                 <button
-                  className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                  
+                  className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
                   disabled={!jobDescriptionFile && !(isManualEntry && manualJobDescription)}
                   onClick={handleNextClick}
                 >
@@ -834,9 +884,9 @@ const InterviewComponent = () => {
 
       {/* Step 3: Configure Devices */}
       {step === 3 && (
-        <div className="max-w-[1200px] gap-6 w-full flex justify-between ">
+        <div className="max-w-[1200px] gap-4 w-full flex flex-col md:flex-row justify-between ">
           {/* Left Section */}
-          <div className="w-full max-w-[450px] max-h-[580px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+          <div className="w-full max-w-[90vw] md:max-w-[350px] lg:max-w-[450px] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative ml-[5vw] mr-[5vw] md:ml-8 xl:ml-0">
             <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-56 mb-2"></video>
             <div className="flex justify-between w-full text-sm mb-32">
               <span className="flex items-center">
@@ -861,7 +911,7 @@ const InterviewComponent = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-3/4 flex flex-col items-center justify-center bg-primary-foreground">
+          <div className="w-full md:max-w-[500px]  lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
               {/* Progress Bar */}
@@ -900,9 +950,9 @@ const InterviewComponent = () => {
               </div>
             </div>
             <div className="w-full flex justify-center text-center mt-4 mb-6">
-              <h2 className="text-sm xl:text-2xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
+              <h2 className="text-2xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
             </div>
-            <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center">
+            <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
               {!isMicTestEnabled && !isSoundTesting && (
                 <div className="w-full flex flex-col items-center justify-center">
 
@@ -996,7 +1046,8 @@ const InterviewComponent = () => {
             </div>
             <div className="mt-8 w-full px-4 flex flex-col items-center">
                 <button
-                  className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                  
+                  className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
                   disabled={!allDevicesConfigured}
                   onClick={handleNextClick}
                 >
@@ -1016,3 +1067,4 @@ const InterviewComponent = () => {
 };
 
 export default InterviewComponent;
+//in this code when i open step 1, the progress bar is already showing completion of the first step even though i have not uploaded any document, similar for other steps. in step 2 the 2nd step of progress bar shows completed when i press to even though i have not uploaded job profile fill manually. maybe problem with useeffect cleanup function. please fix this and rewrite the whole code for me
