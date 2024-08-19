@@ -43,6 +43,7 @@
         
         socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
+            
             if (data.type === 'cv_uploaded') {
                 document.getElementById('status').innerText = data.message;
                 cvText = data.cv_text;

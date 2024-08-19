@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { IoDocumentAttach } from "react-icons/io5";
-import AudioToText from "./Recording";
+import AudioToText from "./recording";
 import { FiMic, FiSpeaker, FiVideo, FiMessageSquare } from "react-icons/fi";
 import useInterviewStore from './store';
 
@@ -319,6 +319,11 @@ const InterviewComponent = () => {
     }
   };
 
+  const handleJobProfileSelect = (event) => {
+    setSelectedJobProfile(event.target.value);
+  };
+  
+
   const handleSoundToggle = (e) => {
     setIsSoundEnabled(e.target.checked);
     if (e.target.checked) {
@@ -413,6 +418,28 @@ const InterviewComponent = () => {
     return null;
   }
 
+  const handleManualJDUpload = () => {
+    if (manualJobDescription.trim() !== "") {
+      setJD(manualJobDescription.trim());
+  
+      // Send the manually entered JD to the WebSocket
+      websocketRef.current?.send(
+        JSON.stringify({
+          type: "analyze_jd",
+          job_description: manualJobDescription.trim(),
+        })
+      );
+  
+      // You can also add a condition to automatically start the interview if the CV is also uploaded
+      if (cvText) {
+        startInterview();
+      }
+    } else {
+      alert("Please fill in the job description.");
+    }
+  };
+  
+
   if (isInterviewStarted) {
     return (
       <div className="min-h-screen flex flex-col relative">
@@ -437,7 +464,7 @@ const InterviewComponent = () => {
         </nav>
   
         {/* Main Content */}
-        <div className="flex-1 flex justify-center items-center flex-col sm:flex-row bg-gray-100 overflow-hidden h-screen">
+        <div className="flex-1 flex justify-center items-center bg-gray-100 overflow-hidden h-screen">
           <video
             ref={videoRef}
             className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75"
@@ -785,25 +812,24 @@ const InterviewComponent = () => {
 
               {isManualEntry ? (
                 <div className="w-full p-4 bg-white rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center mb-8">
-                  <textarea
-                    className="w-full h-28 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-                    placeholder="Write or paste here complete job details (Word limit 1000 words)"
-                    maxLength={1000}
-                    value={manualJobDescription}
-                    onChange={(e) => setManualJobDescription(e.target.value)}
-                  />
-                  <p className="text-gray-400 text-sm mt-2">Word limit 1000 words.</p>
-                  <div className="w-full text-center mt-4">
-                    <select value={selectedJobProfile} onChange={handleJobProfileSelect} className="px-4 py-2 bg-purple-500 text-white font-semibold rounded-md shadow-md hover:bg-purple-600 focus:outline-none">
-                      <option value="" disabled>
-                        Select Job Profile
-                      </option>
-                      <option value="a">a</option>
-                      <option value="b">b</option>
-                      <option value="c">cd</option>
-                    </select>
-                  </div>
+                <textarea
+                  className="w-full h-28 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
+                  placeholder="Write or paste here complete job details (Word limit 1000 words)"
+                  maxLength={1000}
+                  value={manualJobDescription}
+                  onChange={(e) => setManualJobDescription(e.target.value)}
+                />
+                <p className="text-gray-400 text-sm mt-2">Word limit 1000 words.</p>
+                <div className="w-full text-center mt-4">
+                  <button
+                    onClick={handleManualJDUpload}
+                    className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
+                  >
+                    Upload JD
+                  </button>
                 </div>
+              </div>
+             
               ) : (
                 <div className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white " onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, setJobDescriptionFile)}>
                   <div className="mb-8">
