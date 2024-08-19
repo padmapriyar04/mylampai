@@ -2,12 +2,13 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { Toaster } from "@/components/ui/sonner";
-import HomeNavbar from "@/components/home/HomeNavbar";
-import Flexsidebar from "@/components/misc/Flexsidebar";
-
+import Navbar from "@/components/global/Navbar";
 import type { Metadata } from "next";
 import "../globals.css";
 import { Open_Sans } from "next/font/google";
+import AuthProvider from "@/components/auth/AuthProvider";
+import Flexsidebar from "@/components/misc/Flexsidebar";
+
 const openSans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -39,14 +40,14 @@ export default function ProtectedLayout({
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
       <body className={`${openSans.className} bg-primary-foreground`}>
-        <HomeNavbar />
-        <Toaster />
-        <div className="flex h-full transition-all duration-300 ">
-          {/* <Flexsidebar /> */}
-          <div className=" flex-1 protected-layout lg:transition-all lg:duration-300">
+        <AuthProvider>
+          <Navbar />
+          <div className="flex w-full h-full transition-all duration-300 ">
+            <Flexsidebar />
             {children}
           </div>
-        </div>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
