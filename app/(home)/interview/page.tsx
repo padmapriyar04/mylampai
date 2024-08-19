@@ -7,7 +7,7 @@ import useInterviewStore from './store';
 import Image from "next/image"
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { FaRegFileAlt } from "react-icons/fa";
-import { toast } from 'sonner';
+import DeviceSelection from './DeviceSelection'; // Importing the DeviceSelection component
 
 const InterviewComponent = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -30,7 +30,7 @@ const InterviewComponent = () => {
   const [audioTextInputs, setAudioTextInputs] = useState([]);
   const videoRef = useRef(null);
   const audioRef = useRef(null);
- 
+
   const [textToSpeak, setTextToSpeak] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [micActive, setMicActive] = useState(false);
@@ -39,12 +39,10 @@ const InterviewComponent = () => {
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
   const rafIdRef = useRef(null);
-  
 
   const allDevicesConfigured = isCameraEnabled && isMicEnabled && isSoundEnabled;
 
   const websocketRef = useRef<WebSocket | null>(null);
-
 
   const waitForSocketConnection = (socket) => {
     return new Promise((resolve) => {
@@ -58,6 +56,8 @@ const InterviewComponent = () => {
       }
     });
   };
+
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     setIsMounted(true);
@@ -74,13 +74,11 @@ const InterviewComponent = () => {
       websocketRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === "cv_uploaded") {
-          toast.success("CV uploaded Successfully")
           console.log("CV uploaded:", data.message);
           setCvText(data.cv_text);  // Update the state with CV text
         } else if (data.type === "jd_analyzed") {
           console.log("Job description analyzed:", data.message);
           setJD(data.job_description);  // Update the state with JD text
-
         } else if (data.type === "interview_question") {
           console.log("Interview question received:", data.question);
           setChatMessages((prevMessages) => [...prevMessages, { user: "Interviewer", message: data.question }]);
@@ -110,6 +108,7 @@ const InterviewComponent = () => {
       websocketRef.current?.send(JSON.stringify({ type: "answer", answer: message }));
     }
   };
+
   const handleTextSubmit = (text) => {
     setAudioTextInputs((prevInputs) => [...prevInputs, text]); // Store the audio-to-text input
     websocketRef.current?.send(
@@ -257,26 +256,24 @@ const isResumeUploaded = !!resumeFile;
 
   const startInterview = () => {
     if (cvText && JD) {
-        console.log('Starting interview with:', { cvText, JD });
-        waitForSocketConnection(websocketRef.current).then(() => {
-            console.log('WebSocket is ready to send start_interview');
-            websocketRef.current?.send(
-                JSON.stringify({
-                    type: "start_interview",
-                    pdf_text: cvText, // Use actual cvText
-                    job_description: JD, // Use actual JD
-                })
-            );
-            setIsInterviewStarted(true);  // Set interview started state
-        }).catch(err => {
-            console.error('Failed to start interview:', err);
-        });
+      console.log('Starting interview with:', { cvText, JD });
+      waitForSocketConnection(websocketRef.current).then(() => {
+        console.log('WebSocket is ready to send start_interview');
+        websocketRef.current?.send(
+          JSON.stringify({
+            type: "start_interview",
+            pdf_text: cvText, // Use actual cvText
+            job_description: JD, // Use actual JD
+          })
+        );
+        setIsInterviewStarted(true);  // Set interview started state
+      }).catch(err => {
+        console.error('Failed to start interview:', err);
+      });
     } else {
-        console.error("CV or JD not uploaded, cannot start interview.");
+      console.error("CV or JD not uploaded, cannot start interview.");
     }
-};
-
-
+  };
 
   const handleNextClick = () => {
     if (step === 3 && allDevicesConfigured) {
@@ -289,8 +286,6 @@ const isResumeUploaded = !!resumeFile;
       setStep(step + 1);
     }
   };
-
-
 
   const handleBackClick = () => {
     if (step > 1) {
@@ -308,22 +303,18 @@ const isResumeUploaded = !!resumeFile;
     setJobDescriptionFile(null);
   };
 
-
   const triggerFileInput = (inputId) => {
     // Trigger the file input click
     document.getElementById(inputId)?.click();
 
     // Check if both CV and Job Description are uploaded
     if (cvText && JD) {
-        // Start the interview and set the state
-        startInterview();
+      // Start the interview and set the state
+      startInterview();
     } else {
-        console.error("CV or JD not uploaded, cannot start the interview.");
+      console.error("CV or JD not uploaded, cannot start the interview.");
     }
-};
-
-
-
+  };
 
   useEffect(() => {
     const timerInterval = setInterval(() => {
@@ -357,113 +348,6 @@ const isResumeUploaded = !!resumeFile;
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleCameraToggle = () => {
-    setIsCameraEnabled(!isCameraEnabled);
-  };
-
-  const handleMicToggle = (e) => {
-    if (e.target.checked) {
-      startMicrophoneTest();
-      setIsMicTestEnabled(true);
-    } else {
-      setIsMicEnabled(false);
-      stopMicrophoneTest();
-    }
-  };
-
-  const handleJobProfileSelect = (event) => {
-    setSelectedJobProfile(event.target.value);
-  };
-  
-
-  const handleSoundToggle = (e) => {
-    setIsSoundEnabled(e.target.checked);
-    if (e.target.checked) {
-      setIsSoundTesting(true);
-      playTestSound();
-    } else {
-      setIsSoundTesting(false);
-      stopTestSound();
-    }
-  };
-
-  const playTestSound = () => {
-    if (audioRef.current) {
-      console.log("Playing sound");
-      audioRef.current.src = "/sounds/audio.mp3";
-      audioRef.current.play().then(() => {
-        console.log("Sound started successfully");
-      }).catch((error) => {
-        console.error("Error playing sound: ", error);
-      });
-    }
-  };
-
-  const stopTestSound = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  };
-
-  const handleMicTestConfirmation = () => {
-    setIsMicTestEnabled(false);
-    setIsMicEnabled(true);
-    stopMicrophoneTest();
-  };
-
-  const handleSoundConfirmation = () => {
-    stopTestSound();
-    setIsSoundEnabled(true);
-    setIsSoundTesting(false);
-  };
-
-  const startMicrophoneTest = () => {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then((stream) => {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
-        const microphone = audioContext.createMediaStreamSource(stream);
-        microphone.connect(analyser);
-
-        analyser.fftSize = 256;
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-
-        audioContextRef.current = audioContext;
-        analyserRef.current = analyser;
-        dataArrayRef.current = dataArray;
-        setMicActive(true);
-        updateVolume();
-      })
-      .catch((err) => {
-        console.error("Error accessing microphone: ", err);
-        alert("Unable to access microphone: " + err.message);
-      });
-  };
-
-  const updateVolume = () => {
-    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
-    const volume = dataArrayRef.current.reduce((a, b) => a + b) / dataArrayRef.current.length;
-    setVolume(volume);
-    rafIdRef.current = requestAnimationFrame(updateVolume);
-  };
-
-  const stopMicrophoneTest = () => {
-    cancelAnimationFrame(rafIdRef.current);
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-    }
-    setMicActive(false);
-    setVolume(0);
-  };
-
-  useEffect(() => {
-    return () => {
-      stopMicrophoneTest();
-    };
-  }, []);
-
   const [activeTab, setActiveTab] = useState('conversation');
 
   if (!isMounted) {
@@ -473,7 +357,7 @@ const isResumeUploaded = !!resumeFile;
   const handleManualJDUpload = () => {
     if (manualJobDescription.trim() !== "") {
       setJD(manualJobDescription.trim());
-  
+
       // Send the manually entered JD to the WebSocket
       websocketRef.current?.send(
         JSON.stringify({
@@ -481,15 +365,73 @@ const isResumeUploaded = !!resumeFile;
           job_description: manualJobDescription.trim(),
         })
       );
-  
+
       // You can also add a condition to automatically start the interview if the CV is also uploaded
-      if (cvText) {
-        startInterview();
+      if (cvText && JD) {
+
       }
     } else {
       alert("Please fill in the job description.");
     }
   };
+
+  const handleMicTestConfirmation = () => {
+    setIsMicTestEnabled(false);  // Disable mic test mode
+    setIsMicEnabled(true);       // Mark microphone as enabled
+    stopMicrophoneTest();        // Stop the microphone test
+  };
+
+  const handleSoundConfirmation = () => {
+    stopTestSound();           // Stop the sound test
+    setIsSoundEnabled(true);   // Mark sound as enabled
+    setIsSoundTesting(false);  // Disable sound testing mode
+  };
+
+  const startMicrophoneTest = () => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+  
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+  
+        audioContextRef.current = audioContext;
+        analyserRef.current = analyser;
+        dataArrayRef.current = dataArray;
+        updateVolume();
+      })
+      .catch((err) => {
+        console.error("Error accessing microphone: ", err);
+        alert("Unable to access microphone: " + err.message);
+      });
+  };
+  
+  const updateVolume = () => {
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+    const volume = dataArrayRef.current.reduce((a, b) => a + b) / dataArrayRef.current.length;
+    setVolume(volume);
+    rafIdRef.current = requestAnimationFrame(updateVolume);
+  };
+  
+  const stopMicrophoneTest = () => {
+    cancelAnimationFrame(rafIdRef.current);
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+    }
+    setVolume(0);
+  };
+
+  const stopTestSound = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;  // Reset the audio to the start
+    }
+  };
+  
   
 
   if (isInterviewStarted) {
@@ -530,8 +472,8 @@ const isResumeUploaded = !!resumeFile;
 
         {/* Prompt Box */}
         {isChatOpen && (
-          <div className="absolute top-20 right-6 bg-white border border-gray-300 shadow-lg rounded-lg w-96 h-1/2 flex flex-col">
-            <div className="flex justify-between items-center bg-purple-600 text-white p-4 rounded-t-lg">
+          <div className="absolute top-20 right-6 bg-white border border-gray-300 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
+            <div className="flex justify-between items-center bg-primary text-white p-4 rounded-t-lg">
               <span className="font-semibold text-lg">Prompt Box</span>
               <button onClick={() => setIsChatOpen(false)} className="text-white text-2xl">
                 &times;
@@ -539,15 +481,15 @@ const isResumeUploaded = !!resumeFile;
             </div>
 
             {/* Tabs for switching between sections */}
-            <div className="flex border-b border-gray-300">
+            <div className="flex border-b border-gray-300 rounded-b-lg">
               <button
-                className={`flex-1 text-center p-2 ${activeTab === 'conversation' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                className={`flex-1 text-center p-2 rounded-bl-lg ${activeTab === 'conversation' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}
                 onClick={() => setActiveTab('conversation')}
               >
                 Conversation
               </button>
               <button
-                className={`flex-1 text-center p-2 ${activeTab === 'audioToText' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                className={`flex-1 text-center p-2 rounded-br-lg ${activeTab === 'audioToText' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}
                 onClick={() => setActiveTab('audioToText')}
               >
                 Audio-to-Text
@@ -558,7 +500,7 @@ const isResumeUploaded = !!resumeFile;
             <div className="flex-1 overflow-y-auto p-4">
               {activeTab === 'conversation' && (
                 <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Conversation</h3>
+                 
                   {chatMessages.map((chat, index) => (
                     <div key={index} className="bg-gray-100 p-2 rounded-md mb-2">
                       <span className="font-semibold">{chat.user}: </span>
@@ -569,7 +511,7 @@ const isResumeUploaded = !!resumeFile;
               )}
               {activeTab === 'audioToText' && (
                 <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Audio-to-Text Inputs</h3>
+                  
                   {audioTextInputs.map((text, index) => (
                     <div key={index} className="bg-gray-200 p-2 rounded-md">
                       <span>{text}</span>
@@ -580,7 +522,7 @@ const isResumeUploaded = !!resumeFile;
             </div>
 
             {/* Input and Buttons Container */}
-            <div className="p-4 bg-gray-100 border-t border-gray-300">
+            <div className="p-4 bg-gray-100 border-t border-b-gray-300 border-1 rounded-b-lg">
               <input
                 id="answerInput"
                 type="text"
@@ -594,7 +536,7 @@ const isResumeUploaded = !!resumeFile;
                   }
                 }}
               />
-              <div className="flex justify-between">
+              <div className="flex justify-between ">
                 <button
                   id="sendAnswerButton"
                   className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition"
@@ -635,8 +577,8 @@ const isResumeUploaded = !!resumeFile;
       {step === 1 && (
         <div className="max-w-[1200px] md:gap-4 w-full flex flex-col md:flex-row justify-between ">
           {/* Left Section */}
-          <div className="w-full max-w-[90vw] md:max-w-[350px] lg:max-w-[450px] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative ml-[5vw] mr-[5vw] md:ml-8 xl:ml-0">
-            <Image src={"/images/Globe.svg" } className='w-full h-auto' alt="image" width={100} height={100}></Image>
+          <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+            <Image src={"/images/Globe.svg"} className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
               <p className="mt-2 text-center text-sm leading-relaxed">
@@ -684,8 +626,6 @@ const isResumeUploaded = !!resumeFile;
               </div>
             </div>
 
-
-
             <div className="text-center mb-6 mt-3 w-[100%]">
               <h3 className="text-2xl font-bold text-gray-800">Upload your latest CV/Resume</h3>
             </div>
@@ -717,7 +657,7 @@ const isResumeUploaded = !!resumeFile;
                 />
 
                 <div className="text-4xl mt-3 text-gray-300">
-                <IoCloudUploadOutline />
+                  <IoCloudUploadOutline />
                 </div>
 
                 <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
@@ -762,8 +702,8 @@ const isResumeUploaded = !!resumeFile;
       {step === 2 && (
         <div className="max-w-[1200px] gap-4 w-full flex flex-col md:flex-row justify-between ">
           {/* Left Section */}
-          <div className="w-full max-w-[90vw] md:max-w-[350px] lg:max-w-[450px] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative ml-[5vw] mr-[5vw] md:ml-8 xl:ml-0">
-            <Image src={"/images/Globe.svg" } className='w-full h-auto' alt="image" width={100} height={100}></Image>
+          <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+            <Image src={"/images/Globe.svg"} className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
               <p className="mt-2 text-center text-sm leading-relaxed">
@@ -775,43 +715,43 @@ const isResumeUploaded = !!resumeFile;
           {/* Right Section */}
           <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div className="w-full flex flex-col items-center mb-2">
-            <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
-            <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
-              {/* Progress Bar */}
-              <div className="relative flex-1">
-                <div className={`w-8 h-8 ${resumeFile ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                  {(resumeFile) ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  )}
+              <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
+              <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
+                {/* Progress Bar */}
+                <div className="relative flex-1">
+                  <div className={`w-8 h-8 ${resumeFile ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                    {(resumeFile) ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
                 </div>
-                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
-              </div>
-              {/* Step 2 */}
-              <div className="relative flex-1">
-                <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                  {(jobDescriptionFile || isManualEntry) ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  )}
+                {/* Step 2 */}
+                <div className="relative flex-1">
+                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                    {(jobDescriptionFile || isManualEntry) ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
                 </div>
-                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
-              </div>
-              {/* Step 3 */}
-              <div className="relative  flex items-center">
-                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                {/* Step 3 */}
+                <div className="relative  flex items-center">
+                  <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                  </div>
                 </div>
               </div>
             </div>
-            </div>
-            <h3 className="text-2xl mb-6 font-bold text-gray-800">Choose your Interview Profile</h3>
+            <h3 className="text-sm xl:text-2xl mb-6 font-bold text-gray-800">Choose your Interview Profile</h3>
 
             <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
 
@@ -832,29 +772,29 @@ const isResumeUploaded = !!resumeFile;
 
               {isManualEntry ? (
                 <div className="w-full p-4 bg-white rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center mb-8">
-                <textarea
-                  className="w-full h-28 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-                  placeholder="Write or paste here complete job details (Word limit 1000 words)"
-                  maxLength={1000}
-                  value={manualJobDescription}
-                  onChange={(e) => setManualJobDescription(e.target.value)}
-                />
-                <p className="text-gray-400 text-sm mt-2">Word limit 1000 words.</p>
-                <div className="w-full text-center mt-4">
-                  <button
-                    onClick={handleManualJDUpload}
-                    className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
-                  >
-                    Upload JD
-                  </button>
+                  <textarea
+                    className="w-full h-28 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
+                    placeholder="Write or paste here complete job details (Word limit 1000 words)"
+                    maxLength={1000}
+                    value={manualJobDescription}
+                    onChange={(e) => setManualJobDescription(e.target.value)}
+                  />
+                  <p className="text-gray-400 text-sm mt-2">Word limit 1000 words.</p>
+                  <div className="w-full text-center mt-4">
+                    <button
+                      onClick={handleManualJDUpload}
+                      className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
+                    >
+                      Upload JD
+                    </button>
+                  </div>
                 </div>
-              </div>
-             
+
               ) : (
                 <div className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white " onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, setJobDescriptionFile)}>
                   <div className="text-4xl mb-3 text-gray-300">
-                <IoCloudUploadOutline />
-                </div>
+                    <IoCloudUploadOutline />
+                  </div>
                   <p className="text-gray-500 mb-2">Drag & Drop or</p>
                   <label htmlFor="jobDescriptionUpload" className="text-gray-500 cursor-pointer">
                     Click to <span className="font-semibold text-gray-700">Upload Job Description</span>
@@ -863,208 +803,56 @@ const isResumeUploaded = !!resumeFile;
                   <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
                 </div>
               )}
-              
+
             </div>
             <div className="mt-8 w-full px-4 flex flex-col items-center">
-                <button
-                  
-                  className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
-                  disabled={!jobDescriptionFile && !(isManualEntry && manualJobDescription)}
-                  onClick={handleNextClick}
-                >
-                  Next
-                </button>
-                <button className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition" onClick={handleBackClick}>
-                  Back
-                </button>
-              </div>
+              <button
+                className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                disabled={!jobDescriptionFile && !(isManualEntry && manualJobDescription)}
+                onClick={handleNextClick}
+              >
+                Next
+              </button>
+              <button className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition" onClick={handleBackClick}>
+                Back
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Step 3: Configure Devices */}
       {step === 3 && (
-        <div className="max-w-[1200px] gap-4 w-full flex flex-col md:flex-row justify-between ">
-          {/* Left Section */}
-          <div className="w-full max-w-[90vw] md:max-w-[350px] lg:max-w-[450px] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative ml-[5vw] mr-[5vw] md:ml-8 xl:ml-0">
-            <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-56 mb-2"></video>
-            <div className="flex justify-between w-full text-sm mb-32">
-              <span className="flex items-center">
-                <FiMic className="w-5 h-5 mr-1" />
-                Default - External Mic
-              </span>
-              <span className="flex items-center">
-                <FiSpeaker className="w-5 h-5 mr-1" />
-                Default - External Speaker
-              </span>
-              <span className="flex items-center">
-                <FiVideo className="w-5 h-5 mr-1" />
-                Default - Web Cam
-              </span>
-            </div>
-            <p className="text-center text-lg font-bold leading-relaxed">
-              Take the wiZe AI mock Interview
-            </p>
-            <p className="text-center text-sm mt-2 leading-relaxed">
-              You'll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
-            </p>
-          </div>
-
-          {/* Right Section */}
-          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
-            <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
-            <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
-              {/* Progress Bar */}
-              <div className="relative flex-1">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-primary w-full z-0`}></div>
-              </div>
-              {/* Step 2 */}
-              <div className="relative flex-1">
-                <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                  {(jobDescriptionFile || isManualEntry) ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  )}
-                </div>
-                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
-              </div>
-              {/* Step 3 */}
-              <div className="relative">
-                <div className={`w-8 h-8 ${allDevicesConfigured ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                  {(allDevicesConfigured) ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="w-full flex justify-center text-center mt-4 mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
-            </div>
-            <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
-              {!isMicTestEnabled && !isSoundTesting && (
-                <div className="w-full flex flex-col items-center justify-center">
-
-
-                  <div className="w-full max-w-md flex-col flex gap-4 justify-evenly py-4">
-                    <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-dashed border-2 border-gray-400 rounded-2xl">
-                      <span className="flex items-center gap-2">
-                        <FiVideo className="h-6 w-6" />
-                        Enable Camera
-                      </span>
-                      <input
-                        type="checkbox"
-                        className="form-checkbox h-6 w-6 text-purple-600 "
-                        checked={isCameraEnabled}
-                        onChange={handleCameraToggle}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-dashed border-2 border-gray-400 rounded-2xl">
-                      <span className="flex items-center gap-2">
-                        <FiMic className="h-6 w-6" />
-                        Enable Microphone
-                      </span>
-                      <input type="checkbox" className="form-checkbox h-6 w-6 text-purple-600" checked={isMicEnabled} onChange={handleMicToggle} />
-                    </div>
-                    <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-dashed border-2 border-gray-400 rounded-2xl">
-                      <span className="flex items-center gap-2">
-                        <FiSpeaker className="h-6 w-6" />
-                        Enable Speaker
-                      </span>
-                      <input type="checkbox" className="form-checkbox h-6 w-6 text-purple-600" checked={isSoundEnabled} onChange={handleSoundToggle} />
-                    </div>
-                  </div>
-                </div>
-
-              )}
-
-              {isMicTestEnabled && (
-                <div className="w-full h-full flex flex-col items-center justify-center">
-                  <div className="w-full px-4">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your microphone</h2>
-                    <div className="text-center mb-4">
-                      <img src="/path_to_your_image.svg" alt="wiZe AI" className="mx-auto mb-2" />
-                      <p className="text-gray-600">You're audible</p>
-                    </div>
-                    <audio ref={audioRef} src="/path_to_audio_file.mp3" className="hidden"></audio>
-                    <div className="relative mb-4">
-                      <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
-                        <option>Default - External Speaker</option>
-                        <option>Default - Internal Speaker</option>
-                        <option>Bluetooth Speaker</option>
-                      </select>
-                    </div>
-                    <p className="text-lg font-semibold text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
-                    <button
-                      className="bg-primary text-white font-bold py-4 px-4 rounded-xl hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition w-64"
-                      onClick={handleMicTestConfirmation}
-                    >
-                      My mic is working
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {isSoundTesting && (
-                <div className="w-full h-[95%] flex flex-col items-center justify-center rounder-2xl">
-                  <div className="w-full px-4">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your speakers</h2>
-                    <div className="text-center mb-4">
-                      <img src="/path_to_your_image.svg" alt="wiZe AI" className="mx-auto mb-2" />
-                      <p className="text-gray-600">WizeAI is speaking</p>
-                    </div>
-                    <audio ref={audioRef} src="/path_to_audio_file.mp3" className="hidden" autoPlay></audio>
-                    <div className="relative mb-4">
-                      <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
-                        <option>Default - External Speaker</option>
-                        <option>Default - Internal Speaker</option>
-                        <option>Bluetooth Speaker</option>
-                      </select>
-                    </div>
-                    <p className="text-lg font-semibold text-gray-500 underline cursor-pointer mb-4">Facing issues? Report here.</p>
-                    <button
-                      className="bg-primary text-white font-bold py-4 px-4 rounded-xl hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition w-64"
-                      onClick={handleSoundConfirmation}
-                    >
-                      I can hear the sound
-                    </button>
-                  </div>
-                </div>
-
-              )}
-            </div>
-            <div className="mt-8 w-full px-4 flex flex-col items-center">
-                <button
-                  
-                  className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
-                  disabled={!allDevicesConfigured}
-                  onClick={handleNextClick}
-                >
-                  Next
-                </button>
-                <button className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition" onClick={handleBackClick}>
-                  Back
-                </button>
-              </div>
-          </div>
-
-        </div>
+        <DeviceSelection
+          videoRef={videoRef}
+          isCameraEnabled={isCameraEnabled}
+          isMicEnabled={isMicEnabled}
+          isSoundEnabled={isSoundEnabled}
+          setIsCameraEnabled={setIsCameraEnabled}
+          setIsMicEnabled={setIsMicEnabled}
+          setIsMicTestEnabled={setIsMicTestEnabled}
+          setIsSoundEnabled={setIsSoundEnabled}
+          setIsSoundTesting={setIsSoundTesting}
+          isMicTestEnabled={isMicTestEnabled}
+          isSoundTesting={isSoundTesting}
+          handleMicTestConfirmation={handleMicTestConfirmation}
+          handleSoundConfirmation={handleSoundConfirmation}
+          startMicrophoneTest={startMicrophoneTest}
+          stopMicrophoneTest={stopMicrophoneTest}
+          volume={volume}
+          setVolume={setVolume}
+          updateVolume={updateVolume}
+          rafIdRef={rafIdRef}
+          audioContextRef={audioContextRef}
+          analyserRef={analyserRef}
+          dataArrayRef={dataArrayRef}
+          handleNextClick={handleNextClick}
+          handleBackClick={handleBackClick}
+          allDevicesConfigured={allDevicesConfigured}
+        />
       )}
     </div>
   )
-
 };
 
 export default InterviewComponent;
-//in this code when i open step 1, the progress bar is already showing completion of the first step even though i have not uploaded any document, similar for other steps. in step 2 the 2nd step of progress bar shows completed when i press to even though i have not uploaded job profile fill manually. maybe problem with useeffect cleanup function. please fix this and rewrite the whole code for me
