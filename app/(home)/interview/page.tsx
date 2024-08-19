@@ -646,7 +646,7 @@ const isResumeUploaded = !!resumeFile;
           </div>
 
           {/* Right Section */}
-          <div className="w-full md:max-w-[500px] max-h-full lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
+          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
 
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
@@ -773,7 +773,7 @@ const isResumeUploaded = !!resumeFile;
           </div>
 
           {/* Right Section */}
-          <div className="w-full md:max-w-[500px]  lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
+          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div className="w-full flex flex-col items-center mb-2">
             <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
@@ -911,7 +911,7 @@ const isResumeUploaded = !!resumeFile;
           </div>
 
           {/* Right Section */}
-          <div className="w-full md:max-w-[500px]  lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
+          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
               {/* Progress Bar */}
