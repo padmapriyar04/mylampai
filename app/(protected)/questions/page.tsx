@@ -115,13 +115,13 @@ const QuestionPage: React.FC = () => {
   );
 
   return (
-    <div className="bg-purple-200 flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
+    <div className="bg-white flex flex-col items-center justify-center h-[calc(100vh-4rem)]  relative p-4 md:p-0">
       <div className="hidden md:block absolute top-8 left-8 z-10">
         {/* Logo can be added here */}
       </div>
 
-      <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 shadow-xl hover:shadow-2xl transition-shadow duration-300 w-11/12 max-w-7xl flex flex-col md:flex-row h-auto md:h-3/4">
-        <div className="md:block w-full md:w-1/3 bg-purple-500 rounded-2xl md:rounded-tr-6xl md:rounded-tl-2xl md:rounded-bl-6xl md:rounded-br-2xl p-4 flex flex-col items-center justify-start mb-4 md:mb-0">
+      <div className="bg-white backdrop-filter backdrop-blur-lg rounded-2xl p-4 transition-shadow duration-300 w-[95%] flex flex-col gap-32 md:flex-row h-[88%]">
+        <div className="w-full lg:max-w-[800px] min-h-[550px] h-full md:max-w-[530px]  md:w-[38vw] flex flex-col items-center justify-end bg-primary shadow-2xl text-white rounded-3xl p-10 relative">
           <Carousel className="w-full h-full">
             <CarouselContent>
               {[
@@ -145,7 +145,7 @@ const QuestionPage: React.FC = () => {
           </Carousel>
         </div>
 
-        <div className="w-full md:w-2/3 p-4 md:p-12 flex flex-col justify-between">
+        <div className="w-full md:w-2/3 h-[600px]  flex flex-col justify-between">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPageIndex}
@@ -153,14 +153,14 @@ const QuestionPage: React.FC = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -300, opacity: 0 }}
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="space-y-6 bg-gray-100 p-10 rounded-4xl"
+              className="space-y-9 min-h-[520px] bg-gray-200 shadow-lg p-10 rounded-4xl flex flex-col justify-evenly"
             >
-              <h2 className="text-2xl font-bold text-gray-800 ">
+              <h2 className="text-3xl font-bold  text-gray-800 ">
                 {currentPage.question}
               </h2>
 
               {currentPage.gridLayout ? (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid border-dashed border-2 p-10 rounded-3xl border-gray-400 grid-cols-3 gap-[1vw] relative">
                   {currentPage.options?.map(renderButton)}
                 </div>
               ) : currentPage.options ? (
@@ -168,7 +168,7 @@ const QuestionPage: React.FC = () => {
                   {currentPage.options.map((row, rowIndex) => (
                     <div
                       key={rowIndex}
-                      className="flex flex-wrap gap-4 justify-center"
+                      className="flex flex-wrap gap-[1vw] justify-center relative"
                     >
                       {Array.isArray(row)
                         ? row.map((option, optionIndex) =>
@@ -218,27 +218,27 @@ const QuestionPage: React.FC = () => {
             </motion.div>
           </AnimatePresence>
 
-          <div className="flex justify-between mt-8">
+          <div className="flex flex-col justify-center gap-2 py-6">
+            
+            <button
+              onClick={nextPage}
+              disabled={!isAnswerSelected()}
+              className={`w-full h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${ isAnswerSelected()
+                  ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+
+            >
+              {currentPageIndex === pageData.length - 1 ? "Finish" : "Next"}
+            </button>
+            
             <button
               onClick={() =>
                 setCurrentPageIndex((prev) =>
                   prev < pageData.length - 1 ? prev + 1 : prev
                 )
               }
-              className="bg-gray-300 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-400 transition-colors duration-300"
+              className=" text-gray-800 text-lg py-2"
             >
               Skip
-            </button>
-            <button
-              onClick={nextPage}
-              disabled={!isAnswerSelected()}
-              className={`bg-purple-500 text-white px-8 py-3 rounded-full transition-colors duration-300 hover:shadow-lg hover:transform hover:scale-105 text-lg ${
-                !isAnswerSelected()
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-purple-600"
-              }`}
-            >
-              {currentPageIndex === pageData.length - 1 ? "Finish" : "Next"}
             </button>
           </div>
         </div>

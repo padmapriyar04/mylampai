@@ -19,7 +19,6 @@ export const POST = async (req: NextRequest, { params }: { params: { communityId
     }
 
     const { id: userId } = decodedToken;
-    console.log(userId)
     const community = await prisma.community.findUnique({
       where: { id: params.communityId },
     });
