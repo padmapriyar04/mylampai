@@ -4,7 +4,6 @@ interface AudioToTextProps {
   onTextSubmit: (text: string) => void;
 }
 
-// Extend the global Window interface to include SpeechRecognition
 declare global {
   interface Window {
     SpeechRecognition: typeof SpeechRecognition;

@@ -6,9 +6,11 @@ import { FiUser } from "react-icons/fi";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { useUserStore } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
+import { useRouterStore } from "@/utils/useRouteStore";
 
 const Navbar = () => {
   const { userData, clearUser } = useUserStore();
+  const { bears } = useRouterStore();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -46,40 +48,41 @@ const Navbar = () => {
 
   const initials = getUserInitials();
 
-  return (
-    <div className="flex bg-white justify-between z-20 items-center gap-4 backdrop-blur-sm transition px-8 sticky top-0 w-full h-[4rem]">
-      <Link
-        href={"/"}
-        className="grid place-items-center max-w-[220px] w-full h-full"
-      >
-        <Image
-          src={"/home/logo.svg"}
-          height={100}
-          width={180}
-          alt="logo"
-          className="w-full h-auto drop-shadow-md"
-        />
-      </Link>
-
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 border border-purple-500 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md">
-          <SlBell className="text-purple-500" />
-        </div>
+  if (bears)
+    return (
+      <div className="flex bg-white justify-between z-20 items-center gap-4 backdrop-blur-sm transition px-8 sticky top-0 w-full h-[4rem]">
         <Link
-          href="/profile"
-          className="flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md"
+          href={"/"}
+          className="grid place-items-center max-w-[220px] w-full h-full"
         >
-          <span className="text-black">{initials}</span>
-          <FiUser className="text-purple-500" />
+          <Image
+            src={"/home/logo.svg"}
+            height={100}
+            width={180}
+            alt="logo"
+            className="w-full h-auto drop-shadow-md"
+          />
         </Link>
-        <button>Logout</button>
-        <div className="flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md">
-          <span className="text-black">Menu</span>
-          <BsFillMenuButtonWideFill className="text-purple-500" />
+
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 border border-purple-500 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md">
+            <SlBell className="text-purple-500" />
+          </div>
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md"
+          >
+            <span className="text-black">{initials}</span>
+            <FiUser className="text-purple-500" />
+          </Link>
+          <button>Logout</button>
+          <div className="flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md">
+            <span className="text-black">Menu</span>
+            <BsFillMenuButtonWideFill className="text-purple-500" />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default Navbar;

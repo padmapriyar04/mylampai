@@ -6,22 +6,20 @@ import { SlBell } from "react-icons/sl";
 import { FiUser } from "react-icons/fi";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { useUserStore } from "@/utils/userStore";
-import useRouterStore from "../navbar/useRouteStore";
+import { useRouterStore } from "@/utils/useRouteStore";
 import {
   CommunityComponent,
   ResourcesComponent,
   CompanyComponent,
 } from "./HomeNavbarComponents";
 import { useRouter } from "next/navigation";
-import useInterviewStore from '../../app/(home)/interview/store';
 
 const HomeNavbar = () => {
   const { bears } = useRouterStore();
   const [scroll, setScroll] = useState(false);
-  const { userData, setUserData ,clearUser } = useUserStore();
+  const { userData, setUserData, clearUser } = useUserStore();
   const [initials, setInitials] = useState("");
   const router = useRouter();
- 
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
@@ -31,22 +29,22 @@ const HomeNavbar = () => {
     }
   };
 
-  const handleLogout = async () =>{
+  const handleLogout = async () => {
     try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
       });
       if (response.ok) {
         clearUser();
         console.log("Logged out successfully");
-        router.push("/")
+        router.push("/");
       } else {
         console.error("Logout failed:", response.statusText);
       }
     } catch (error) {
       console.error("Error during logout:", error);
     }
-  }
+  };
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -77,9 +75,6 @@ const HomeNavbar = () => {
   }, [userData]);
 
   if (bears)
-
-
-  
     return (
       <div
         className={`flex justify-between items-center gap-4 ${
@@ -111,7 +106,7 @@ const HomeNavbar = () => {
               <span className="text-black">{initials}</span>
               <FiUser className="text-purple-500" />
             </Link>
-            <button onClick={handleLogout} >Logout</button>
+            <button onClick={handleLogout}>Logout</button>
             <div className="flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-110 hover:shadow-md">
               <span className="text-black">Menu</span>
               <BsFillMenuButtonWideFill className="text-purple-500" />
