@@ -19,6 +19,7 @@ interface Page {
 }
 
 const pageData: Page[] = [
+
     {
         question: "Where do you want to study?",
         options: [

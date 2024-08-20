@@ -13,6 +13,7 @@ import {
   CompanyComponent,
 } from "./HomeNavbarComponents";
 import { useRouter } from "next/navigation";
+import useInterviewStore from '../../app/(home)/interview/store';
 
 const HomeNavbar = () => {
   const { bears } = useRouterStore();
@@ -20,6 +21,7 @@ const HomeNavbar = () => {
   const { userData, setUserData ,clearUser } = useUserStore();
   const [initials, setInitials] = useState("");
   const router = useRouter();
+ 
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
@@ -75,6 +77,9 @@ const HomeNavbar = () => {
   }, [userData]);
 
   if (bears)
+
+
+  
     return (
       <div
         className={`flex justify-between items-center gap-4 ${
