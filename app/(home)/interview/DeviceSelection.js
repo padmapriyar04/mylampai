@@ -112,7 +112,7 @@ const DeviceSelection = ({
           Take the wiZe AI mock Interview
         </p>
         <p className="text-center text-sm mt-2 leading-relaxed">
-          You'll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
+          You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
         </p>
       </div>
 
@@ -209,7 +209,7 @@ const DeviceSelection = ({
               <div className="w-full px-4">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">Test your microphone</h2>
                 <div className="text-center mb-4">
-                  <p className="text-gray-600">You're audible</p>
+                  <p className="text-gray-600">You&apos;re audible</p>
                 </div>
 
                 {/* Volume Indicator */}

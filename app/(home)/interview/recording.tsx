@@ -1,10 +1,73 @@
 import React, { useState, useEffect } from 'react';
 
-const AudioToText = ({ onTextSubmit }) => {
+interface AudioToTextProps {
+  onTextSubmit: (text: string) => void;
+}
+
+// Extend the global Window interface to include SpeechRecognition
+declare global {
+  interface Window {
+    SpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: typeof SpeechRecognition;
+  }
+
+  // Define SpeechRecognition and SpeechRecognitionError if not present in the DOM types
+  var SpeechRecognition: {
+    prototype: SpeechRecognition;
+    new (): SpeechRecognition;
+  };
+
+  var webkitSpeechRecognition: {
+    prototype: SpeechRecognition;
+    new (): SpeechRecognition;
+  };
+
+  interface SpeechRecognition {
+    start(): void;
+    stop(): void;
+    abort(): void;
+    onresult: ((event: SpeechRecognitionEvent) => void) | null;
+    onerror: ((event: SpeechRecognitionError) => void) | null;
+    onend: (() => void) | null;
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+  }
+
+  interface SpeechRecognitionEvent {
+    resultIndex: number;
+    results: SpeechRecognitionResultList;
+  }
+
+  interface SpeechRecognitionResultList {
+    readonly length: number; // Make sure this is readonly and consistent
+    item(index: number): SpeechRecognitionResult;
+    [index: number]: SpeechRecognitionResult;
+  }
+
+  interface SpeechRecognitionResult {
+    readonly isFinal: boolean; // Consistent use of readonly
+    readonly length: number; // Make sure this is readonly and consistent
+    item(index: number): SpeechRecognitionAlternative;
+    [index: number]: SpeechRecognitionAlternative;
+  }
+
+  interface SpeechRecognitionAlternative {
+    readonly transcript: string; // Consistent use of readonly
+    readonly confidence: number; // Consistent use of readonly
+  }
+
+  interface SpeechRecognitionError {
+    error: string;
+    message: string;
+  }
+}
+
+const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit }) => {
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
-  let recognition = null;
+  let recognition: SpeechRecognition | null = null;
 
   if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -86,7 +149,11 @@ const AudioToText = ({ onTextSubmit }) => {
   }, []);
 
   return (
-    <div></div>
+    <div>
+      {/* You can render the interim and final transcript if you want */}
+      <p>Interim: {interimTranscript}</p>
+      <p>Final: {transcript}</p>
+    </div>
   );
 };
 

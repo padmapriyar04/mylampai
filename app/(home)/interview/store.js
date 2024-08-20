@@ -8,6 +8,7 @@ const useInterviewStore = create(
       jobDescriptionFile: null,
       setResumeFile: (file) => set({ resumeFile: file }),
       setJobDescriptionFile: (file) => set({ jobDescriptionFile: file }),
+     
     }),
     {
       name: 'interview-storage', // unique name for the storage (localStorage key)

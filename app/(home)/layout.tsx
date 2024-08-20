@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
       <body className={`${openSans.className}`}>
-        { <HomeNavbar />}
+        <HomeNavbar />
         <div className="flex flex-col min-h-screen bg-cover transition-all duration-300">
             <div className={`flex-1 lg:transition-all lg:duration-300`}>
               {children}
