@@ -596,7 +596,7 @@ const startInterview = () => {
             </div>
 
             {/* Content Sections */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
               {activeTab === 'conversation' && (
                 <div>
                  
@@ -822,17 +822,17 @@ const startInterview = () => {
               <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
                 {/* Progress Bar */}
                 <div className="relative flex-1">
-                  <div className={`w-8 h-8 ${resumeFile ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                    {(resumeFile) ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                      </svg>
-                    ) : (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
-                </div>
+              <div className={`w-8 h-8 ${isResumeUploaded ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+            {isResumeUploaded ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                </svg>
+            ) : (
+                <div className="w-3 h-3 bg-white rounded-full"></div>
+            )}
+        </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              </div>
                 {/* Step 2 */}
                 <div className="relative flex-1">
                   <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
