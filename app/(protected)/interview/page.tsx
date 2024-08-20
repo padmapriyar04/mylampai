@@ -1,6 +1,6 @@
 "use client";
 import React, {
- 
+  useState,
   useRef,
   useEffect,
   DragEvent,
@@ -567,11 +567,7 @@ const InterviewComponent = () => {
         {/* Navbar */}
         <nav className="flex justify-between items-center bg-white shadow-md p-4">
           <div className="flex items-center">
-            <img
-              src="/path_to_your_logo.svg"
-              alt="wiZe Logo"
-              className="h-8 w-8 mr-2"
-            />
+            <img src="/path_to_your_logo.svg" alt="wiZe Logo" className="h-8 w-8 mr-2" />
             <span className="text-xl font-semibold text-purple-600">wiZe</span>
           </div>
           <div className="flex items-center">
@@ -587,6 +583,7 @@ const InterviewComponent = () => {
             </button>
           </div>
         </nav>
+
         {/* Main Content */}
         <div className="flex-1 flex justify-center items-center bg-gray-100 overflow-hidden h-screen">
           <video
@@ -596,18 +593,16 @@ const InterviewComponent = () => {
             muted
           />
         </div>
+
         {/* Microphone enabled: Display AudioToText */}
-        {isMicEnabled && <AudioToText onTextSubmit={handleTextSubmit} />}{" "}
-        {/* Display when mic is enabled */}
+        {isMicEnabled && <AudioToText onTextSubmit={handleTextSubmit} />} {/* Display when mic is enabled */}
+
         {/* Prompt Box */}
         {isChatOpen && (
           <div className="absolute top-20 right-6 bg-white border border-gray-300 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
             <div className="flex justify-between items-center bg-primary text-white p-4 rounded-t-lg">
               <span className="font-semibold text-lg">Prompt Box</span>
-              <button
-                onClick={() => setIsChatOpen(false)}
-                className="text-white text-2xl"
-              >
+              <button onClick={() => setIsChatOpen(false)} className="text-white text-2xl">
                 &times;
               </button>
             </div>
@@ -615,36 +610,35 @@ const InterviewComponent = () => {
             {/* Tabs for switching between sections */}
             <div className="flex border-b border-gray-300 rounded-b-lg">
               <button
-                className={`flex-1 text-center p-2 rounded-bl-lg ${activeTab === "conversation" ? "bg-primary text-white" : "bg-gray-100 text-gray-700"}`}
-                onClick={() => setActiveTab("conversation")}
+                className={`flex-1 text-center p-2 rounded-bl-lg ${activeTab === 'conversation' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}
+                onClick={() => setActiveTab('conversation')}
               >
                 Conversation
               </button>
               <button
-                className={`flex-1 text-center p-2 rounded-br-lg ${activeTab === "audioToText" ? "bg-primary text-white" : "bg-gray-100 text-gray-700"}`}
-                onClick={() => setActiveTab("audioToText")}
+                className={`flex-1 text-center p-2 rounded-br-lg ${activeTab === 'audioToText' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}
+                onClick={() => setActiveTab('audioToText')}
               >
                 Audio-to-Text
               </button>
             </div>
 
             {/* Content Sections */}
-            <div className="flex-1 overflow-y-auto p-4">
-              {activeTab === "conversation" && (
+            <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+              {activeTab === 'conversation' && (
                 <div>
+                 
                   {chatMessages.map((chat, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-100 p-2 rounded-md mb-2"
-                    >
+                    <div key={index} className="bg-gray-100 p-2 rounded-md mb-2">
                       <span className="font-semibold">{chat.user}: </span>
                       <span>{chat.message}</span>
                     </div>
                   ))}
                 </div>
               )}
-              {activeTab === "audioToText" && (
+              {activeTab === 'audioToText' && (
                 <div>
+                  
                   {audioTextInputs.map((text, index) => (
                     <div key={index} className="bg-gray-200 p-2 rounded-md">
                       <span>{text}</span>
@@ -656,41 +650,35 @@ const InterviewComponent = () => {
 
             {/* Input and Buttons Container */}
             <div className="p-4 bg-gray-100 border-t border-gray-300">
-              <input
-                id="answerInput"
-                type="text"
-                placeholder="Type your answer here"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none mb-2"
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    const target = e.target as HTMLInputElement;
-                    const answer = target.value;
-                    handleSendMessage(answer);
-                    target.value = "";
-                  }
-                }}
-              />
+            <input
+  id="answerInput"
+  type="text"
+  placeholder="Type your answer here"
+  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none mb-2"
+  onKeyPress={(e) => {
+    if (e.key === "Enter") {
+      const target = e.target as HTMLInputElement;
+      const answer = target.value;
+      handleSendMessage(answer);
+      target.value = "";
+    }
+  }}
+/>
 
               <div className="flex justify-between">
-                <button
-                  id="sendAnswerButton"
-                  className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition"
-                  onClick={() => {
-                    const answer = (
-                      document.getElementById("answerInput") as HTMLInputElement
-                    ).value;
-                    if (answer) {
-                      handleSendMessage(answer);
-                      (
-                        document.getElementById(
-                          "answerInput",
-                        ) as HTMLInputElement
-                      ).value = "";
-                    }
-                  }}
-                >
-                  Send Answer
-                </button>
+              <button
+  id="sendAnswerButton"
+  className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition"
+  onClick={() => {
+    const answer = (document.getElementById("answerInput") as HTMLInputElement).value;
+    if (answer) {
+      handleSendMessage(answer);
+      (document.getElementById("answerInput") as HTMLInputElement).value = "";
+    }
+  }}
+>
+  Send Answer
+</button>
 
                 <button
                   id="getAnalysisButton"
@@ -699,7 +687,7 @@ const InterviewComponent = () => {
                     websocketRef.current?.send(
                       JSON.stringify({
                         type: "get_analysis",
-                      }),
+                      })
                     );
                   }}
                 >
@@ -721,85 +709,45 @@ const InterviewComponent = () => {
           {/* Left Section */}
 
           <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
-            <Image
-              src={"/images/Globe.svg"}
-              className="w-full h-auto"
-              alt="image"
-              width={100}
-              height={100}
-            ></Image>
+            <Image src={"/images/Globe.svg"} className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
-              <h2 className="text-xl font-bold text-center leading-snug">
-                Take the wiZe AI mock Interview
-              </h2>
+              <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
               <p className="mt-2 text-center text-sm leading-relaxed">
-                You&apos;ll be taking a 20-minute interview to have your skills
-                evaluated. Just relax and take the interview.{" "}
-                <span className="font-semibold"> All the best!</span>
+                You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
               </p>
             </div>
           </div>
 
           {/* Right Section */}
           <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
-            <div>
-              <p className="text-2xl font-bold text-primary mb-2">
-                Get Started!
-              </p>
-            </div>
+            <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
 
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
               {/* Progress Bar */}
               <div className="relative flex-1">
-                <div
-                  className={`w-8 h-8 ${isResumeUploaded ? "bg-purple-500" : "bg-gray-400"} rounded-full flex items-center justify-center`}
-                >
-                  {isResumeUploaded ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-white"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ) : (
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  )}
-                </div>
-                <div
-                  className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? "bg-primary w-full" : "bg-gray-400 w-full"} z-0`}
-                ></div>
+              <div className={`w-8 h-8 ${isResumeUploaded ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+            {isResumeUploaded ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                </svg>
+            ) : (
+                <div className="w-3 h-3 bg-white rounded-full"></div>
+            )}
+        </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
               </div>
               {/* Step 2 */}
               <div className="relative flex-1">
-                <div
-                  className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
-                >
-                  {jobDescriptionFile || isManualEntry ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-white"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                        clipRule="evenodd"
-                      />
+                <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                  {(jobDescriptionFile || isManualEntry) ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
                     </svg>
                   ) : (
                     <div className="w-3 h-3 bg-white rounded-full"></div>
                   )}
                 </div>
-                <div
-                  className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? "bg-primary w-full" : "bg-gray-400 w-full"} z-0`}
-                ></div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
               </div>
               {/* Step 3 */}
               <div className="relative  flex items-center">
@@ -810,9 +758,7 @@ const InterviewComponent = () => {
             </div>
 
             <div className="text-center mb-6 mt-3 w-[100%]">
-              <h3 className="text-2xl font-bold text-gray-800">
-                Upload your latest CV/Resume
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-800">Upload your latest CV/Resume</h3>
             </div>
 
             {/* Upload Section */}
@@ -831,10 +777,7 @@ const InterviewComponent = () => {
                   htmlFor="resumeUpload"
                   className="text-gray-500 cursor-pointer text-sm"
                 >
-                  Click to{" "}
-                  <span className="font-semibold text-gray-700 ">
-                    Upload Resume
-                  </span>
+                  Click to <span className="font-semibold text-gray-700 ">Upload Resume</span>
                 </label>
                 <input
                   id="resumeUpload"
@@ -848,36 +791,26 @@ const InterviewComponent = () => {
                   <IoCloudUploadOutline />
                 </div>
 
-                <p className="text-gray-400 text-sm mt-3">
-                  Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.
-                </p>
+                <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
               </div>
 
               {/* Upload Button */}
               <div className="flex justify-center mt-2">
                 <button
                   className="bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"
-                  onClick={() => triggerFileInput("resumeUpload")}
+                  onClick={() => triggerFileInput('resumeUpload')}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 inline-block mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                      clipRule="evenodd"
-                    />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
                   </svg>
                   Upload Resume
                 </button>
               </div>
+
             </div>
             <div className="mt-8 w-full px-4 flex flex-col items-center">
               <button
-                className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? "bg-gray-600 text-black hover:bg-gray-800 text-white" : "bg-gray-300 text-gray-800 cursor-not-allowed"}`}
+                className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
                 disabled={!resumeFile}
                 onClick={handleNextClick}
               >
@@ -891,6 +824,7 @@ const InterviewComponent = () => {
                 Back
               </button>
             </div>
+
           </div>
         </div>
       )}
@@ -900,21 +834,11 @@ const InterviewComponent = () => {
         <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row md:justify-between">
           {/* Left Section */}
           <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
-            <Image
-              src={"/images/Globe.svg"}
-              className="w-full h-auto"
-              alt="image"
-              width={100}
-              height={100}
-            ></Image>
+            <Image src={"/images/Globe.svg"} className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
-              <h2 className="text-xl font-bold text-center leading-snug">
-                Take the wiZe AI mock Interview
-              </h2>
+              <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
               <p className="mt-2 text-center text-sm leading-relaxed">
-                You&apos;ll be taking a 20-minute interview to have your skills
-                evaluated. Just relax and take the interview.{" "}
-                <span className="font-semibold"> All the best!</span>
+                You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
               </p>
             </div>
           </div>
@@ -922,63 +846,33 @@ const InterviewComponent = () => {
           {/* Right Section */}
           <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
             <div className="w-full flex flex-col items-center mb-2">
-              <div>
-                <p className="text-2xl font-bold text-primary mb-2">
-                  Get Started!
-                </p>
-              </div>
+              <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
               <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
                 {/* Progress Bar */}
                 <div className="relative flex-1">
-                  <div
-                    className={`w-8 h-8 ${resumeFile ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
-                  >
-                    {resumeFile ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-white"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    ) : (
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                  <div
-                    className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? "bg-primary w-full" : "bg-gray-400 w-full"} z-0`}
-                  ></div>
-                </div>
+              <div className={`w-8 h-8 ${isResumeUploaded ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+            {isResumeUploaded ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
+                </svg>
+            ) : (
+                <div className="w-3 h-3 bg-white rounded-full"></div>
+            )}
+        </div>
+                <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              </div>
                 {/* Step 2 */}
                 <div className="relative flex-1">
-                  <div
-                    className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
-                  >
-                    {jobDescriptionFile || isManualEntry ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-white"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                          clipRule="evenodd"
-                        />
+                  <div className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                    {(jobDescriptionFile || isManualEntry) ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
                       </svg>
                     ) : (
                       <div className="w-3 h-3 bg-white rounded-full"></div>
                     )}
                   </div>
-                  <div
-                    className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? "bg-primary w-full" : "bg-gray-400 w-full"} z-0`}
-                  ></div>
+                  <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${jobDescriptionFile || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
                 </div>
                 {/* Step 3 */}
                 <div className="relative  flex items-center">
@@ -988,20 +882,19 @@ const InterviewComponent = () => {
                 </div>
               </div>
             </div>
-            <h3 className="text-sm xl:text-2xl mb-6 font-bold text-gray-800">
-              Choose your Interview Profile
-            </h3>
+            <h3 className="text-sm xl:text-2xl mb-6 font-bold text-gray-800">Choose your Interview Profile</h3>
 
             <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
+
               <div className="w-full flex justify-center mb-6">
                 <button
-                  className={`px-6 py-2 font-semibold ${!isManualEntry ? "text-white bg-primary" : "text-primary bg-gray-100"} rounded-lg focus:outline-none`}
+                  className={`px-6 py-2 font-semibold ${!isManualEntry ? 'text-white bg-primary' : 'text-primary bg-gray-100'} rounded-lg focus:outline-none`}
                   onClick={handleUploadJDToggle}
                 >
                   Upload JD
                 </button>
                 <button
-                  className={`px-6 py-2 font-semibold ${isManualEntry ? "text-white bg-primary" : "text-primaary bg-gray-100"} rounded-lg focus:outline-none`}
+                  className={`px-6 py-2 font-semibold ${isManualEntry ? 'text-white bg-primary' : 'text-primaary bg-gray-100'} rounded-lg focus:outline-none`}
                   onClick={handleManualEntryToggle}
                 >
                   Fill Manually
@@ -1017,9 +910,7 @@ const InterviewComponent = () => {
                     value={manualJobDescription}
                     onChange={(e) => setManualJobDescription(e.target.value)}
                   />
-                  <p className="text-gray-400 text-sm mt-2">
-                    Word limit 1000 words.
-                  </p>
+                  <p className="text-gray-400 text-sm mt-2">Word limit 1000 words.</p>
                   <div className="w-full text-center mt-4">
                     <button
                       onClick={handleManualJDUpload}
@@ -1029,54 +920,31 @@ const InterviewComponent = () => {
                     </button>
                   </div>
                 </div>
+
               ) : (
-                <div
-                  className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white "
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, setJobDescriptionFile)}
-                >
+                <div className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white " onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, setJobDescriptionFile)}>
                   <div className="text-4xl mb-3 text-gray-300">
                     <IoCloudUploadOutline />
                   </div>
                   <p className="text-gray-500 mb-2">Drag & Drop or</p>
-                  <label
-                    htmlFor="jobDescriptionUpload"
-                    className="text-gray-500 cursor-pointer"
-                  >
-                    Click to{" "}
-                    <span className="font-semibold text-gray-700">
-                      Upload Job Description
-                    </span>
+                  <label htmlFor="jobDescriptionUpload" className="text-gray-500 cursor-pointer">
+                    Click to <span className="font-semibold text-gray-700">Upload Job Description</span>
                   </label>
-                  <input
-                    id="jobDescriptionUpload"
-                    type="file"
-                    accept=".doc,.docx,.pdf"
-                    className="hidden"
-                    onChange={handleJobDescriptionUpload}
-                  />
-                  <p className="text-gray-400 text-sm mt-3">
-                    Supported file formats: DOC, DOCX, PDF. File size limit 10
-                    MB.
-                  </p>
+                  <input id="jobDescriptionUpload" type="file" accept=".doc,.docx,.pdf" className="hidden" onChange={handleJobDescriptionUpload} />
+                  <p className="text-gray-400 text-sm mt-3">Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.</p>
                 </div>
               )}
+
             </div>
             <div className="mt-8 w-full px-4 flex flex-col items-center">
               <button
-                className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${jobDescriptionFile || (isManualEntry && manualJobDescription) ? "bg-gray-600 text-black hover:bg-gray-800 text-white" : "bg-gray-300 text-gray-800 cursor-not-allowed"}`}
-                disabled={
-                  !jobDescriptionFile &&
-                  !(isManualEntry && manualJobDescription)
-                }
+                className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${(jobDescriptionFile || (isManualEntry && manualJobDescription)) ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+                disabled={!jobDescriptionFile && !(isManualEntry && manualJobDescription)}
                 onClick={handleNextClick}
               >
                 Next
               </button>
-              <button
-                className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
-                onClick={handleBackClick}
-              >
+              <button className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition" onClick={handleBackClick}>
                 Back
               </button>
             </div>
@@ -1115,7 +983,7 @@ const InterviewComponent = () => {
         />
       )}
     </div>
-  );
+  )
 };
 
 export default InterviewComponent;
