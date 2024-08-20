@@ -9,7 +9,7 @@ import React, {
 import { IoDocumentAttach } from "react-icons/io5";
 import AudioToText from "./recording";
 import { FiMic, FiSpeaker, FiVideo, FiMessageSquare } from "react-icons/fi";
-import useInterviewStore from "./store";
+import {useInterviewStore} from "./store";
 import Image from "next/image";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { FaRegFileAlt } from "react-icons/fa";
@@ -18,7 +18,7 @@ import { useRouterStore } from "@/utils/useRouteStore";
 import { toast } from "sonner";
 
 const InterviewComponent = () => {
-  const { changeRoute } = useRouterStore();
+  const { changeRoute } = useRouterStore(); // for hiding the default navbar in interview section
   const [isMounted, setIsMounted] = useState(false);
   const {
     resumeFile,
