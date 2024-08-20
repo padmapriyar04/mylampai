@@ -274,6 +274,7 @@ const InterviewComponent = () => {
       setResumeFile(null);
       setCvText(""); // Optionally reset CV text
     }
+    toast.success("CV Uploaded successfully");
   };
 
   const isResumeUploaded = !!resumeFile;
@@ -476,6 +477,7 @@ const InterviewComponent = () => {
 
       // You can also add a condition to automatically start the interview if the CV is also uploaded
       if (cvText && JD) {
+        toast.success("Job Description uploaded successfully");
       }
     } else {
       alert("Please fill in the job description.");
@@ -589,7 +591,7 @@ const InterviewComponent = () => {
 
       {/* Main Content */}
       <div
-        className={`flex-1 flex min-h-[100vh] justify-center items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${
+        className={`flex-1 flex min-h-[100vh] justify- items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${
           isChatOpen ? "w-[80vw]" : "w-full"
         }`}
       >
