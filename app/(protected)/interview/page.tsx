@@ -16,6 +16,7 @@ import { FaRegFileAlt } from "react-icons/fa";
 import DeviceSelection from "./DeviceSelection"; // Importing the DeviceSelection component
 import { useRouterStore } from "@/utils/useRouteStore";
 import { toast } from "sonner";
+import { PiChatsThin } from "react-icons/pi";
 
 const InterviewComponent = () => {
   const { changeRoute } = useRouterStore(); // for hiding the default navbar in interview section
@@ -560,46 +561,54 @@ const InterviewComponent = () => {
       audioElement.currentTime = 0; // Reset the audio to the start
     }
   };
+  
 
   if (isInterviewStarted) {
     return (
-      <div className="min-h-screen flex flex-col relative">
+      <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground ">
         {/* Navbar */}
         <nav className="flex justify-between items-center bg-white shadow-md p-4">
           <div className="flex items-center">
-            <img src="/path_to_your_logo.svg" alt="wiZe Logo" className="h-8 w-8 mr-2" />
-            <span className="text-xl font-semibold text-purple-600">wiZe</span>
+            <img src="/home/logo.svg" alt="wiZe Logo" className="h-auto w-48 ml-2" />
           </div>
+          <div className="font-medium text-lg">Technical Interview 1st round</div>
+        
           <div className="flex items-center">
             <span className="text-gray-600 text-sm mr-4" id="status"></span>
-            <button className="mr-4" onClick={() => setIsChatOpen(!isChatOpen)}>
-              <FiMessageSquare className="w-6 h-6 text-gray-600" />
+            <button className="mr-6" onClick={() => setIsChatOpen(!isChatOpen)}>
+              <PiChatsThin className="w-10 h-10  text-gray-600" />
             </button>
             <button
-              className="bg-red-500 text-white px-4 py-2 rounded-lg"
+              className="bg-red-500 text-white px-4 py-3 rounded-full font-semibold"
               onClick={() => window.close()} // Close the tab
             >
-              End Interview
+              END INTERVIEW
             </button>
           </div>
         </nav>
 
-        {/* Main Content */}
-        <div className="flex-1 flex justify-center items-center bg-gray-100 overflow-hidden h-screen">
-          <video
-            ref={videoRef}
-            className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75"
-            autoPlay
-            muted
-          />
-        </div>
+      {/* Main Content */}
+      <div
+        className={`flex-1 flex min-h-[100vh] justify-center items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${
+          isChatOpen ? "w-[80vw]" : "w-full"
+        }`}
+      >
+        <video
+          ref={videoRef}
+          className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75"
+          autoPlay
+          muted
+        />
+      </div>
+
+
 
         {/* Microphone enabled: Display AudioToText */}
         {isMicEnabled && <AudioToText onTextSubmit={handleTextSubmit} />} {/* Display when mic is enabled */}
 
         {/* Prompt Box */}
-        {isChatOpen && (
-          <div className="absolute top-20 right-6 bg-white border border-gray-300 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
+        {isChatOpen && 
+          <div className="absolute top-[5.7rem] right-6 bg-white border border-gray-300 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
             <div className="flex justify-between items-center bg-primary text-white p-4 rounded-t-lg">
               <span className="font-semibold text-lg">Prompt Box</span>
               <button onClick={() => setIsChatOpen(false)} className="text-white text-2xl">
@@ -649,36 +658,36 @@ const InterviewComponent = () => {
             </div>
 
             {/* Input and Buttons Container */}
-            <div className="p-4 bg-gray-100 border-t border-gray-300">
+            <div className="p-4 bg-gray-100 border-t border-b border-gray-300 rounded-lg">
             <input
-  id="answerInput"
-  type="text"
-  placeholder="Type your answer here"
-  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none mb-2"
-  onKeyPress={(e) => {
-    if (e.key === "Enter") {
-      const target = e.target as HTMLInputElement;
-      const answer = target.value;
-      handleSendMessage(answer);
-      target.value = "";
-    }
-  }}
-/>
+            id="answerInput"
+            type="text"
+            placeholder="Type your answer here"
+            className="w-full px-4 py-4 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary focus:outline-none mb-4"
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                const target = e.target as HTMLInputElement;
+                const answer = target.value;
+                handleSendMessage(answer);
+                target.value = "";
+              }
+            }}
+            />
 
-              <div className="flex justify-between">
+              <div className="flex justify-between ">
               <button
-  id="sendAnswerButton"
-  className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition"
-  onClick={() => {
-    const answer = (document.getElementById("answerInput") as HTMLInputElement).value;
-    if (answer) {
-      handleSendMessage(answer);
-      (document.getElementById("answerInput") as HTMLInputElement).value = "";
-    }
-  }}
->
-  Send Answer
-</button>
+              id="sendAnswerButton"
+              className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition"
+              onClick={() => {
+                const answer = (document.getElementById("answerInput") as HTMLInputElement).value;
+                if (answer) {
+                  handleSendMessage(answer);
+                  (document.getElementById("answerInput") as HTMLInputElement).value = "";
+                }
+              }}
+            >
+              Send Answer
+            </button>
 
                 <button
                   id="getAnalysisButton"
@@ -696,7 +705,7 @@ const InterviewComponent = () => {
               </div>
             </div>
           </div>
-        )}
+        }
       </div>
     );
   }
