@@ -571,8 +571,8 @@ const startInterview = () => {
 
         {/* Prompt Box */}
         {isChatOpen && (
-          <div className="absolute top-20 right-6 bg-white border border-gray-300 shadow-lg rounded-lg w-96 h-1/2 flex flex-col">
-            <div className="flex justify-between items-center bg-purple-600 text-white p-4 rounded-t-lg">
+          <div className="absolute top-20 right-6 bg-white border border-gray-300 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
+            <div className="flex justify-between items-center bg-primary text-white p-4 rounded-t-lg">
               <span className="font-semibold text-lg">Prompt Box</span>
               <button onClick={() => setIsChatOpen(false)} className="text-white text-2xl">
                 &times;
@@ -580,15 +580,15 @@ const startInterview = () => {
             </div>
 
             {/* Tabs for switching between sections */}
-            <div className="flex border-b border-gray-300">
+            <div className="flex border-b border-gray-300 rounded-b-lg">
               <button
-                className={`flex-1 text-center p-2 ${activeTab === 'conversation' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                className={`flex-1 text-center p-2 rounded-bl-lg ${activeTab === 'conversation' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}
                 onClick={() => setActiveTab('conversation')}
               >
                 Conversation
               </button>
               <button
-                className={`flex-1 text-center p-2 ${activeTab === 'audioToText' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                className={`flex-1 text-center p-2 rounded-br-lg ${activeTab === 'audioToText' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'}`}
                 onClick={() => setActiveTab('audioToText')}
               >
                 Audio-to-Text
@@ -599,7 +599,7 @@ const startInterview = () => {
             <div className="flex-1 overflow-y-auto p-4">
               {activeTab === 'conversation' && (
                 <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Conversation</h3>
+                 
                   {chatMessages.map((chat, index) => (
                     <div key={index} className="bg-gray-100 p-2 rounded-md mb-2">
                       <span className="font-semibold">{chat.user}: </span>
@@ -610,7 +610,7 @@ const startInterview = () => {
               )}
               {activeTab === 'audioToText' && (
                 <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">Audio-to-Text Inputs</h3>
+                  
                   {audioTextInputs.map((text, index) => (
                     <div key={index} className="bg-gray-200 p-2 rounded-md">
                       <span>{text}</span>
@@ -679,6 +679,7 @@ const startInterview = () => {
       {step === 1 && (
         <div className="max-w-[1200px] md:gap-4 w-full flex flex-col md:flex-row justify-between ">
           {/* Left Section */}
+          
           <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
             <Image src={"/images/Globe.svg"} className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
@@ -690,7 +691,7 @@ const startInterview = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-full md:max-w-[500px] max-h-full lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
+          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
 
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
@@ -815,7 +816,7 @@ const startInterview = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-full md:max-w-[500px]  lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
+          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
             <div className="w-full flex flex-col items-center mb-2">
               <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
               <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
