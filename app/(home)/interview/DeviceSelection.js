@@ -90,9 +90,10 @@ const DeviceSelection = ({
   };
 
   return (
-    <div className="max-w-[1200px] gap-6 w-full flex justify-between ">
+    <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
+    <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row md:justify-between">
       {/* Left Section */}
-      <div className="w-full max-w-[450px] max-h-[580px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+      <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
         <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-56 mb-2"></video>
         <div className="flex justify-between w-full text-sm mb-32">
           <span className="flex items-center">
@@ -117,7 +118,7 @@ const DeviceSelection = ({
       </div>
 
       {/* Right Section */}
-      <div className="w-3/4 flex flex-col items-center justify-center bg-primary-foreground">
+      <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
         <div>
           <p className="text-2xl font-bold text-primary mb-2">Get Started!</p>
         </div>
@@ -158,7 +159,7 @@ const DeviceSelection = ({
           </div>
         </div>
         <div className="w-full flex justify-center text-center mt-4 mb-6">
-          <h2 className="text-sm xl:text-2xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
         </div>
         <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center">
           {!isMicTestEnabled && !isSoundTesting && (
@@ -268,9 +269,10 @@ const DeviceSelection = ({
         </div>
         <div className="mt-8 w-full px-4 flex flex-col items-center">
           <button
-            className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-              allDevicesConfigured ? "bg-gray-600 text-black hover:bg-gray-800 text-white" : "bg-gray-300 text-gray-800 cursor-not-allowed"
-            }`}
+           
+              className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
+              allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+
             disabled={!allDevicesConfigured}
             onClick={handleNextClick}
           >
@@ -284,6 +286,7 @@ const DeviceSelection = ({
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 };

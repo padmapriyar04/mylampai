@@ -674,13 +674,13 @@ const startInterview = () => {
   }
 
   return (
-    <div className="md:h-[calc(100vh-4rem)] h-[130vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
+    <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
       {/* Step 1: Upload Resume */}
       {step === 1 && (
-        <div className="max-w-[1200px] md:gap-4 w-full flex flex-col md:flex-row justify-between ">
+        <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row justify-between">
           {/* Left Section */}
-          
-          <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+
+          <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
             <Image src={"/images/Globe.svg"} className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
@@ -691,7 +691,7 @@ const startInterview = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
+          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
             <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
 
             <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
@@ -735,7 +735,7 @@ const startInterview = () => {
 
             {/* Upload Section */}
             <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
-              <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-[2vw]">
+              <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-3xl">
                 <IoDocumentAttach />
               </div>
 
@@ -803,9 +803,9 @@ const startInterview = () => {
 
       {/* Step 2: Upload Job Description */}
       {step === 2 && (
-        <div className="max-w-[1200px] gap-4 w-full flex flex-col md:flex-row justify-between ">
+        <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row md:justify-between">
           {/* Left Section */}
-          <div className="w-full max-w-[450px] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-3xl p-10 relative">
+          <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
             <Image src={"/images/Globe.svg"} className='w-full h-auto' alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
               <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
@@ -816,7 +816,7 @@ const startInterview = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 mr-8 lg:mr-0">
+          <div className="w-full  md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
             <div className="w-full flex flex-col items-center mb-2">
               <div ><p className='text-2xl font-bold text-primary mb-2'>Get Started!</p></div>
               <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
