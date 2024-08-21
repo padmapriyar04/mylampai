@@ -116,7 +116,7 @@ const HomeNavbar = () => {
           <div className="md:flex hidden justify-between bg-[#ffffff90] items-center w-full max-w-[600px] gap-1 pr-2 my-2 pl-4 py-2 min-h-[40px] backdrop-blur-md font-medium rounded-full shadow-sm">
             <Link
               href={"/"}
-              className="hover:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-purple-600 hover:transform hover:scale-105"
+              className="transition-all py-2 px-4 rounded-full duration-300 hover:shadow-lg hover:bg-primary-foreground hover:transform hover:scale-105"
             >
               Home
             </Link>
