@@ -231,7 +231,6 @@ const InterviewComponent = () => {
   };
 
   // Make sure you define handleResumeUpload in a way that can handle file input
-
   const handleResumeUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target?.files?.[0];
 
