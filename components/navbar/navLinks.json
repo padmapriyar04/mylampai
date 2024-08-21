@@ -40,19 +40,8 @@
         "Link":"/mentorship"
     },
     {
-        "name": "Blogs",
-        "icon": "/sidebar/blogs.svg",
-        "Link":"/blogs"
-    },
-    {
         "name": "Community",
         "icon": "/sidebar/community.svg",
         "Link":"/community"
-    },
-    {
-        "name": "AI Interviewer",
-        "icon": "/sidebar/community.svg",
-        "Link":"/interview"
     }
-
 ]
