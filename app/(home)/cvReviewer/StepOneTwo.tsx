@@ -2,7 +2,7 @@
 import React, { useState, DragEvent, ChangeEvent } from "react";
 import { IoDocumentAttach, IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
-import  useInterviewStore  from '@/utils/store';
+import  {useInterviewStore}  from '@/utils/store';
 
 interface StepOneTwoProps {
   step: number;
