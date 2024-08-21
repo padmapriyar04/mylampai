@@ -62,7 +62,7 @@ export default function Community() {
     socket.emit("check-join", { communityId });
   };
 
-  const fetchCommunities = useCallback(async () => {
+  const fetchCommunities = async () => {
     try {
       const response = await fetch("/api/community");
       const data = await response.json();
@@ -75,7 +75,7 @@ export default function Community() {
     } catch (error) {
       console.error("Error fetching communities:", error);
     }
-  }, []);
+  };
 
   const joinCommunity = async (communityId: string) => {
     try {

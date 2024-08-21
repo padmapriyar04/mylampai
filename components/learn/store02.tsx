@@ -1,5 +1,5 @@
 // store.ts
-import create from "zustand";
+import { create } from "zustand";
 
 interface ModalStore {
   isOpen: boolean;
