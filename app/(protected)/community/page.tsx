@@ -3,7 +3,6 @@ import Image from "next/image";
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import ExclusiveCommunity from "@/components/community/ExclusiveCommunity";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
 import socket from "@/utils/socket";
 import { useUserStore } from "@/utils/userStore";
 import { format } from "date-fns";

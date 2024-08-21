@@ -8,7 +8,7 @@ type BearState = {
 // Create the Zustand store
 const useRouterStore = create<BearState>((set) => ({
   bears: true,
-  changeRoute: (val) => set({ bears: val })
+  changeRoute: (val) => set({ bears: val }),
 }));
 
-export default useRouterStore;
+export { useRouterStore };

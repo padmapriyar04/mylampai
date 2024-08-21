@@ -41,7 +41,10 @@ export default function Flexsidebar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
+  
+  if (pathname === "/interview")
+    return null;
+  
   return (
     <>
       <div
