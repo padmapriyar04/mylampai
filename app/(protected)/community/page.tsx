@@ -264,9 +264,9 @@ export default function Community() {
 
   return (
     <div className="w-full shadow-inner flex items-stretch justify-between h-[calc(100vh-4rem)] gap-4 p-4 ">
-      <div className="w-full max-w-[440px] h-[calc(100vh-6rem)] flex flex-col items-stretch justify-start gap-4">
+      <div className="w-full max-w-[500px] h-[calc(100vh-6rem)] flex flex-col items-stretch justify-start gap-4">
         <div className="w-full flex flex-col">
-          <div className="font-semibold text-gray-700">Hello {userData?.name.split(" ")[0] }!</div>
+          <div className="font-semibold text-gray-700">Hello Raj!</div>
           <span className="text-sm text-gray-700">
             Learn with your peers to maximize learning
           </span>

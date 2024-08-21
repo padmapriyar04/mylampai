@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import navData from "@/components/navbar/navLinks.json";
 import smData from "@/app/data/navsocialicon.json";
 import NavLinks from "@/components/navbar/NavItems";
-import Link from "next/link";
 
 export default function Flexsidebar() {
   const sidebarRef = useRef<HTMLDivElement | null>(null);
@@ -42,63 +41,58 @@ export default function Flexsidebar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  if (pathname === "/interview") return null;
-
+  
+  if (pathname === "/interview")
+    return null;
+  
   return (
     <>
       <div
         ref={sidebarRef}
-        className={`bg-white shadow-inner py-2 h-[calc(100vh-4rem)] z-10 transition-all duration-300 w-full max-w-[220px] flex flex-row items-center gap-2 ${isSmallScreen && !isSidebarOpen ? "hidden" : "flex"} flex flex-col w-full transition-all duration-300 z-10 ${isSmallScreen ? "w-screen" : "w-[270px]"}`}
+        className={`bg-white p-4 h-[calc(100vh-4rem)] z-10 transition-all duration-300 w-full max-w-[250px] flex flex-row items-center gap-2 ${isSmallScreen && !isSidebarOpen ? "hidden" : "flex"} flex flex-col w-full transition-all duration-300 z-50 ${isSmallScreen ? "w-screen" : "w-[270px]"}`}
       >
         <button
-          className="absolute top-4 left-4 block sm:hidden"
+          className={`absolute top-4 left-4 ${isSmallScreen ? "block" : "hidden"}`}
           onClick={toggleSidebar}
         >
           ☰
         </button>
-        <div className="w-full h-[70vh] flex flex-col justify-evenly pb-4 gap-4 overflow-y-auto scrollbar-hide ">
-          {navRender.map((item, index) => {
-            const isActive = pathname === navData[index].Link;
+        <div className="w-full h-[70vh] flex flex-col gap-7 overflow-y-auto scrollbar-hide mr-6 ">
+          {navRender.map((item, navindex) => {
+            const isActive = pathname === navData[navindex].Link;
             return (
-              <NavLinks
-                name={navData[index].name}
-                icon={navData[index].icon}
-                Link={navData[index].Link}
-                index={index}
-                key={index}
-              />
+              <div key={navindex}>
+                <NavLinks
+                  name={navData[navindex].name}
+                  icon={navData[navindex].icon}
+                  Link={navData[navindex].Link}
+                  index={navindex}
+                />
+              </div>
             );
           })}
         </div>
-        <div className="w-full flex flex-col px-2 items-center relative ">
-          <div className="w-12 h-12 border-4 rounded-full absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 z-10">
-            <Image
-              src="/avtar.svg"
-              alt="pfp"
-              height={50}
-              width={50}
-              className="w-full"
-            />
+        <div className="w-full flex flex-col items-center ">
+          <div className="w-12 h-12 border-4 rounded-full border-[#f5f5f5] absolute z-10">
+            <Image src="/avtar.svg" alt="pfp" height={50} width={50} />
           </div>
-          <div className="w-full h-32 bg-primary rounded-lg"></div>
+          <div className="w-11/12 h-24 border-2 bg-[#8c52ff] rounded-xl relative top-5"></div>
         </div>
-        <div className="px-2 w-full">
-          <div className="w-full p-4 bg-primary-foreground text-md font-semibold flex flex-col justify-center items-center gap-2 rounded-lg">
-            <span>Connect with us</span>
-            <div className="flex w-full gap-4 justify-center font-semibold ">
-              {smRender.map((item, index) => (
-                <Link href={"/"} className="w-6 h-6" key={index}>
+        <div className="w-full h-36 bg-primary-foreground text-lg font-medium flex flex-col justify-center items-center gap-2 relative rounded-lg">
+          <span>Connect with us</span>
+          <div className="flex flex-row gap-1.5 font-semibold">
+            {smRender.map((item, smindex) => (
+              <div key={smindex}>
+                <div className="w-7 h-7">
                   <Image
-                    src={smData[index].icon}
-                    alt={smData[index].name}
+                    src={smData[smindex].icon}
+                    alt={smData[smindex].name}
                     height={100}
                     width={100}
-                    className="w-full"
                   />
-                </Link>
-              ))}
-            </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

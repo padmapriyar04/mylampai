@@ -50,10 +50,10 @@ const Navbar = () => {
 
   if (bears)
     return (
-      <div className="flex shadow-sm bg-white justify-between z-20 items-center gap-4 backdrop-blur-sm transition pr-8 sticky top-0 w-full h-[4rem]">
+      <div className="flex bg-white justify-between z-20 items-center gap-4 backdrop-blur-sm transition px-8 sticky top-0 w-full h-[4rem]">
         <Link
           href={"/"}
-          className="grid place-items-center max-w-[200px] w-full h-full"
+          className="grid place-items-center max-w-[220px] w-full h-full"
         >
           <Image
             src={"/home/logo.svg"}
