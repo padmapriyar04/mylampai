@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import useInterviewStore from '../interview/store';
+import useInterviewStore from '@/utils/store';
 import * as pdfjsLib from 'pdfjs-dist/webpack';
 import 'pdfjs-dist/web/pdf_viewer.css';
 
@@ -73,7 +73,7 @@ const PDFViewer: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-4 h-screen p-4">
+    <div className="grid grid-cols-12 gap-4 h-[calc(100vh-4rem)] p-4">
       <div className="col-span-3 flex flex-col gap-4">
         <div className="bg-white p-4 rounded-lg shadow-md flex items-center gap-4">
           <div className="relative w-16 h-16 flex justify-center items-center">

@@ -2,7 +2,7 @@
 import React, { useState, DragEvent, ChangeEvent } from "react";
 import { IoDocumentAttach, IoCloudUploadOutline } from "react-icons/io5";
 import Image from "next/image";
-import  useInterviewStore  from '../interview/store';
+import  useInterviewStore  from '@/utils/store';
 
 interface StepOneTwoProps {
   step: number;
@@ -50,9 +50,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
             <Image src={"/images/Globe.svg"} className="w-full h-auto" alt="image" width={100} height={100}></Image>
             <div className="relative flex flex-col items-center mt-auto">
-              <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI mock Interview</h2>
+              <h2 className="text-xl font-bold text-center leading-snug">Take the wiZe AI CV review</h2>
               <p className="mt-2 text-center text-sm leading-relaxed">
-                You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview.{" "}
+                .....{" "}
                 <span className="font-semibold"> All the best!</span>
               </p>
             </div>
@@ -64,7 +64,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               <p className="text-2xl font-bold text-primary mb-2">Get Started!</p>
             </div>
 
-            <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
+            <div className="flex  items-center max-w-[250px] justify-center mb-2 w-full">
               {/* Progress Bar */}
               <div className="relative flex-1">
                 <div
@@ -89,7 +89,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                 ></div>
               </div>
               {/* Step 2 */}
-              <div className="relative flex-1">
+              <div className="relative">
                 <div
                   className={`w-8 h-8 ${
                     jobDescriptionFile || isManualEntry ? "bg-primary" : "bg-gray-400"
@@ -107,18 +107,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     <div className="w-3 h-3 bg-white rounded-full"></div>
                   )}
                 </div>
-                <div
-                  className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${
-                    jobDescriptionFile || isManualEntry ? "bg-primary w-full" : "bg-gray-400 w-full"
-                  } z-0`}
-                ></div>
               </div>
-              {/* Step 3 */}
-              <div className="relative  flex items-center">
-                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
-                </div>
-              </div>
+              
             </div>
 
             <div className="text-center mb-6 mt-3 w-[100%]">

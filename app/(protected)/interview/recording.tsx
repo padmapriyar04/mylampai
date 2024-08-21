@@ -148,9 +148,8 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit }) => {
   }, []);
 
   return (
-    <div>
-      {/* You can render the interim and final transcript if you want */}
-      <p>Interim: {interimTranscript}</p>
+    <div className='absolute bottom-0 right-1/2 translate-x-1/2 '>
+      {/* <p>Interim: {interimTranscript}</p> */}
       <p>Final: {transcript}</p>
     </div>
   );
