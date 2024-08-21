@@ -110,7 +110,7 @@ const DeviceSelection = ({
           </span>
         </div>
         <p className="text-center text-lg font-bold leading-relaxed">
-          Take the wiZe AI mock Interview
+          Take the wiinZe AI mock Interview
         </p>
         <p className="text-center text-sm mt-2 leading-relaxed">
           You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>

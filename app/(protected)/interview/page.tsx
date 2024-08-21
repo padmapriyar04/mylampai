@@ -17,6 +17,12 @@ import DeviceSelection from "./DeviceSelection"; // Importing the DeviceSelectio
 import { useRouterStore } from "@/utils/useRouteStore";
 import { toast } from "sonner";
 import { PiChatsThin } from "react-icons/pi";
+// import type { Metadata } from "next";
+
+// export const metadata: Metadata = {
+//     title: "MyLampAi - Interview",
+//     description: "MyLampAi - Home Page",
+// };
 
 const InterviewComponent = () => {
   const { changeRoute } = useRouterStore();
