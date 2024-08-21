@@ -94,7 +94,7 @@ const DeviceSelection = ({
     <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row md:justify-between">
       {/* Left Section */}
       <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
-        <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-56 mb-2"></video>
+        <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-[19vh] md:h-[22vh] mb-2"></video>
         <div className="flex justify-between w-full text-sm mb-32">
           <span className="flex items-center">
             <FiMic className="w-5 h-5 mr-1" />
