@@ -4,7 +4,7 @@ import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/home/Footer";
 import { Toaster } from "sonner";
 
-const openSans = Open_Sans({ subsets: ["latin"] });
+const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
 
 export default function RootLayout({
   children,

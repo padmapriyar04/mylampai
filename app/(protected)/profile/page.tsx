@@ -6,42 +6,11 @@ import { toast } from "sonner";
 
 export default function ProfilePage() {
   const { userData } = useUserStore();
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      console.log("userData", userData);
-      try {
-        const response = await fetch("/api/user/profile");
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log("userData", data);
-        } else if (response.status === 404) {
-          toast.error("User not found. Try logging in again.");
-        } else {
-          throw new Error("Failed to fetch user data");
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        toast.error("Failed to load user data. Please try again later.");
-        setLoading(false);
-      }
-    };
-    if (!userData) fetchUser();
-  }, [userData]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center m-auto">Loading...</div>
-    );
-  }
 
   if (!userData) {
     return (
       <div className="flex justify-center items-center h-screen">
-        User not found
+        Loading....
       </div>
     );
   }

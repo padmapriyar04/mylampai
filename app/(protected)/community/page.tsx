@@ -59,6 +59,7 @@ export default function Community() {
   const toggleHeading = (name: string, communityId: string) => {
     setSelectedCommunityId(communityId);
     setMessageHeading(name);
+    setMessages([]);
     socket.emit("check-join", { communityId });
   };
 
@@ -77,26 +78,29 @@ export default function Community() {
     }
   };
 
-  const joinCommunity = async (communityId: string) => {
-    try {
-      const response = await fetch(`/api/community/${communityId}/join`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        socket.emit("join-room", { communityId });
-        setMessages([]);
-        socket.emit("fetch-community-messages", { communityId });
-        toast.success("Joined to the community");
-      } else {
-        console.error("Error joining community:", response.statusText);
+  const joinCommunity = useCallback(
+    async (communityId: string) => {
+      try {
+        const response = await fetch(`/api/community/${communityId}/join`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          socket.emit("join-room", { communityId });
+          setMessages([]);
+          socket.emit("fetch-community-messages", { communityId });
+          toast.success("Joined to the community");
+        } else {
+          console.error("Error joining community:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error joining community:", error);
       }
-    } catch (error) {
-      console.error("Error joining community:", error);
-    }
-  };
+    },
+    [token],
+  );
 
   const leaveCommunity = async (communityId: string) => {
     try {
@@ -182,7 +186,10 @@ export default function Community() {
         );
         if (response.ok) {
           const data = await response.json();
-          toast.info(data.message);
+
+          if (data.exists === false) {
+            joinCommunity(communityId);
+          }
         }
       } catch (error) {
         toast.error("Error getting Info");
@@ -192,7 +199,7 @@ export default function Community() {
     if (selectedCommunityId !== null) {
       crossCheck(selectedCommunityId);
     }
-  }, [selectedCommunityId, token]);
+  }, [selectedCommunityId, token, joinCommunity]);
 
   const base64ToBlobUrl = (base64: string, type: string) => {
     const byteCharacters = atob(base64.split(",")[1]);
@@ -266,7 +273,9 @@ export default function Community() {
     <div className="w-full shadow-inner flex items-stretch justify-between h-[calc(100vh-4rem)] gap-4 p-4 ">
       <div className="w-full max-w-[440px] h-[calc(100vh-6rem)] flex flex-col items-stretch justify-start gap-4">
         <div className="w-full flex flex-col">
-          <div className="font-semibold text-gray-700">Hello {userData?.name.split(" ")[0] }!</div>
+          <div className="font-semibold text-gray-700">
+            Hello {userData?.name.split(" ")[0]}!
+          </div>
           <span className="text-sm text-gray-700">
             Learn with your peers to maximize learning
           </span>
@@ -315,24 +324,34 @@ export default function Community() {
                       </div>
                       <span className="pl-5 capitalize">{community.name}</span>
                     </div>
-                    <button
-                      className="text-sm font-semibold text-green-500 mr-4"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        joinCommunity(community.id);
-                      }}
-                    >
-                      Join
-                    </button>
                   </div>
                 ),
             )}
           </div>
         </div>
       </div>
-      <div className="w-full flex flex-col h-calc(100vh-6rem) bg-[#fff] overflow-hidden rounded-xl shadow-lg">
+      <div
+        className={`w-full flex flex-col items-center justify-center h-calc(100vh-6rem) bg-white overflow-hidden rounded-xl shadow-lg`}
+      >
         {selectedCommunityId === null ? (
-          <div>Select the Community</div>
+          <div className="max-w-[400px]">
+            <Image
+              src={"/community/communityicon.svg"}
+              alt="community"
+              width={1000}
+              height={1000}
+              className="w-full h-auto object-cover object-center"
+            />
+
+            <div className="flex flex-col items-center text-center">
+              <span className="text-2xl font-semibold text-primary">
+                Welcome to the Community
+              </span>
+              <span className="text-lg text-gray-700">
+                Select a community to start chatting
+              </span>
+            </div>
+          </div>
         ) : (
           <>
             <div className="flex flex-row bg-primary w-full p-2 items-center justify-between">
@@ -388,10 +407,12 @@ export default function Community() {
                       )}
 
                       <div
-                        className={`px-4 py-2 flex gap-2 hover:bg-[#fafafa]`}
+                        className={`px-4 py-1 ${
+                          showSender ? "pt-2" : "pt-0"
+                        } flex gap-2 hover:bg-[#fafafa] group`}
                       >
-                        <div className="max-w-12 w-full h-12 rounded-lg">
-                          {showSender && (
+                        <div className="max-w-12 w-full rounded-lg">
+                          {showSender && !showDate && (
                             <Image
                               src={"/home/profile.jpg"}
                               alt="user"
@@ -401,16 +422,23 @@ export default function Community() {
                             />
                           )}
                         </div>
-                        <div>
-                          <div className="text-primary font-semibold text-lg gap-x-3 uppercase flex items-center ">
-                            <div>
-                              {message.sender.first_name}{" "}
-                              {userData?.id === message.sender.id && "(Me)"}
-                            </div>
-                            <div className="text-[#333] font-normal text-sm">
+                        <div className="relative">
+                          {!showSender && (
+                            <div className="absolute hidden group-hover:block left-0 -translate-x-full text-xs w-14 text-[#777] -translate-y-1/2 top-1/2">
                               {format(new Date(message.createdAt), "h:mm a")}
                             </div>
-                          </div>
+                          )}
+                          {showSender && (
+                            <div className="text-primary font-semibold text-lg gap-x-3 uppercase flex items-center ">
+                              <div>
+                                {message.sender.first_name}{" "}
+                                {userData?.id === message.sender.id && "(Me)"}
+                              </div>
+                              <div className="text-[#333] font-normal text-sm">
+                                {format(new Date(message.createdAt), "h:mm a")}
+                              </div>
+                            </div>
+                          )}
 
                           {message.type === "text" ? (
                             <div className="text-base">{message.content}</div>

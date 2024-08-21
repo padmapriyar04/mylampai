@@ -9,7 +9,7 @@ import { Open_Sans } from "next/font/google";
 import AuthProvider from "@/components/auth/AuthProvider";
 import Flexsidebar from "@/components/misc/Flexsidebar";
 
-const openSans = Open_Sans({ subsets: ["latin"] });
+const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "MyLampAi - Home",
