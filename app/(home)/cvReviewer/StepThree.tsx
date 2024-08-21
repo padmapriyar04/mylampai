@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import useInterviewStore from '@/utils/store';
+import{ useInterviewStore} from '@/utils/store';
 import * as pdfjsLib from 'pdfjs-dist/webpack';
 import 'pdfjs-dist/web/pdf_viewer.css';
 
@@ -149,13 +149,13 @@ const PDFViewer = () => {
           </select>
         </div>
       </div>
-      <div className="col-span-5 bg-white rounded-lg">
-        <h2 className="text-2xl font-bold">Fixes or Corrections</h2>
+      <div className="col-span-5 bg-gray-200 rounded-md w-full shadow-md h-full">
+        <h2 className="text-xl font-bold pt-3 px-4">Fixes or Corrections</h2>
       </div>
       <div className="col-span-4 bg-white rounded-lg h-full flex flex-col justify-between">
-        <h2 className="text-2xl font-bold">Uploaded CV Preview</h2>
+        <h2 className="text-xl font-bold">Uploaded CV Preview</h2>
         <canvas ref={canvasRef} className="w-full h-[75vh]"></canvas>
-        <div className="flex justify-between">
+        <div className="flex justify-between relative top-1">
           <button onClick={handlePrevPage} disabled={pageNumber <= 1} className={`px-4 py-2 bg-primary border-4 border-primary-foreground rounded-xl transition  ${ pageNumber >= totalPages ? 'hover:bg-purple-600' : 'bg-primary' }`}>
             Previous Page
           </button>
