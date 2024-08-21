@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, DragEvent, ChangeEvent } from 'react';
 import StepOneTwo from './StepOneTwo'; // Adjust the path if necessary
-import useInterviewStore from '../interview/store';
+import useInterviewStore from '@/utils/store';
 import StepThree from './StepThree';
 import PDFViewer from './StepThree';
 
@@ -68,6 +68,8 @@ const Page: React.FC = () => {
       setJobDescriptionFile(new File([manualJobDescription], "manual-jd.txt", { type: "text/plain" }));
     }
   };
+
+  const pdfUrl = "./Resume.pdf"
 
   return (
     <div>

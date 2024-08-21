@@ -9,7 +9,7 @@ import React, {
 import { IoDocumentAttach } from "react-icons/io5";
 import AudioToText from "./recording";
 import { FiMic, FiSpeaker, FiVideo, FiMessageSquare } from "react-icons/fi";
-import useInterviewStore from "./store";
+import useInterviewStore from "../../../utils/store";
 import Image from "next/image";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { FaRegFileAlt } from "react-icons/fa";
