@@ -83,7 +83,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   }, [resumeFile]);
 
   const handleAnalysisChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
+    event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSelectedAnalysis(event.target.value);
     runAnalysis(event.target.value);
@@ -98,83 +98,83 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       case "quantification_checker":
         endpoint = "/quantification";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "resume_length":
         endpoint = "/resume_length";
         data = {
           text: extractedText,
-          experience: "FRESHER"
-        }
+          experience: "FRESHER",
+        };
         break;
       case "bullet_point_length":
         endpoint = "/bullet_point_length";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "bullet_points_improver":
         endpoint = "/bullet_points_improver";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "total_bullet_points":
         endpoint = "/total_bullet_list";
         query = `?experience=FRESHER`;
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "verb_tense_checker":
         endpoint = "/verb_tense";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "weak_verb_checker":
         endpoint = "/weak_verb_checker";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "section_checker":
         endpoint = "/section_checker";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "skill_checker":
         endpoint = "/skill_checker";
         data = {
-          extracted_data: structuredData
-        }
-        query = `?profile=${profile}`
+          extracted_data: structuredData,
+        };
+        query = `?profile=${profile}`;
         break;
       case "repetition_checker":
         endpoint = "/repetition";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "personal_info":
         endpoint = "/personal_info";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "responsibility_checker":
         endpoint = "/responsibility";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       case "spelling_checker":
         endpoint = "/spelling_checker";
         data = {
-          extracted_data: structuredData
-        }
+          extracted_data: structuredData,
+        };
         break;
       default:
         console.log("Unknown analysis type");
@@ -186,7 +186,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-4 min-h-[calc(100vh-4rem)] p-4">
+    <div className="grid grid-cols-12 gap-2 p-2">
       <div className="col-span-3 flex flex-col gap-4">
         <div className="bg-white p-4 rounded-lg shadow-md flex items-center gap-4">
           <div className="relative w-16 h-16 flex justify-center items-center">

@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, DragEvent, ChangeEvent } from "react";
+import React, { useState, DragEvent, ChangeEvent, useRef } from "react";
 import StepOneTwo from "./StepOneTwo"; // Adjust the path if necessary
 import { useInterviewStore } from "@/utils/store";
 import StepThree from "./StepThree";
 import PDFViewer from "./StepThree";
+import { toast } from "sonner";
 
 const Page: React.FC = () => {
   const { resumeFile, setResumeFile, setJobDescriptionFile, structuredData } =
@@ -12,6 +13,8 @@ const Page: React.FC = () => {
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState("");
   const [profile, setProfile] = useState<string>("SOFTWARE");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [customProfile, setCustomProfile] = useState("");
 
   const handleDrop = (
     event: DragEvent<HTMLDivElement>,
@@ -87,10 +90,8 @@ const Page: React.FC = () => {
   const pdfUrl = "./Resume.pdf";
 
   return (
-    <div>
-      {(step === 3) ? (
-        <PDFViewer profile={profile} />
-      ) : (
+    <div className="w-full m-auto min-h-[calc(100vh-4rem)]">
+      {step === 1 || step === 2 ? (
         <StepOneTwo
           step={step}
           setStep={setStep}
@@ -107,7 +108,11 @@ const Page: React.FC = () => {
           isManualEntry={isManualEntry}
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
+          customProfile={customProfile}
+          setCustomProfile={setCustomProfile}
         />
+      ) : (
+        <PDFViewer profile={profile} />
       )}
     </div>
   );
