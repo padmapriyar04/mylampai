@@ -1,9 +1,11 @@
 "use client";
-import React, { useState, DragEvent, ChangeEvent } from 'react';
+import React, { useState, DragEvent, ChangeEvent, useRef } from 'react';
 import StepOneTwo from './StepOneTwo'; // Adjust the path if necessary
 import {useInterviewStore} from '@/utils/store';
 import StepThree from './StepThree';
 import PDFViewer from './StepThree';
+import { toast } from "sonner";
+
 
 const Page: React.FC = () => {
   const { setResumeFile, setJobDescriptionFile } = useInterviewStore();
@@ -11,7 +13,10 @@ const Page: React.FC = () => {
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState('');
   const [structuredData, setStructuredData] = useState<any>(null);
-  const [profile, setProfile] = useState<string>("SOFTWARE")
+  const [profile, setProfile] = useState<string>("SOFTWARE");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [customProfile, setCustomProfile] = useState("");
+  
 
   const handleDrop = (event: DragEvent<HTMLDivElement>, setFile: (file: File) => void) => {
     event.preventDefault();
@@ -95,6 +100,7 @@ const Page: React.FC = () => {
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
           setStructuredData={setStructuredData}
+          setCustomProfile={setCustomProfile}
         />
       ) : step === 3 ? (
         <PDFViewer
