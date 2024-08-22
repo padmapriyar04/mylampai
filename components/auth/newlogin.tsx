@@ -242,7 +242,7 @@ const AuthForm: React.FC = () => {
         if (data.user.role === "admin") {
           router.push("/adminDashboard");
         } else {
-          router.push("/questions");
+          router.push("/profile");
         }
       } else {
         const errorData = await response.json();

@@ -108,7 +108,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               await extractStructuredData(extractedText);
 
             if (structuredDataResult) {
-              setStructuredData(structuredDataResult.message);
+              // setStructuredData(structuredDataResult.message);
               setUploading(false);
             }
           } catch (err) {
@@ -145,21 +145,22 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
   async function extractStructuredData(text: string) {
     try {
-      const response = await fetch(`${baseUrl}/extract_structured_data`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cv_text: text }),
-      });
 
-      const result = await response.json();
-      if (response.ok) {
+      // const response = await fetch(`${baseUrl}/extract_structured_data`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ cv_text: text }),
+      // });
+
+      // const result = await response.json();
+      // if (response.ok) {
         setIsResumeUploaded(true);
-        toast.success("Resume uploaded successfully");
-        return result;
-      }
-      toast.error("Error extracting structured data from resume");
+      //   toast.success("Resume uploaded successfully");
+      //   return result;
+      // }
+      // toast.error("Error extracting structured data from resume");
       return null;
     } catch (error) {
       toast.error("Error extracting structured data from resume");

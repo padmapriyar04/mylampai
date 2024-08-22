@@ -1,8 +1,10 @@
+"use client"
 import Image from "next/image";
 import { HiOutlineDocumentCheck } from "react-icons/hi2";
 import Link from "next/link";
 import { RiComputerLine } from "react-icons/ri";
 import { FaLinkedin } from "react-icons/fa";
+import { toast } from "sonner";
 
 export default function Achieve() {
   return (
@@ -27,6 +29,7 @@ export default function Achieve() {
           </Link>
           <Link
             href="/cvreviewer"
+            onClick={() => toast.info("Redirecting to CV Reviewer")}
             className="bg-primary  py-2 md:py-5 px-3 w-1/2 font-semibold text-white md:text-2xl rounded-lg border-2 border-primary text-center hover:bg-purple-600 transition"
           >
             Get CV Reviewed
@@ -53,7 +56,8 @@ export default function Achieve() {
             Past Analysis
           </Link>
           <Link
-            href="/cvreviewer"
+            href="/interview"
+            onClick={() => toast.info("Redirecting to AI Interviewer")}
             className="bg-primary py-2 md:py-5 px-3 w-1/2 font-semibold text-white md:text-2xl rounded-lg border-2 border-primary text-center hover:bg-purple-600 transition"
           >
             Get Interviewed
