@@ -16,8 +16,10 @@ import Lock from "../../public/images/icons8-lock.svg";
 import GoogleImg from "../../public/images/Google_Icons-09-512.png";
 
 const AuthForm: React.FC = () => {
-  const { userData, setUserData } = useUserStore();
+  const { userData, setUserData, clearUser } = useUserStore();
   const [isSignUp, setIsSignUp] = useState(true);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [isOTPVerifing, setIsOTPVerifing] = useState(false);
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
@@ -66,11 +68,30 @@ const AuthForm: React.FC = () => {
   };
 
   const sendOTP = async () => {
+    
+    if (!user.firstName || !user.lastName || !user.email || !user.phone || !user.password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    if (!validateEmail(user.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
     if (!validatePhone(user.phone)) {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
-
+    if (!otpVerified) {
+      toast.error("Please verify OTP first.");
+      return;
+    }
+    if (!agreeToTerms) {
+      toast.error("Please agree to the terms and conditions.");
+      return;
+    }
+      
+    setIsOTPVerifing(true);
+    
     try {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
@@ -89,6 +110,7 @@ const AuthForm: React.FC = () => {
       console.error("Error sending OTP:", error);
       toast.error("An error occurred while sending OTP");
     }
+    setIsOTPVerifing(false);
   };
 
   const verifyOTP = async () => {
@@ -96,7 +118,9 @@ const AuthForm: React.FC = () => {
       toast.error("Please enter OTP.");
       return;
     }
-
+    
+    setIsOTPVerifing(true);
+    
     try {
       const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
@@ -115,11 +139,24 @@ const AuthForm: React.FC = () => {
       console.error("Error verifying OTP:", error);
       toast.error("An error occurred while verifying OTP");
     }
+    setIsOTPVerifing(false);
   };
 
   const handleSubmitSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!user.firstName || !user.lastName || !user.email || !user.phone || !user.password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    if (!validateEmail(user.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (!validatePhone(user.phone)) {
+      toast.error("Please enter a valid 10-digit phone number.");
+      return;
+    }
     if (!otpVerified) {
       toast.error("Please verify OTP first.");
       return;
@@ -128,23 +165,9 @@ const AuthForm: React.FC = () => {
       toast.error("Please agree to the terms and conditions.");
       return;
     }
-    if (!user.firstName || !user.lastName) {
-      toast.error("Please enter your full name.");
-      return;
-    }
-    if (!validateEmail(user.email)) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
-    if (!validatePhone(user.phone)) {
-      toast.error("Please enter a valid 10-digit phone number.");
-      return;
-    }
-    if (!user.password) {
-      toast.error("Please enter a password.");
-      return;
-    }
-
+    
+    
+    setIsSigningUp(true);
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -159,20 +182,26 @@ const AuthForm: React.FC = () => {
           role: "user"
         }),
       });
+      
+      
 
       if (res.ok) {
         const userData = await res.json();
+        setCookie("token", userData.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(userData.user), 7); // Set cookie for 7 days
         toast.success("Registration successful!");
+        setUserData(userData.user, userData.token);
+        setIsSigningUp(false);
         router.push("/questions");
       } else {
         const errorData = await res.json();
-        toast.error(errorData.error || "Registration failed");
+        toast.error(errorData.error || "Registration failed")
       }
     } catch (error) {
       console.error("Register error:", error);
       toast.error("An error occurred during registration");
     }
+    setIsSigningUp(false);
   };
 
   const handleSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
@@ -239,11 +268,8 @@ const AuthForm: React.FC = () => {
   };
   
   useEffect(()=> {
-    if (userData) {
-      toast.success("Already Logged In");
-      router.push("/")
-    }
-  }, [router, userData])
+    clearUser();
+  }, [clearUser])
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
@@ -331,7 +357,7 @@ const AuthForm: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex flex-col md:flex-row md:space-x-4 items-center mt-4">
+                <div className="flex flex-col md:flex-row md:space-x-4 items-center">
                   <Input
                     name="password"
                     placeholder="Password"
@@ -339,20 +365,20 @@ const AuthForm: React.FC = () => {
                     value={user.password}
                     onChange={handleChange}
                   />
-                  <div className="relative w-full mt-4 md:mt-0">
+                  <div className="relative w-full md:mt-0">
                     <input
                       type="text"
                       placeholder="Enter OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
-                      className="w-full p-2 pl-3 pr-24 border-2 outline-none focus:border-primary-foreground rounded-md text-black placeholder:text-gray-400 font-semibold hover:border-primary-foreground transition-all duration-300"
+                      className="w-full px-4 py-3 border-2 bg-white outline-none rounded-md text-[#222] placeholder:text-gray-400 placeholder:font-semibold  focus:border-primary-foreground font-medium border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
                     <button
                       type="button"
                       onClick={otpSent ? verifyOTP : sendOTP}
                       className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-white py-1 px-3 rounded-md text-sm font-medium transition-all duration-200"
                     >
-                      {otpSent ? "Verify OTP" : "Send OTP"}
+                      {otpSent ? (isOTPVerifing ? "Verifing" : "Verify OTP") : (isOTPVerifing ? "Sending" : "Send OTP")}
                     </button>
                   </div>
                 </div>
@@ -392,13 +418,13 @@ const AuthForm: React.FC = () => {
                       onClick={() => setIsSignUp(false)}
                       className="text-primary font-semibold"
                     >
-                      Sign In
+                      {isSigningUp ? "Signing In" : "Sign In"}
                     </button>
                   </div>
                   <div className="flex space-x-6 mr-8 mb-1">
                     <button
                       type="submit"
-                      className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl"
+                      className="bg-primary text-white px-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl"
                     >
                       <span>Sign Up</span>
                       <Image

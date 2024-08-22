@@ -331,7 +331,7 @@ export default function Community() {
         </div>
       </div>
       <div
-        className={`w-full flex flex-col items-center justify-center h-calc(100vh-6rem) bg-white overflow-hidden rounded-xl shadow-lg`}
+        className={`w-full flex flex-col items-center justify-center h-calc(100vh-6rem) ${selectedCommunityId === null ? "bg-[#fafafa]" : "bg-white"} overflow-hidden rounded-xl shadow-lg`}
       >
         {selectedCommunityId === null ? (
           <div className="max-w-[400px]">

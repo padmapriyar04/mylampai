@@ -43,7 +43,7 @@ export default function Flexsidebar() {
     };
   }, []);
 
-  if (pathname === "/interview") return null;
+  if (pathname === "/interview" || pathname === "/cvreviewer") return null;
 
   return (
     <>

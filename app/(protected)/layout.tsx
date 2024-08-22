@@ -45,7 +45,7 @@ export default function ProtectedLayout({
             <Flexsidebar />
             {children}
           </div>
-          <Toaster />
+          <Toaster position="top-center" />
         </AuthProvider>
       </body>
     </html>

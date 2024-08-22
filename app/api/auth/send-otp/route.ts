@@ -34,12 +34,12 @@ export async function POST(req: NextRequest) {
     try {
       await prisma.oTP.create({
         data: {
-          email,
           otp,
           expiresAt,
           userId: user.id,
+          email
         },
-      });
+      })
 
       const info = await transporter.sendMail({
         from: process.env.EMAIL_USER,
