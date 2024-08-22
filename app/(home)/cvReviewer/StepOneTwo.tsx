@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useInterviewStore } from "@/utils/store";
 import { toast } from "sonner";
 import * as pdfjsLib from "pdfjs-dist";
-
+import { useUserStore } from "@/utils/userStore";
 const baseUrl = "https://cv-judger.onrender.com";
 
 interface StepOneTwoProps {
@@ -53,75 +53,81 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
+  
+  const {token} = useUserStore()
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     const file = event.target.files?.[0];
 
     setUploading(true);
 
     if (file && file.type === "application/pdf") {
-      const fileReader = new FileReader();
-
-      // Limiting the file size to 5MB
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size should be less than 5MB");
-        return;
-      }
-
-      setResumeFile(file);
-
-      let extractedText = "";
-
-      fileReader.onload = async function () {
-        const typedArray: ArrayBuffer = new Uint8Array(
-          this.result as ArrayBuffer,
-        );
-
-        // Load the PDF document
-        const pdf = await pdfjsLib.getDocument(typedArray).promise;
-
-        // Loop through each page
-        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-          const page = await pdf.getPage(pageNumber);
-          const textContent = await page.getTextContent();
-
-          // Extract text
-          const pageText = textContent.items
-            .map((item: any) => item.str)
-            .join(" ");
-
-          extractedText += pageText + "\n";
-        }
-        console.log(extractedText);
-
-        if (extractedText) {
-          try {
-            setExtractedText(extractedText);
-            const structuredDataResult =
-              await extractStructuredData(extractedText);
-
-            if (structuredDataResult) {
-              setStructuredData(structuredDataResult.message);
-              setUploading(false);
-            }
-          } catch (err) {
+        // Limiting the file size to 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("File size should be less than 5MB");
             setUploading(false);
-          }
-        } else {
-          toast.error("Error extracting text from PDF");
-          setUploading(false);
+            return;
         }
-      };
-      fileReader.readAsArrayBuffer(file);
-    } else {
-      toast.error("Please upload a PDF file");
-      setUploading(false);
-    }
-  };
 
+        const fileReader = new FileReader();
+        let extractedText = "";
+
+        // This function is called when the file is fully loaded
+        fileReader.onload = async function () {
+            const typedArray: ArrayBuffer = new Uint8Array(this.result as ArrayBuffer);
+
+            // Load the PDF document
+            const pdf = await pdfjsLib.getDocument(typedArray).promise;
+
+            // Loop through each page
+            for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+                const page = await pdf.getPage(pageNumber);
+                const textContent = await page.getTextContent();
+
+                // Extract text
+                const pageText = textContent.items
+                    .map((item: any) => item.str)
+                    .join(" ");
+
+                extractedText += pageText + "\n";
+            }
+
+            // Convert the file to base64
+            const base64Reader = new FileReader();
+            base64Reader.onloadend = async () => {
+                const base64String = base64Reader.result?.toString().split(",")[1]; // Convert to base64 string
+
+                if (base64String && extractedText) {
+                    try {
+                        setExtractedText(extractedText);
+                        const structuredDataResult = await extractStructuredData(extractedText);
+
+                        if (structuredDataResult) {
+                            setStructuredData(structuredDataResult.message);
+                        }
+
+                        // Trigger the upload of CV and Job Description with base64 string and extracted text
+                        await uploadCVAndJobDescription(base64String, extractedText);
+                    } catch (err) {
+                        toast.error("Failed to process the PDF");
+                        console.error("Error:", err);
+                    }
+                } else {
+                    toast.error("Error converting file to base64 or extracting text");
+                }
+            };
+            base64Reader.readAsDataURL(file); // Start reading the file as a data URL
+        };
+
+        fileReader.readAsArrayBuffer(file);
+    } else {
+        toast.error("Please upload a PDF file");
+        setUploading(false);
+    }
+};
+
+  
   const extractTextFromPDF = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -138,6 +144,39 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       return null;
     }
   };
+
+  const uploadCVAndJobDescription = async (base64String: string, extractedText: string) => {
+    try {
+        if (!token) {
+            toast.error("Unauthorized");
+            return;
+        }
+
+        const response = await fetch("/api/interviewer/post_cv", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                Resume: base64String, // Sending base64 string of the PDF
+                JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
+            }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            toast.success("CV and Job Description uploaded successfully");
+            // Handle successful upload
+        } else {
+            toast.error(result.error || "Failed to upload CV and Job Description");
+        }
+    } catch (error) {
+        toast.error("An error occurred while uploading CV and Job Description");
+        console.error("Error:", error);
+    }
+};
 
   async function extractStructuredData(text: string) {
     try {
