@@ -10,6 +10,7 @@ const Page: React.FC = () => {
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState('');
+  const [structuredData, setStructuredData] = useState<any>(null);
 
   const handleDrop = (event: DragEvent<HTMLDivElement>, setFile: (file: File) => void) => {
     event.preventDefault();
@@ -68,6 +69,8 @@ const Page: React.FC = () => {
       setJobDescriptionFile(new File([manualJobDescription], "manual-jd.txt", { type: "text/plain" }));
     }
   };
+  
+  console.log("structured Data", structuredData)
 
   const pdfUrl = "./Resume.pdf"
 
@@ -90,6 +93,7 @@ const Page: React.FC = () => {
           isManualEntry={isManualEntry}
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
+          setStructuredData={setStructuredData}
         />
       ) : step === 3 ? (
         <PDFViewer />

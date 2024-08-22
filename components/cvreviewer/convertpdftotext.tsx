@@ -1,21 +1,26 @@
-import React, { useState } from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
+"use client";
+import React, { useState } from "react";
+import * as pdfjsLib from "pdfjs-dist";
 
-const PdfUploader = () => {
-  const [textContent, setTextContent] = useState('');
+interface PDFUploaderProps {
+  setExtractedText: (text: string) => void;
+}
 
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
+const PdfUploader: React.FC<PDFUploaderProps> = ({ setExtractedText }) => {
+  const [textContent, setTextContent] = useState("");
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && file.type === "application/pdf") {
       const fileReader = new FileReader();
 
       fileReader.onload = async function () {
-        const typedArray = new Uint8Array(this.result);
+        const typedArray: ArrayBuffer = new Uint8Array(this.result as ArrayBuffer);
 
         // Load the PDF document
         const pdf = await pdfjsLib.getDocument(typedArray).promise;
 
-        let extractedText = '';
+        let extractedText = "";
 
         // Loop through each page
         for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
@@ -23,19 +28,19 @@ const PdfUploader = () => {
           const textContent = await page.getTextContent();
 
           // Extract text
-          const pageText = textContent.items
-            .map(item => item.str)
-            .join(' ');
+          const pageText = textContent.items.map((item: any) => item.str ).join(" ");
 
-          extractedText += pageText + '\n';
+          extractedText += pageText + "\n";
         }
+  
 
         setTextContent(extractedText);
+        setExtractedText(extractedText);
       };
 
       fileReader.readAsArrayBuffer(file);
     } else {
-      alert('Please upload a valid PDF file.');
+      alert("Please upload a valid PDF file.");
     }
   };
 
