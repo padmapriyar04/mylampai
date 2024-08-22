@@ -272,9 +272,9 @@ const AuthForm: React.FC = () => {
   }, [clearUser])
 
   return (
-    <div className="bg-primary-foreground flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
-      <div className="bg-[#fcfcfc] rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-3 w-full max-w-5xl flex flex-col md:flex-row min-h-[600px] shadow-md">
-        <div className="md:block w-full md:max-w-[350px] bg-purple-500 rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-4 flex flex-col items-center justify-between mb-4 md:mb-0 relative">
+    <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0">
+      <div className="bg-[#fcfcfc] rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center">
+        <div className="md:block w-full md:max-w-[350px] bg-purple-500 rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 flex flex-col items-center justify-between mb-4 md:mb-0 relative h-full">
           <Carousel
             showThumbs={false}
             showStatus={false}
@@ -283,7 +283,7 @@ const AuthForm: React.FC = () => {
             interval={5000}
             showArrows={false}
             showIndicators={false}
-            className="w-full h-full flex flex-col justify-between"
+            className="w-full  md:h-full flex flex-col justify-between"
           >
             <div className="flex justify-center items-center h-full">
               <Image
@@ -306,7 +306,7 @@ const AuthForm: React.FC = () => {
           </Carousel>
         </div>
 
-        <div className="w-full h-[80vh] p-4 md:p-6 flex flex-col justify-evenly">
+        <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 gap-2 flex flex-col justify-center ">
           {isSignUp ? (
             <>
               <div className="text-popover-foreground  flex flex-col">
@@ -343,7 +343,7 @@ const AuthForm: React.FC = () => {
                   onChange={handleChange}
                 />
 
-                <div className="flex flex-col mt-4 md:flex-row md:space-x-4 ">
+                <div className="flex flex-col mt-4 md:flex-row md:space-x-2 ">
                   <div className="flex items-center justify-evenly w-full max-w-[150px] border-2 rounded-md mb-4 md:mb-0">
                     <CountrySelector />
                   </div>
@@ -357,7 +357,7 @@ const AuthForm: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex flex-col md:flex-row md:space-x-4 items-center">
+                <div className="flex flex-col md:flex-row md:space-x-2 items-center">
                   <Input
                     name="password"
                     placeholder="Password"
@@ -467,7 +467,7 @@ const AuthForm: React.FC = () => {
               </div>
 
               <form onSubmit={handleSubmitLogin} className="space-y-10 mt-4">
-                <div>
+                <div className="flex flex-col gap-2">
                   <input
                     type="email"
                     name="email"
@@ -479,7 +479,7 @@ const AuthForm: React.FC = () => {
                   <Link
                     href="#"
                     onClick={() => setIsOtpLogin(!isOtpLogin)}
-                    className="text-blue-500 font-semibold text-le hover:text-blue-700 transition-colors duration-300 "
+                    className="text-blue-500 font-semibold text-le hover:text-blue-700 transition-colors duration-300"
                   >
                     {isOtpLogin ? "Login with Password" : "Login via OTP"}
                   </Link>
@@ -494,7 +494,7 @@ const AuthForm: React.FC = () => {
                       onChange={(e) => setOtp(e.target.value)}
                       className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
-                    <div className="flex items-center">
+                    <div className="flex items-center mt-3 ml-[-10px]">
                       <Image
                         src={Lock}
                         alt="Image beside Forgot password"
@@ -502,7 +502,7 @@ const AuthForm: React.FC = () => {
                       />
                       <Link
                         href="/forgot-password"
-                        className="text-blue-500 font-semibold text-left hover:text-blue-700 transition-colors duration-300"
+                        className="text-blue-500 font-semibold text-left hover:text-blue-700 transition-colors duration-300 "
                       >
                         Didn&apos;t Receive OTP yet?
                       </Link>
@@ -511,7 +511,7 @@ const AuthForm: React.FC = () => {
                       <button
                         type="button"
                         onClick={verifyOTP}
-                        className="absolute right-2 top-1/3 transform -translate-y-1/2 bg-green-500 text-white p-1 rounded-xl text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
+                        className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-green-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
                       >
                         Verify OTP
                       </button>
@@ -519,7 +519,7 @@ const AuthForm: React.FC = () => {
                       <button
                         type="button"
                         onClick={sendOTP}
-                        className="absolute right-2 top-1/3 transform -translate-y-1/2 bg-purple-500 text-white p-1 rounded-xl text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
+                        className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-purple-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
                       >
                         Send OTP
                       </button>
@@ -535,7 +535,7 @@ const AuthForm: React.FC = () => {
                       onChange={handleCredentialsChange}
                       className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
-                    <div className="flex items-center mt-3">
+                    <div className="flex items-center mt-3 ml-[-10px]">
                       <Image
                         src={Lock}
                         alt="Image beside Forgot password"
