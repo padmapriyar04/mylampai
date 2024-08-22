@@ -1,16 +1,23 @@
 "use client";
-import React, { useState, DragEvent, ChangeEvent } from 'react';
-import StepOneTwo from '@/components/cvreviewer/StepOneTwo'; // Adjust the path if necessary
-import {useInterviewStore} from '@/utils/store';
-import PDFViewer from '@/components/cvreviewer/StepThree';
+import React, { useState, DragEvent, ChangeEvent, useRef } from "react";
+import StepOneTwo from "./StepOneTwo"; // Adjust the path if necessary
+import { useInterviewStore } from "@/utils/store";
+import PDFViewer from "./StepThree";
 
 const Page: React.FC = () => {
-  const { setResumeFile, setJobDescriptionFile } = useInterviewStore();
+  const { resumeFile, setResumeFile, setJobDescriptionFile, structuredData } =
+    useInterviewStore();
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
-  const [manualJobDescription, setManualJobDescription] = useState('');
+  const [manualJobDescription, setManualJobDescription] = useState("");
+  const [profile, setProfile] = useState<string>("SOFTWARE");
+  const [selectedOption, setSelectedOption] = useState("");
+  const [customProfile, setCustomProfile] = useState("");
 
-  const handleDrop = (event: DragEvent<HTMLDivElement>, setFile: (file: File) => void) => {
+  const handleDrop = (
+    event: DragEvent<HTMLDivElement>,
+    setFile: (file: File) => void
+  ) => {
     event.preventDefault();
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
@@ -27,7 +34,9 @@ const Page: React.FC = () => {
   };
 
   const triggerFileInput = (inputId: string) => {
-    const inputElement = document.getElementById(inputId) as HTMLInputElement | null;
+    const inputElement = document.getElementById(
+      inputId
+    ) as HTMLInputElement | null;
     if (inputElement) {
       inputElement.click();
     }
@@ -45,7 +54,9 @@ const Page: React.FC = () => {
     setStep((prevStep) => prevStep - 1);
   };
 
-  const handleJobDescriptionUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleJobDescriptionUpload = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target?.files?.[0];
     if (file) {
       setJobDescriptionFile(file);
@@ -59,19 +70,25 @@ const Page: React.FC = () => {
 
   const handleUploadJDToggle = () => {
     setIsManualEntry(false);
-    setManualJobDescription('');
+    setManualJobDescription("");
   };
 
   const handleManualJDUpload = () => {
     if (manualJobDescription.trim()) {
-      setJobDescriptionFile(new File([manualJobDescription], "manual-jd.txt", { type: "text/plain" }));
+      setJobDescriptionFile(
+        new File([manualJobDescription], "manual-jd.txt", {
+          type: "text/plain",
+        })
+      );
     }
   };
 
-  const pdfUrl = "./Resume.pdf"
+  console.log("structured Data", structuredData);
+
+  const pdfUrl = "./Resume.pdf";
 
   return (
-    <div className='w-full'>
+    <div className="w-full m-auto min-h-[calc(100vh-4rem)]">
       {step === 1 || step === 2 ? (
         <StepOneTwo
           step={step}
@@ -89,10 +106,12 @@ const Page: React.FC = () => {
           isManualEntry={isManualEntry}
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
+          customProfile={customProfile}
+          setCustomProfile={setCustomProfile}
         />
-      ) : step === 3 ? (
-        <PDFViewer />
-      ) : null}
+      ) : (
+        <PDFViewer profile={profile} />
+      )}
     </div>
   );
 };

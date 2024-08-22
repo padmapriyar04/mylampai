@@ -9,7 +9,6 @@ import * as pdfjsLib from "pdfjs-dist";
 const baseUrl = "https://cv-judger.onrender.com";
 
 
-
 interface StepOneTwoProps {
   step: number;
   setStep: (step: number) => void;
@@ -31,7 +30,6 @@ interface StepOneTwoProps {
   isManualEntry: boolean;
   manualJobDescription: string;
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
-  setStructuredData: React.Dispatch<React.SetStateAction<any>>;
   customProfile: string;
   setCustomProfile: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -51,11 +49,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   isManualEntry,
   manualJobDescription,
   setManualJobDescription,
-  setStructuredData,
   customProfile,
   setCustomProfile,
 }) => {
-  const { resumeFile, setResumeFile, setExtractedText, jobDescriptionFile } =
+  const { resumeFile, setResumeFile, setExtractedText, jobDescriptionFile, setStructuredData } =
     useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -72,7 +69,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       const fileReader = new FileReader();
 
       // Limiting the file size to 5MB
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 1024 * 1024) {
         toast.error("File size should be less than 5MB");
         return;
       }
@@ -101,6 +98,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
           extractedText += pageText + "\n";
         }
+
         console.log(extractedText);
 
         if (extractedText) {
@@ -165,6 +163,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       return null;
     } catch (error) {
       toast.error("Error extracting structured data from resume");
+      setUploading(false)
       return null;
     }
   }
@@ -342,7 +341,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     ? "bg-gray-600 hover:bg-gray-800 text-white"
                     : "bg-gray-300 text-gray-800 cursor-not-allowed"
                 }`}
-                disabled={!isResumeUploaded}
+                // disabled={!isResumeUploaded}
                 onClick={handleNextClick}
               >
                 Next
@@ -471,10 +470,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     ? "bg-gray-600 hover:bg-gray-800 text-white"
                     : "bg-gray-300 text-gray-800 cursor-not-allowed"
                 }`}
-                disabled={
-                  !jobDescriptionFile &&
-                  !(isManualEntry && manualJobDescription)
-                }
+                // disabled={
+                //   !jobDescriptionFile &&
+                //   !(isManualEntry && manualJobDescription)
+                // }
                 onClick={handleNextClick}
               >
                 Next
