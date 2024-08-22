@@ -17,6 +17,8 @@ import DeviceSelection from "./DeviceSelection"; // Importing the DeviceSelectio
 import { useRouterStore } from "@/utils/useRouteStore";
 import { toast } from "sonner";
 import { PiChatsThin } from "react-icons/pi";
+import { FiX } from "react-icons/fi"; // Import the FiX icon
+
 // import type { Metadata } from "next";
 
 // export const metadata: Metadata = {
@@ -27,12 +29,8 @@ import { PiChatsThin } from "react-icons/pi";
 const InterviewComponent = () => {
   const { changeRoute } = useRouterStore(); // for hiding the default navbar in interview section
   const [isMounted, setIsMounted] = useState(false);
-  const {
-    resumeFile,
-    setResumeFile,
-    jobDescriptionFile,
-    setJobDescriptionFile,
-  } = useInterviewStore();
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [jobDescriptionFile, setJobDescriptionFile] = useState<File | null>(null);
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState("");
@@ -42,6 +40,8 @@ const InterviewComponent = () => {
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const [isMicEnabled, setIsMicEnabled] = useState(false);
   const [isMicTestEnabled, setIsMicTestEnabled] = useState(false);
+  const [isMicTestCompleted, setIsMicTestCompleted] = useState(false);
+
   const [cvText, setCvText] = useState("");
   const [JD, setJD] = useState("");
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
@@ -61,11 +61,58 @@ const InterviewComponent = () => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const rafIdRef = useRef<number | null>(null);
-
+  const [loading,setLoading] = useState(true)
+  const [isRecognitionActive, setIsRecognitionActive] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const allDevicesConfigured =
     isCameraEnabled && isMicEnabled && isSoundEnabled;
 
   const websocketRef = useRef<WebSocket | null>(null);
+
+  const jobProfiles = [
+    "Software Engineer",
+    "Data Scientist",
+    "Product Manager",
+    "UI/UX Designer",
+    "Business Analyst",
+    "DevOps Engineer",
+    "System Administrator",
+  ];
+
+  useEffect(() => {
+    const savedResume = localStorage.getItem('resumeFile');
+    
+    if (savedResume) {
+      const file = base64ToFile(savedResume, 'resume.pdf');
+      setResumeFile(file);
+      setIsUploading(true); // Set uploading to true if a resume is found on reload
+      sendResumeToWebSocket(file);
+    }
+  
+    setIsMounted(true);
+  }, []);
+  
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+  
+  const base64ToFile = (base64String: string, filename: string): File => {
+    const arr = base64String.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  };
 
   type ChatMessage = {
     user: string;
@@ -85,8 +132,7 @@ const InterviewComponent = () => {
     });
   };
 
-  const [loading, setLoading] = useState(true); // Add loading state
-
+  
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -105,6 +151,7 @@ const InterviewComponent = () => {
         const data = JSON.parse(event.data);
         if (data.type === "cv_uploaded") {
           console.log("CV uploaded:", data.message);
+          setIsUploading(false);
           setCvText(data.cv_text); // Update the state with CV text
         } else if (data.type === "jd_analyzed") {
           console.log("Job description analyzed:", data.message);
@@ -116,6 +163,7 @@ const InterviewComponent = () => {
             { user: "Interviewer", message: data.question },
           ]);
           setTextToSpeak(data.question);
+          setLoading(false); // Stop loading when the question is received
         } else if (data.type === "interview_end") {
           console.log("Interview ended:", data.message);
           setChatMessages((prevMessages) => [
@@ -152,6 +200,9 @@ const InterviewComponent = () => {
       );
     }
   };
+  
+
+  
 
   const handleTextSubmit = (text: string) => {
     setAudioTextInputs((prevInputs) => [...prevInputs, text]); // Store the audio-to-text input
@@ -174,18 +225,18 @@ const InterviewComponent = () => {
 
   const handleSpeak = () => {
     if (!textToSpeak) return;
-
+  
     console.log("Speak function called with text:", textToSpeak);
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    setIsSpeaking(true);
-
+    setIsSpeaking(true); // Set isSpeaking to true when TTS starts
+  
     utterance.onend = () => {
-      setIsSpeaking(false);
+      setIsSpeaking(false); // Reset isSpeaking to false when TTS ends
     };
-
+  
     window.speechSynthesis.speak(utterance);
   };
-
+  
   useEffect(() => {
     if (textToSpeak) {
       console.log("Text to Speak:", textToSpeak);
@@ -234,70 +285,69 @@ const InterviewComponent = () => {
   const handleResumeUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target?.files?.[0];
 
-    if (
-      file &&
-      (file.type === "application/pdf" ||
-        file.type === "application/msword" ||
-        file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    ) {
-      setResumeFile(file); // Set the resume file state
-      const reader = new FileReader();
+    if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
+        setIsUploading(true); // Set uploading to true when starting upload
 
-      reader.onload = async (e) => {
-        const binaryData = e.target?.result as ArrayBuffer; // Ensure the result is treated as ArrayBuffer
-        console.log("Resume binary data:", binaryData); // Debugging log
+        setResumeFile(file);
+        const base64 = await fileToBase64(file);
+        localStorage.setItem('resumeFile', base64);
+        setCvText(file.name); // Update the display text to show the uploaded file name
 
-        if (binaryData) {
-          // Check if WebSocket is ready
-          if (websocketRef.current) {
-            await waitForSocketConnection(websocketRef.current);
-
-            // Send the binary data via WebSocket
-            websocketRef.current.send(
-              JSON.stringify({
-                type: "upload_cv",
-                cv_data: Array.from(new Uint8Array(binaryData)),
-              }),
-            );
-
-            setCvText("Uploaded");
-
-            // Check if JD is also uploaded before starting the interview
-            if (JD) {
-              startInterview();
+        // Send the resume to the WebSocket
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const binaryData = e.target?.result as ArrayBuffer;
+            if (binaryData && websocketRef.current) {
+                await waitForSocketConnection(websocketRef.current);
+                websocketRef.current.send(
+                    JSON.stringify({
+                        type: "upload_cv",
+                        cv_data: Array.from(new Uint8Array(binaryData)),
+                    })
+                );
+            } else {
+                console.error("WebSocket is not initialized");
             }
-          } else {
-            console.error("WebSocket is not initialized");
-          }
-        }
-      };
-
-      reader.readAsArrayBuffer(file);
+        };
+        reader.readAsArrayBuffer(file);
     } else {
-      alert("Please upload a valid DOC, DOCX, or PDF file.");
-      setResumeFile(null);
-      setCvText(""); // Optionally reset CV text
+        alert("Please upload a valid DOC, DOCX, or PDF file.");
+        setResumeFile(null);
+        setCvText("");
+        setIsUploading(false); // Ensure uploading is turned off on error
     }
-    toast.success("CV Uploaded successfully");
+};
+
+  const sendResumeToWebSocket = async (file: File) => {
+    const reader = new FileReader();
+  
+    reader.onload = async (e) => {
+      const binaryData = e.target?.result as ArrayBuffer;
+  
+      if (binaryData && websocketRef.current) {
+        await waitForSocketConnection(websocketRef.current);
+        
+        websocketRef.current.send(
+          JSON.stringify({
+            type: "upload_cv",
+            cv_data: Array.from(new Uint8Array(binaryData)),
+          }),
+        );
+      }
+    };
+  
+    reader.readAsArrayBuffer(file);
   };
 
   const isResumeUploaded = !!resumeFile;
 
-  const handleJobDescriptionUpload = async (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleJobDescriptionUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    if (
-      file &&
-      (file.type === "application/pdf" ||
-        file.type === "application/msword" ||
-        file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-    ) {
+    if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
       setJobDescriptionFile(file);
-
+      const base64 = await fileToBase64(file);
+      localStorage.setItem('jobDescriptionFile', base64);
       const reader = new FileReader();
       reader.onload = async (e) => {
         const binaryData = e.target?.result as ArrayBuffer; // Ensure the result is treated as ArrayBuffer
@@ -313,6 +363,7 @@ const InterviewComponent = () => {
             }),
           );
           setJD("Uploaded");
+          toast.success("Job Description Uploaded successfully");
 
           // Check if CV is also uploaded
           if (cvText) {
@@ -344,6 +395,7 @@ const InterviewComponent = () => {
               }),
             );
             setIsInterviewStarted(true); // Set interview started state
+            setLoading(true);
           })
           .catch((err) => {
             console.error("Failed to start interview:", err);
@@ -471,6 +523,7 @@ const InterviewComponent = () => {
   const handleManualJDUpload = () => {
     if (manualJobDescription.trim() !== "") {
       setJD(manualJobDescription.trim());
+      setIsManualEntry(true); // Ensure manual entry mode is set
 
       // Send the manually entered JD to the WebSocket
       websocketRef.current?.send(
@@ -493,8 +546,13 @@ const InterviewComponent = () => {
     setIsMicTestEnabled(false); // Disable mic test mode
     setIsMicEnabled(true); // Mark microphone as enabled
     stopMicrophoneTest(); // Stop the microphone test
+  
+    // Notify parent component that mic test is completed
+    if (typeof onMicTestComplete === 'function') {
+      onMicTestComplete(); // Call this prop function to notify the parent
+    }
   };
-
+  
   const handleSoundConfirmation = () => {
     stopTestSound(); // Stop the sound test
     setIsSoundEnabled(true); // Mark sound as enabled
@@ -548,6 +606,12 @@ const InterviewComponent = () => {
     }
   };
 
+  const handleDeleteResume = () => {
+    setResumeFile(null);
+    setCvText("");
+    localStorage.removeItem('resumeFile'); // Also remove the file from local storage
+  };
+
   const stopMicrophoneTest = () => {
     if (rafIdRef.current !== null) {
       cancelAnimationFrame(rafIdRef.current);
@@ -571,7 +635,7 @@ const InterviewComponent = () => {
 
   if (isInterviewStarted) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground ">
+      <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground">
         {/* Navbar */}
         <nav className="flex justify-between items-center bg-white shadow-md p-4">
           <div className="flex items-center">
@@ -584,11 +648,11 @@ const InterviewComponent = () => {
           <div className="font-medium text-lg">
             Technical Interview 1st round
           </div>
-
+  
           <div className="flex items-center">
             <span className="text-gray-600 text-sm mr-4" id="status"></span>
             <button className="mr-6" onClick={() => setIsChatOpen(!isChatOpen)}>
-              <PiChatsThin className="w-10 h-10  text-gray-600" />
+              <PiChatsThin className="w-10 h-10 text-gray-600" />
             </button>
             <button
               className="bg-red-500 text-white px-4 py-3 rounded-full font-semibold"
@@ -600,7 +664,7 @@ const InterviewComponent = () => {
         </nav>
         {/* Main Content */}
         <div
-          className={`flex-1 flex min-h-[100vh] justify- items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${
+          className={`flex-1 flex min-h-[100vh] justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${
             isChatOpen ? "w-[80vw]" : "w-full"
           }`}
         >
@@ -612,7 +676,14 @@ const InterviewComponent = () => {
           />
         </div>
         {/* Microphone enabled: Display AudioToText */}
-        {isMicEnabled && <AudioToText onTextSubmit={handleTextSubmit} />}{" "}
+        {isMicEnabled && (
+          <AudioToText
+            onTextSubmit={handleTextSubmit}
+            isSpeaking={isSpeaking} // Pass the isSpeaking state
+            isMicTestCompleted={isMicTestCompleted}
+          />
+        )}
+  
         {/* Display when mic is enabled */}
         {/* Prompt Box */}
         {isChatOpen && (
@@ -626,7 +697,7 @@ const InterviewComponent = () => {
                 &times;
               </button>
             </div>
-
+  
             {/* Tabs for switching between sections */}
             <div className="flex border-b border-gray-300 rounded-b-lg">
               <button
@@ -642,7 +713,7 @@ const InterviewComponent = () => {
                 Audio-to-Text
               </button>
             </div>
-
+  
             {/* Content Sections */}
             <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
               {activeTab === "conversation" && (
@@ -668,7 +739,7 @@ const InterviewComponent = () => {
                 </div>
               )}
             </div>
-
+  
             {/* Input and Buttons Container */}
             <div className="p-4 bg-gray-100 border-t border-b border-gray-300 rounded-lg">
               <input
@@ -685,8 +756,8 @@ const InterviewComponent = () => {
                   }
                 }}
               />
-
-              <div className="flex justify-between ">
+  
+              <div className="flex justify-between">
                 <button
                   id="sendAnswerButton"
                   className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition"
@@ -706,7 +777,7 @@ const InterviewComponent = () => {
                 >
                   Send Answer
                 </button>
-
+  
                 <button
                   id="getAnalysisButton"
                   className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 transition"
@@ -724,9 +795,17 @@ const InterviewComponent = () => {
             </div>
           </div>
         )}
+  
+        {/* Loading Spinner */}
+        {loading && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+            <div className="border-t-4 border-blue-500 border-solid w-16 h-16 rounded-full animate-spin"></div>
+          </div>
+        )}
       </div>
     );
   }
+  
 
   return (
     <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
@@ -830,70 +909,68 @@ const InterviewComponent = () => {
               </h3>
             </div>
 
-            {/* Upload Section */}
-            <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
-              <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-3xl">
-                <IoDocumentAttach />
-              </div>
+            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center">
+  <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-3xl">
+    <IoDocumentAttach />
+  </div>
 
-              <div
-                className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white "
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, setResumeFile)}
-              >
-                <p className="text-gray-500 mt-2 text-sm">Drag & Drop or</p>
-                <label
-                  htmlFor="resumeUpload"
-                  className="text-gray-500 cursor-pointer text-sm"
-                >
-                  Click to{" "}
-                  <span className="font-semibold text-gray-700 ">
-                    Upload Resume
-                  </span>
-                </label>
-                <input
-                  id="resumeUpload"
-                  type="file"
-                  accept=".doc,.docx,.pdf"
-                  className="hidden"
-                  onChange={handleResumeUpload}
-                />
+  {resumeFile ? (
+    <div className="text-center text-gray-600 font-semibold relative">
+      Resume Uploaded: {resumeFile.name}
+      <button
+        className="absolute top-0 right-0 text-gray-600 hover:text-red-600 focus:outline-none"
+        onClick={handleDeleteResume}
+      >
+        <FiX className="w-5 h-5" />
+      </button>
+    </div>
+  ) : (
+    <div
+      className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white"
+      onDragOver={handleDragOver}
+      onDrop={(e) => handleDrop(e, setResumeFile)}
+    >
+      <p className="text-gray-500 mt-2 text-sm">Drag & Drop or</p>
+      <label
+        htmlFor="resumeUpload"
+        className="text-gray-500 cursor-pointer text-sm"
+      >
+        Click to <span className="font-semibold text-gray-700">Upload Resume</span>
+      </label>
+      <input
+        id="resumeUpload"
+        type="file"
+        accept=".doc,.docx,.pdf"
+        className="hidden"
+        onChange={handleResumeUpload}
+      />
 
-                <div className="text-4xl mt-3 text-gray-300">
-                  <IoCloudUploadOutline />
-                </div>
+      <div className="text-4xl mt-3 text-gray-300">
+        <IoCloudUploadOutline />
+      </div>
 
-                <p className="text-gray-400 text-sm mt-3">
-                  Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.
-                </p>
-              </div>
+      <p className="text-gray-400 text-sm mt-3">
+        Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.
+      </p>
+    </div>
+  )}
 
-              {/* Upload Button */}
-              <div className="flex justify-center mt-2">
-                <button
-                  className="bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"
-                  onClick={() => triggerFileInput("resumeUpload")}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 inline-block mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Upload Resume
-                </button>
-              </div>
-            </div>
+  {/* Upload Button */}
+  <div className="flex justify-center mt-2">
+  <button
+    className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl ${resumeFile ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
+    onClick={() => !resumeFile && triggerFileInput("resumeUpload")}
+    disabled={!!resumeFile || isUploading}
+>
+    {isUploading ? "Uploading..." : resumeFile ? 'Resume Uploaded' : 'Upload Resume'}
+</button>
+  </div>
+</div>
+
             <div className="mt-8 w-full px-4 flex flex-col items-center">
               <button
                 className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? "bg-gray-600 text-black hover:bg-gray-800 text-white" : "bg-gray-300 text-gray-800 cursor-not-allowed"}`}
-                disabled={!resumeFile}
+                disabled={!resumeFile || isUploading}
                 onClick={handleNextClick}
               >
                 Next
@@ -1007,87 +1084,64 @@ const InterviewComponent = () => {
               Choose your Interview Profile
             </h3>
 
-            <div className="bg-white  py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px]  shadow-lg text-center">
-              <div className="w-full flex justify-center mb-6">
-                <button
-                  className={`px-6 py-2 font-semibold ${!isManualEntry ? "text-white bg-primary" : "text-primary bg-gray-100"} rounded-lg focus:outline-none`}
-                  onClick={handleUploadJDToggle}
-                >
-                  Upload JD
-                </button>
-                <button
-                  className={`px-6 py-2 font-semibold ${isManualEntry ? "text-white bg-primary" : "text-primaary bg-gray-100"} rounded-lg focus:outline-none`}
-                  onClick={handleManualEntryToggle}
-                >
-                  Fill Manually
-                </button>
-              </div>
+            {/* Right Section */}
+<div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center">
+    <div className="w-full flex justify-center mb-6">
+        <label htmlFor="jobProfileDropdown" className="text-gray-700 font-semibold">
+            Select Job Profile:
+        </label>
+    </div>
 
-              {isManualEntry ? (
-                <div className="w-full p-4 bg-white rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center mb-8">
-                  <textarea
-                    className="w-full h-28 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-                    placeholder="Write or paste here complete job details (Word limit 1000 words)"
-                    maxLength={1000}
-                    value={manualJobDescription}
-                    onChange={(e) => setManualJobDescription(e.target.value)}
-                  />
-                  <p className="text-gray-400 text-sm mt-2">
-                    Word limit 1000 words.
-                  </p>
-                  <div className="w-full text-center mt-4">
-                    <button
-                      onClick={handleManualJDUpload}
-                      className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
-                    >
-                      Upload JD
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white "
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, setJobDescriptionFile)}
-                >
-                  <div className="text-4xl mb-3 text-gray-300">
-                    <IoCloudUploadOutline />
-                  </div>
-                  <p className="text-gray-500 mb-2">Drag & Drop or</p>
-                  <label
-                    htmlFor="jobDescriptionUpload"
-                    className="text-gray-500 cursor-pointer"
-                  >
-                    Click to{" "}
-                    <span className="font-semibold text-gray-700">
-                      Upload Job Description
-                    </span>
-                  </label>
-                  <input
-                    id="jobDescriptionUpload"
-                    type="file"
-                    accept=".doc,.docx,.pdf"
-                    className="hidden"
-                    onChange={handleJobDescriptionUpload}
-                  />
-                  <p className="text-gray-400 text-sm mt-3">
-                    Supported file formats: DOC, DOCX, PDF. File size limit 10
-                    MB.
-                  </p>
-                </div>
+    <select
+        id="jobProfileDropdown"
+        className="w-full p-4 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+        value={selectedJobProfile}
+        onChange={(e) => setSelectedJobProfile(e.target.value)}
+    >
+        <option value="">Select a profile</option>
+        {jobProfiles.map((profile) => (
+            <option key={profile} value={profile}>
+                {profile}
+            </option>
+        ))}
+    </select>
+
+    <div className="w-full p-4 bg-white rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center mb-8">
+        <textarea
+            className="w-full h-28 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary text-center placeholder:text-gray-500"
+            placeholder="Write or paste here complete job details (Word limit 1000 words)"
+            maxLength={1000}
+            value={manualJobDescription}
+            onChange={(e) => setManualJobDescription(e.target.value)}
+        />
+        <p className="text-gray-400 text-sm mt-2">
+            Word limit 1000 words.
+        </p>
+        <div className="w-full text-center mt-4">
+            <button
+                onClick={handleManualJDUpload}
+                className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
+            >
+                Submit JD
+            </button>
+        </div>
+    </div>
+
+
               )}
             </div>
             <div className="mt-8 w-full px-4 flex flex-col items-center">
-              <button
-                className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${jobDescriptionFile || (isManualEntry && manualJobDescription) ? "bg-gray-600 text-black hover:bg-gray-800 text-white" : "bg-gray-300 text-gray-800 cursor-not-allowed"}`}
-                disabled={
-                  !jobDescriptionFile &&
-                  !(isManualEntry && manualJobDescription)
-                }
-                onClick={handleNextClick}
-              >
-                Next
-              </button>
+            <button
+  className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
+    jobDescriptionFile || (isManualEntry && manualJobDescription) 
+      ? "bg-gray-600 text-black hover:bg-gray-800 text-white" 
+      : "bg-gray-300 text-gray-800 cursor-not-allowed"
+  }`}
+  disabled={!jobDescriptionFile && !(isManualEntry && manualJobDescription)}
+  onClick={handleNextClick}
+>
+  Next
+</button>
               <button
                 className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
                 onClick={handleBackClick}
@@ -1127,6 +1181,7 @@ const InterviewComponent = () => {
           handleNextClick={handleNextClick}
           handleBackClick={handleBackClick}
           allDevicesConfigured={allDevicesConfigured}
+          onMicTestComplete={() => setIsMicTestCompleted(true)}
         />
       )}
     </div>
