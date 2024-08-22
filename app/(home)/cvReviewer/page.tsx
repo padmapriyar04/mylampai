@@ -11,6 +11,7 @@ const Page: React.FC = () => {
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState('');
   const [structuredData, setStructuredData] = useState<any>(null);
+  const [profile, setProfile] = useState<string>("SOFTWARE")
 
   const handleDrop = (event: DragEvent<HTMLDivElement>, setFile: (file: File) => void) => {
     event.preventDefault();
@@ -96,7 +97,10 @@ const Page: React.FC = () => {
           setStructuredData={setStructuredData}
         />
       ) : step === 3 ? (
-        <PDFViewer />
+        <PDFViewer
+          profile={profile}
+          structuredData={structuredData}
+        />
       ) : null}
     </div>
   );

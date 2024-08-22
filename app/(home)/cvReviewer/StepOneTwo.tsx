@@ -96,13 +96,18 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           extractedText += pageText + "\n";
         }
         console.log(extractedText);
-        if (extractedText) {
-          setExtractedText(extractedText);
-          const structuredDataResult =
-            await extractStructuredData(extractedText);
 
-          if (structuredDataResult) {
-            setStructuredData(structuredDataResult.message);
+        if (extractedText) {
+          try {
+            setExtractedText(extractedText);
+            const structuredDataResult =
+              await extractStructuredData(extractedText);
+
+            if (structuredDataResult) {
+              setStructuredData(structuredDataResult.message);
+              setUploading(false);
+            }
+          } catch (err) {
             setUploading(false);
           }
         } else {
@@ -110,7 +115,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           setUploading(false);
         }
       };
-
       fileReader.readAsArrayBuffer(file);
     } else {
       toast.error("Please upload a PDF file");
@@ -151,6 +155,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         toast.success("Resume uploaded successfully");
         return result;
       }
+      toast.error("Error extracting structured data from resume");
       return null;
     } catch (error) {
       toast.error("Error extracting structured data from resume");
@@ -160,30 +165,30 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
   return (
     <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee]">
-      {step === 1 && (
-        <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">
-          {/* Left Section */}
-          <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
-            <Image
-              src={"/images/Globe.svg"}
-              className="w-full h-auto"
-              alt="image"
-              width={100}
-              height={100}
-            ></Image>
-            <div className="relative flex flex-col items-center mt-auto">
-              <h2 className="text-xl font-bold text-center leading-snug">
-                Take the wiZe AI mock Interview
-              </h2>
-              <p className="mt-2 text-center text-sm leading-relaxed">
-                You&apos;ll be taking a 20-minute interview to have your skills
-                evaluated. Just relax and take the interview.{" "}
-                <span className="font-semibold"> All the best!</span>
-              </p>
-            </div>
+      <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">
+        {/* Left Section */}
+        <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
+          <Image
+            src={"/images/Globe.svg"}
+            className="w-full h-auto"
+            alt="image"
+            width={100}
+            height={100}
+          ></Image>
+          <div className="relative flex flex-col items-center mt-auto">
+            <h2 className="text-xl font-bold text-center leading-snug">
+              Take the wiZe AI mock Interview
+            </h2>
+            <p className="mt-2 text-center text-sm leading-relaxed">
+              You&apos;ll be taking a 20-minute interview to have your skills
+              evaluated. Just relax and take the interview.{" "}
+              <span className="font-semibold"> All the best!</span>
+            </p>
           </div>
-
-          {/* Right Section */}
+        </div>
+        
+        {/* Right Section */}
+        {step === 1 && (
           <div className="w-full md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
             <div>
               <p className="text-2xl font-bold text-primary mb-2">
@@ -342,32 +347,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row md:justify-between">
-          {/* Left Section */}
-          <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
-            <Image
-              src={"/images/Globe.svg"}
-              className="w-full h-auto"
-              alt="image"
-              width={100}
-              height={100}
-            ></Image>
-            <div className="relative flex flex-col items-center mt-auto">
-              <h2 className="text-xl font-bold text-center leading-snug">
-                Take the wiZe AI mock Interview
-              </h2>
-              <p className="mt-2 text-center text-sm leading-relaxed">
-                You&apos;ll be taking a 20-minute interview to have your skills
-                evaluated. Just relax and take the interview.{" "}
-                <span className="font-semibold"> All the best!</span>
-              </p>
-            </div>
-          </div>
-
+        )}
+        {step === 2 && (
           <div className="w-full md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
             <div className="w-full flex flex-col items-center mb-2">
               <div>
@@ -545,8 +526,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

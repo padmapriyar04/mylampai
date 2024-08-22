@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useInterviewStore } from "../../../utils/store";
+import { useInterviewStore } from "@/utils/store";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 import "pdfjs-dist/web/pdf_viewer.css";
 
@@ -7,29 +7,34 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 
 const baseUrl = "https://cv-judger.onrender.com";
 
-async function analyzeResume(endpoint, data) {
-  try {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    const result = await response.json();
-    console.log("Analysis result:", result);
-    return result;
-  } catch (error) {
-    console.error("Error:", error);
-    return null;
-  }
+interface PDFViewerProps {
+  profile: string;
+  structuredData: any;
 }
 
-const PDFViewer: React.FC = () => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
   const { resumeFile, extractedText } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState("");
   const [atsScore, setAtsScore] = useState(56);
+
+  async function analyzeResume(endpoint: string, data: any, query: string) {
+    try {
+      const response = await fetch(`${baseUrl}${endpoint}${query}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      console.log("Analysis result:", result);
+      return result;
+    } catch (error) {
+      console.error("Error:", error);
+      return null;
+    }
+  }
 
   useEffect(() => {
     const renderPDF = async () => {
@@ -87,51 +92,94 @@ const PDFViewer: React.FC = () => {
 
   const runAnalysis = async (analysisType: string) => {
     let endpoint = "";
-    const data = { resume_text: extractedText };
+    let data: any = {};
+    let query = "";
 
     switch (analysisType) {
       case "quantification_checker":
         endpoint = "/quantification";
+        data = {
+          extracted_data: structuredData
+        }
         break;
       case "resume_length":
         endpoint = "/resume_length";
+        data = {
+          text: extractedText,
+          experience: "FRESHER"
+        }
         break;
       case "bullet_point_length":
         endpoint = "/bullet_point_length";
+        data = {
+          extracted_data: structuredData
+        }
         break;
       case "bullet_points_improver":
         endpoint = "/bullet_points_improver";
+        data = {
+          extracted_data: structuredData
+        }
         break;
       case "total_bullet_points":
         endpoint = "/total_bullet_list";
+        query = `?cv_data=${extractedText.trim()}?experience=FRESHER`
         break;
       case "verb_tense_checker":
         endpoint = "/verb_tense";
+        data = {
+          extracted_data: structuredData
+        }
         break;
       case "weak_verb_checker":
         endpoint = "/weak_verb_checker";
+        data = {
+          extracted_data: structuredData
+        }
         break;
       case "section_checker":
         endpoint = "/section_checker";
+        data = {
+          extracted_data: structuredData
+        }
         break;
       case "skill_checker":
         endpoint = "/skill_checker";
+        data = {
+          extracted_data: structuredData
+        }
+        query = `?profile=${profile}`
         break;
       case "repetition_checker":
         endpoint = "/repetition";
+        data = {
+          extracted_data: structuredData
+        }
         break;
+      case "personal_info":
+        endpoint = "/personal_info";
+        data = {
+          extracted_data: structuredData
+        }
+        break;    
       case "responsibility_checker":
         endpoint = "/responsibility";
+        data = {
+          extracted_data: structuredData
+        }
         break;
       case "spelling_checker":
         endpoint = "/spelling_checker";
+        data = {
+          extracted_data: structuredData
+        }
         break;
       default:
         console.log("Unknown analysis type");
         return;
     }
 
-    const result = await analyzeResume(endpoint, data);
+    const result = await analyzeResume(endpoint, data, query);
     console.log("Analysis Result:", result);
   };
 
@@ -191,7 +239,6 @@ const PDFViewer: React.FC = () => {
       </div>
       <div className="col-span-5 bg-white p-4 rounded-lg">
         <h2 className="text-xl font-bold">Fixes or Corrections</h2>
-        {/* Fixes or corrections content */}
       </div>
       <div className="col-span-4 bg-white p-4 rounded-lg">
         <h2 className="text-xl font-bold">Uploaded CV Preview</h2>
