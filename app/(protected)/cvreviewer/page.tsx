@@ -2,9 +2,7 @@
 import React, { useState, DragEvent, ChangeEvent, useRef } from "react";
 import StepOneTwo from "./StepOneTwo"; // Adjust the path if necessary
 import { useInterviewStore } from "@/utils/store";
-import StepThree from "./StepThree";
 import PDFViewer from "./StepThree";
-import { toast } from "sonner";
 
 const Page: React.FC = () => {
   const { resumeFile, setResumeFile, setJobDescriptionFile, structuredData } =
