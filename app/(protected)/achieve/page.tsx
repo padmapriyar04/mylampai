@@ -22,7 +22,7 @@ export default function Achieve() {
         <div className="flex flex-row justify-evenly relative md:top-[3vh] gap-6 w-full px-[1vw] pb-8 md:mt-16">
           <Link
             href="#"
-            className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-gray-200 transition"
+            className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-primary hover:text-white transition"
           >
             Past Analysis
           </Link>
@@ -51,7 +51,7 @@ export default function Achieve() {
         <div className="flex flex-row justify-evenly relative md:top-[3vh] gap-6 w-full px-[1vw] pb-8 md:mt-16">
           <Link
             href="#"
-            className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-gray-200 transition"
+            className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-primary hover:text-white transition"
           >
             Past Analysis
           </Link>
