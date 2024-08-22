@@ -29,7 +29,6 @@ interface StepOneTwoProps {
   isManualEntry: boolean;
   manualJobDescription: string;
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
-  setStructuredData: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
@@ -47,9 +46,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   isManualEntry,
   manualJobDescription,
   setManualJobDescription,
-  setStructuredData,
 }) => {
-  const { resumeFile, setResumeFile, setExtractedText, jobDescriptionFile } =
+  const { resumeFile, setResumeFile, setExtractedText, jobDescriptionFile, setStructuredData } =
     useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -340,7 +338,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     ? "bg-gray-600 hover:bg-gray-800 text-white"
                     : "bg-gray-300 text-gray-800 cursor-not-allowed"
                 }`}
-                disabled={!isResumeUploaded}
+                // disabled={!isResumeUploaded}
                 onClick={handleNextClick}
               >
                 Next
@@ -510,10 +508,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     ? "bg-gray-600 hover:bg-gray-800 text-white"
                     : "bg-gray-300 text-gray-800 cursor-not-allowed"
                 }`}
-                disabled={
-                  !jobDescriptionFile &&
-                  !(isManualEntry && manualJobDescription)
-                }
+                // disabled={
+                //   !jobDescriptionFile &&
+                //   !(isManualEntry && manualJobDescription)
+                // }
                 onClick={handleNextClick}
               >
                 Next

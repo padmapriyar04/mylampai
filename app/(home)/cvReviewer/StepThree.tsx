@@ -9,11 +9,10 @@ const baseUrl = "https://cv-judger.onrender.com";
 
 interface PDFViewerProps {
   profile: string;
-  structuredData: any;
 }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
-  const { resumeFile, extractedText } = useInterviewStore();
+const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
+  const { resumeFile, extractedText, structuredData } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState("");
   const [atsScore, setAtsScore] = useState(56);
@@ -123,7 +122,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
         break;
       case "total_bullet_points":
         endpoint = "/total_bullet_list";
-        query = `?cv_data=${extractedText.trim()}?experience=FRESHER`
+        query = `?experience=FRESHER`;
+        data = {
+          extracted_data: structuredData
+        }
         break;
       case "verb_tense_checker":
         endpoint = "/verb_tense";
@@ -161,7 +163,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
         data = {
           extracted_data: structuredData
         }
-        break;    
+        break;
       case "responsibility_checker":
         endpoint = "/responsibility";
         data = {
@@ -184,7 +186,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-4 h-screen p-4">
+    <div className="grid grid-cols-12 gap-4 min-h-[calc(100vh-4rem)] p-4">
       <div className="col-span-3 flex flex-col gap-4">
         <div className="bg-white p-4 rounded-lg shadow-md flex items-center gap-4">
           <div className="relative w-16 h-16 flex justify-center items-center">
@@ -230,6 +232,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             <option value="section_checker">Section Checker</option>
             <option value="skill_checker">Skill Checker</option>
             <option value="repetition_checker">Repetition Checker</option>
+            <option value="personal_info">Personal Info</option>
             <option value="responsibility_checker">
               Responsibility In Words Checker
             </option>
@@ -240,7 +243,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
       <div className="col-span-5 bg-white p-4 rounded-lg">
         <h2 className="text-xl font-bold">Fixes or Corrections</h2>
       </div>
-      <div className="col-span-4 bg-white p-4 rounded-lg">
+      <div className="col-span-4 bg-black p-4 rounded-lg">
         <h2 className="text-xl font-bold">Uploaded CV Preview</h2>
         <canvas ref={canvasRef} className="w-full h-auto"></canvas>
       </div>
