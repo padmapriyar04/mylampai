@@ -9,7 +9,6 @@ const baseUrl = "https://cv-judger.onrender.com";
 
 interface PDFViewerProps {
   profile: string;
-  structuredData: any;
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
@@ -141,7 +140,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
   }, [resumeFile]);
 
   const handleAnalysisChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
+    event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSelectedAnalysis(event.target.value);
     runAnalysis(event.target.value);
@@ -153,8 +152,90 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
     let query = "";
 
     switch (analysisType) {
-      // Add cases for analysis options here
-      // Each case will set the appropriate endpoint, data, and query
+      case "quantification_checker":
+        endpoint = "/quantification";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "resume_length":
+        endpoint = "/resume_length";
+        data = {
+          text: extractedText,
+          experience: "FRESHER",
+        };
+        break;
+      case "bullet_point_length":
+        endpoint = "/bullet_point_length";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "bullet_points_improver":
+        endpoint = "/bullet_points_improver";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "total_bullet_points":
+        endpoint = "/total_bullet_list";
+        query = `?experience=FRESHER`;
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "verb_tense_checker":
+        endpoint = "/verb_tense";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "weak_verb_checker":
+        endpoint = "/weak_verb_checker";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "section_checker":
+        endpoint = "/section_checker";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "skill_checker":
+        endpoint = "/skill_checker";
+        data = {
+          extracted_data: structuredData,
+        };
+        query = `?profile=${profile}`;
+        break;
+      case "repetition_checker":
+        endpoint = "/repetition";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "personal_info":
+        endpoint = "/personal_info";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "responsibility_checker":
+        endpoint = "/responsibility";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      case "spelling_checker":
+        endpoint = "/spelling_checker";
+        data = {
+          extracted_data: structuredData,
+        };
+        break;
+      default:
+        console.log("Unknown analysis type");
+        return;
     }
 
     const result = await analyzeResume(endpoint, data, query);
@@ -162,7 +243,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-4 h-screen p-4">
+    <div className="grid grid-cols-12 gap-2 p-2">
       <div className="col-span-3 flex flex-col gap-4">
         <div className="bg-white p-4 rounded-lg shadow-md flex items-center gap-4">
           <div className="relative w-16 h-16 flex justify-center items-center">
@@ -194,14 +275,32 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             <option value="" disabled>
               Select Analysis
             </option>
-            {/* Add options for different analyses */}
+            <option value="quantification_checker">
+              Quantification Checker
+            </option>
+            <option value="resume_length">Resume Length</option>
+            <option value="bullet_point_length">Bullet Point Length</option>
+            <option value="bullet_points_improver">
+              Bullet Points Improver
+            </option>
+            <option value="total_bullet_points">Total Bullet Points</option>
+            <option value="verb_tense_checker">Verb Tense Checker</option>
+            <option value="weak_verb_checker">Weak Verb Checker</option>
+            <option value="section_checker">Section Checker</option>
+            <option value="skill_checker">Skill Checker</option>
+            <option value="repetition_checker">Repetition Checker</option>
+            <option value="personal_info">Personal Info</option>
+            <option value="responsibility_checker">
+              Responsibility In Words Checker
+            </option>
+            <option value="spelling_checker">Spelling Checker</option>
           </select>
         </div>
       </div>
       <div className="col-span-5 bg-white p-4 rounded-lg">
         <h2 className="text-xl font-bold">Fixes or Corrections</h2>
       </div>
-      <div className="col-span-4 bg-white p-4 rounded-lg">
+      <div className="col-span-4 bg-black p-4 rounded-lg">
         <h2 className="text-xl font-bold">Uploaded CV Preview</h2>
         <canvas ref={canvasRef} className="w-full h-auto"></canvas>
       </div>

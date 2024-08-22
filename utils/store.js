@@ -6,9 +6,11 @@ export const useInterviewStore = create(
     (set) => ({
       resumeFile: null,
       jobDescriptionFile: null,
+      extractedText: '',
+      structuredData: null,
+      setStructuredData: (data) => set({ structuredData: data }),
       setResumeFile: (file) => set({ resumeFile: file }),
       setJobDescriptionFile: (file) => set({ jobDescriptionFile: file }),
-      extractedText: '',
       setExtractedText: (text) => set({ extractedText: text }),
     }),
     {

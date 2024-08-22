@@ -61,6 +61,8 @@ const InterviewComponent = () => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const rafIdRef = useRef<number | null>(null);
+  const [customProfile, setCustomProfile] = useState("");
+
   const [loading,setLoading] = useState(true)
   const [isRecognitionActive, setIsRecognitionActive] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -521,19 +523,18 @@ const InterviewComponent = () => {
   }
 
   const handleManualJDUpload = () => {
-    if (manualJobDescription.trim() !== "") {
-      setJD(manualJobDescription.trim());
-      setIsManualEntry(true); // Ensure manual entry mode is set
-
-      // Send the manually entered JD to the WebSocket
+    const jobDescription = manualJobDescription === "Other" ? customProfile.trim() : manualJobDescription.trim();
+  
+    if (jobDescription !== "") {
+      setJD(jobDescription);
+  
       websocketRef.current?.send(
         JSON.stringify({
           type: "analyze_jd",
-          job_description: manualJobDescription.trim(),
+          job_description: jobDescription,
         }),
       );
-
-      // You can also add a condition to automatically start the interview if the CV is also uploaded
+  
       if (cvText && JD) {
         toast.success("Job Description uploaded successfully");
       }
@@ -541,6 +542,7 @@ const InterviewComponent = () => {
       alert("Please fill in the job description.");
     }
   };
+  
 
   const handleMicTestConfirmation = () => {
     setIsMicTestEnabled(false); // Disable mic test mode

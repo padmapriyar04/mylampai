@@ -8,6 +8,7 @@ import * as pdfjsLib from "pdfjs-dist";
 import { useUserStore } from "@/utils/userStore";
 const baseUrl = "https://cv-judger.onrender.com";
 
+
 interface StepOneTwoProps {
   step: number;
   setStep: (step: number) => void;
@@ -29,7 +30,8 @@ interface StepOneTwoProps {
   isManualEntry: boolean;
   manualJobDescription: string;
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
-  setStructuredData: React.Dispatch<React.SetStateAction<any>>;
+  customProfile: string;
+  setCustomProfile: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
@@ -47,9 +49,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   isManualEntry,
   manualJobDescription,
   setManualJobDescription,
-  setStructuredData,
+  customProfile,
+  setCustomProfile,
 }) => {
-  const { resumeFile, setResumeFile, setExtractedText, jobDescriptionFile } =
+  const { resumeFile, setResumeFile, setExtractedText, jobDescriptionFile, setStructuredData } =
     useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -198,9 +201,12 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       return null;
     } catch (error) {
       toast.error("Error extracting structured data from resume");
+      setUploading(false)
       return null;
     }
   }
+
+  
 
   return (
     <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee]">
@@ -235,72 +241,66 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               </p>
             </div>
 
-            <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
-              {/* Progress Bar */}
-              <div className="relative flex-1">
-                <div
-                  className={`w-8 h-8 ${isResumeUploaded ? "bg-purple-500" : "bg-gray-400"} rounded-full flex items-center justify-center`}
-                >
-                  {isResumeUploaded ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-white"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ) : (
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  )}
+            <div className="flex mx-auto items-center max-w-[250px] justify-center mb-2 w-full">
+                {/* Progress Bar */}
+                <div className="relative flex-1">
+                  <div
+                    className={`w-8 h-8 ${resumeFile ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
+                  >
+                    {resumeFile ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-white"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                  <div
+                    className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ?
+                         "bg-primary w-full"
+                        : "bg-gray-400 w-full"
+                    } z-0`}
+                  ></div>
                 </div>
-                <div
-                  className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${
-                    resumeFile ? "bg-primary w-full" : "bg-gray-400 w-full"
-                  } z-0`}
-                ></div>
-              </div>
-              {/* Step 2 */}
-              <div className="relative flex-1">
-                <div
-                  className={`w-8 h-8 ${jobDescriptionFile || isManualEntry ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
-                >
-                  {jobDescriptionFile || isManualEntry ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-white"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ) : (
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  )}
+                {/* Step 2 */}
+                <div className="relative">
+                  <div
+                    className={`w-8 h-8 ${
+                      jobDescriptionFile || isManualEntry
+                        ? "bg-primary"
+                        : "bg-gray-400"
+                    } rounded-full flex items-center justify-center`}
+                  >
+                    {jobDescriptionFile || isManualEntry ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-white"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    )}
+                  </div>
                 </div>
-                <div
-                  className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${
-                    jobDescriptionFile || isManualEntry
-                      ? "bg-primary w-full"
-                      : "bg-gray-400 w-full"
-                  } z-0`}
-                ></div>
+ 
+                
               </div>
-              {/* Step 3 */}
-              <div className="relative  flex items-center">
-                <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
-                </div>
-              </div>
-            </div>
 
             <div className="text-center mb-6 mt-3 w-[100%]">
               <h3 className="text-2xl font-bold text-gray-800">
@@ -379,7 +379,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     ? "bg-gray-600 hover:bg-gray-800 text-white"
                     : "bg-gray-300 text-gray-800 cursor-not-allowed"
                 }`}
-                disabled={!isResumeUploaded}
+                // disabled={!isResumeUploaded}
                 onClick={handleNextClick}
               >
                 Next
@@ -395,7 +395,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                   Get Started!
                 </p>
               </div>
-              <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
+              <div className="flex mx-auto items-center max-w-[250px] justify-center mb-2 w-full">
                 {/* Progress Bar */}
                 <div className="relative flex-1">
                   <div
@@ -419,15 +419,14 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     )}
                   </div>
                   <div
-                    className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${
-                      jobDescriptionFile || isManualEntry
-                        ? "bg-primary w-full"
+                    className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ?
+                         "bg-primary w-full"
                         : "bg-gray-400 w-full"
                     } z-0`}
                   ></div>
                 </div>
                 {/* Step 2 */}
-                <div className="relative flex-1">
+                <div className="relative">
                   <div
                     className={`w-8 h-8 ${
                       jobDescriptionFile || isManualEntry
@@ -452,96 +451,56 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                       <div className="w-3 h-3 bg-white rounded-full"></div>
                     )}
                   </div>
-                  <div
-                    className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${
-                      jobDescriptionFile || isManualEntry
-                        ? "bg-primary w-full"
-                        : "bg-gray-400 w-full"
-                    } z-0`}
-                  ></div>
                 </div>
-                {/* Step 3 */}
-                <div className="relative  flex items-center">
-                  <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
-                  </div>
-                </div>
+ 
+                
               </div>
             </div>
             <h3 className="text-sm xl:text-2xl mb-6 font-bold text-gray-800">
               Choose your Interview Profile
             </h3>
 
-            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center">
-              <div className="w-full flex justify-center mb-6">
-                <button
-                  className={`px-6 py-2 font-semibold ${!isManualEntry ? "text-white bg-primary" : "text-primary bg-gray-100"} rounded-lg focus:outline-none`}
-                  onClick={handleUploadJDToggle}
-                >
-                  Upload JD
-                </button>
-                <button
-                  className={`px-6 py-2 font-semibold ${isManualEntry ? "text-white bg-primary" : "text-primary bg-gray-100"} rounded-lg focus:outline-none`}
-                  onClick={handleManualEntryToggle}
-                >
-                  Fill Manually
-                </button>
-              </div>
-
-              {isManualEntry ? (
-                <div className="w-full p-4 bg-white rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center mb-8">
-                  <textarea
-                    className="w-full h-28 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-                    placeholder="Write or paste here complete job details (Word limit 1000 words)"
-                    maxLength={1000}
-                    value={manualJobDescription}
-                    onChange={(e) => setManualJobDescription(e.target.value)}
-                  />
-                  <p className="text-gray-400 text-sm mt-2">
-                    Word limit 1000 words.
-                  </p>
-                  <div className="w-full text-center mt-4">
-                    <button
-                      onClick={handleManualJDUpload}
-                      className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
+            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]">
+            
+                    <div className="w-full  p-4 bg-white rounded-lg flex flex-col items-center justify-center ">
+                    <select
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
+                        value={manualJobDescription}
+                        onChange={(e) => setManualJobDescription(e.target.value)}
                     >
-                      Upload JD
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className="border-dashed border-2 border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center bg-white"
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, () => {})}
-                >
-                  <div className="text-4xl mb-3 text-gray-300">
-                    <IoCloudUploadOutline />
-                  </div>
-                  <p className="text-gray-500 mb-2">Drag & Drop or</p>
-                  <label
-                    htmlFor="jobDescriptionUpload"
-                    className="text-gray-500 cursor-pointer"
-                  >
-                    Click to{" "}
-                    <span className="font-semibold text-gray-700">
-                      Upload Job Description
-                    </span>
-                  </label>
-                  <input
-                    id="jobDescriptionUpload"
-                    type="file"
-                    accept=".doc,.docx,.pdf"
-                    className="hidden"
-                    onChange={handleJobDescriptionUpload}
-                  />
-                  <p className="text-gray-400 text-sm mt-3">
-                    Supported file formats: DOC, DOCX, PDF. File size limit 10
-                    MB.
-                  </p>
-                </div>
-              )}
+                        <option value="" disabled>
+                        <div>Select a role</div>
+
+                        </option>
+                        <option value="SDE">SDE</option>
+                        <option value="AI/ML">AI/ML</option>
+                        <option value="Core">Core</option>
+                        <option value="Consulting">Consulting</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    {manualJobDescription === "Other" && (
+                        <input
+                        type="text"
+                        className="w-full mt-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
+                        placeholder="Please specify your profile"
+                        value={customProfile}
+                        onChange={(e) => setCustomProfile(e.target.value)}
+                        />
+                    )}
+
+                    <div className="w-full text-center mt-4">
+                        <button
+                        onClick={handleManualJDUpload}
+                        className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
+                        >
+                        Upload JD
+                        </button>
+                    </div>
+                    </div>
             </div>
+
             <div className="mt-8 w-full px-4 flex flex-col items-center">
               <button
                 className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
@@ -549,10 +508,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     ? "bg-gray-600 hover:bg-gray-800 text-white"
                     : "bg-gray-300 text-gray-800 cursor-not-allowed"
                 }`}
-                disabled={
-                  !jobDescriptionFile &&
-                  !(isManualEntry && manualJobDescription)
-                }
+                // disabled={
+                //   !jobDescriptionFile &&
+                //   !(isManualEntry && manualJobDescription)
+                // }
                 onClick={handleNextClick}
               >
                 Next
