@@ -30,35 +30,38 @@ export default function About() {
         <>
             {/* First Section */}
             <div className="bg-primary min-h-[calc(100vh-4rem)] w-full flex justify-evenly items-center text-white">
-                <div className="max-w-[500px] w-full justify-top h-[300px] relative">
-                    <h1 className="font-medium text-5xl">We&apos;re building the future of language AI</h1>
-                    <p className="text-2xl mt-10">Cohere empowers every developer and enterprise to build amazing products and capture true business value with language AI.</p>
+                <div className="max-w-[500px] w-full justify-center h-[300px] relative items-center md:mt-16 xl:mt-0">
+                    <h1 className="font-medium xl:text-5xl md:text-3xl">We&apos;re building the future of language AI</h1>
+                    <p className="xl:text-2xl md:text-md md:mt-3 xl:mt-10 md:pr-24 lg:pr-24">Cohere empowers every developer and enterprise to build amazing products and capture true business value with language AI.</p>
                 </div>
-                <div className="bg-gray-700 max-w-[600px] w-full h-[500px] relative left-10"></div>
+                <div className="bg-gray-700 max-w-[34vw] w-full h-[40vh] relative xl:left-10 md:left-0"></div>
             </div>
 
+
             {/* Second Section */}
-            <div className=" relative w-full flex justify-top text-black gap-4 p-4">
-                <div className="shadow-2xl sticky top-[5rem] left-0 max-h-[calc(100vh-6rem)] max-w-[20vw] w-full rounded-xl items-center flex flex-col justify-start gap-[1vh]">
-                    <div className="bg-gray-400 h-[500px] w-full p-6 rounded-lg">
-                        <h1 className="font-bold text-2xl">Our Mission</h1>
-                        <p>Just relax and take the interview. All the best!</p>
-                        <div className="h-20"></div>
-                        <h1 className="font-bold text-2xl relative translate-x-36">Our Vision</h1>
-                        <p>Just relax and take the interview. Have your skills evaluated. All the best!</p>
+            <div className=" relative w-full flex justify-top text-black gap-4 p-4 bg-white">
+                <div className="sticky top-[5rem] left-0 max-h-[calc(100vh-6rem)]  max-w-[20vw] w-full rounded-xl items-center flex flex-col justify-start gap-[1.2vh]">
+                    <div className="bg-gray-400 h-[calc(40vh-2rem)] w-full 2xl:p-6 md:p-2 rounded-lg flex flex-col shadow-lg justify-evenly">
+                        <h1 className="font-bold 2xl:text-xl  md:text-md">Our Mission</h1>
+                        <p className=' 2xl:text-md  md:text-sm'>Just relax and take the interview. All the best!</p>
+                        <div className="2xl:h-20 md:h-14 bg-white"></div>
+                        <h1 className="font-bold relative right-0 2xl:text-xl  md:text-md">Our Vision</h1>
+                        <p className=' 2xl:text-md  md:text-sm'>Just relax and take the interview. Have your skills evaluated. All the best!</p>
                     </div>
 
-                    <div className="bg-primary-foreground h-[310px] w-full p-6 rounded-lg">
-                        <div className="relative flex flex-col justify-evenly left-36 gap-6">
-                            <p className="w-1/2 relative max-h-1/2 text-sm">Just relax and take the interview. Have your skills evaluated. All the best!</p>
-                            <button className="bg-primary w-1/2 relative top-[2vh] rounded-lg px-4 py-2 font-semibold text-xl text-white">Contact us</button>
+                    <div className="bg-primary-foreground h-[calc(30vh-2rem)] w-full p-6 rounded-lg shadow-lg flex flex-row justify-evenly">
+                        <div className='w-1/2 bg-white flex justify-center items-center'>img</div>
+                        <div className="relative flex flex-col justify-evenly gap-6 w-1/2">
+                            <p className="w-full relative max-h-1/2 2xl:text-sm  md:text-[0.9vw] ">Just relax and take the interview. Have your skills evaluated. All the best!</p>
+                            <button className="bg-primary w-full relative md:top-[-1vw] 2xl:top-[2vh] rounded-lg px-4 py-2 font-semibold 2xl:text-lg md:text-[1vw] text-white ">Contact us</button>
                         </div>
                     </div>
 
-                    <div className="bg-violet-400 h-[310px] w-full p-6 rounded-lg">
-                        <div className="relative flex flex-col justify-evenly left-36 gap-6">
-                            <p className="w-1/2 relative max-h-1/2 text-sm text-gray-600">Just relax and take the interview. Have your skills evaluated. All the best!</p>
-                            <button className="bg-primary-foreground w-1/2 relative top-[2vh] rounded-lg px-4 py-2 font-semibold text-xl text-primary">Join us</button>
+                    <div className="bg-violet-400 h-[calc(30vh-2rem)] w-full p-6 rounded-lg flex shadow-lg flex-row justify-evenly">
+                    <div className='w-1/2 bg-white flex justify-center items-center'>img</div>
+                    <div className="relative flex flex-col justify-evenly gap-6 w-1/2">
+                            <p className="w-full relative max-h-1/2 2xl:text-sm  md:text-[0.9vw] text-gray-600">Just relax and take the interview. Have your skills evaluated. All the best!</p>
+                            <button className="bg-primary-foreground w-full relative md:top-[-1vw] 2xl:top-[2vh] rounded-lg px-4 py-2 font-semibold 2xl:text-lg  md:text-[1vw] text-primary">Join us</button>
                         </div>
                     </div>
                 </div>
