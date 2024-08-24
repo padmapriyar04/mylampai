@@ -24,6 +24,7 @@ export default function BlogList() {
       try {
         const response = await fetch("http://localhost:3000/api/blogs", {
           method: "GET",
+
         });
 
         if (!response.ok) {
