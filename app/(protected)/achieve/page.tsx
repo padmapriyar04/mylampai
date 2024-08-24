@@ -56,7 +56,7 @@ export default function Achieve() {
             Past Analysis
           </Link>
           <Link
-            href="/cvreviewer"
+            href="/interview"
             className="bg-primary py-2 md:py-5 px-3 w-1/2 font-semibold text-white md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-purple-600 transition"
           >
             Get Interviewed
