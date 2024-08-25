@@ -78,6 +78,16 @@ body::--webkit-scrollbar {
   width: 0.5rem;
 }
 
+@keyframes fadeOut {
+    from {opacity: 1}
+    to {opacity: 0}
+}
+
+.element {
+    animation: fadeOut 2s forwards;
+    animation-timeline: scroll();
+}
+
 @layer base {
   * {
     @apply border-border;
