@@ -89,7 +89,7 @@ const Page: React.FC = () => {
 
   return (
     <div className="w-full m-auto min-h-[calc(100vh-4rem)]">
-      {step === 3 || step === 2 ? (
+      {step === 1 || step === 2 ? (
         <StepOneTwo
           step={step}
           setStep={setStep}

@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useInterviewStore } from "@/utils/store";
-// import * as pdfjsLib from "pdfjs-dist/webpack";
+import * as pdfjsLib from "pdfjs-dist/webpack";
 // import "pdfjs-dist/web/pdf_viewer.css";
+import { useUserStore } from "@/utils/userStore"
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import {
   Dialog,
@@ -19,7 +20,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-// pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const baseUrl = "https://cv-judger.onrender.com";
 
@@ -27,10 +28,14 @@ interface PDFViewerProps {
   profile: string;
 }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
-  const { resumeFile, extractedText, structuredData } = useInterviewStore();
+const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
+  const { extractedText } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [reviewedData, setReviewedData] = useState<any>({});
+  const [selectedAnalysis, setSelectedAnalysis] = useState("");
+  const [atsScore, setAtsScore] = useState(56);
+  const [resumeFile, setResumeFile] = useState<Uint8Array | null>(null);
+  const { token } = useUserStore();
 
   async function analyzeResume(endpoint: string, data: any, query: string) {
     try {
@@ -67,7 +72,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           result = await analyzeResume(endpoint, data, query);
           setReviewedData((prevData: any) => ({
             ...prevData,
-            quantification_checker: result.message,
+            quantification_checker: result?.message,
           }));
           break;
         case "resume_score":
@@ -81,9 +86,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             },
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            resume_score: result.message,
+            resume_score: result?.message,
           }));
           break;
         case "resume_length":
@@ -93,9 +98,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             experience: "FRESHER",
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            resume_length: result.message,
+            resume_length: result?.message,
           }));
           break;
         case "bullet_point_length":
@@ -104,9 +109,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            bullet_point_length: result.message,
+            bullet_point_length: result?.message,
           }));
           break;
         case "bullet_points_improver":
@@ -115,9 +120,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            bullet_points_improver: result.message,
+            bullet_points_improver: result?.message,
           }));
           break;
         case "total_bullet_points":
@@ -127,9 +132,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            total_bullet_points: result.message,
+            total_bullet_points: result?.message,
           }));
           break;
         case "verb_tense_checker":
@@ -139,9 +144,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           };
           query = "";
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            verb_tense_checker: result.message,
+            verb_tense_checker: result?.message,
           }));
           break;
         case "weak_verb_checker":
@@ -150,9 +155,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            weak_verb_checker: result.message,
+            weak_verb_checker: result?.message,
           }));
           break;
         case "section_checker":
@@ -161,7 +166,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
             section_checker: result.message,
           }));
@@ -173,9 +178,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           };
           query = `?profile=${profile}`;
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            skill_checker: result.message,
+            skill_checker: result?.message,
           }));
           break;
         case "repetition_checker":
@@ -185,9 +190,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           };
           query = "";
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            repetition_checker: result.message,
+            repetition_checker: result?.message,
           }));
           break;
         case "personal_info":
@@ -196,9 +201,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            personal_info: result.message,
+            personal_info: result?.message,
           }));
           break;
         case "responsibility_checker":
@@ -207,9 +212,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            responsibility_checker: result.message,
+            responsibility_checker: result?.message,
           }));
           break;
         case "spelling_checker":
@@ -218,9 +223,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
-          setReviewedData((prevData) => ({
+          setReviewedData((prevData: any) => ({
             ...prevData,
-            spelling_checker: result.message,
+            spelling_checker: result?.message,
           }));
           break;
         default:
@@ -231,6 +236,104 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     [structuredData, extractedText, profile],
   );
 
+  useEffect(() => {
+    const fetchCVs = async () => {
+      try {
+        const response = await fetch('/api/interviewer/get_cv', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch CVs');
+        }
+
+        const data = await response.json();
+
+        if (data.cvs.length > 0) {
+          const firstCV = data.cvs[0]; // Assuming you want to display the first CV
+
+          if (firstCV && firstCV.fileData) {
+            const pdfData = base64ToUint8Array(firstCV.fileData); // Convert base64 to Uint8Array
+            if (pdfData) {
+              setResumeFile(pdfData);
+            } else {
+              console.error('Failed to convert base64 string to Uint8Array.');
+            }
+          } else {
+            console.error('No valid fileData found in the response.');
+          }
+        } else {
+          console.error('No CVs found in the API response.');
+        }
+      } catch (error) {
+        console.error('Error fetching CVs:', error);
+      }
+    };
+
+    fetchCVs();
+  }, [token]);
+
+  const base64ToUint8Array = (base64: string): Uint8Array | null => {
+    if (!base64) {
+      console.error('Invalid base64 input');
+      return null;
+    }
+
+    try {
+      // Remove any characters that are not valid in a base64 string
+      const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, '');
+
+      // Ensure the length of the base64 string is correct
+      if (cleanedBase64.length % 4 !== 0) {
+        console.error("Base64 string length is invalid.");
+        return null;
+      }
+
+      // Decode the base64 string
+      const raw = window.atob(cleanedBase64);
+      const uint8Array = new Uint8Array(raw.length);
+      for (let i = 0; i < raw.length; i++) {
+        uint8Array[i] = raw.charCodeAt(i);
+      }
+      return uint8Array;
+    } catch (error) {
+      console.error("Failed to convert base64 string to Uint8Array:", error);
+      return null;
+    }
+  };
+
+
+
+  useEffect(() => {
+    const renderPDF = async () => {
+      if (resumeFile && canvasRef.current) {
+        const loadingTask = pdfjsLib.getDocument({ data: resumeFile });
+
+        loadingTask.promise
+          .then(async (pdf) => {
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = canvasRef.current!;
+            const context = canvas.getContext("2d")!;
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+              canvasContext: context,
+              viewport,
+            };
+
+            await page.render(renderContext).promise;
+          })
+          .catch((error) => {
+            console.error("Error loading PDF:", error);
+          });
+      }
+    };
+  }, [resumeFile]);
   console.log("Analysis Result:", reviewedData);
 
   useEffect(() => {
@@ -341,12 +444,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <DialogDescription>
                   <Accordion type="single" collapsible>
                     <AccordionItem value={`item-1`}>
-                      {reviewedData["quantification_checker"] !== undefined && (
+                      {reviewedData["quantification_checker"] && (
                         <AccordionTrigger>
                           Needs Quantification
                         </AccordionTrigger>
                       )}
-                      {reviewedData["quantification_checker"] !== undefined &&
+                      {reviewedData["quantification_checker"] &&
                         reviewedData["quantification_checker"][
                           "Not Quantify"
                         ].map((data: string, index: number) => {
@@ -358,10 +461,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                         })}
                     </AccordionItem>
                     <AccordionItem value={`item-2`}>
-                      {reviewedData["quantification_checker"] !== undefined && (
+                      {reviewedData["quantification_checker"] && (
                         <AccordionTrigger>Quantified</AccordionTrigger>
                       )}
-                      {reviewedData["quantification_checker"] !== undefined &&
+                      {reviewedData["quantification_checker"] &&
                         reviewedData["quantification_checker"]["Quantify"].map(
                           (data: string, index: number) => {
                             return (
@@ -385,7 +488,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               <DialogHeader>
                 <DialogTitle>Bullet Point Length</DialogTitle>
                 <DialogDescription>
-                  {reviewedData.bullet_point_length !== undefined &&
+                  {reviewedData.bullet_point_length &&
                   reviewedData.bullet_point_length.length === 0 ? (
                     reviewedData.bullet_point_length.Result.map(
                       (data: string, ind: number) => {
@@ -408,7 +511,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <DialogTitle> Bullet Points Improver </DialogTitle>
                 <DialogDescription>
                   <Accordion type="single" collapsible>
-                    {reviewedData.bullet_points_improver !== undefined &&
+                    {reviewedData.bullet_points_improver &&
                       reviewedData.bullet_points_improver.bulletPoints.map(
                         (data, ind: number) => (
                           <AccordionItem value={`item-${ind + 1}`} key={ind}>
@@ -449,7 +552,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <DialogTitle> Verb Tense Checker </DialogTitle>
                 <DialogDescription>
                   <Accordion type="single" collapsible>
-                    {reviewedData.verb_tense_checker !== undefined && (
+                    {reviewedData.verb_tense_checker && (
                       <div>
                         {" "}
                         {Object.keys(reviewedData.verb_tense_checker).map(
@@ -492,7 +595,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <DialogTitle> Weak Verb Checker </DialogTitle>
                 <DialogDescription>
                   <Accordion type="single" collapsible>
-                    {reviewedData.weak_verb_checker !== undefined &&
+                    {reviewedData.weak_verb_checker &&
                       Object.keys(reviewedData.weak_verb_checker).map(
                         (key, ind: number) => (
                           <AccordionItem value={`item-${ind + 1}`} key={ind}>
@@ -519,7 +622,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <DialogTitle> Section Checker </DialogTitle>
                 <DialogDescription>
                   <Accordion type="single" collapsible>
-                    {reviewedData.section_checker !== undefined &&
+                    {reviewedData.section_checker &&
                       Object.keys(reviewedData.section_checker).map(
                         (key, ind: number) => (
                           <AccordionItem value={`item-${ind + 1}`} key={ind}>
@@ -546,7 +649,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <DialogTitle> Skill Checker </DialogTitle>
                 <DialogDescription>
                   <Accordion type="single" collapsible>
-                    {reviewedData.skill_checker !== undefined &&
+                    {reviewedData.skill_checker &&
                       Object.keys(reviewedData.skill_checker).map(
                         (key, ind: number) => (
                           <AccordionItem value={`item-${ind + 1}`} key={ind}>
@@ -573,7 +676,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <DialogTitle> Repetition Checker </DialogTitle>
                 <DialogDescription>
                   <Accordion type="single" collapsible>
-                    {reviewedData.repetition_checker !== undefined &&
+                    {reviewedData.repetition_checker &&
                       Object.keys(reviewedData.repetition_checker).map(
                         (key, ind: number) => (
                           <AccordionItem value={`item-${ind + 1}`} key={ind}>
@@ -610,7 +713,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               <DialogTitle> Personal Info </DialogTitle>
               <DialogDescription>
                 <Accordion type="single" collapsible>
-                  {reviewedData.personal_info !== undefined &&
+                  {reviewedData.personal_info &&
                     Object.keys(reviewedData.personal_info).map(
                       (key, ind: number) => (
                         <AccordionItem value={`item-${ind + 1}`} key={ind}>
@@ -636,7 +739,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <DialogTitle> Responsibility Checker </DialogTitle>
                 <DialogDescription>
                   <Accordion type="single" collapsible>
-                    {reviewedData.responsibility_checker !== undefined &&
+                    {reviewedData.responsibility_checker &&
                       Object.keys(reviewedData.responsibility_checker).map(
                         (key, ind: number) => (
                           <AccordionItem value={`item-${ind + 1}`} key={ind}>

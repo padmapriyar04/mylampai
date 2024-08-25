@@ -56,7 +56,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
-
+  
   const {token} = useUserStore()
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +66,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     setUploading(true);
 
     if (file && file.type === "application/pdf") {
-
+        // Limiting the file size to 5MB
         if (file.size > 5 * 1024 * 1024) {
             toast.error("File size should be less than 5MB");
             setUploading(false);
@@ -76,8 +76,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         const fileReader = new FileReader();
         let extractedText = "";
 
-        setResumeFile(file);
-
+        // This function is called when the file is fully loaded
         fileReader.onload = async function () {
             const typedArray: ArrayBuffer = new Uint8Array(this.result as ArrayBuffer);
 
@@ -107,7 +106,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                         setExtractedText(extractedText);
                         const structuredDataResult = await extractStructuredData(extractedText);
 
-                        if (structuredDataResult.message) {
+                        if (structuredDataResult) {
                             setStructuredData(structuredDataResult.message);
                         }
 
@@ -121,7 +120,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     toast.error("Error converting file to base64 or extracting text");
                 }
             };
-
             base64Reader.readAsDataURL(file); // Start reading the file as a data URL
         };
 
@@ -132,7 +130,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     }
 };
 
-
+  
   const extractTextFromPDF = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -185,7 +183,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
   async function extractStructuredData(text: string) {
     try {
-
       const response = await fetch(`${baseUrl}/extract_structured_data`, {
         method: "POST",
         headers: {
@@ -209,7 +206,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     }
   }
 
-
+  
 
   return (
     <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee]">
@@ -234,7 +231,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             </p>
           </div>
         </div>
-
+        
         {/* Right Section */}
         {step === 1 && (
           <div className="w-full md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
@@ -301,8 +298,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     )}
                   </div>
                 </div>
-
-
+ 
+                
               </div>
 
             <div className="text-center mb-6 mt-3 w-[100%]">
@@ -455,8 +452,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                     )}
                   </div>
                 </div>
-
-
+ 
+                
               </div>
             </div>
             <h3 className="text-sm xl:text-2xl mb-6 font-bold text-gray-800">
@@ -464,7 +461,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             </h3>
 
             <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]">
-
+            
                     <div className="w-full  p-4 bg-white rounded-lg flex flex-col items-center justify-center ">
                     <select
                         className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"

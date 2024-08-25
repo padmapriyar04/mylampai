@@ -29,6 +29,8 @@ model User {
   sentmessages     Directmessage[] @relation("SenderUser")
   receivedMessages Directmessage[] @relation("ReceiverUser")
   otps             OTP[]
+  cvs              CV[]
+
   sessions         Session[]
 }
 
@@ -41,6 +43,16 @@ model OTP {
   verified  Boolean  @default(false)
   userId    String?  @db.ObjectId
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CV{
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  Resume    String
+  JobDescription    String
+  createdAt DateTime @default(now())
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
 }
 
 model Account {

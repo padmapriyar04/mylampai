@@ -1,6 +1,5 @@
 // pages/api/auth/send-otp.ts
 import prisma from "@/lib";
-// import { connectToDatabase } from "@/app/helpers/server";
 import { NextResponse, NextRequest } from "next/server";
 import transporter from "@/lib/nodemailer";
 

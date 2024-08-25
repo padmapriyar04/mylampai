@@ -1,10 +1,8 @@
 "use client"
-import Image from "next/image";
 import { HiOutlineDocumentCheck } from "react-icons/hi2";
 import Link from "next/link";
 import { RiComputerLine } from "react-icons/ri";
 import { FaLinkedin } from "react-icons/fa";
-import { toast } from "sonner";
 
 
 export default function Achieve() {
@@ -25,7 +23,7 @@ export default function Achieve() {
         <div className="flex flex-row justify-evenly relative md:top-[3vh] gap-6 w-full px-[1vw] pb-8 md:mt-16">
           <Link
             href="#"
-            className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-gray-200 transition"
+            className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-primary hover:text-white transition"
           >
             Past Analysis
           </Link>
@@ -54,12 +52,12 @@ export default function Achieve() {
         <div className="flex flex-row justify-evenly relative md:top-[3vh] gap-6 w-full px-[1vw] pb-8 md:mt-16">
           <Link
             href="#"
-            className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-gray-200 transition"
+            className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-primary hover:text-white transition"
           >
             Past Analysis
           </Link>
           <Link
-            href="/cvreviewer"
+            href="/interview"
             className="bg-primary py-2 md:py-5 px-3 w-1/2 font-semibold text-white md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-purple-600 transition"
           >
             Get Interviewed
