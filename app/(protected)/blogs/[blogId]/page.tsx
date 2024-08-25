@@ -149,16 +149,7 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
                                     <li>{section.subheading}</li>
                                 ))}
                             </ul>
-                            {/* <ul className="list-none txt-sm flex flex-col items-center space-y-4">
-                                <li>Lorem Ipsum</li>
-                                <li>Lorem Ipsum</li>
-                                <li>Lorem Ipsum</li>
-                                <li>Lorem Ipsum</li>
-                                <li>Lorem Ipsum</li>
-                                <li>Lorem Ipsum</li>
-                                <li>Lorem Ipsum</li>
-                                <li>Lorem Ipsum</li>
-                            </ul> */}
+                           
                             <div className='border-[1.6px] my-2 border-b-black w-[49%] mx-auto'></div>
                             <div className="flex justify-center space-x-4 mt-3 w-full">
                                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#8C52FF]">
