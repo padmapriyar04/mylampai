@@ -2,11 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaHome } from "react-icons/fa";
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import Footer from '@/components/home/Footer';
 import Carousel from "./crousal";
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaThumbsUp, FaShare, FaDownload } from 'react-icons/fa';
-interface BlogPost {
+interface BlogPostbyId {
     title: string;
     createdAt: string;
     readtime: string;
@@ -16,12 +15,23 @@ interface BlogPost {
     tags: string[];
     sections: { subheading: string; content: string }[];
 }
+interface Blog {
+    id: string;
+    title: string;
+    description:String;
+    authorName: String;
+    position: string;
+    readtime: string;
+    createdAt: string;
+    tags: string[];
+}
 
 export default function BlogId({ params }: { params: { blogId: string } }) {
-    const [blogPost, setBlogPost] = useState<BlogPost | null>(null);
+    const [blogPost, setBlogPost] = useState<BlogPostbyId | null>(null);
+    const [blog, setBlog] = useState<Blog[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
+    const [newerror, setNewError] = useState<string | null>(null);
     const { blogId } = params;
 
     useEffect(() => {
@@ -47,6 +57,25 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
         fetchPost();
     }, [blogId]);
 
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/api/blogs", {
+                    method: "GET",
+                });
+                if (!response.ok) {
+                    throw new Error("Failed to fetch blog posts");
+                }
+                const data = await response.json();
+                setBlog(data.posts);
+            } catch (err) {
+                setNewError((err as Error).message);
+            }
+        };
+
+        fetchPosts();
+    }, []);
+
     const [showMore, setShowMore] = useState<boolean>(false);
     const contentRef = useRef<HTMLDivElement>(null);
 
@@ -64,6 +93,18 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
     if (!blogPost) return <p>No blog post found.</p>;
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const itemsToShow = 4;
+    const numberOfItems = blog.length;
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex >= numberOfItems - itemsToShow ? 0 : prevIndex + 1));
+        }, 3000); // Change slide every 3 seconds
+        return () => clearInterval(interval);
+    }, [numberOfItems, itemsToShow]);
+
 
     return (
         <div className='w-full min-h-[100vh] bg-[#000000] flex flex-col'>
@@ -149,7 +190,7 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
                                     <li>{section.subheading}</li>
                                 ))}
                             </ul>
-                           
+
                             <div className='border-[1.6px] my-2 border-b-black w-[49%] mx-auto'></div>
                             <div className="flex justify-center space-x-4 mt-3 w-full">
                                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#8C52FF]">
@@ -168,46 +209,22 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
                         </div>
 
                         <div className="w-[60%] px-6 lg:px-[60px] xl:px-[100px] my-8 bg-[#FFFFFF] relative">
-                            <div id="allroundassistance" className="pb-[30px] sm:pb-[50px]">
-                                <div className="text-2xl sm:text-3xl font-medium mt-4 mb-2">
-                                    Why Choose WordPress?
-                                </div>
-                                <p className="text-sm sm:text-lg text-[#000000BB] font-medium my-4">
-                                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet nam nobis tenetur vitae placeat inventore, doloremque atque facere molestias doloribus assumenda officiis suscipit hic! Ipsa sit neque eligendi magni explicabo ab, non modi maxime!
-                                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Accusantium earum culpa, non corrupti fugit, accusamus animi amet cupiditate illo iste placeat, expedita aut nam eos fugiat! Totam facilis repellat ut ipsam dicta, illum optio sunt accusamus, et tenetur expedita atque possimus? Corrupti ut sed consequuntur sunt, laborum veniam repellat odit nihil perferendis debitis provident maxime assumenda aspernatur quia itaque alias, veritatis accusamus, consectetur deserunt eos voluptate nostrum! Deleniti corrupti amet iure consectetur modi sunt incidunt deserunt ab? Ipsam vitae at eveniet, rem vel possimus dolorum officiis nostrum deleniti minus reprehenderit.
-                                </p>
-                            </div>
-                            <div id="smartestplatform" className="pb-[30px] sm:pb-[50px]">
-                                <div className="text-2xl sm:text-3xl font-medium mt-4 mb-2">
-                                    WordPress Developer Roadmap (Step-By-Step)
-                                </div>
-                                <p className="text-sm sm:text-lg text-[#000000BB] font-medium my-4">
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus laudantium tenetur, dicta quae qui cum obcaecati rerum sit? Officia iusto explicabo dolores! Est iure quos saepe aliquam magni accusantium voluptates voluptatem incidunt. Eveniet, perferendis.
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis architecto, tempora suscipit quod culpa exercitationem! Aliquam iste sapiente maiores, totam natus quasi dignissimos perferendis iusto animi odio ipsam dolorem dolorum molestiae quo in repellendus similique ipsum optio laborum ea ullam placeat excepturi. Eum totam ipsum similique tenetur dicta repellat architecto consequatur! Corporis facilis illo sapiente sequi debitis pariatur, delectus esse asperiores ipsa, recusandae laudantium iusto! Corporis explicabo, aspernatur debitis quidem mollitia iure pariatur omnis animi maiores, laboriosam eos repellat fuga atque nostrum ducimus nesciunt dolore fugiat asperiores. Labore, incidunt obcaecati!
-                                </p>
-                            </div>
-                            <div id="ourwinningrecord">
-                                <div className="text-2xl sm:text-3xl font-medium mt-4 mb-2">
-                                    Conclusion
-                                </div>
-                                <p className="text-sm sm:text-lg text-[#000000BB] font-medium my-4">
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti ab aspernatur expedita! Provident unde eos a non tempora sit ducimus repellendus officia magnam debitis. Magni ipsam veniam vel est nostrum deleniti consequuntur sunt rem!
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet quas quasi suscipit mollitia architecto animi dicta debitis odio praesentium provident excepturi quia nostrum maiores aut, voluptas, aliquam nemo unde commodi cupiditate. Dolorum deserunt culpa, nulla ratione saepe commodi ea hic voluptatibus sit officiis magnam tempore iste tempora ex consectetur quis dolore beatae nobis! Dignissimos odio voluptatibus esse cupiditate iusto non, tempora odit quam. Accusantium cum nihil cumque iusto quam nobis explicabo saepe magni, labore minima, blanditiis ut tempore. Deleniti id ullam cum tempora perspiciatis maxime maiores temporibus perferendis ad illum!
-                                </p>
-                            </div>
+                            {blogPost.sections.map((section) => (
+                                <li>
+                                    <div className="text-2xl sm:text-3xl font-medium mt-4 mb-2">
+                                        {section.subheading}
+                                    </div>
+                                    <p className="text-sm sm:text-lg text-[#000000BB] font-medium my-4">
+                                        {section.content}
+                                    </p>
+                                </li>
+                            ))}
 
                         </div>
 
                         {/* Right Sidebar */}
                         <div className="w-[20%] hidden md:block p-4 my-10 mx-4">
                             <div className="text-lg mb-4 font-semibold text-[#8C52FF] shadow-lg py-2">Featured Content :</div>
-                            <div className="flex items-start mb-4">
-                                <img src="/blog/instructor.svg" alt="Title 1" className="w-[28%] mr-4" />
-                                <div>
-                                    <h3 className="text-black text-sm">Title 2</h3>
-                                    <p className="text-black text-sm">Description for Title 2.</p>
-                                </div>
-                            </div>
                             <div className="mb-6">
                                 <div className="flex items-start mb-4">
                                     <img src="/blog/instructor.svg" alt="Title 1" className="w-[28%] mr-4" />
@@ -251,7 +268,24 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
                         </div>
                     </div>
 
-                    <Carousel />
+                    <div className='relative w-full px-20 text-2xl'>
+                        <div className=' w-full p-4  text-3xl font-semibold text-[#8C52FF]'>Suggested Resources  </div>
+                        <div className='relative w-full overflow-hidden flex justify-center'>
+                            <div className='flex transition-transform duration-500' style={{ transform: `translateX(-${currentIndex * (100 / itemsToShow)}%)` }}>
+                                {blog.map((item) => (
+                                    <div key={item.id} className='flex-none w-[calc(100% / 4)] shadow-xl p-4'>
+                                        <div className='bg-white shadow-xl rounded-sm overflow-hidden flex flex-col items-center'>
+                                            <img src='/blog/instructor.svg' alt={item.title} className='w-full rounded-lg max-w-[300px] h-48 object-cover mb-3' />
+                                            <div className='p-4 text-center'>
+                                                <h3 className='text-lg font-semibold text-gray-800 mb-2'>{item.title}</h3>
+                                                <p className='text-gray-600'>{item.description}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                     <Footer />
                 </div>
             </div>
