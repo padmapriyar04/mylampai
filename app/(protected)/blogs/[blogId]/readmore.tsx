@@ -1,8 +1,8 @@
 import React from 'react';
 import Footer from '@/components/home/Footer';
-import { FaThumbsUp, FaShare, FaDownload } from 'react-icons/fa';
+
 import Carousel from "./crousal";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn,FaThumbsUp, FaShare, FaDownload } from 'react-icons/fa';
 
 export default function Read() {
     return (
