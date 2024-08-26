@@ -17,7 +17,7 @@ model User {
   last_name        String?
   phone            String?
   hashedPassword   String?
-  role             String?
+  role             String? @default("user")
   posts            Modules[]
   userInfo         UserInfo?
   accounts         Account[]

@@ -1,40 +1,89 @@
 "use client";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useUserStore } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
 import { useRouterStore } from "@/utils/useRouteStore";
 import { toast } from "sonner";
+import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
-  const { userData, clearUser } = useUserStore();
+  const { data: session } = useSession();
+  const { userData, setUserData, clearUser } = useUserStore();
   const { bears } = useRouterStore();
   const router = useRouter();
+  const [initials, setInitials] = useState("Profile");
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-      });
-      if (response.ok) {
+      if (session) {
         clearUser();
-        toast.success("Logged out successfully");
-        router.push("/");
+        signOut();
       } else {
-        console.error("Logout failed:", response.statusText);
+        const response = await fetch("/api/auth/logout", {
+          method: "POST",
+        });
+        if (response.ok) {
+          clearUser();
+          toast.success("Logged out successfully");
+          router.push("/");
+        } else {
+          console.error("Logout failed:", response.statusText);
+        }
       }
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
   
+  
+  const getToken = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/getToken", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: session?.user.email }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setUserData(data.user, data.token);
+        console.log(data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (session) {
+      getToken();
+    }
+  }, [session]);
+
   const handleToast = (message: string) => {
     toast.success(message);
   };
 
-  const getUserInitials = () => {
+  const getUserInitials = useCallback(() => {
     if (userData) {
       let name = userData.name;
+      if (!name) return "Profile";
+      let arr = name.trim().split(" ");
+
+      let initials = "";
+
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].length > 0) initials += arr[i][0].toUpperCase();
+      }
+
+      return initials;
+    } else if (session) {
+      let name = session.user.name;
+      if (!name) return "Profile";
       let arr = name.trim().split(" ");
 
       let initials = "";
@@ -46,9 +95,11 @@ const Navbar = () => {
       return initials;
     }
     return "";
-  };
+  }, [userData, session]);
 
-  const initials = getUserInitials();
+  useEffect(() => {
+    setInitials(getUserInitials());
+  }, [getUserInitials]);
 
   if (bears)
     return (
@@ -67,7 +118,10 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 border-1 border-primary rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-105" onClick={() => handleToast("No notifications available")}>
+          <button
+            className="flex items-center gap-2 border-1 border-primary rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-105"
+            onClick={() => handleToast("No notifications available")}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -108,7 +162,10 @@ const Navbar = () => {
               <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v2A1.5 1.5 0 0 0 1.5 5h13A1.5 1.5 0 0 0 16 3.5v-2A1.5 1.5 0 0 0 14.5 0zm1 2h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1m9.927.427A.25.25 0 0 1 12.604 2h.792a.25.25 0 0 1 .177.427l-.396.396a.25.25 0 0 1-.354 0zM0 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm1 3v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2zm14-1V8a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v2zM2 8.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5" />
             </svg>
           </button>
-          <button className="flex items-center gap-2 border-1 border-primary rounded-full px-2 py-2 h-[40px] transition-transform transform hover:scale-105 " onClick={handleLogout}>
+          <button
+            className="flex items-center gap-2 border-1 border-primary rounded-full px-2 py-2 h-[40px] transition-transform transform hover:scale-105 "
+            onClick={handleLogout}
+          >
             {/* <span>Logout</span> */}
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -1,6 +1,5 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib";
 
@@ -10,38 +9,35 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-    }),
+      allowDangerousEmailAccountLinking: true,
+    })
   ],
+
   // callbacks: {
-  //   async signIn({ account, profile }) {
-  //     if (account?.provider === "google" && profile?.email) {
-  //       // Check if email exists
-  //       const existingUser = await prisma.user.findUnique({
-  //         where: { email: profile.email },
-  //       });
+      // async signIn({ account, profile }) {
+        // if (account?.provider === "google" && profile?.email) {
+        //   // Check if email exists
+        //   const existingUser = await prisma.user.findUnique({
+        //     where: { email: profile.email },
+        //   });
 
-  //       if (existingUser) {
-  //         // User already exists, do nothing or update some fields
-  //         console.log("User already exists:", existingUser);
-  //       } else {
-  //         // User does not exist, create a new user with the profile data
-  //         const newUser = await prisma.user.create({
-  //           data: {
-  //             name: profile.name || "",
-  //             email: profile.email,
-  //             role:"user",
-  //           },
-  //         });
-  //         console.log("User created:", newUser);
-  //       }
-  //     }
+        //   if (existingUser) {
+        //     console.log("User already exists:", existingUser);
+        //   } else {
+        //     // User does not exist, create a new user with the profile data
+        //     const newUser = await prisma.user.create({
+        //       data: {
+        //         name: profile.name || "",
+        //         email: profile.email,
+        //         role:"user",
+        //       },
+        //     });
+        //     console.log("User created:", newUser);
+        //   }
+        // }
 
-  //     return true;
-  //   },
+      //   return true;
+      // },
   // },
   debug: process.env.NODE_ENV === "development",
   session: {

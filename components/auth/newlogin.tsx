@@ -19,7 +19,7 @@ import GoogleImg from "../../public/images/Google_Icons-09-512.png";
 const AuthForm: React.FC = () => {
   const { data: session } = useSession();
   const { userData, setUserData, clearUser } = useUserStore();
-  const [isSignUp, setIsSignUp] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [isOTPVerifing, setIsOTPVerifing] = useState(false);
   const [user, setUser] = useState({
@@ -248,8 +248,6 @@ const AuthForm: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signIn("google");
-      toast.success("Google sign-in successful!");
-      console.log("result", result);
       if (result?.error) {
         console.error("Google sign-in error:", result.error);
         toast.error("Google sign-in failed. Please try again.");
