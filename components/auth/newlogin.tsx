@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -16,6 +17,7 @@ import Lock from "../../public/images/icons8-lock.svg";
 import GoogleImg from "../../public/images/Google_Icons-09-512.png";
 
 const AuthForm: React.FC = () => {
+  const { data: session } = useSession();
   const { userData, setUserData, clearUser } = useUserStore();
   const [isSignUp, setIsSignUp] = useState(true);
   const [isSigningUp, setIsSigningUp] = useState(false);
@@ -81,14 +83,6 @@ const AuthForm: React.FC = () => {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
-    if (!otpVerified) {
-      toast.error("Please verify OTP first.");
-      return;
-    }
-    if (!agreeToTerms) {
-      toast.error("Please agree to the terms and conditions.");
-      return;
-    }
       
     setIsOTPVerifing(true);
     
@@ -107,7 +101,6 @@ const AuthForm: React.FC = () => {
         toast.error(errorData.message || "Failed to send OTP");
       }
     } catch (error) {
-      console.error("Error sending OTP:", error);
       toast.error("An error occurred while sending OTP");
     }
     setIsOTPVerifing(false);
@@ -182,8 +175,6 @@ const AuthForm: React.FC = () => {
           role: "user"
         }),
       });
-      
-      
 
       if (res.ok) {
         const userData = await res.json();
@@ -257,6 +248,8 @@ const AuthForm: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signIn("google");
+      toast.success("Google sign-in successful!");
+      console.log("result", result);
       if (result?.error) {
         console.error("Google sign-in error:", result.error);
         toast.error("Google sign-in failed. Please try again.");
@@ -267,9 +260,14 @@ const AuthForm: React.FC = () => {
     }
   };
   
-  useEffect(()=> {
-    clearUser();
-  }, [clearUser])
+  useEffect(() => {
+    console.log("session", session);
+    if (session?.user) {
+        router.push("/");
+    } else {
+      clearUser();
+    }
+  }, [session]);
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0">

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 // import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { useUserStore } from "@/utils/userStore";
 // import { useRouterStore } from "@/utils/useRouteStore";
+import { signOut } from "next-auth/react";
 import {
   CommunityComponent,
   ResourcesComponent,
@@ -103,26 +104,26 @@ const HomeNavbar = () => {
         <ResourcesComponent />
 
         <CompanyComponent />
-        
-        {
-          userData ? (
-            <Link
-              href={"/profile"}
-              className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
-            >
-              {initials}
-              <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
-            </Link>
-          ) : (
-            <Link
-              href={"/login"}
-              className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
-            >
-              Sign In
-              <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
-            </Link>
-          )
-        }
+
+        <button onClick={() => signOut()}>Logout</button>
+
+        {userData ? (
+          <Link
+            href={"/profile"}
+            className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
+          >
+            {initials}
+            <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
+          </Link>
+        ) : (
+          <Link
+            href={"/login"}
+            className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
+          >
+            Sign In
+            <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
+          </Link>
+        )}
       </div>
     </div>
   );

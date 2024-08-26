@@ -9,6 +9,7 @@ export const POST = async (req: Request) => {
   try {
     const {
       email,
+      name,
       first_name,
       last_name,
       phone,
@@ -23,9 +24,10 @@ export const POST = async (req: Request) => {
       expectedGraduationDate,
       goal,
       skills,
-      headline
-    } = await req.json() as {
+      headline,
+    } = (await req.json()) as {
       email: string;
+      name: string;
       first_name: string;
       last_name: string;
       phone: string;
@@ -44,14 +46,20 @@ export const POST = async (req: Request) => {
     };
 
     // Basic validation
-    if (!email || !first_name || !last_name || !phone || !password || (role === "admin" && !secret)) {
+    if (
+      !email ||
+      !first_name ||
+      !last_name ||
+      !name ||
+      !phone ||
+      !password ||
+      (role === "admin" && !secret)
+    ) {
       return NextResponse.json(
         { error: "All fields are required." },
-        { status: 422 }
+        { status: 422 },
       );
     }
-
-    await connectToDatabase();
 
     // Check OTP verification status
     const otpRecord = await prisma.oTP.findUnique({ where: { email } });
@@ -59,7 +67,7 @@ export const POST = async (req: Request) => {
     if (!otpRecord || !otpRecord.verified) {
       return NextResponse.json(
         { error: "OTP not verified. Please verify OTP before registration." },
-        { status: 422 }
+        { status: 422 },
       );
     }
 
@@ -76,6 +84,7 @@ export const POST = async (req: Request) => {
         data: {
           first_name,
           last_name,
+          name,
           phone,
           hashedPassword: hashedPassword,
           role,
@@ -84,7 +93,17 @@ export const POST = async (req: Request) => {
 
       // Optionally update userInfo
       let userInfo;
-      if (country || college || degree || branch || areaOfStudy || expectedGraduationDate || goal || skills || headline) {
+      if (
+        country ||
+        college ||
+        degree ||
+        branch ||
+        areaOfStudy ||
+        expectedGraduationDate ||
+        goal ||
+        skills ||
+        headline
+      ) {
         userInfo = await prisma.userInfo.upsert({
           where: { userId: existingUser.id },
           update: {
@@ -116,7 +135,10 @@ export const POST = async (req: Request) => {
       // Delete OTP record
       await prisma.oTP.delete({ where: { email } });
 
-      return NextResponse.json({ user: existingUser, userInfo }, { status: 200 });
+      return NextResponse.json(
+        { user: existingUser, userInfo },
+        { status: 200 },
+      );
     } else {
       // Create a new user
       const newUser = await prisma.user.create({
@@ -124,6 +146,7 @@ export const POST = async (req: Request) => {
           email,
           first_name,
           last_name,
+          name,
           phone,
           hashedPassword: hashedPassword,
           role,
@@ -132,7 +155,17 @@ export const POST = async (req: Request) => {
 
       // Optionally create userInfo
       let userInfo;
-      if (country || college || degree || branch || areaOfStudy || expectedGraduationDate || goal || skills || headline) {
+      if (
+        country ||
+        college ||
+        degree ||
+        branch ||
+        areaOfStudy ||
+        expectedGraduationDate ||
+        goal ||
+        skills ||
+        headline
+      ) {
         userInfo = await prisma.userInfo.create({
           data: {
             country: country || null,
@@ -152,13 +185,24 @@ export const POST = async (req: Request) => {
       // Delete OTP record
       await prisma.oTP.delete({ where: { email } });
 
-      return NextResponse.json({ user: newUser, userInfo }, { status: 201 });
+      return NextResponse.json(
+        {
+          token: "",
+          user: {
+            id: newUser.id,
+            email,
+            name,
+            role,
+          },
+        },
+        { status: 201 },
+      );
     }
   } catch (error) {
     console.error("Error during user registration:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
