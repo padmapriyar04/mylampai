@@ -46,7 +46,7 @@ export default function About() {
                         <p className=' 2xl:text-md  md:text-sm'>Just relax and take the interview. All the best!</p>
                         <div className="2xl:h-20 md:h-14 bg-white"></div>
                         <h1 className="font-bold relative right-0 2xl:text-xl  md:text-md">Our Vision</h1>
-                        <p className=' 2xl:text-md  md:text-sm'>Just relax and take the interview. Have your skills evaluated. All the best!</p>
+                        <p className=' 2xl:text-md  md:text-sm '>Just relax and take the interview. Have your skills evaluated. All the best!</p>
                     </div>
 
                     <div className="bg-primary-foreground h-[calc(30vh-2rem)] w-full p-6 rounded-lg shadow-lg flex flex-row justify-evenly">
@@ -69,22 +69,22 @@ export default function About() {
                 {/* Scrollable Container */}
                 <div
                     ref={scrollContainerRef}
-                    className="bg-primary-foreground flex flex-col shadow-2xl w-full rounded-xl p-6 gap-6"
+                    className="bg-primary-foreground flex min-h-[200vh] flex-col shadow-2xl w-full rounded-xl p-6 gap-6"
                 >
-                    <div className='w-full min-h-[500px] flex justify-center items-center'> 
+                    <div className='w-full  h-[150vh] flex justify-center items-center'> 
                         content
                     </div>
-                    <div className="w-full bg-white min-h-[400px] h-full rounded-lg shadow-lg p-2">
+                    <div className="w-full bg-white min-h-[30vh] max-h-[400px] h-full rounded-lg shadow-lg p-2">
                         <div className="font-bold text-2xl flex justify-end">
                             <h1>Team</h1>
                         </div>
                     </div>
-                    <div className="w-full max-h-[400px] min-h-[300px] h-full bg-white rounded-lg shadow-lg p-2">
+                    <div className="w-full min-h-[30vh] max-h-[400px] h-full bg-white rounded-lg shadow-lg p-2">
                         <div className="font-bold text-2xl flex justify-end">
                             <h1>Backers</h1>
                         </div>
                     </div>
-                    <div className="w-full max-h-[400px] min-h-[300px] h-full bg-white rounded-lg shadow-lg p-2">
+                    <div className="w-full max-h-[400px] min-h-[30vh] h-full bg-white rounded-lg shadow-lg p-2">
                         <div className="font-bold text-2xl flex justify-end">
                             <h1>ETC</h1>
                         </div>

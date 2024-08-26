@@ -911,63 +911,63 @@ const InterviewComponent = () => {
               </h3>
             </div>
 
-            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center">
-  <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-3xl">
-    <IoDocumentAttach />
-  </div>
+            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] lg:max-h-[280px]  shadow-lg text-center">
+              <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-3xl">
+                <IoDocumentAttach />
+              </div>
 
-  {resumeFile ? (
-    <div className="text-center text-gray-600 font-semibold relative">
-      Resume Uploaded: {resumeFile.name}
-      <button
-        className="absolute top-0 right-0 text-gray-600 hover:text-red-600 focus:outline-none"
-        onClick={handleDeleteResume}
-      >
-        <FiX className="w-5 h-5" />
-      </button>
-    </div>
-  ) : (
-    <div
-      className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white"
-      onDragOver={handleDragOver}
-      onDrop={(e) => handleDrop(e, setResumeFile)}
-    >
-      <p className="text-gray-500 mt-2 text-sm">Drag & Drop or</p>
-      <label
-        htmlFor="resumeUpload"
-        className="text-gray-500 cursor-pointer text-sm"
-      >
-        Click to <span className="font-semibold text-gray-700">Upload Resume</span>
-      </label>
-      <input
-        id="resumeUpload"
-        type="file"
-        accept=".doc,.docx,.pdf"
-        className="hidden"
-        onChange={handleResumeUpload}
-      />
+              {resumeFile ? (
+                <div className="text-center text-gray-600 font-semibold relative">
+                  Resume Uploaded: {resumeFile.name}
+                  <button
+                    className="absolute top-0 right-0 text-gray-600 hover:text-red-600 focus:outline-none"
+                    onClick={handleDeleteResume}
+                  >
+                    <FiX className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white h-[145px]"
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, setResumeFile)}
+                >
+                  <p className="text-gray-500 mt-2 text-sm">Drag & Drop or</p>
+                  <label
+                    htmlFor="resumeUpload"
+                    className="text-gray-500 cursor-pointer text-sm"
+                  >
+                    Click to <span className="font-semibold text-gray-700">Upload Resume</span>
+                  </label>
+                  <input
+                    id="resumeUpload"
+                    type="file"
+                    accept=".doc,.docx,.pdf"
+                    className="hidden"
+                    onChange={handleResumeUpload}
+                  />
 
-      <div className="text-4xl mt-3 text-gray-300">
-        <IoCloudUploadOutline />
-      </div>
+                  <div className="text-4xl mt-3 text-gray-300">
+                    <IoCloudUploadOutline />
+                  </div>
 
-      <p className="text-gray-400 text-sm mt-3">
-        Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.
-      </p>
-    </div>
-  )}
+                  <p className="text-gray-400 text-sm mt-3">
+                    Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.
+                  </p>
+                </div>
+              )}
 
-  {/* Upload Button */}
-  <div className="flex justify-center mt-2">
-  <button
-    className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl ${resumeFile ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
-    onClick={() => !resumeFile && triggerFileInput("resumeUpload")}
-    disabled={!!resumeFile || isUploading}
->
-    {isUploading ? "Uploading..." : resumeFile ? 'Resume Uploaded' : 'Upload Resume'}
-</button>
-  </div>
-</div>
+              {/* Upload Button */}
+              <div className="flex justify-center mt-2">
+              <button
+                className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl ${resumeFile ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
+                onClick={() => !resumeFile && triggerFileInput("resumeUpload")}
+                disabled={!!resumeFile || isUploading}
+            >
+                {isUploading ? "Uploading..." : resumeFile ? 'Resume Uploaded' : 'Upload Resume'}
+            </button>
+              </div>
+            </div>
 
             <div className="mt-8 w-full px-4 flex flex-col items-center">
               <button
