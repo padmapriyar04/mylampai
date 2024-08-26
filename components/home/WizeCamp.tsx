@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function WizeCamp() {
   return (
@@ -52,9 +53,9 @@ export default function WizeCamp() {
             </div>
           </div>
           <div className="w-full flex justify-between  text-white max-w-[400px] mx-auto gap-8">
-            <button className="bg-[#ffffff72] rounded-lg py-2 px-4 w-full text-lg font-semibold">
+            <Link href="/wizecamp" className="bg-[#ffffff72] rounded-lg py-2 px-4 w-full text-lg font-semibold flex justify-center items-center">
               More Info.
-            </button>
+            </Link>
             <button className="border-2 rounded-lg py-3 px-4 w-full text-lg font-semibold">
               Register Now
             </button>
