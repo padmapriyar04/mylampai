@@ -37,7 +37,7 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/api/blogs/${blogId}`, {
+                const response = await fetch(`/api/blogs/${blogId}`, {
                     method: "GET",
                 });
 

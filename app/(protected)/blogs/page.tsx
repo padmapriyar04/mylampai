@@ -22,7 +22,7 @@ export default function BlogList() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/blogs", {
+        const response = await fetch("/api/blogs", {
           method: "GET",
 
         });
