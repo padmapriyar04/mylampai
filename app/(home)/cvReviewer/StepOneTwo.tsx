@@ -170,8 +170,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         const result = await response.json();
 
         if (response.ok) {
-            toast.success("CV and Job Description uploaded successfully");
-            // Handle successful upload
+            setIsResumeUploaded(true);
+            toast.success("CV Uploaded successfully");
         } else {
             toast.error(result.error || "Failed to upload CV and Job Description");
         }
@@ -194,7 +194,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       const result = await response.json();
       if (response.ok) {
         setIsResumeUploaded(true);
-        toast.success("Resume uploaded successfully");
         return result;
       }
       toast.error("Error extracting structured data from resume");

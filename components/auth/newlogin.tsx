@@ -220,8 +220,6 @@ const AuthForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
-        console.log(data);
-
         // Store user data and token in cookies
         setCookie("token", data.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
@@ -259,7 +257,6 @@ const AuthForm: React.FC = () => {
   };
   
   useEffect(() => {
-    console.log("session", session);
     if (session?.user) {
         router.push("/");
     } else {

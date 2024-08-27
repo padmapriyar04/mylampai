@@ -43,7 +43,6 @@ const HomeNavbar = () => {
 
       if (res.ok) {
         setUserData(data.user, data.token);
-        console.log(data);
       }
     } catch (err) {
       console.log(err);
