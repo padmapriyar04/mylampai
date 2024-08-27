@@ -72,7 +72,7 @@ export default function WhyWize() {
         <div className="md:border-l-4 md:border-[#baa1eb] px-6 lg:px-[60px] xl:px-[100px] relative">
           <div
             id="allroundguidance"
-            ref={(el) => (sectionsRef.current[0] = el)}
+            ref={(el) => { sectionsRef.current[0] = el }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
@@ -93,27 +93,10 @@ export default function WhyWize() {
 
           <PracticeCoding />
 
-          <div
-            id="pathtosuccess"
-            ref={(el) => (sectionsRef.current[1] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
-          >
-            <h4 className="pt-4 font-semibold text-[#8C52FF]">
-              PATH TO SUCCESS
-              <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%]"></div>
-            </h4>
-            <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-              We&apos;re with you at every step
-            </div>
-            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              Success is not just about hard work; it&apos;s also about making smart choices. And w&apos;re here to help you make them.
-            </p>
-            <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
-          </div>
 
           <div
             id="smartestplatform"
-            ref={(el) => (sectionsRef.current[2] = el)}
+            ref={(el) => { sectionsRef.current[2] = el }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
@@ -136,28 +119,8 @@ export default function WhyWize() {
           <ExperiencedCounsellors />
 
           <div
-            id="expertsinsights"
-            ref={(el) => (sectionsRef.current[3] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
-          >
-            <h4 className="pt-4 font-semibold text-[#8C52FF]">
-              EXPERTS INSIGHTS
-              <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%]"></div>
-            </h4>
-            <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-              Learn from the best in the industry
-            </div>
-            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              Gain valuable insights from industry experts who have a wealth of
-              experience. Get the advice and guidance you need to excel in your
-              career.
-            </p>
-            <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
-          </div>
-
-          <div
             id="advancedfeatures"
-            ref={(el) => (sectionsRef.current[4] = el)}
+            ref={(el) => { sectionsRef.current[4] = el }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
