@@ -458,7 +458,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               Choose your Interview Profile
             </h3>
 
-            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]">
+            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center max-h-[300px]">
               <div className="w-full  p-4 bg-white rounded-lg flex flex-col items-center justify-center ">
                 <select
                   className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
