@@ -810,7 +810,7 @@ const InterviewComponent = () => {
   
 
   return (
-    <div className="md:h-[calc(100vh)] h-[132vh] overflow-y-scroll bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
+    <div className="md:h-[calc(100vh-4rem)] h-[132vh] overflow-y-scroll bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
       {/* Step 1: Upload Resume */}
       {step === 1 && (
         <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row justify-between">
