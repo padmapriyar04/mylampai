@@ -1,5 +1,9 @@
 "use client";
 import React, { useState, ChangeEvent, FormEvent } from "react";
+import axios from "axios";
+import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -9,7 +13,7 @@ import Input from "./Input";
 import CountrySelector from "../misc/CountryFlag";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { setCookie } from "@/utils/cookieUtils"; 
+import { setCookie } from "@/utils/cookieUtils";
 import { useUserStore } from "@/utils/userStore";
 
 import Globe from "../../public/images/Globe.svg";
@@ -46,6 +50,29 @@ const AuthForm: React.FC = () => {
   const [isOtpLogin, setIsOtpLogin] = useState(false);
 
   const router = useRouter();
+
+  const login = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const res = await axios.get(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${response.access_token}`,
+            },
+          }
+        );
+        console.log(res);
+        const { email, name } = res.data;
+        await axios.post("/api/auth/google", {
+          email,
+          name,
+        });
+      } catch (err) {
+        console.log('Error during Google login:', err);
+      }
+    },
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -207,15 +234,15 @@ const AuthForm: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-      
-        console.log(data)
+
+        console.log(data);
 
         // Store user data and token in cookies
         setCookie("token", data.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
 
         toast.success("Login successful!");
-        
+
         setUserData(data.user, data.token);
 
         if (data.user.role === "admin") {
@@ -399,9 +426,9 @@ const AuthForm: React.FC = () => {
                     className="form-checkbox h-12 w-12 accent-primary transition duration-150 ease-in-out mb-10 "
                   />
                   <span className="text-gray-800 text-l font-medium">
-                    All your information is collected, stored, and processed as per
-                    our data processing guidelines. By signing up on wiZe, you agree
-                    to our{" "}
+                    All your information is collected, stored, and processed as
+                    per our data processing guidelines. By signing up on wiZe,
+                    you agree to our{" "}
                     <Link
                       href="/privacypolicy"
                       className="text-purple-500 hover:text-purple-700 transition-colors duration-300"
@@ -435,7 +462,11 @@ const AuthForm: React.FC = () => {
                       className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl"
                     >
                       <span>Sign Up</span>
-                      <Image src={Arrow} alt="Sign Up Icon" className="w-6 h-6" />
+                      <Image
+                        src={Arrow}
+                        alt="Sign Up Icon"
+                        className="w-6 h-6"
+                      />
                     </button>
                   </div>
                 </div>
@@ -451,10 +482,19 @@ const AuthForm: React.FC = () => {
                 <div className="h-[1px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full  "></div>
               </div>
 
-              <button
+              {/* <button
                 type="button"
                 className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2 mb-8 mt-5 font-semibold transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105 text-lg"
                 onClick={handleGoogleSignIn}
+              >
+                <Image src={GoogleImg} alt="Google" className="w-6 h-6" />
+                <span className="text-gray-600 font-bold">
+                  Login with Google
+                </span>
+              </button> */}
+              <button
+                className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2 mb-8 mt-5 font-semibold transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105 text-lg"
+                onClick={() => login()}
               >
                 <Image src={GoogleImg} alt="Google" className="w-6 h-6" />
                 <span className="text-gray-600 font-bold">
@@ -478,7 +518,7 @@ const AuthForm: React.FC = () => {
                     placeholder="Email"
                     value={credentials.email}
                     onChange={handleCredentialsChange}
-                   className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
+                    className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                   />
                   <Link
                     href="#"
@@ -537,7 +577,7 @@ const AuthForm: React.FC = () => {
                       placeholder="Password"
                       value={credentials.password}
                       onChange={handleCredentialsChange}
-                     className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
+                      className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
                     <div className="flex items-center mt-3">
                       <Image
@@ -571,7 +611,11 @@ const AuthForm: React.FC = () => {
                       className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl mr-11"
                     >
                       <span>Log In</span>
-                      <Image src={Arrow} alt="Sign Up Icon" className="w-6 h-6" />
+                      <Image
+                        src={Arrow}
+                        alt="Sign Up Icon"
+                        className="w-6 h-6"
+                      />
                     </button>
                   </div>
                 </div>

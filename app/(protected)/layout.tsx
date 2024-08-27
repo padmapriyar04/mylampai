@@ -1,22 +1,21 @@
-// app/(protected)/layout.tsx
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { Toaster } from "@/components/ui/sonner";
 import HomeNavbar from "../../components/home/HomeNavbar";
-// import Head from "next/head";
-
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import Flexsidebar from "@/components/misc/Flexsidebar";
-
 import type { Metadata } from "next";
-import "./../globals.css";
+import "../globals.css";
 import { Open_Sans } from "next/font/google";
+
 const openSans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "MyLampAi - Home",
   description: "MyLampAi - Home Page",
 };
+
 export default function ProtectedLayout({
   children,
 }: {
@@ -38,14 +37,16 @@ export default function ProtectedLayout({
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
       <body className={`${openSans.className} bg-primary-foreground`}>
-        <HomeNavbar />
-        <Toaster />
-        <div className="flex h-full transition-all duration-300 ">
-          {/* <Flexsidebar /> */}
-          <div className=" flex-1 protected-layout lg:transition-all lg:duration-300">
-            {children}
+        <GoogleOAuthProvider clientId="755200801298-p9reuv63bvn31o2otna28u0jrueehleb.apps.googleusercontent.com">
+          <HomeNavbar />
+          <Toaster />
+          <div className="flex h-full transition-all duration-300">
+            {/* <Flexsidebar /> */}
+            <div className="flex-1 protected-layout lg:transition-all lg:duration-300">
+              {children}
+            </div>
           </div>
-        </div>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );
