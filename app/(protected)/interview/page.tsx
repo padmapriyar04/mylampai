@@ -106,6 +106,9 @@ const InterviewComponent = () => {
   
   const base64ToFile = (base64String: string, filename: string): File => {
     const arr = base64String.split(',');
+    if (arr.length !) {
+      throw new Error('Invalid base64 string');
+    }
     const mime = arr[0].match(/:(.*?);/)[1];
     const bstr = atob(arr[1]);
     let n = bstr.length;

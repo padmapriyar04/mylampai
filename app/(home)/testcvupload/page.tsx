@@ -1,24 +1,25 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { useUserStore } from "@/utils/userStore";
 
 const CreateCV = () => {
-  const [resume, setResume] = useState(null);
-  const [jobDescription, setJobDescription] = useState("");
+  const [resume, setResume] = useState<null | string>(null);
+  const [jobDescription, setJobDescription] = useState<null | string>("");
   const [message, setMessage] = useState("");
 
-  const {token} = useUserStore()
+  const { token, clearUser } = useUserStore();
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     const { name } = e.target;
     if (file) {
       const reader = new FileReader();
-      reader.readAsDataURL(file); // Convert file to base64 string
+      reader.readAsDataURL(file);
       reader.onload = () => {
-        if (name === "cv") setResume(reader.result);
-        else setJobDescription(reader.result);
+        const result = reader.result as string | null;
+        if (name === "cv") setResume(result);
+        else setJobDescription(result);
       };
       reader.onerror = () => {
         setMessage("Error reading file");
@@ -28,12 +29,12 @@ const CreateCV = () => {
 
   console.log(token);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(token)
-    
+
     if (!token) {
-        console.log("token", token)
+      console.log("token", token);
+      clearUser();
       setMessage("Unauthorized: Please log in.");
       return;
     }

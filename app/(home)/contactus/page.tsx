@@ -1,32 +1,8 @@
 "use client";
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Careers() {
-    const [selectedProfile, setSelectedProfile] = useState(null);
-    const scrollContainerRef = useRef(null);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const container = scrollContainerRef.current;
-            const rect = container.getBoundingClientRect();
-
-            // Check if the top of the container is within the viewport
-            if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-                container.classList.remove("overflow-hidden");
-                container.classList.add("overflow-y-auto");
-            } else {
-                container.classList.remove("overflow-y-auto");
-                container.classList.add("overflow-hidden");
-            }
-        };
-
-        window.addEventListener("scroll", handleScroll);
-
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-        };
-    }, []);
+    const [selectedProfile, setSelectedProfile] = useState<null | string>(null);
 
     const renderForm = () => {
         switch (selectedProfile) {
@@ -62,19 +38,19 @@ export default function Careers() {
                                 className={`w-full mb-2 p-2 rounded  2xl:text-md  md:text-sm ${selectedProfile === 'SDE' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
                                 onClick={() => setSelectedProfile('type3')}
                             >
-                                type1
+                                Type 1
                             </button>
                             <button
                                 className={`w-full mb-2 p-2 rounded  2xl:text-md  md:text-sm  ${selectedProfile === 'AI/ML' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
                                 onClick={() => setSelectedProfile('type2')}
                             >
-                                type2
+                                Type 2
                             </button>
                             <button
                                 className={`w-full mb-2 p-2 rounded  2xl:text-md  md:text-sm ${selectedProfile === 'Consulting' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
                                 onClick={() => setSelectedProfile('type1')}
                             >
-                                type3
+                                Type 3
                             </button>
                         </div>
                     </div>
@@ -98,7 +74,6 @@ export default function Careers() {
 
                 {/* Scrollable Container */}
                 <div
-                    ref={scrollContainerRef}
                     className="bg-primary-foreground flex flex-col shadow-2xl w-full rounded-xl p-6 gap-6 h-[200vh]"
                 >
                     <div className='w-full h-1/2 flex justify-center items-center'> 
