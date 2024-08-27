@@ -222,17 +222,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     }
   }
 
-  // Client-side rendering only to avoid hydration errors
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return null; // or return a loading indicator
-  }
-
   return (
     <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee]">
       <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">

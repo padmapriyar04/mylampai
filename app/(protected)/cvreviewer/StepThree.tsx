@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useInterviewStore } from "@/utils/store";
-import * as pdfjsLib from "pdfjs-dist/webpack";
+import * as pdfjsLib from "pdfjs-dist";
 // import "pdfjs-dist/web/pdf_viewer.css";
 import { useUserStore } from "@/utils/userStore";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";

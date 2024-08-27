@@ -20,22 +20,19 @@ export const GET = async (req: NextRequest) => {
 
     const { id: userId } = decodedToken;
 
-    // Fetch the most recently uploaded CV for the authenticated user using findFirst
-    const cv = await prisma.cV.findFirst({
+    // Fetch all CVs for the authenticated user
+    const cvs = await prisma.cV.findMany({
       where: { userId },
-      orderBy: {
-        createdAt: 'desc', // Fetch the most recent CV based on the createdAt field
-      },
     });
 
-    if (!cv) {
-      return NextResponse.json({ message: 'No CV found' }, { status: 404 });
+    if (cvs.length === 0) {
+      return NextResponse.json({ message: 'No CVs found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'CV retrieved successfully', cv }, { status: 200 });
+    return NextResponse.json({ message: 'CVs retrieved successfully', cvs }, { status: 200 });
 
   } catch (error) {
-    console.error('Error fetching CV:', error);
+    console.error('Error fetching CVs:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 };
