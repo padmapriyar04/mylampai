@@ -1,5 +1,30 @@
+"use client";
+import React, { useEffect, useRef } from 'react';
+
 export default function Careers() {
-    
+    const scrollContainerRef = useRef(null);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const container = scrollContainerRef.current;
+            const rect = container.getBoundingClientRect();
+
+            // Check if the top of the container is within the viewport
+            if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+                container.classList.remove("overflow-hidden");
+                container.classList.add("overflow-y-auto");
+            } else {
+                container.classList.remove("overflow-y-auto");
+                container.classList.add("overflow-hidden");
+            }
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
 
     return (
         <>
@@ -39,6 +64,7 @@ export default function Careers() {
 
                 {/* Scrollable Container */}
                 <div
+                    ref={scrollContainerRef}
                     className="bg-primary-foreground flex flex-col shadow-2xl w-full rounded-xl p-6 gap-6"
                 >
                     <div className='w-full min-h-[500px] flex justify-center items-center'> 

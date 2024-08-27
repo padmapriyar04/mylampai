@@ -103,10 +103,10 @@ export default function WhyWize() {
               <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%]"></div>
             </h4>
             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-              We&apos;re with you at every step
+              We're with you at every step
             </div>
             <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              Success is not just about hard work; it&apos;s also about making smart choices. And w&apos;re here to help you make them.
+              Success is not just about hard work; it's also about making smart choices. And we're here to help you make them.
             </p>
             <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
           </div>
