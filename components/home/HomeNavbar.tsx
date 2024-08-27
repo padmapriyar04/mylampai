@@ -1,12 +1,14 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useSession } from "next-auth/react";
 // import { SlBell } from "react-icons/sl";
 // import { FiUser } from "react-icons/fi";
 // import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { useUserStore } from "@/utils/userStore";
 // import { useRouterStore } from "@/utils/useRouteStore";
+import { signOut } from "next-auth/react";
 import {
   CommunityComponent,
   ResourcesComponent,
@@ -15,9 +17,10 @@ import {
 // import { useRouter } from "next/navigation";
 
 const HomeNavbar = () => {
+  const { data: session } = useSession();
   const [scroll, setScroll] = useState(false);
-  const { userData } = useUserStore();
-  const [initials, setInitials] = useState("");
+  const { userData, setUserData } = useUserStore();
+  const [initials, setInitials] = useState("Profile");
 
   const handleScroll = () => {
     if (window.scrollY > 80) {
@@ -27,22 +30,30 @@ const HomeNavbar = () => {
     }
   };
 
-  // const handleLogout = async () => {
-  //   try {
-  //     const response = await fetch("/api/auth/logout", {
-  //       method: "POST",
-  //     });
-  //     if (response.ok) {
-  //       clearUser();
-  //       console.log("Logged out successfully");
-  //       router.push("/");
-  //     } else {
-  //       console.error("Logout failed:", response.statusText);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error during logout:", error);
-  //   }
-  // };
+  const getToken = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/getToken", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: session?.user.email }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setUserData(data.user, data.token);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (session) {
+      getToken();
+    }
+  }, [session]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -56,6 +67,24 @@ const HomeNavbar = () => {
     const getUserInitials = () => {
       if (userData) {
         let name = userData.name;
+        if (!name) {
+          return "Profile";
+        }
+        let arr = name?.trim().split(" ");
+
+        let initials = "";
+
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i].length > 0) initials += arr[i][0].toUpperCase();
+        }
+
+        return initials;
+      } else if (session) {
+        let name = session.user.name;
+
+        if (!name) {
+          return "Profile";
+        }
         let arr = name.trim().split(" ");
 
         let initials = "";
@@ -70,7 +99,7 @@ const HomeNavbar = () => {
     };
 
     setInitials(getUserInitials);
-  }, [userData]);
+  }, [userData, session]);
 
   return (
     <div
@@ -103,26 +132,24 @@ const HomeNavbar = () => {
         <ResourcesComponent />
 
         <CompanyComponent />
-        
-        {
-          userData ? (
-            <Link
-              href={"/profile"}
-              className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
-            >
-              {initials}
-              <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
-            </Link>
-          ) : (
-            <Link
-              href={"/login"}
-              className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
-            >
-              Sign In
-              <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
-            </Link>
-          )
-        }
+
+        {userData || session ? (
+          <Link
+            href={"/profile"}
+            className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
+          >
+            {initials}
+            <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
+          </Link>
+        ) : (
+          <Link
+            href={"/login"}
+            className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
+          >
+            Sign In
+            <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
+          </Link>
+        )}
       </div>
     </div>
   );

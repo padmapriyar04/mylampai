@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useInterviewStore } from "@/utils/store";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 // import "pdfjs-dist/web/pdf_viewer.css";
-import { useUserStore } from "@/utils/userStore"
+import { useUserStore } from "@/utils/userStore";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import {
   Dialog,
@@ -25,11 +25,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 const baseUrl = "https://cv-judger.onrender.com";
 
 interface PDFViewerProps {
-  profile: string;
+  profile: string | null;
 }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
-  const { extractedText } = useInterviewStore();
+const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
+  const { extractedText, structuredData } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [reviewedData, setReviewedData] = useState<any>({});
   const [selectedAnalysis, setSelectedAnalysis] = useState("");
@@ -65,6 +65,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
 
       switch (analysisType) {
         case "quantification_checker":
+          if (reviewedData.quantification_checker) break;
           endpoint = "/quantification";
           data = {
             extracted_data: structuredData,
@@ -76,12 +77,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "resume_score":
+          if (reviewedData.resume_score) break;
+
           endpoint = "/job_description_resume_score";
           data = {
-            cv_text_parameter: {
+            cv_text: {
               cv_text: extractedText,
             },
-            job_text_parameter: {
+            job_text: {
               job_text: profile,
             },
           };
@@ -92,6 +95,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "resume_length":
+          if (reviewedData.resume_length) break;
           endpoint = "/resume_length";
           data = {
             text: extractedText,
@@ -104,6 +108,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "bullet_point_length":
+          if (reviewedData.bullet_point_length) break;
           endpoint = "/bullet_point_length";
           data = {
             extracted_data: structuredData,
@@ -115,6 +120,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "bullet_points_improver":
+          if (reviewedData.bullet_points_improver) break;
           endpoint = "/bullet_points_improver";
           data = {
             extracted_data: structuredData,
@@ -126,6 +132,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "total_bullet_points":
+          if (reviewedData.total_bullet_points) break;
           endpoint = "/total_bullet_list";
           query = `?experience=FRESHER`;
           data = {
@@ -138,6 +145,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "verb_tense_checker":
+          if (reviewedData.verb_tense_checker) break;
           endpoint = "/verb_tense";
           data = {
             extracted_data: structuredData,
@@ -150,6 +158,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "weak_verb_checker":
+          if (reviewedData.weak_verb_checker) break;
           endpoint = "/weak_verb_checker";
           data = {
             extracted_data: structuredData,
@@ -161,6 +170,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "section_checker":
+          if (reviewedData.section_checker) break;
           endpoint = "/section_checker";
           data = {
             extracted_data: structuredData,
@@ -172,6 +182,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "skill_checker":
+          if (reviewedData.skill_checker) break;
           endpoint = "/skill_checker";
           data = {
             extracted_data: structuredData,
@@ -184,6 +195,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "repetition_checker":
+          if (reviewedData.repetition_checker) break;
           endpoint = "/repetition";
           data = {
             extracted_data: structuredData,
@@ -196,6 +208,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "personal_info":
+          if (reviewedData.personal_info) break;
           endpoint = "/personal_info";
           data = {
             extracted_data: structuredData,
@@ -207,6 +220,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "responsibility_checker":
+          if (reviewedData.responsibility_checker) break;
           endpoint = "/responsibility";
           data = {
             extracted_data: structuredData,
@@ -218,6 +232,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
           }));
           break;
         case "spelling_checker":
+          if (reviewedData.spelling_checker) break;
           endpoint = "/spelling_checker";
           data = {
             extracted_data: structuredData,
@@ -239,15 +254,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
   useEffect(() => {
     const fetchCVs = async () => {
       try {
-        const response = await fetch('/api/interviewer/get_cv', {
-          method: 'GET',
+        const response = await fetch("/api/interviewer/get_cv", {
+          method: "GET",
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch CVs');
+          throw new Error("Failed to fetch CVs");
         }
 
         const data = await response.json();
@@ -260,16 +275,16 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             if (pdfData) {
               setResumeFile(pdfData);
             } else {
-              console.error('Failed to convert base64 string to Uint8Array.');
+              console.error("Failed to convert base64 string to Uint8Array.");
             }
           } else {
-            console.error('No valid fileData found in the response.');
+            console.error("No valid fileData found in the response.");
           }
         } else {
-          console.error('No CVs found in the API response.');
+          console.error("No CVs found in the API response.");
         }
       } catch (error) {
-        console.error('Error fetching CVs:', error);
+        console.error("Error fetching CVs:", error);
       }
     };
 
@@ -278,13 +293,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
 
   const base64ToUint8Array = (base64: string): Uint8Array | null => {
     if (!base64) {
-      console.error('Invalid base64 input');
+      console.error("Invalid base64 input");
       return null;
     }
 
     try {
       // Remove any characters that are not valid in a base64 string
-      const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, '');
+      const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, "");
 
       // Ensure the length of the base64 string is correct
       if (cleanedBase64.length % 4 !== 0) {
@@ -304,8 +319,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
       return null;
     }
   };
-
-
 
   useEffect(() => {
     const renderPDF = async () => {
@@ -435,7 +448,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
 
         <div className="flex flex-wrap justify-center items-start gap-2 py-2">
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("quantification_checker")}
+            >
               Quantification Checker
             </DialogTrigger>
             <DialogContent>
@@ -481,7 +497,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("bullet_point_length")}
+            >
               Bullet Point Length
             </DialogTrigger>
             <DialogContent>
@@ -503,7 +522,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("bullet_points_improver")}
+            >
               Bullet Points Improver
             </DialogTrigger>
             <DialogContent>
@@ -530,7 +552,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("total_bullet_points")}
+            >
               Total Bullet Points
             </DialogTrigger>
             <DialogContent>
@@ -544,7 +569,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("verb_tense_checker")}
+            >
               Verb Tense Checker
             </DialogTrigger>
             <DialogContent>
@@ -587,7 +615,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("weak_verb_checker")}
+            >
               Weak Verb Checker
             </DialogTrigger>
             <DialogContent>
@@ -614,7 +645,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("section_checker")}
+            >
               Section Checker
             </DialogTrigger>
             <DialogContent>
@@ -641,7 +675,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("skill_checker")}
+            >
               Skill Checker
             </DialogTrigger>
             <DialogContent>
@@ -668,7 +705,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("repetition_checker")}
+            >
               Repetition Checker
             </DialogTrigger>
             <DialogContent>
@@ -706,7 +746,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("personal_info")}
+            >
               Personal Info
             </DialogTrigger>
             <DialogContent>
@@ -731,7 +774,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("responsibility_checker")}
+            >
               Responsibilty
             </DialogTrigger>
             <DialogContent>
@@ -766,7 +812,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ structuredData, profile }) => {
             </DialogContent>
           </Dialog>
           <Dialog>
-            <DialogTrigger className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center ">
+            <DialogTrigger
+              className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+              onClick={() => runAnalysis("spelling_checker")}
+            >
               Spelling Checker
             </DialogTrigger>
             <DialogContent>

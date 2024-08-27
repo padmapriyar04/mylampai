@@ -10,7 +10,7 @@ const Page: React.FC = () => {
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState("");
-  const [profile, setProfile] = useState<string>("SOFTWARE");
+  const [profile, setProfile] = useState<string | null>(null);
   const [selectedOption, setSelectedOption] = useState("");
   const [customProfile, setCustomProfile] = useState("");
 
@@ -25,6 +25,7 @@ const Page: React.FC = () => {
       setFile(file);
     }
   };
+
 
  const handleResumeUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target?.files?.[0];
@@ -82,8 +83,8 @@ const Page: React.FC = () => {
       );
     }
   };
-
-  console.log("structured Data", structuredData);
+  
+  console.log("Hello World")
 
   const pdfUrl = "./Resume.pdf";
 
@@ -98,6 +99,7 @@ const Page: React.FC = () => {
           triggerFileInput={triggerFileInput}
           handleDragOver={handleDragOver}
           handleNextClick={handleNextClick}
+          profile={profile}
           handleBackClick={handleBackClick}
           handleJobDescriptionUpload={handleJobDescriptionUpload}
           handleManualEntryToggle={handleManualEntryToggle}
@@ -105,6 +107,7 @@ const Page: React.FC = () => {
           handleManualJDUpload={handleManualJDUpload}
           isManualEntry={isManualEntry}
           manualJobDescription={manualJobDescription}
+          setProfile={setProfile}
           setManualJobDescription={setManualJobDescription}
           customProfile={customProfile}
           setCustomProfile={setCustomProfile}

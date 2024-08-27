@@ -1,8 +1,9 @@
-import type { Metadata } from "next";;
+import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "../globals.css";
 import AuthProvider from "@/components/auth/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
 

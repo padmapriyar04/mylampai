@@ -13,11 +13,12 @@ model User {
   name             String?
   emailVerified    DateTime?
   image            String?
+  googleId         String?
   first_name       String?
   last_name        String?
   phone            String?
   hashedPassword   String?
-  role             String?
+  role             String? @default("user")
   posts            Modules[]
   userInfo         UserInfo?
   accounts         Account[]
