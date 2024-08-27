@@ -5,7 +5,7 @@ import AuthProvider from "@/components/auth/AuthProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
-const openSans = Open_Sans({ subsets: ["latin"] });
+const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "MyLampAi - Login",
@@ -20,12 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`${openSans.className} h-full overflow-hidden`}>
-        <GoogleOAuthProvider clientId="755200801298-p9reuv63bvn31o2otna28u0jrueehleb.apps.googleusercontent.com">
-          <Toaster />
-          <main className="h-full">
-            <AuthProvider>{children}</AuthProvider>
-          </main>
-        </GoogleOAuthProvider>
+        <main className="h-full">
+          <AuthProvider>{children}</AuthProvider>
+          <Toaster position="top-center" />
+        </main>
       </body>
     </html>
   );

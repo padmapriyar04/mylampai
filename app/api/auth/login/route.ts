@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { message: "Invalid email or password" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
         name: user.first_name + " " + user.last_name,
         role: user.role,
       },
-      process.env.JWT_SECRET || "okokokok",
-      { expiresIn: "7d" }
+      process.env.JWT_SECRET as string,
+      { expiresIn: "7d" },
     );
 
     // Set token in cookie
@@ -40,16 +40,16 @@ export async function POST(req: NextRequest) {
         user: {
           id: user.id,
           email: user.email,
-          name: user.first_name + " " + user.last_name,
+          name: user.name,
           role: user.role,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
 
     response.headers.append(
       "Set-Cookie",
-      `token=${token}; HttpOnly; Path=/; Max-Age=86400;`
+      `token=${token}; HttpOnly; Path=/; Max-Age=604800;`,
     );
 
     return response;
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     console.error("Login error:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

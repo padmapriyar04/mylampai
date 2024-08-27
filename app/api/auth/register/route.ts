@@ -1,19 +1,20 @@
 // pages/api/auth/register.ts
 
 import { NextResponse } from "next/server";
-import prisma from "../../../../lib/index";
+import prisma from "@/lib";
 import bcrypt from "bcrypt";
-import { connectToDatabase } from "@/app/helpers/server";
+import jwt from "jsonwebtoken";
 
 export const POST = async (req: Request) => {
   try {
     const {
       email,
+      name,
       first_name,
       last_name,
       phone,
       password,
-      role = "user", // Default role set to "user"
+      role = "user",
       secret,
       country,
       college,
@@ -23,50 +24,32 @@ export const POST = async (req: Request) => {
       expectedGraduationDate,
       goal,
       skills,
-      headline
-    } = await req.json() as {
-      email: string;
-      first_name: string;
-      last_name: string;
-      phone: string;
-      password: string;
-      role?: string;
-      secret?: string;
-      country?: string;
-      college?: string;
-      degree?: string;
-      branch?: string;
-      areaOfStudy?: string;
-      expectedGraduationDate?: string;
-      goal?: string;
-      skills?: string;
-      headline?: string;
-    };
+      headline,
+    } = await req.json();
 
-    // Basic validation
-    if (!email || !first_name || !last_name || !phone || !password || (role === "admin" && !secret)) {
+    if (
+      !email ||
+      !first_name ||
+      !last_name ||
+      !name ||
+      !phone ||
+      !password ||
+      (role === "admin" && !secret)
+    ) {
       return NextResponse.json(
         { error: "All fields are required." },
-        { status: 422 }
+        { status: 422 },
       );
     }
 
-    await connectToDatabase();
-
-    // Check OTP verification status
     const otpRecord = await prisma.oTP.findUnique({ where: { email } });
 
     if (!otpRecord || !otpRecord.verified) {
-      return NextResponse.json(
-        { error: "OTP not verified. Please verify OTP before registration." },
-        { status: 422 }
-      );
+      return NextResponse.json({ error: "OTP not verified." }, { status: 422 });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Check if the user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
@@ -76,6 +59,7 @@ export const POST = async (req: Request) => {
         data: {
           first_name,
           last_name,
+          name,
           phone,
           hashedPassword: hashedPassword,
           role,
@@ -84,7 +68,17 @@ export const POST = async (req: Request) => {
 
       // Optionally update userInfo
       let userInfo;
-      if (country || college || degree || branch || areaOfStudy || expectedGraduationDate || goal || skills || headline) {
+      if (
+        country ||
+        college ||
+        degree ||
+        branch ||
+        areaOfStudy ||
+        expectedGraduationDate ||
+        goal ||
+        skills ||
+        headline
+      ) {
         userInfo = await prisma.userInfo.upsert({
           where: { userId: existingUser.id },
           update: {
@@ -113,17 +107,48 @@ export const POST = async (req: Request) => {
         });
       }
 
-      // Delete OTP record
       await prisma.oTP.delete({ where: { email } });
 
-      return NextResponse.json({ user: existingUser, userInfo }, { status: 200 });
+      const token = jwt.sign(
+        {
+          id: existingUser.id,
+          email: existingUser.email,
+          name: existingUser.name,
+          role: existingUser.role,
+        },
+        process.env.JWT_SECRET as string,
+        { expiresIn: "7d" },
+      );
+
+      const response = NextResponse.json(
+        {
+          user: {
+            id: existingUser.id,
+            email: existingUser.email,
+            name: existingUser.name,
+            first_name: existingUser.first_name,
+            last_name: existingUser.last_name,
+            phone: existingUser.phone,
+            role: existingUser.role,
+          },
+          token: token,
+        },
+        { status: 200 },
+      );
+
+      response.headers.append(
+        "Set-Cookie",
+        `token=${token}; HttpOnly; Path=/; Max-Age=604800;`,
+      );
+
+      return response;
     } else {
-      // Create a new user
       const newUser = await prisma.user.create({
         data: {
           email,
           first_name,
           last_name,
+          name,
           phone,
           hashedPassword: hashedPassword,
           role,
@@ -132,7 +157,17 @@ export const POST = async (req: Request) => {
 
       // Optionally create userInfo
       let userInfo;
-      if (country || college || degree || branch || areaOfStudy || expectedGraduationDate || goal || skills || headline) {
+      if (
+        country ||
+        college ||
+        degree ||
+        branch ||
+        areaOfStudy ||
+        expectedGraduationDate ||
+        goal ||
+        skills ||
+        headline
+      ) {
         userInfo = await prisma.userInfo.create({
           data: {
             country: country || null,
@@ -149,16 +184,26 @@ export const POST = async (req: Request) => {
         });
       }
 
-      // Delete OTP record
       await prisma.oTP.delete({ where: { email } });
 
-      return NextResponse.json({ user: newUser, userInfo }, { status: 201 });
+      return NextResponse.json(
+        {
+          token: "",
+          user: {
+            id: newUser.id,
+            email,
+            name,
+            role,
+          },
+        },
+        { status: 201 },
+      );
     }
   } catch (error) {
     console.error("Error during user registration:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from "../../../lib/index";
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib";
 
 export const GET = async (req: NextRequest) => {
   try {
-    // Fetch all modules from the database
     const modules = await prisma.modules.findMany({
       include: {
         author: true,
@@ -13,10 +12,10 @@ export const GET = async (req: NextRequest) => {
 
     return NextResponse.json(modules, { status: 200 });
   } catch (error) {
-    console.error('Error fetching modules:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  } finally {
-    // Disconnect Prisma client
-    await prisma.$disconnect();
+    console.error("Error fetching modules:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 };

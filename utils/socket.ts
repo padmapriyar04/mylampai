@@ -1,4 +1,3 @@
-
 import { io, Socket } from 'socket.io-client';
 
 interface UserStorage {
@@ -13,7 +12,7 @@ const userStorage: UserStorage | null = typeof window !== 'undefined'
 
 const token: string | null = userStorage?.state?.token || null;
 
-const socket: Socket = io('http://localhost:4000/', {
+const socket: Socket = io('https://mylamp-server.onrender.com/', {
     withCredentials: true,
     query: {
         token: token || '',

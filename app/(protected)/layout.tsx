@@ -1,52 +1,28 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import jwt from "jsonwebtoken";
-import { Toaster } from "@/components/ui/sonner";
-import HomeNavbar from "../../components/home/HomeNavbar";
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import Flexsidebar from "@/components/misc/Flexsidebar";
-import type { Metadata } from "next";
-import "../globals.css";
+import type { Metadata } from "next";;
 import { Open_Sans } from "next/font/google";
+import "../globals.css";
+import AuthProvider from "@/components/auth/AuthProvider";
+import { Toaster } from "@/components/ui/sonner";
 
-const openSans = Open_Sans({ subsets: ["latin"] });
+const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "MyLampAi - Home",
-  description: "MyLampAi - Home Page",
+  title: "MyLampAi - Login",
+  description: "MyLampAi - Login Page",
 };
 
-export default function ProtectedLayout({
+export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
-  const cookieStore = cookies();
-  const token = cookieStore.get("token");
-
-  if (!token) {
-    redirect("/login");
-  }
-
-  try {
-    jwt.verify(token?.value || "", process.env.JWT_SECRET || "okokokok");
-  } catch (error) {
-    redirect("/login");
-  }
-
+}>) {
   return (
-    <html lang="en" className="scroll-smooth focus:scroll-auto">
-      <body className={`${openSans.className} bg-primary-foreground`}>
-        <GoogleOAuthProvider clientId="755200801298-p9reuv63bvn31o2otna28u0jrueehleb.apps.googleusercontent.com">
-          <HomeNavbar />
-          <Toaster />
-          <div className="flex h-full transition-all duration-300">
-            {/* <Flexsidebar /> */}
-            <div className="flex-1 protected-layout lg:transition-all lg:duration-300">
-              {children}
-            </div>
-          </div>
-        </GoogleOAuthProvider>
+    <html lang="en" className="h-full">
+      <body className={`${openSans.className} h-full overflow-hidden`}>
+        <main className="h-full">
+          <AuthProvider>{children}</AuthProvider>
+          <Toaster position="top-center" />
+        </main>
       </body>
     </html>
   );

@@ -6,7 +6,7 @@ const progressSection = () => {
 			<div className="flex justify-around border-b pb-5">
 				<div className="w-[30%]">
 					<CircularProgressbarWithChildren
-						value={27}
+						value={50}
 						styles={{ path: { stroke: "#8C52FF",
 						strokeLinecap:"round"
 						 } }}>

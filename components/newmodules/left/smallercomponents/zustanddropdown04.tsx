@@ -1,5 +1,5 @@
 // store.ts
-import create from 'zustand';
+import { create } from "zustand";
 
 interface dropdownLesson04 {
   isOpen04: boolean;
@@ -13,4 +13,4 @@ const usedropdown04 = create<dropdownLesson04>((set) => ({
   close04: () => set({ isOpen04: false }),
 }));
 
-export default usedropdown04 ;
+export default usedropdown04;

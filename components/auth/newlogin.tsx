@@ -1,9 +1,6 @@
 "use client";
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
-import { GoogleLogin } from "@react-oauth/google";
-import { useGoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -15,30 +12,25 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { setCookie } from "@/utils/cookieUtils";
 import { useUserStore } from "@/utils/userStore";
-
-import Globe from "../../public/images/Globe.svg";
 import Arrow from "../../public/images/Arrow.png";
 import Lock from "../../public/images/icons8-lock.svg";
 import GoogleImg from "../../public/images/Google_Icons-09-512.png";
 
-import CarouselImage1 from "../../public/images/Globe.svg";
-import CarouselImage2 from "../../public/images/Globe.svg";
-import CarouselImage3 from "../../public/images/Globe.svg";
-import CarouselImage4 from "../../public/images/Globe.svg";
-
 const AuthForm: React.FC = () => {
-  const { setUserData } = useUserStore();
-  const [isSignUp, setIsSignUp] = useState(true);
-  const [activeTab, setActiveTab] = useState("student");
+  const { data: session } = useSession();
+  const { userData, setUserData, clearUser } = useUserStore();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
+  const [isOTPVerifing, setIsOTPVerifing] = useState(false);
   const [user, setUser] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
     password: "",
-    role: "user",
-    secret: "",
+    role: "user"
   });
+  
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
@@ -51,36 +43,13 @@ const AuthForm: React.FC = () => {
 
   const router = useRouter();
 
-  const login = useGoogleLogin({
-    onSuccess: async (response) => {
-      try {
-        const res = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: {
-              Authorization: `Bearer ${response.access_token}`,
-            },
-          }
-        );
-        console.log(res);
-        const { email, name } = res.data;
-        await axios.post("/api/auth/google", {
-          email,
-          name,
-        });
-      } catch (err) {
-        console.log('Error during Google login:', err);
-      }
-    },
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
     setUser((prevUser) => ({
       ...prevUser,
-      [name]: value,
+      [name]: value.trim(),
     }));
-    console.log(value);
   };
 
   const handleCredentialsChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -101,11 +70,22 @@ const AuthForm: React.FC = () => {
   };
 
   const sendOTP = async () => {
+    
+    if (!user.firstName || !user.lastName || !user.email || !user.phone || !user.password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    if (!validateEmail(user.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
     if (!validatePhone(user.phone)) {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
-
+      
+    setIsOTPVerifing(true);
+    
     try {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
@@ -121,9 +101,9 @@ const AuthForm: React.FC = () => {
         toast.error(errorData.message || "Failed to send OTP");
       }
     } catch (error) {
-      console.error("Error sending OTP:", error);
       toast.error("An error occurred while sending OTP");
     }
+    setIsOTPVerifing(false);
   };
 
   const verifyOTP = async () => {
@@ -131,7 +111,9 @@ const AuthForm: React.FC = () => {
       toast.error("Please enter OTP.");
       return;
     }
-
+    
+    setIsOTPVerifing(true);
+    
     try {
       const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
@@ -150,11 +132,24 @@ const AuthForm: React.FC = () => {
       console.error("Error verifying OTP:", error);
       toast.error("An error occurred while verifying OTP");
     }
+    setIsOTPVerifing(false);
   };
 
   const handleSubmitSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!user.firstName || !user.lastName || !user.email || !user.phone || !user.password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+    if (!validateEmail(user.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (!validatePhone(user.phone)) {
+      toast.error("Please enter a valid 10-digit phone number.");
+      return;
+    }
     if (!otpVerified) {
       toast.error("Please verify OTP first.");
       return;
@@ -163,23 +158,9 @@ const AuthForm: React.FC = () => {
       toast.error("Please agree to the terms and conditions.");
       return;
     }
-    if (!user.firstName || !user.lastName) {
-      toast.error("Please enter your full name.");
-      return;
-    }
-    if (!validateEmail(user.email)) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
-    if (!validatePhone(user.phone)) {
-      toast.error("Please enter a valid 10-digit phone number.");
-      return;
-    }
-    if (!user.password) {
-      toast.error("Please enter a password.");
-      return;
-    }
-
+    
+    
+    setIsSigningUp(true);
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -188,26 +169,30 @@ const AuthForm: React.FC = () => {
           email: user.email,
           first_name: user.firstName,
           last_name: user.lastName,
+          name: `${user.firstName} ${user.lastName}`,
           phone: user.phone,
           password: user.password,
-          role: activeTab === "admin" ? "admin" : "user",
-          secret: user.secret, // Only send secret if role is admin
+          role: "user"
         }),
       });
 
       if (res.ok) {
         const userData = await res.json();
+        setCookie("token", userData.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(userData.user), 7); // Set cookie for 7 days
         toast.success("Registration successful!");
-        router.push("/login");
+        setUserData(userData.user, userData.token);
+        setIsSigningUp(false);
+        router.push("/questions");
       } else {
         const errorData = await res.json();
-        toast.error(errorData.error || "Registration failed");
+        toast.error(errorData.error || "Registration failed")
       }
     } catch (error) {
       console.error("Register error:", error);
       toast.error("An error occurred during registration");
     }
+    setIsSigningUp(false);
   };
 
   const handleSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
@@ -235,8 +220,6 @@ const AuthForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
-        console.log(data);
-
         // Store user data and token in cookies
         setCookie("token", data.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
@@ -248,7 +231,7 @@ const AuthForm: React.FC = () => {
         if (data.user.role === "admin") {
           router.push("/adminDashboard");
         } else {
-          router.push("/questions");
+          router.push("/profile");
         }
       } else {
         const errorData = await response.json();
@@ -272,11 +255,19 @@ const AuthForm: React.FC = () => {
       toast.error("An error occurred during Google sign-in");
     }
   };
+  
+  useEffect(() => {
+    if (session?.user) {
+        router.push("/");
+    } else {
+      clearUser();
+    }
+  }, [session]);
 
   return (
-    <div className="bg-primary-foreground flex flex-col items-center justify-center min-h-screen h-screen relative p-4 md:p-0">
-      <div className="bg-[#fcfcfc] rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-3 w-full max-w-5xl flex flex-col md:flex-row min-h-[600px] shadow-md">
-        <div className="md:block w-full md:max-w-[350px] bg-purple-500 rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-4 flex flex-col items-center justify-between mb-4 md:mb-0 relative">
+    <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0">
+      <div className="bg-[#fcfcfc] rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center">
+        <div className="md:block w-full md:max-w-[350px] bg-purple-500 rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 flex flex-col items-center justify-between mb-4 md:mb-0 relative h-full">
           <Carousel
             showThumbs={false}
             showStatus={false}
@@ -284,53 +275,31 @@ const AuthForm: React.FC = () => {
             autoPlay
             interval={5000}
             showArrows={false}
-            className="w-full h-full flex flex-col justify-between"
+            showIndicators={false}
+            className="w-full  md:h-full flex flex-col justify-between"
           >
-            <div>
-              <div className="flex justify-center mt-4">
-                <Image src={Globe} alt="Globe" className="w-4/5" />
-              </div>
+            <div className="flex justify-center items-center h-full">
+              <Image
+                src={"/images/Globe.svg"}
+                alt="Carousel Image 1"
+                className="w-4/5"
+                width={100}
+                height={100}
+              />
             </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage1}
-                  alt="Carousel Image 1"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage2}
-                  alt="Carousel Image 2"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage3}
-                  alt="Carousel Image 3"
-                  className="w-4/5"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-center items-center h-full">
-                <Image
-                  src={CarouselImage4}
-                  alt="Carousel Image 4"
-                  className="w-4/5"
-                />
-              </div>
+            <div className="flex justify-center items-center h-full">
+              <Image
+                src={"/images/Globe.svg"}
+                alt="Carousel Image 1"
+                className="w-4/5"
+                width={100}
+                height={100}
+              />
             </div>
           </Carousel>
         </div>
 
-        <div className="w-full h-[80vh] p-4 md:p-6 flex flex-col justify-evenly">
+        <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 gap-2 flex flex-col justify-center ">
           {isSignUp ? (
             <>
               <div className="text-popover-foreground  flex flex-col">
@@ -367,7 +336,7 @@ const AuthForm: React.FC = () => {
                   onChange={handleChange}
                 />
 
-                <div className="flex flex-col mt-4 md:flex-row md:space-x-4 ">
+                <div className="flex flex-col mt-4 md:flex-row md:space-x-2 ">
                   <div className="flex items-center justify-evenly w-full max-w-[150px] border-2 rounded-md mb-4 md:mb-0">
                     <CountrySelector />
                   </div>
@@ -381,7 +350,7 @@ const AuthForm: React.FC = () => {
                   />
                 </div>
 
-                <div className="flex flex-col md:flex-row md:space-x-4 items-center mt-4">
+                <div className="flex flex-col md:flex-row md:space-x-2 items-center">
                   <Input
                     name="password"
                     placeholder="Password"
@@ -389,34 +358,23 @@ const AuthForm: React.FC = () => {
                     value={user.password}
                     onChange={handleChange}
                   />
-                  <div className="relative w-full mt-4 md:mt-0">
+                  <div className="relative w-full md:mt-0">
                     <input
                       type="text"
                       placeholder="Enter OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
-                      className="w-full p-2 pl-3 pr-24 border-2 outline-none focus:border-primary-foreground rounded-md text-black placeholder:text-gray-400 font-semibold hover:border-primary-foreground transition-all duration-300"
+                      className="w-full px-4 py-3 border-2 bg-white outline-none rounded-md text-[#222] placeholder:text-gray-400 placeholder:font-semibold  focus:border-primary-foreground font-medium border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
                     <button
                       type="button"
                       onClick={otpSent ? verifyOTP : sendOTP}
                       className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-white py-1 px-3 rounded-md text-sm font-medium transition-all duration-200"
                     >
-                      {otpSent ? "Verify OTP" : "Send OTP"}
+                      {otpSent ? (isOTPVerifing ? "Verifing" : "Verify OTP") : (isOTPVerifing ? "Sending" : "Send OTP")}
                     </button>
                   </div>
                 </div>
-
-                {activeTab === "admin" && (
-                  <input
-                    type="password"
-                    name="secret"
-                    placeholder="Secret Key"
-                    value={user.secret}
-                    onChange={handleChange}
-                    className="w-full p-2 border-2 bg-primary-foreground focus:outline-none rounded-xl text-black placeholder:text-gray-400 font-semibold focus:-translate-y-1 focus:border-purple-300 focus:shadow-lg hover:shadow-sm hover:border-purple-300 transition-all duration-300"
-                  />
-                )}
 
                 <div className="flex items-center space-x-2 mt-6">
                   <input
@@ -453,13 +411,13 @@ const AuthForm: React.FC = () => {
                       onClick={() => setIsSignUp(false)}
                       className="text-primary font-semibold"
                     >
-                      Sign In
+                      {isSigningUp ? "Signing In" : "Sign In"}
                     </button>
                   </div>
                   <div className="flex space-x-6 mr-8 mb-1">
                     <button
                       type="submit"
-                      className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl"
+                      className="bg-primary text-white px-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl"
                     >
                       <span>Sign Up</span>
                       <Image
@@ -482,19 +440,10 @@ const AuthForm: React.FC = () => {
                 <div className="h-[1px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full  "></div>
               </div>
 
-              {/* <button
+              <button
                 type="button"
                 className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2 mb-8 mt-5 font-semibold transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105 text-lg"
                 onClick={handleGoogleSignIn}
-              >
-                <Image src={GoogleImg} alt="Google" className="w-6 h-6" />
-                <span className="text-gray-600 font-bold">
-                  Login with Google
-                </span>
-              </button> */}
-              <button
-                className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2 mb-8 mt-5 font-semibold transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105 text-lg"
-                onClick={() => login()}
               >
                 <Image src={GoogleImg} alt="Google" className="w-6 h-6" />
                 <span className="text-gray-600 font-bold">
@@ -511,7 +460,7 @@ const AuthForm: React.FC = () => {
               </div>
 
               <form onSubmit={handleSubmitLogin} className="space-y-10 mt-4">
-                <div>
+                <div className="flex flex-col gap-2">
                   <input
                     type="email"
                     name="email"
@@ -523,7 +472,7 @@ const AuthForm: React.FC = () => {
                   <Link
                     href="#"
                     onClick={() => setIsOtpLogin(!isOtpLogin)}
-                    className="text-blue-500 font-semibold text-le hover:text-blue-700 transition-colors duration-300 "
+                    className="text-blue-500 font-semibold text-le hover:text-blue-700 transition-colors duration-300"
                   >
                     {isOtpLogin ? "Login with Password" : "Login via OTP"}
                   </Link>
@@ -538,7 +487,7 @@ const AuthForm: React.FC = () => {
                       onChange={(e) => setOtp(e.target.value)}
                       className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
-                    <div className="flex items-center">
+                    <div className="flex items-center mt-3 ml-[-10px]">
                       <Image
                         src={Lock}
                         alt="Image beside Forgot password"
@@ -546,7 +495,7 @@ const AuthForm: React.FC = () => {
                       />
                       <Link
                         href="/forgot-password"
-                        className="text-blue-500 font-semibold text-left hover:text-blue-700 transition-colors duration-300"
+                        className="text-blue-500 font-semibold text-left hover:text-blue-700 transition-colors duration-300 "
                       >
                         Didn&apos;t Receive OTP yet?
                       </Link>
@@ -555,7 +504,7 @@ const AuthForm: React.FC = () => {
                       <button
                         type="button"
                         onClick={verifyOTP}
-                        className="absolute right-2 top-1/3 transform -translate-y-1/2 bg-green-500 text-white p-1 rounded-xl text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
+                        className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-green-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
                       >
                         Verify OTP
                       </button>
@@ -563,7 +512,7 @@ const AuthForm: React.FC = () => {
                       <button
                         type="button"
                         onClick={sendOTP}
-                        className="absolute right-2 top-1/3 transform -translate-y-1/2 bg-purple-500 text-white p-1 rounded-xl text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
+                        className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-purple-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
                       >
                         Send OTP
                       </button>
@@ -579,7 +528,7 @@ const AuthForm: React.FC = () => {
                       onChange={handleCredentialsChange}
                       className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
-                    <div className="flex items-center mt-3">
+                    <div className="flex items-center mt-3 ml-[-10px]">
                       <Image
                         src={Lock}
                         alt="Image beside Forgot password"

@@ -1,7 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib";
 
-// GET all posts
 export const GET = async (req: NextRequest) => {
   try {
     const posts = await prisma.blog.findMany();
@@ -11,10 +10,7 @@ export const GET = async (req: NextRequest) => {
     return NextResponse.json({ message: "Error", error }, { status: 500 });
   }
 };
-function myfunction(item: any) {
-  console.log(item);
-}
-// POST a new post
+
 export const POST = async (req: NextRequest) => {
   try {
     const formData = await req.formData();
@@ -27,6 +23,7 @@ export const POST = async (req: NextRequest) => {
       subheading: section.subheading,
       content: section.content,
     }));
+    
     const post = await prisma.blog.create({
       data: {
         title,
@@ -39,9 +36,9 @@ export const POST = async (req: NextRequest) => {
         image,
       },
     });
-
     return NextResponse.json({ message: "Success" }, { status: 201 });
   } catch (err) {
+    console.log(err);
     return NextResponse.json({ message: "Error", err }, { status: 500 });
   }
 };
