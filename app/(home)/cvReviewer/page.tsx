@@ -2,7 +2,6 @@
 import React, { useState, DragEvent, ChangeEvent } from 'react';
 import StepOneTwo from './StepOneTwo'; // Adjust the path if necessary
 import { useInterviewStore } from '@/utils/store';
-import StepThree from './StepThree';
 import PDFViewer from './StepThree';
 import { useUserStore } from '@/utils/userStore';
 import { toast } from 'sonner';
@@ -30,7 +29,8 @@ const Page: React.FC = () => {
     const file = event.target?.files?.[0];
     if (file) {
       setResumeFile(file);
-      uploadCVAndJobDescription(file, manualJobDescription);
+      const resumeFileBinary = await getBinaryData(file); // Convert resume to binary
+      uploadCVAndJobDescription(resumeFileBinary, manualJobDescription);
     }
   };
 
@@ -59,13 +59,26 @@ const Page: React.FC = () => {
       const extractedText = await extractTextFromFile(file);
       if (extractedText) {
         setJobDescriptionFile(extractedText);
-        await uploadCVAndJobDescription(resumeFile, extractedText);
+
+        // Read the resume file as binary
+        const resumeFileBinary = await getBinaryData(resumeFile);
+
+        // Now upload both resume (in binary) and job description
+        await uploadCVAndJobDescription(resumeFileBinary, extractedText);
       }
     }
   };
 
+  const getBinaryData = (file: File): Promise<ArrayBuffer> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as ArrayBuffer);
+      reader.onerror = () => reject(new Error("Failed to read file as binary"));
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
   const extractTextFromFile = async (file: File) => {
-    // Assuming a similar function to extract text from PDF/DOC/DOCX
     const formData = new FormData();
     formData.append("file", file);
   
@@ -95,22 +108,23 @@ const Page: React.FC = () => {
 
   const handleManualJDUpload = async () => {
     if (manualJobDescription.trim()) {
-      await uploadCVAndJobDescription(resumeFile, manualJobDescription);
+      const resumeFileBinary = await getBinaryData(resumeFile); // Convert resume to binary
+      await uploadCVAndJobDescription(resumeFileBinary, manualJobDescription);
     }
   };
-  console.log(token);
 
-  
-  const uploadCVAndJobDescription = async (resumeFile: string, jobDescriptionText: string) => {
+  const uploadCVAndJobDescription = async (resumeFileBinary: ArrayBuffer, jobDescriptionText: string) => {
     try {
       if (!token) {
         toast.error("Unauthorized");
         return;
       }
-  
-      // Convert the job description text to base64
-      const jobDescriptionBase64 = btoa(jobDescriptionText); // `btoa` encodes a string to base64
-  
+
+      const jobDescriptionBase64 = btoa(jobDescriptionText);
+
+      // Convert binary data to a Base64 string
+      const resumeBase64 = Buffer.from(resumeFileBinary).toString('base64');
+
       const response = await fetch("/api/interviewer/post_cv", {
         method: "POST",
         headers: {
@@ -118,16 +132,15 @@ const Page: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Resume: resumeFile, // Sending the resume file as base64 (assuming this is how it's being handled)
+          Resume: resumeBase64, // Sending the resume file as base64
           JobDescription: jobDescriptionBase64, // Sending the job description text as base64
         }),
       });
-  
+
       const result = await response.json();
-  
+
       if (response.ok) {
         toast.success("CV and Job Description uploaded successfully");
-        // Handle successful upload
       } else {
         toast.error(result.error || "Failed to upload CV and Job Description");
       }
@@ -136,9 +149,6 @@ const Page: React.FC = () => {
       console.error("Error:", error);
     }
   };
-  
-
-  console.log("structured Data", structuredData);
 
   return (
     <div>
@@ -160,6 +170,8 @@ const Page: React.FC = () => {
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
           setStructuredData={setStructuredData}
+          profile={profile}           // Pass the profile
+          setProfile={setProfile}     // Pass the setProfile function
         />
       ) : step === 3 ? (
         <PDFViewer
