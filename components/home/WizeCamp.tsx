@@ -1,9 +1,27 @@
 import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function WizeCamp() {
+
+  const [isFormOpen, setIsFormOpen] = useState(true);
+    const toggleForm = () => {
+      setIsFormOpen(!isFormOpen);
+  };
+
   return (
+    
     <>
-      <div className="element xl:max-w-[1220px] max-w-[650px] m-3 sm:m-auto bg-primary-foreground flex flex-col xl:flex-row justify-around items-center rounded-2xl p-4 sm:p-8 gap-4 my-4">
+    <div className={`fixed top-[94vh] left-0 right-0 flex justify-center transition-transform duration-500 z-10 ${isFormOpen ? "translate-y-[-300vh]" : "-translate-y-full"}`}>
+                <div className="bg-white w-[85vw] h-[80vh] flex flex-col items-center justify-center shadow-lg rounded-lg">
+                <h1> I am a Reg. Form</h1>
+                    <button onClick={toggleForm} className="relative text-white font-bold top-[30vh] p-4 border-x-primary-foreground border-4 rounded-xl bg-primary">
+                        CLOSE FORM
+                    </button>
+                    
+                </div>
+            </div>
+      <div className={`element xl:max-w-[1220px] max-w-[650px] m-3 sm:m-auto bg-primary-foreground flex flex-col xl:flex-row justify-around items-center rounded-2xl p-4 sm:p-8 gap-4 my-4 transition ${!isFormOpen ? "blur-sm" : "blur-none"}`}>
         <div className="bg-[#8C52FF] w-full h-full max-w-[600px] min-h-[500px] flex flex-col items-center justify-evenly rounded-2xl p-4">
           <Image
             src="/home/logoCombined.svg"
@@ -52,10 +70,10 @@ export default function WizeCamp() {
             </div>
           </div>
           <div className="w-full flex justify-between  text-white max-w-[400px] mx-auto gap-8">
-            <button className="bg-[#ffffff72] rounded-lg py-2 px-4 w-full text-lg font-semibold">
+            <Link href="/wizecamp" className="bg-[#ffffff72] rounded-lg py-2 px-4 w-full text-lg font-semibold flex justify-center items-center">
               More Info.
-            </button>
-            <button className="border-2 rounded-lg py-3 px-4 w-full text-lg font-semibold">
+            </Link>
+            <button onClick={toggleForm} className="border-2 rounded-lg py-3 px-4 w-full text-lg font-semibold">
               Register Now
             </button>
           </div>

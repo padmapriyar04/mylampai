@@ -90,10 +90,10 @@ const DeviceSelection = ({
   };
 
   return (
-    <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
+    <div className="md:h-[calc(100vh)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
     <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row md:justify-between">
       {/* Left Section */}
-      <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
+      <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative ">
         <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-[19vh] md:h-[22vh] mb-2"></video>
         <div className="flex justify-between w-full text-sm mb-32">
           <span className="flex items-center">
@@ -161,10 +161,10 @@ const DeviceSelection = ({
         <div className="w-full flex justify-center text-center mt-4 mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Ready to join? Configure Devices</h2>
         </div>
-        <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center">
+        <div className="bg-white py-4 px-8 rounded-3xl w-full max-w-[400px] shadow-lg text-center max-h-[280px]">
           {!isMicTestEnabled && !isSoundTesting && (
             <div className="w-full flex flex-col items-center justify-center">
-              <div className="w-full max-w-md flex-col flex gap-4 justify-evenly py-4">
+              <div className="w-full max-w-md flex-col flex gap-2 justify-evenly">
                 <div className="flex items-center justify-between pt-6 pb-6 pr-8 pl-8 border-dashed border-2 border-gray-400 rounded-2xl">
                   <span className="flex items-center gap-2">
                     <FiVideo className="h-6 w-6" />

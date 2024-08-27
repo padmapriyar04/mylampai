@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useInterviewStore } from '@/utils/store';
 import * as pdfjsLib from 'pdfjs-dist/webpack';
-import 'pdfjs-dist/web/pdf_viewer.css';
+// import 'pdfjs-dist/web/pdf_viewer.css';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
