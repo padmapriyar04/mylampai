@@ -82,44 +82,42 @@ const BulletCard: React.FC<BulletCardProps> = ({ title, description }) => {
   );
 };
 
-const ExperiencedCounsellors = () => {
+const ExperiencedCounsellors: React.FC = () => {
   return (
     <>
-      <div id="expertsinsights" className="pb-[100px] min-h-screen">
-        <h4 className="pt-4 font-semibold text-primary">
-          EXPERTS INSIGHTS
-          <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
-        </h4>
-        <div className="text-3xl font-medium mt-8 mb-4">
-          Expertise of 1,000+ industry professionals and experts at your reach
-        </div>
-        <p className="text-[#000000BB] font-medium my-4">
-          For every phase of your college and career journey, we&apos;ve got you
-          covered. Our models are trained on extensive quality data and curated
-          insights from experienced industry and subject matter experts, guiding
-          you to your dream path.
-        </p>
-        <div className="w-full my-8 rounded-2xl shadow-md">
-          <Carousel>
-            <CarouselContent className="px-2 pb-8">
-              {carouselData.map((item, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 xl:basis-1/3">
-                  <CounsellorCard
-                    name={item.name}
-                    image={item.image}
-                    experience={item.experience}
-                    ranking={item.ranking}
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </Carousel>
-          <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground py-8 px-4">
-            <BulletCard title="10k+" description="Successful Premium Admits" />
-            <BulletCard title="10k+" description="Successful Premium Admits" />
-            <BulletCard title="10k+" description="Successful Premium Admits" />
-            <BulletCard title="10k+" description="Successful Premium Admits" />
-          </div>
+      <h4 className="pt-4 font-semibold text-primary">
+        EXPERTS INSIGHTS
+        <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
+      </h4>
+      <div className="text-3xl font-medium mt-8 mb-4">
+        Expertise of 1,000+ industry professionals and experts at your reach
+      </div>
+      <p className="text-[#000000BB] font-medium my-4">
+        For every phase of your college and career journey, we&apos;ve got you
+        covered. Our models are trained on extensive quality data and curated
+        insights from experienced industry and subject matter experts, guiding
+        you to your dream path.
+      </p>
+      <div className="w-full my-8 rounded-2xl shadow-md">
+        <Carousel>
+          <CarouselContent className="px-2 pb-8">
+            {carouselData.map((item, index) => (
+              <CarouselItem key={index} className="md:basis-1/2 xl:basis-1/3">
+                <CounsellorCard
+                  name={item.name}
+                  image={item.image}
+                  experience={item.experience}
+                  ranking={item.ranking}
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+        <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground py-8 px-4">
+          <BulletCard title="10k+" description="Successful Premium Admits" />
+          <BulletCard title="10k+" description="Successful Premium Admits" />
+          <BulletCard title="10k+" description="Successful Premium Admits" />
+          <BulletCard title="10k+" description="Successful Premium Admits" />
         </div>
       </div>
     </>

@@ -28,9 +28,9 @@ const AuthForm: React.FC = () => {
     email: "",
     phone: "",
     password: "",
-    role: "user"
+    role: "user",
   });
-  
+
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
@@ -45,7 +45,7 @@ const AuthForm: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     setUser((prevUser) => ({
       ...prevUser,
       [name]: value.trim(),
@@ -70,8 +70,13 @@ const AuthForm: React.FC = () => {
   };
 
   const sendOTP = async () => {
-    
-    if (!user.firstName || !user.lastName || !user.email || !user.phone || !user.password) {
+    if (
+      !user.firstName ||
+      !user.lastName ||
+      !user.email ||
+      !user.phone ||
+      !user.password
+    ) {
       toast.error("Please fill in all fields.");
       return;
     }
@@ -83,9 +88,9 @@ const AuthForm: React.FC = () => {
       toast.error("Please enter a valid 10-digit phone number.");
       return;
     }
-      
+
     setIsOTPVerifing(true);
-    
+
     try {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
@@ -111,9 +116,9 @@ const AuthForm: React.FC = () => {
       toast.error("Please enter OTP.");
       return;
     }
-    
+
     setIsOTPVerifing(true);
-    
+
     try {
       const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
@@ -138,7 +143,13 @@ const AuthForm: React.FC = () => {
   const handleSubmitSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user.firstName || !user.lastName || !user.email || !user.phone || !user.password) {
+    if (
+      !user.firstName ||
+      !user.lastName ||
+      !user.email ||
+      !user.phone ||
+      !user.password
+    ) {
       toast.error("Please fill in all fields.");
       return;
     }
@@ -158,8 +169,7 @@ const AuthForm: React.FC = () => {
       toast.error("Please agree to the terms and conditions.");
       return;
     }
-    
-    
+
     setIsSigningUp(true);
     try {
       const res = await fetch("/api/auth/register", {
@@ -172,7 +182,7 @@ const AuthForm: React.FC = () => {
           name: `${user.firstName} ${user.lastName}`,
           phone: user.phone,
           password: user.password,
-          role: "user"
+          role: "user",
         }),
       });
 
@@ -186,7 +196,7 @@ const AuthForm: React.FC = () => {
         router.push("/questions");
       } else {
         const errorData = await res.json();
-        toast.error(errorData.error || "Registration failed")
+        toast.error(errorData.error || "Registration failed");
       }
     } catch (error) {
       console.error("Register error:", error);
@@ -246,6 +256,7 @@ const AuthForm: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signIn("google");
+      if (result?.ok) router.push("/");
       if (result?.error) {
         console.error("Google sign-in error:", result.error);
         toast.error("Google sign-in failed. Please try again.");
@@ -255,10 +266,11 @@ const AuthForm: React.FC = () => {
       toast.error("An error occurred during Google sign-in");
     }
   };
-  
+
   useEffect(() => {
+    console.log(session);
     if (session?.user) {
-        router.push("/");
+      router.push("/");
     } else {
       clearUser();
     }
@@ -266,6 +278,15 @@ const AuthForm: React.FC = () => {
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0">
+      <div className="absolute top-4 left-4 max-w-[180px]">
+        <Image
+          src={"/home/logo.svg"}
+          width={180}
+          height={100}
+          alt="logo"
+          className="w-full h-auto drop-shadow-md"
+        />
+      </div>
       <div className="bg-[#fcfcfc] rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center">
         <div className="md:block w-full md:max-w-[350px] bg-purple-500 rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 flex flex-col items-center justify-between mb-4 md:mb-0 relative h-full">
           <Carousel
@@ -303,14 +324,19 @@ const AuthForm: React.FC = () => {
           {isSignUp ? (
             <>
               <div className="text-popover-foreground  flex flex-col">
-                <div className="text-[#555] text-sm mb-1">Hey Champ!</div>
-                <div className="font-semibold text-[#333] text-2xl mb-4 ">
+                <div className="text-[#666] font-medium text-sm mb-1">
+                  Hey Champ!
+                </div>
+                <div className="font-semibold text-[#444] text-2xl mb-4 ">
                   Create your wiZe Account
-                  <div className="h-[1px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full mt-3 "></div>
+                  <div className="h-[2px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full mt-3 "></div>
                 </div>
               </div>
 
-              <form onSubmit={handleSubmitSignUp} className="space-y-8">
+              <form
+                onSubmit={handleSubmitSignUp}
+                className="flex flex-col gap-y-2"
+              >
                 <div className="flex flex-col md:flex-row gap-2 ">
                   <Input
                     name="firstName"
@@ -336,7 +362,7 @@ const AuthForm: React.FC = () => {
                   onChange={handleChange}
                 />
 
-                <div className="flex flex-col mt-4 md:flex-row md:space-x-2 ">
+                <div className="flex flex-col md:flex-row md:space-x-2 ">
                   <div className="flex items-center justify-evenly w-full max-w-[150px] border-2 rounded-md mb-4 md:mb-0">
                     <CountrySelector />
                   </div>
@@ -364,14 +390,20 @@ const AuthForm: React.FC = () => {
                       placeholder="Enter OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
-                      className="w-full px-4 py-3 border-2 bg-white outline-none rounded-md text-[#222] placeholder:text-gray-400 placeholder:font-semibold  focus:border-primary-foreground font-medium border-primary-foreground hover:border-primary-foreground transition-all duration-300"
+                      className="w-full px-4 py-3 border-1 bg-white outline-none rounded-md text-[#222] placeholder:text-gray-400 placeholder:font-semibold  focus:border-primary-foreground font-medium hover:border-primary-foreground transition-all duration-300"
                     />
                     <button
                       type="button"
                       onClick={otpSent ? verifyOTP : sendOTP}
                       className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-white py-1 px-3 rounded-md text-sm font-medium transition-all duration-200"
                     >
-                      {otpSent ? (isOTPVerifing ? "Verifing" : "Verify OTP") : (isOTPVerifing ? "Sending" : "Send OTP")}
+                      {otpSent
+                        ? isOTPVerifing
+                          ? "Verifing"
+                          : "Verify OTP"
+                        : isOTPVerifing
+                          ? "Sending"
+                          : "Send OTP"}
                     </button>
                   </div>
                 </div>
@@ -381,9 +413,9 @@ const AuthForm: React.FC = () => {
                     type="checkbox"
                     checked={agreeToTerms}
                     onChange={(e) => setAgreeToTerms(e.target.checked)}
-                    className="form-checkbox h-12 w-12 accent-primary transition duration-150 ease-in-out mb-10 "
+                    className="form-checkbox h-8 w-8 accent-primary transition duration-150 ease-in-out "
                   />
-                  <span className="text-gray-800 text-l font-medium">
+                  <span className="text-gray-800 text-xs font-medium">
                     All your information is collected, stored, and processed as
                     per our data processing guidelines. By signing up on wiZe,
                     you agree to our{" "}
@@ -411,7 +443,7 @@ const AuthForm: React.FC = () => {
                       onClick={() => setIsSignUp(false)}
                       className="text-primary font-semibold"
                     >
-                      {isSigningUp ? "Signing In" : "Sign In"}
+                      Sign In
                     </button>
                   </div>
                   <div className="flex space-x-6 mr-8 mb-1">
@@ -432,17 +464,19 @@ const AuthForm: React.FC = () => {
             </>
           ) : (
             <>
-              <div className="">
-                <div className="text-gray-400 font-semibold">Hey Champ!</div>
-                <div className="text-gray-600 text-2xl font-semibold mb-3">
-                  Welcome Back to wiZe!
+              <div className="text-popover-foreground  flex flex-col">
+                <div className="text-[#666] font-medium text-sm mb-1 mt-8">
+                  Hey Champ!
                 </div>
-                <div className="h-[1px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full  "></div>
+                <div className="font-semibold text-[#444] text-2xl mb-4 ">
+                  Welcome Back to wiZe!
+                  <div className="h-[2px] my-2 bg-gradient-to-r from-white to-gray-400 max-w-[300px] rounded-full mt-3 "></div>
+                </div>
               </div>
 
               <button
                 type="button"
-                className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2 mb-8 mt-5 font-semibold transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105 text-lg"
+                className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2  font-semibold transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02] text-lg"
                 onClick={handleGoogleSignIn}
               >
                 <Image src={GoogleImg} alt="Google" className="w-6 h-6" />
@@ -451,60 +485,60 @@ const AuthForm: React.FC = () => {
                 </span>
               </button>
 
-              <div className="flex items-center justify-center mb-4">
+              <div className="flex items-center justify-center my-4">
                 <div className="w-1/3 border-b border-gray-300 mr-4"></div>
-                <span className="text-gray-400 font-bold text-center text-sm">
+                <span className="text-gray-400 font-semibold text-center text-sm">
                   Or login with email
                 </span>
                 <div className="w-1/3 border-b border-gray-300 ml-4 "></div>
               </div>
 
-              <form onSubmit={handleSubmitLogin} className="space-y-10 mt-4">
-                <div className="flex flex-col gap-2">
-                  <input
+              <form
+                onSubmit={handleSubmitLogin}
+                className="flex flex-col justify-between gap-4 h-full"
+              >
+                <div className="flex flex-col gap-1">
+                  <Input
                     type="email"
                     name="email"
                     placeholder="Email"
                     value={credentials.email}
                     onChange={handleCredentialsChange}
-                    className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                   />
-                  <Link
-                    href="#"
+
+                  <button
                     onClick={() => setIsOtpLogin(!isOtpLogin)}
-                    className="text-blue-500 font-semibold text-le hover:text-blue-700 transition-colors duration-300"
+                    className="text-primary text-left font-semibold px-4"
                   >
                     {isOtpLogin ? "Login with Password" : "Login via OTP"}
-                  </Link>
+                  </button>
                 </div>
 
                 {isOtpLogin ? (
-                  <div className="relative w-full mt-4">
+                  <div className="relative w-full flex flex-col gap-1">
                     <input
                       type="text"
                       placeholder="Enter OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
-                      className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
+                      autoComplete="off"
+                      className="w-full px-2 py-3 border-1 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold  hover:border-primary-foreground transition-all duration-300"
                     />
-                    <div className="flex items-center mt-3 ml-[-10px]">
-                      <Image
+                    {/* <div className="flex items-center mt-3 ml-[-10px]"> */}
+                    {/* <Image
                         src={Lock}
                         alt="Image beside Forgot password"
                         className="ml-2 w-3 h-3"
-                      />
-                      <Link
-                        href="/forgot-password"
-                        className="text-blue-500 font-semibold text-left hover:text-blue-700 transition-colors duration-300 "
-                      >
-                        Didn&apos;t Receive OTP yet?
-                      </Link>
-                    </div>
+                      /> */}
+                    <button className="font-semibold text-left text-primary px-4 absolute bottom-0 translate-y-full ">
+                      Didn&apos;t Receive OTP yet?
+                    </button>
+                    {/* </div> */}
                     {otpSent ? (
                       <button
                         type="button"
                         onClick={verifyOTP}
-                        className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-green-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
+                        className="absolute font-semibold right-2 top-[50%] transform -translate-y-1/2 bg-green-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
                       >
                         Verify OTP
                       </button>
@@ -512,61 +546,53 @@ const AuthForm: React.FC = () => {
                       <button
                         type="button"
                         onClick={sendOTP}
-                        className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-purple-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
+                        className="absolute font-semibold right-2 top-[50%] transform -translate-y-1/2 bg-purple-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
                       >
                         Send OTP
                       </button>
                     )}
                   </div>
                 ) : (
-                  <div>
-                    <input
+                  <div className="flex flex-col gap-1">
+                    <Input
                       type="password"
                       name="password"
                       placeholder="Password"
                       value={credentials.password}
                       onChange={handleCredentialsChange}
-                      className="w-full px-2 py-3 border-2 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold border-primary-foreground hover:border-primary-foreground transition-all duration-300"
                     />
-                    <div className="flex items-center mt-3 ml-[-10px]">
-                      <Image
+                    {/* <div className="flex items-center mt-3 ml-[-10px]"> */}
+                    {/* <Image
                         src={Lock}
                         alt="Image beside Forgot password"
                         className="ml-2 w-3 h-3"
-                      />
-                      <Link
-                        href="/forgot-password"
-                        className="text-blue-500 font-semibold text-left ml-1 hover:text-blue-700 transition-colors duration-300"
-                      >
-                        Forgot Password
-                      </Link>
-                    </div>
+                      /> */}
+                    <button className="font-semibold text-primary text-left px-4 ">
+                      Forgot Password
+                    </button>
+                    {/* </div> */}
                   </div>
                 )}
 
-                <div className="flex justify-between items-center mt-16">
-                  <div className="text-gray-500">
-                    <span>Don&apos;t have an account?</span>{" "}
+                <div className="flex justify-between items-center mt-10">
+                  <div className="text-gray-500 font-semibold ">
+                    <span className="text-sm">
+                      Didn&apos;t have an account?{" "} &nbsp;
+                    </span>{" "}
                     <button
                       onClick={() => setIsSignUp(true)}
-                      className="text-purple-500 text-sm font-semibold hover:text-purple-700 transition-colors duration-300"
+                      className="text-primary font-semibold"
                     >
                       Register
                     </button>
                   </div>
-                  <div className="flex space-x-4">
-                    <button
-                      type="submit"
-                      className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl mr-11"
-                    >
-                      <span>Log In</span>
-                      <Image
-                        src={Arrow}
-                        alt="Sign Up Icon"
-                        className="w-6 h-6"
-                      />
-                    </button>
-                  </div>
+                  <button
+                    type="submit"
+                    className="bg-primary text-white pl-4 pr-2 py-2 rounded-full font-bold flex items-center gap-2 hover:scale-105 duration-200 text-xl "
+                  >
+                    <span>Sign In</span>
+                    <Image src={Arrow} alt="Sign Up Icon" className="w-8 h-8" />
+                  </button>
                 </div>
               </form>
             </>

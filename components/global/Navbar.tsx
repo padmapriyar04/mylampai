@@ -18,8 +18,10 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       if (session) {
+        await signOut();
         clearUser();
-        signOut();
+        document.cookie =
+          "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       } else {
         const response = await fetch("/api/auth/logout", {
           method: "POST",
@@ -36,8 +38,7 @@ const Navbar = () => {
       console.error("Error during logout:", error);
     }
   };
-  
-  
+
   const getToken = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/getToken", {

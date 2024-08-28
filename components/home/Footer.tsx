@@ -56,7 +56,7 @@ export default function Footer() {
               alt="myLampAI"
             />
           </div>
-          <div className="flex w-full gap-4 items-start justify-between ">
+          <div className="flex w-full md:gap-0 items-start justify-between ">
             <div className="w-full flex flex-col items-start justify-between p-4 gap-6">
               <h3 className="text-[#8C52FF] font-semibold text-xl">
                 Stay Connected
@@ -124,7 +124,7 @@ export default function Footer() {
               </form>
               <div className="w-full flex flex-col items-center gap-4 bg-primary-foreground rounded-lg p-4">
                 <div className="font-semibold text-left w-full text-[#00000070]">
-                  Know everything about Wize in just one call
+                  Know everything about Wize in just 1 call
                 </div>
                 <div className="flex gap-4 w-full">
                   <div className="flex gap-2 bg-white rounded-lg p-2 text-center ">

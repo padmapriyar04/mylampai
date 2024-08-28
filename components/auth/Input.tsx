@@ -10,15 +10,15 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({name, type, placeholder, value, onChange}) => {
   return (
     <>
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        autoComplete="off"
-        className="w-full px-4 py-3 border-2 bg-white outline-none rounded-md text-[#222] placeholder:text-gray-400 placeholder:font-semibold  focus:border-primary-foreground font-medium border-primary-foreground hover:border-primary-foreground transition-all duration-300"
-      />
+        <input
+          type={type}
+          name={name}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          autoComplete="off"
+          className="w-full px-2 py-3 border-1 bg-white outline-none rounded-md text-black placeholder:text-gray-400 placeholder:font-semibold placeholder:text-l focus:border-primary-foreground focus:font-semibold  hover:border-primary-foreground transition-all duration-300"
+        />
     </>
   );
 };
