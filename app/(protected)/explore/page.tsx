@@ -11,9 +11,9 @@ export default function Explore() {
     const renderData = Array(8).fill(value);
 
     return (
-        <div className="w-full scrollbar-hide flex flex-row justify-center">
+        <div className="w-full scrollbar-hide flex flex-row justify-center p-5">
             <div className="w-full max-w-[1200px] h-full flex flex-col gap-2 scrollbar-hide ">
-                <div className="w-full flex flex-row mt-5 gap-5">
+                <div className="w-full flex flex-row gap-5">
                     <div className="h-full w-full lg:w-8/12 bg-white p-2 border rounded-xl flex flex-row items-center">
                         <div className="w-full h-full flex flex-col gap-3 p-2 xl:w-3/5">
                             <div className="text-2xl  font-medium font-sans ml-4">Journey through GenAI and LLMS</div>

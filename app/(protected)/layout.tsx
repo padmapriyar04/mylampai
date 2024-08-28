@@ -41,7 +41,7 @@ export default function ProtectedLayout({
       <body className={`${openSans.className} bg-primary-foreground`}>
         <AuthProvider>
           <Navbar />
-          <div className="flex w-full h-full transition-all duration-300 ">
+          <div className="flex w-full h-full transition-all duration-300">
             <Flexsidebar />
             {children}
           </div>

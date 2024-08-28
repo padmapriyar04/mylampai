@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import ExperiencedCounsellors from "./ExperiencedCounsellors";
 import PracticeCoding from "./PractiseCoding";
 import WizeCampLink from "./WizeCampLink";
+import Image from "next/image";
 
 const whyWizeLinks = [
   { id: "allroundguidance", text: "All Round Guidance" },
@@ -32,7 +33,7 @@ export default function WhyWize() {
         root: null, // viewport
         rootMargin: "0px", // no margin
         threshold: 0.5, // trigger when 50% of the section is visible
-      }
+      },
     );
 
     // Observe each section
@@ -49,7 +50,7 @@ export default function WhyWize() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center mb-4">
+    <div className="flex flex-col items-center mb-4 ">
       <div className="max-w-[1300px] h-[100px] flex justify-center items-center w-full gap-4 mb-8">
         <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] bg-gradient-to-r from-white to-primary"></div>
         <div className="w-full text-3xl md:text-4xl font-medium text-center">
@@ -69,10 +70,12 @@ export default function WhyWize() {
             />
           ))}
         </div>
-        <div className="md:border-l-4 md:border-[#baa1eb] px-6 lg:px-[60px] xl:px-[100px] relative">
+        <div className="md:border-l-4 md:border-[#baa1eb]  lg:px-[60px] xl:px-[100px] relative">
           <div
             id="allroundguidance"
-            ref={(el) => (sectionsRef.current[0] = el)}
+            ref={(el) => {
+              sectionsRef.current[0] = el;
+            }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
@@ -91,29 +94,21 @@ export default function WhyWize() {
             <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
           </div>
 
-          <PracticeCoding />
-
           <div
             id="pathtosuccess"
-            ref={(el) => (sectionsRef.current[1] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            ref={(el) => {
+              sectionsRef.current[1] = el;
+            }}
+            className="pb-[100px] min-h-screen"
           >
-            <h4 className="pt-4 font-semibold text-[#8C52FF]">
-              PATH TO SUCCESS
-              <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%]"></div>
-            </h4>
-            <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-              We're with you at every step
-            </div>
-            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              Success is not just about hard work; it's also about making smart choices. And we're here to help you make them.
-            </p>
-            <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
+            <PracticeCoding />
           </div>
 
           <div
             id="smartestplatform"
-            ref={(el) => (sectionsRef.current[2] = el)}
+            ref={(el) => {
+              sectionsRef.current[2] = el;
+            }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
@@ -126,56 +121,86 @@ export default function WhyWize() {
             </div>
             <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
               From starting your college journey to your placement and even
-              post-college, we provide comprehensive guidance. Just keep
-              showing up and stay engaged, and our AI-powered platform will
-              take care of you!
+              post-college, we provide comprehensive guidance. Just keep showing
+              up and stay engaged, and our AI-powered platform will take care of
+              you!
             </p>
             <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
           </div>
 
-          <ExperiencedCounsellors />
-
           <div
             id="expertsinsights"
-            ref={(el) => (sectionsRef.current[3] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            ref={(el) => {
+              sectionsRef.current[3] = el;
+            }}
+            className="pb-[100px] min-h-screen"
           >
-            <h4 className="pt-4 font-semibold text-[#8C52FF]">
-              EXPERTS INSIGHTS
-              <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%]"></div>
-            </h4>
-            <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-              Learn from the best in the industry
-            </div>
-            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              Gain valuable insights from industry experts who have a wealth of
-              experience. Get the advice and guidance you need to excel in your
-              career.
-            </p>
-            <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
+            <ExperiencedCounsellors />
           </div>
 
           <div
             id="advancedfeatures"
-            ref={(el) => (sectionsRef.current[4] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            ref={(el) => {
+              sectionsRef.current[4] = el;
+            }}
+            className=" sm:min-h-[700px]"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               ADVANCED FEATURES
-              <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%]"></div>
+              <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
             </h4>
             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-              Explore the advanced tools and features
+              Important features that&apos;ll sometimes be your buddy, sometimes
+              your saviour
             </div>
             <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              From AI-powered tools to interactive learning experiences, our
-              platform is equipped with the best features.
+              Whether it&apos;s an AI-powered smart community that helps you
+              learn and grow with peers in a unique and engaging way, or
+              assessments that aid in self-evaluation, these features will cover
+              all the gaps in your career journey, making your college and
+              career path smooth.
             </p>
-            <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
+            <div className="flex flex-wrap justify-between gap-4 gap-y-5 min-h-[400px] w-full my-8 rounded-2xl">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[415px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                <Image
+                  src="./home/whywize/4.svg"
+                  alt="winningrecord"
+                  width={100}
+                  height={100}
+                  className="w-full"
+                ></Image>
+              </div>
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[415px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                <Image
+                  src="./home/whywize/2.svg"
+                  alt="winningrecord"
+                  width={100}
+                  height={100}
+                  className="w-full"
+                ></Image>
+              </div>
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[415px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                <Image
+                  src="./home/whywize/3.svg"
+                  alt="winningrecord"
+                  width={100}
+                  height={100}
+                  className="w-full"
+                ></Image>
+              </div>
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] xl:max-w-[415px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+                <Image
+                  src="./home/whywize/1.svg"
+                  alt="winningrecord"
+                  width={100}
+                  height={100}
+                  className="w-full"
+                ></Image>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
