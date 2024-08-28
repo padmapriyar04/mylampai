@@ -194,8 +194,9 @@ const AuthForm: React.FC = () => {
     }
     setIsSigningUp(false);
   };
-
+  
   const handleSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
+    console.log("LoginviaPassword");
     e.preventDefault();
 
     if (!credentials.email || !credentials.password) {
@@ -210,6 +211,7 @@ const AuthForm: React.FC = () => {
 
     try {
       const response = await fetch("/api/auth/login", {
+        
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -228,11 +230,7 @@ const AuthForm: React.FC = () => {
 
         setUserData(data.user, data.token);
 
-        if (data.user.role === "admin") {
-          router.push("/adminDashboard");
-        } else {
-          router.push("/profile");
-        }
+        router.push("/profile");
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Login failed. Please try again.");
@@ -257,12 +255,71 @@ const AuthForm: React.FC = () => {
   };
   
   useEffect(() => {
-    if (session?.user) {
+    if (session?.user || userData) {
         router.push("/");
     } else {
       clearUser();
     }
   }, [session]);
+
+  const sendOTPforlogin = async () => {
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: credentials.email }),
+      });
+  
+      if (response.ok) {
+        setOtpSent(true);
+        // Display a success message using Sonner or any other method
+      } else {
+        // Handle errors, show an error message
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+    }
+  };
+
+  
+  const verifyOTPforlogin = async (e: FormEvent<HTMLFormElement>) => {
+
+    e.preventDefault();
+    try {
+      const response = await fetch("/api/auth/loginWithOtp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          otp: otp,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      
+      if (response.ok) {
+        // Handle successful OTP verification (e.g., log the user in, redirect, etc.)
+        console.log("OTP verified successfully:", data);
+        setCookie("token", data.token, 7); // Set cookie for 7 days
+        setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
+        console.log(data.user);
+        toast.success("Login successful!");
+
+        setUserData(data.user, data.token);
+        router.push("/profile");
+      } else {
+        // Handle error (e.g., show an error message to the user)
+        console.error("Error verifying OTP:", data.error);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0">
@@ -459,7 +516,7 @@ const AuthForm: React.FC = () => {
                 <div className="w-1/3 border-b border-gray-300 ml-4 "></div>
               </div>
 
-              <form onSubmit={handleSubmitLogin} className="space-y-10 mt-4">
+              <form onSubmit={isOtpLogin ? verifyOTPforlogin: handleSubmitLogin} className="space-y-10 mt-4">
                 <div className="flex flex-col gap-2">
                   <input
                     type="email"
@@ -500,23 +557,13 @@ const AuthForm: React.FC = () => {
                         Didn&apos;t Receive OTP yet?
                       </Link>
                     </div>
-                    {otpSent ? (
                       <button
                         type="button"
-                        onClick={verifyOTP}
-                        className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-green-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
-                      >
-                        Verify OTP
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={sendOTP}
+                        onClick={sendOTPforlogin}
                         className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-purple-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
                       >
-                        Send OTP
+                        {otpSent ? "Resend OTP" : "Send OTP"}
                       </button>
-                    )}
                   </div>
                 ) : (
                   <div>
@@ -559,7 +606,7 @@ const AuthForm: React.FC = () => {
                       type="submit"
                       className="bg-primary text-white pl-6 pr-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl mr-11"
                     >
-                      <span>Log In</span>
+                      <span >Log In</span>
                       <Image
                         src={Arrow}
                         alt="Sign Up Icon"
