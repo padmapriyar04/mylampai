@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,9 +12,6 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { setCookie } from "@/utils/cookieUtils";
 import { useUserStore } from "@/utils/userStore";
-import Arrow from "../../public/images/Arrow.png";
-import Lock from "../../public/images/icons8-lock.svg";
-import GoogleImg from "../../public/images/Google_Icons-09-512.png";
 
 const AuthForm: React.FC = () => {
   const { data: session } = useSession();
@@ -43,7 +40,7 @@ const AuthForm: React.FC = () => {
 
   const router = useRouter();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setUser((prevUser) => ({
@@ -52,7 +49,7 @@ const AuthForm: React.FC = () => {
     }));
   };
 
-  const handleCredentialsChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleCredentialsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCredentials((prevCredentials) => ({
       ...prevCredentials,
@@ -205,7 +202,8 @@ const AuthForm: React.FC = () => {
     setIsSigningUp(false);
   };
 
-  const handleSubmitLogin = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("LoginviaPassword");
     e.preventDefault();
 
     if (!credentials.email || !credentials.password) {
@@ -238,11 +236,7 @@ const AuthForm: React.FC = () => {
 
         setUserData(data.user, data.token);
 
-        if (data.user.role === "admin") {
-          router.push("/adminDashboard");
-        } else {
-          router.push("/profile");
-        }
+        router.push("/profile");
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Login failed. Please try again.");
@@ -268,13 +262,68 @@ const AuthForm: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log(session);
-    if (session?.user) {
+    if (session?.user || userData) {
       router.push("/");
     } else {
       clearUser();
     }
   }, [session]);
+
+  const sendOTPforlogin = async () => {
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: credentials.email }),
+      });
+
+      if (response.ok) {
+        setOtpSent(true);
+        // Display a success message using Sonner or any other method
+      } else {
+        // Handle errors, show an error message
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+    }
+  };
+
+  const verifyOTPforlogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/api/auth/loginWithOtp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          otp: otp,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Handle successful OTP verification (e.g., log the user in, redirect, etc.)
+        console.log("OTP verified successfully:", data);
+        setCookie("token", data.token, 7); // Set cookie for 7 days
+        setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
+        console.log(data.user);
+        toast.success("Login successful!");
+
+        setUserData(data.user, data.token);
+        router.push("/profile");
+      } else {
+        // Handle error (e.g., show an error message to the user)
+        console.error("Error verifying OTP:", data.error);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0">
@@ -453,9 +502,11 @@ const AuthForm: React.FC = () => {
                     >
                       <span>Sign Up</span>
                       <Image
-                        src={Arrow}
+                        src={"/images/Arrow.png"}
                         alt="Sign Up Icon"
                         className="w-6 h-6"
+                        width={100}
+                        height={100}
                       />
                     </button>
                   </div>
@@ -479,7 +530,13 @@ const AuthForm: React.FC = () => {
                 className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2  font-semibold transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02] text-lg"
                 onClick={handleGoogleSignIn}
               >
-                <Image src={GoogleImg} alt="Google" className="w-6 h-6" />
+                <Image
+                  src={"/images/Google_Icons-09-512.png"}
+                  alt="Google"
+                  width={100}
+                  height={100}
+                  className="w-6 h-6"
+                />
                 <span className="text-gray-600 font-bold">
                   Login with Google
                 </span>
@@ -494,7 +551,7 @@ const AuthForm: React.FC = () => {
               </div>
 
               <form
-                onSubmit={handleSubmitLogin}
+                onSubmit={isOtpLogin ? verifyOTPforlogin : handleSubmitLogin}
                 className="flex flex-col justify-between gap-4 h-full"
               >
                 <div className="flex flex-col gap-1">
@@ -529,28 +586,18 @@ const AuthForm: React.FC = () => {
                         src={Lock}
                         alt="Image beside Forgot password"
                         className="ml-2 w-3 h-3"
+
                       /> */}
                     <button className="font-semibold text-left text-primary px-4 absolute bottom-0 translate-y-full ">
                       Didn&apos;t Receive OTP yet?
                     </button>
-                    {/* </div> */}
-                    {otpSent ? (
-                      <button
-                        type="button"
-                        onClick={verifyOTP}
-                        className="absolute font-semibold right-2 top-[50%] transform -translate-y-1/2 bg-green-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-green-600"
-                      >
-                        Verify OTP
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={sendOTP}
-                        className="absolute font-semibold right-2 top-[50%] transform -translate-y-1/2 bg-purple-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
-                      >
-                        Send OTP
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={sendOTPforlogin}
+                      className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-purple-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
+                    >
+                      {otpSent ? "Resend OTP" : "Send OTP"}
+                    </button>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-1">
@@ -577,7 +624,7 @@ const AuthForm: React.FC = () => {
                 <div className="flex justify-between items-center mt-10">
                   <div className="text-gray-500 font-semibold ">
                     <span className="text-sm">
-                      Didn&apos;t have an account?{" "} &nbsp;
+                      Didn&apos;t have an account? &nbsp;
                     </span>{" "}
                     <button
                       onClick={() => setIsSignUp(true)}
@@ -591,7 +638,13 @@ const AuthForm: React.FC = () => {
                     className="bg-primary text-white pl-4 pr-2 py-2 rounded-full font-bold flex items-center gap-2 hover:scale-105 duration-200 text-xl "
                   >
                     <span>Sign In</span>
-                    <Image src={Arrow} alt="Sign Up Icon" className="w-8 h-8" />
+                    <Image
+                      src={"/images/Arrow.png"}
+                      alt="Sign Up Icon"
+                      className="w-8 h-8"
+                      width={100}
+                      height={100}
+                    />
                   </button>
                 </div>
               </form>

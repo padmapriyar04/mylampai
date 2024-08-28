@@ -535,7 +535,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   <Accordion type="single" collapsible>
                     {reviewedData.bullet_points_improver &&
                       reviewedData.bullet_points_improver.bulletPoints.map(
-                        (data: any, ind: number) => (
+                        (data, ind: number) => (
                           <AccordionItem value={`item-${ind + 1}`} key={ind}>
                             <AccordionTrigger className="text-left">
                               Original: {data.original}
