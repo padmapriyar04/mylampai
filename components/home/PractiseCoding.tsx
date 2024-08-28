@@ -99,7 +99,7 @@ const PracticeCards = () => {
 
 const PracticeCoding = () => {
   return (
-    <div id="pathtosuccess" className="pb-[100px] min-h-screen px-6">
+    <>
       <h4 className="pt-4 font-semibold text-[#8C52FF]">
         PATH TO SUCCESS
         <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
@@ -111,7 +111,7 @@ const PracticeCoding = () => {
         Empowering you to explore a variety of domains, learn new skills in a personalised way, and craft a unique path to success, helping  you uncover your passions and reach your full potential, making your career aspirations a reality.
       </p>
       <PracticeCards />
-    </div>
+    </>
   );
 };
 

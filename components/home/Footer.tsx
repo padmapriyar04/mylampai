@@ -1,7 +1,40 @@
+"use client";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function Footer() {
+  const [email, setEmail] = useState("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    toast.info("Subscribing..")
+
+    try {
+      const res = await fetch("/api/newsletteremails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        toast.success("Subscribed!");
+        setEmail("");
+      }
+    } catch (err) {
+      toast.error("Failed");
+      console.log(err);
+    }
+  };
+  
   return (
     <>
       <div className="flex flex-col lg:flex-row gap-8 bg-gradient-to-tr shadow-br from-[#8C52FF] to-[#b7cdfb] p-[40px] mt-[100px]">
@@ -23,7 +56,7 @@ export default function Footer() {
               alt="myLampAI"
             />
           </div>
-          <div className="flex w-full gap-4 items-start justify-between ">
+          <div className="flex w-full md:gap-0 items-start justify-between ">
             <div className="w-full flex flex-col items-start justify-between p-4 gap-6">
               <h3 className="text-[#8C52FF] font-semibold text-xl">
                 Stay Connected
@@ -72,13 +105,14 @@ export default function Footer() {
               <h3 className="text-[#8C52FF] font-semibold text-xl">
                 Stay Updated
               </h3>
-              <div className="flex items-center justify-start w-full overflow-hidden rounded-lg ">
+              <form onSubmit={handleSubmit} className="flex items-center justify-start w-full overflow-hidden rounded-lg ">
                 <input
                   placeholder="Sign Up for our Newsletter"
                   type="email"
+                  onChange={handleChange}
                   className="bg-primary-foreground w-full h-[35px] outline-none border-none py-2 px-4 font-semibold "
                 />
-                <button>
+                <button type="submit">
                   <Image
                     className="bg-[#8C52FF] h-[35px] w-[40px] p-2"
                     src={"/home/arrowInput.svg"}
@@ -87,10 +121,10 @@ export default function Footer() {
                     alt="arrowInput"
                   />
                 </button>
-              </div>
+              </form>
               <div className="w-full flex flex-col items-center gap-4 bg-primary-foreground rounded-lg p-4">
                 <div className="font-semibold text-left w-full text-[#00000070]">
-                  Know everything about Wize in just one call
+                  Know everything about Wize in just 1 call
                 </div>
                 <div className="flex gap-4 w-full">
                   <div className="flex gap-2 bg-white rounded-lg p-2 text-center text-xs w-1/2">
@@ -117,7 +151,8 @@ export default function Footer() {
           </div>
           <div className="flex items-center justify-center gap-2 sm:gap-6 pt-4 border-dashed border-t-[3px]">
             <Link
-              href={"https://whatsapp.com/channel/0029Val3cM0CsU9Tnclfk10F"}
+              href={"https://chat.whatsapp.com/G8sVXPrblUwDkttwTxnb2z"}
+              target="_blank"
             >
               <Image
                 src={"/social/whatsapp.svg"}
@@ -126,7 +161,10 @@ export default function Footer() {
                 alt="whatsapp"
               />
             </Link>
-            <Link href={"https://www.instagram.com/wize.mylamp/"}>
+            <Link
+              href={"https://www.instagram.com/wize.mylamp/"}
+              target="_blank"
+            >
               <Image
                 src={"/social/instagram.svg"}
                 width={27}
@@ -134,7 +172,10 @@ export default function Footer() {
                 alt="instagram"
               />
             </Link>
-            <Link href={"https://www.linkedin.com/company/wize-mylamp/"}>
+            <Link
+              href={"https://www.linkedin.com/company/wize-mylamp/"}
+              target="_blank"
+            >
               <Image
                 src={"/social/linkedin.svg"}
                 width={27}
@@ -142,7 +183,7 @@ export default function Footer() {
                 alt="linkedin"
               />
             </Link>
-            <Link href={"https://www.facebook.com/wize.mylamp"}>
+            <Link href={"https://www.facebook.com/wize.mylamp"} target="_blank">
               <Image
                 src={"/social/facebook.svg"}
                 width={27}
@@ -150,7 +191,7 @@ export default function Footer() {
                 alt="facebook"
               />
             </Link>
-            <Link href={"https://www.youtube.com/@wize-mylamp"}>
+            <Link href={"https://www.youtube.com/@wize-mylamp"} target="_blank">
               <Image
                 src={"/social/youtube.svg"}
                 width={27}
@@ -158,7 +199,7 @@ export default function Footer() {
                 alt="youtube"
               />
             </Link>
-            <Link href={"https://t.me/wize_mylamp"}>
+            <Link href={"https://t.me/+E95suGL1idQ2ZWRl"} target="_blank">
               <Image
                 src={"/social/telegram.svg"}
                 width={27}
@@ -166,7 +207,7 @@ export default function Footer() {
                 alt="telegram"
               />
             </Link>
-            <Link href={"https://discord.gg/eaAQr79t"}>
+            <Link href={"https://discord.gg/eaAQr79t"} target="_blank">
               <Image
                 src={"/social/discord.svg"}
                 width={27}
@@ -174,7 +215,7 @@ export default function Footer() {
                 alt="discord"
               />
             </Link>
-            <Link href={"https://x.com/wize_mylamp"}>
+            <Link href={"https://x.com/wize_mylamp"} target="_blank">
               <Image
                 src={"/social/twitter-x.svg"}
                 width={27}

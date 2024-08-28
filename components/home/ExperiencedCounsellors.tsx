@@ -80,10 +80,9 @@ const BulletCard: React.FC<BulletCardProps> = ({ title, description }) => {
   );
 };
 
-const ExperiencedCounsellors = () => {
+const ExperiencedCounsellors: React.FC = () => {
   return (
     <>
-      <div id="expertsinsights" className="pb-[100px] min-h-screen">
         <h4 className="pt-4 font-semibold text-primary px-6">
           EXPERTS INSIGHTS
           <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
@@ -119,7 +118,6 @@ const ExperiencedCounsellors = () => {
             <BulletCard title="10k+" description="Successful Premium Admits" />
           </div>
         </div>
-      </div>
     </>
   );
 };
