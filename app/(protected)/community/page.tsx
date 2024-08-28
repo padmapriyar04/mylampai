@@ -274,7 +274,7 @@ export default function Community() {
       <div className="w-full max-w-[440px] h-[calc(100vh-6rem)] flex flex-col items-stretch justify-start gap-4">
         <div className="w-full flex flex-col">
           <div className="font-semibold text-gray-700">
-            Hello {userData?.name.split(" ")[0]}!
+          Hello {userData?.name ? userData.name.split(" ")[0] : "User"}!
           </div>
           <span className="text-sm text-gray-700">
             Learn with your peers to maximize learning
