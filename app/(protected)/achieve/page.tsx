@@ -27,7 +27,7 @@ export default function Achieve() {
             feedback and optimization tips.
           </p>
         </div>
-        <div className="flex flex-row justify-evenly relative md:top-[3vh] gap-6 w-full px-[1vw] pb-8 md:mt-16">
+        <div className="flex flex-row justify-evenly relative top-[3vh] gap-2 w-full md:px-[1vw] pb-8 md:mt-16 md:gap-6 px-[2vw] ">
           <Link
             href="#"
             className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-primary hover:text-white transition"
@@ -56,7 +56,7 @@ export default function Achieve() {
             evaluated. Just relax and take the interview.{" "}
           </p>
         </div>
-        <div className="flex flex-row justify-evenly relative md:top-[3vh] gap-6 w-full px-[1vw] pb-8 md:mt-16">
+        <div className="flex flex-row justify-evenly relative top-[3vh] gap-2 w-full md:px-[1vw] pb-8 md:mt-16 md:gap-6 px-[2vw]">
           <Link
             href="#"
             className="bg-white py-2 md:py-5 px-3 w-1/2 font-semibold text-primary md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-primary hover:text-white transition"
