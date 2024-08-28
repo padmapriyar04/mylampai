@@ -331,7 +331,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         const loadingTask = pdfjsLib.getDocument({ data: resumeFile });
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1.5 });
+        const viewport = page.getViewport({ scale: 1 });
   
         const canvas = canvasRef.current;
         const context = canvas?.getContext('2d');
@@ -801,13 +801,16 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       </div>
       <div className="w-full bg-primary rounded-lg">
     
-    {loading ? (
-      <div className="flex justify-center items-center h-full">
-        <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
-      </div>
-    ) : (
-      <canvas ref={canvasRef} className="w-full h-auto max-h-full" style={{ minHeight: '75vh' }}></canvas>
-    )}
+      {loading ? (
+  <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
+    <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
+  </div>
+) : (
+  <div className="h-[calc(100vh-5rem)] overflow-y-auto">
+    <canvas ref={canvasRef} className="w-full h-auto"></canvas>
+  </div>
+)}
+
       </div>
     </div>
   );

@@ -142,7 +142,7 @@ const Page: React.FC = () => {
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("CV and Job Description uploaded successfully");
+        
       } else {
         toast.error(result.error || "Failed to upload CV and Job Description");
       }
