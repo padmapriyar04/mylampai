@@ -3,7 +3,14 @@ import { HiOutlineDocumentCheck } from "react-icons/hi2";
 import Link from "next/link";
 import { RiComputerLine } from "react-icons/ri";
 import { FaLinkedin } from "react-icons/fa";
+import { useState } from "react";
+import { toast } from "sonner";
 
+
+
+const HandleInterviewClick = () => {
+  toast.success("This feature coming soon!");
+};
 
 export default function Achieve() {
   return (
@@ -56,12 +63,11 @@ export default function Achieve() {
           >
             Past Analysis
           </Link>
-          <Link
-            href="/interview"
+          <button onClick={HandleInterviewClick} 
             className="bg-primary py-2 md:py-5 px-3 w-1/2 font-semibold text-white md:text-xl rounded-lg border-2 border-primary text-center max-h-[60px] items-center flex justify-center hover:bg-purple-600 transition"
           >
             Get Interviewed
-          </Link>
+          </button>
         </div>
         </div>
       </div>
