@@ -38,7 +38,7 @@ function RecentAdvancesCard({
 }) {
   return (
     <>
-      <div className="relative flex flex-col justify-between max-w-[300px] pb-4 rounded-2xl overflow-hidden min-h-[350px] shadow-md hover:scale-105 transition-all">
+      <div className="relative flex flex-col justify-between md:max-w-[23.5%] pb-4 rounded-2xl overflow-hidden min-h-[350px] shadow-md hover:scale-105 transition-all">
         <Image
           src={imageUrl}
           height={100}
@@ -63,7 +63,7 @@ function RecentAdvancesCard({
 export default function RecentAdvances() {
   return (
     <>
-      <div className="max-w-[1300px] mx-auto mt-12">
+      <div className="max-w-[1300px] mx-auto mt-12 px-5">
         <div className="flex justify-between flex-col sm:flex-row items-center mx-2">
           <h2 className="text-2xl sm:text-3xl font-semibold">
             Recent Blogs
@@ -78,11 +78,13 @@ export default function RecentAdvances() {
             />
           </button>
         </div>
-        <div className="flex flex-wrap justify-center sm:justify-evenly lg:justify-between gap-4 my-8 sm:my-[50px]">
+        
+        <div className="flex flex-col md:flex-row justify-center sm:justify-evenly lg:justify-between gap-4 my-8 sm:my-[50px]">
           {data.map((item, index) => (
             <RecentAdvancesCard key={index} {...item} />
           ))}
         </div>
+        
       </div>
     </>
   );

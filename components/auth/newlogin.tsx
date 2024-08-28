@@ -322,9 +322,9 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0">
-      <div className="bg-[#fcfcfc] rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center">
-        <div className="md:block w-full md:max-w-[350px] bg-purple-500 rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 flex flex-col items-center justify-between mb-4 md:mb-0 relative h-full">
+    <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0 h-[100vh]">
+      <div className="bg-[#fcfcfc] rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center ">
+        <div className="hidden md:block w-full md:max-w-[350px] bg-purple-500 rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 items-center justify-between mb-4 md:mb-0 relative h-full">
           <Carousel
             showThumbs={false}
             showStatus={false}

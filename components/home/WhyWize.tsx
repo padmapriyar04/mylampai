@@ -49,7 +49,7 @@ export default function WhyWize() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center mb-4">
+    <div className="flex flex-col items-center mb-4 ">
       <div className="max-w-[1300px] h-[100px] flex justify-center items-center w-full gap-4 mb-8">
         <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] bg-gradient-to-r from-white to-primary"></div>
         <div className="w-full text-3xl md:text-4xl font-medium text-center">
@@ -69,11 +69,11 @@ export default function WhyWize() {
             />
           ))}
         </div>
-        <div className="md:border-l-4 md:border-[#baa1eb] px-6 lg:px-[60px] xl:px-[100px] relative">
+        <div className="md:border-l-4 md:border-[#baa1eb]  lg:px-[60px] xl:px-[100px] relative">
           <div
             id="allroundguidance"
             ref={(el) => (sectionsRef.current[0] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               ALL ROUND GUIDANCE
@@ -96,7 +96,7 @@ export default function WhyWize() {
           <div
             id="pathtosuccess"
             ref={(el) => (sectionsRef.current[1] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               PATH TO SUCCESS
@@ -114,7 +114,7 @@ export default function WhyWize() {
           <div
             id="smartestplatform"
             ref={(el) => (sectionsRef.current[2] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               SMARTEST PLATFORM
@@ -138,7 +138,7 @@ export default function WhyWize() {
           <div
             id="expertsinsights"
             ref={(el) => (sectionsRef.current[3] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               EXPERTS INSIGHTS
@@ -158,7 +158,7 @@ export default function WhyWize() {
           <div
             id="advancedfeatures"
             ref={(el) => (sectionsRef.current[4] = el)}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               ADVANCED FEATURES

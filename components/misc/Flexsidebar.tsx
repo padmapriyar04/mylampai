@@ -49,7 +49,7 @@ export default function Flexsidebar() {
     <>
       <div
         ref={sidebarRef}
-        className={`bg-white shadow-inner py-2 h-[calc(100vh-4rem)] z-10 transition-all duration-300 w-full max-w-[220px] flex flex-row items-center gap-2 ${isSmallScreen && !isSidebarOpen ? "hidden" : "flex"} flex flex-col w-full transition-all duration-300 z-10 ${isSmallScreen ? "w-screen" : "w-[270px]"}`}
+        className={`bg-white sticky top-[4rem] shadow-inner py-2 h-[calc(100vh-4rem)] z-10 transition-all duration-300 w-full max-w-[220px] flex flex-row items-center gap-2 ${isSmallScreen && !isSidebarOpen ? "hidden" : "flex"} flex flex-col w-full transition-all duration-300 z-10 ${isSmallScreen ? "w-screen" : "w-[270px]"}`}
       >
         <button
           className="absolute top-4 left-4 block sm:hidden"

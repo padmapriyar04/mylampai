@@ -10,7 +10,7 @@ import allAssessements from "@/data/practise/allAssessments";
 
 const Practice = () => {
   return (
-    <div className="bg-[#F1EAFF] p-5 min-h-screen flex flex-col lg:flex-row justify-between z-0">
+    <div className="bg-[#F1EAFF] p-5 min-h-screen flex flex-col lg:flex-row justify-between z-0 max-w-[calc(100vw-240px)]">
       <div className="w-full lg:w-[60%] mb-5 lg:mb-0 ">
         <div className="mb-5">
           <p className="text-[#737373] font-bold text-xl">Let&apos; Rock!</p>
@@ -31,7 +31,7 @@ const Practice = () => {
           />
         </div>
         <div className="mt-5">
-          <ExclusiveAssessements exclusiveAssements={exclusiveAssements} />
+          <ExclusiveAssessements exclusiveAssements={exclusiveAssements}/>
         </div>
         <div className="mt-5">
           <AllAssessments allAssessements={allAssessements} />
