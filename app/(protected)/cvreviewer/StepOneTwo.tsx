@@ -29,11 +29,12 @@ interface StepOneTwoProps {
   isManualEntry: boolean;
   profile: string | null;
   manualJobDescription: string;
-  setProfile: React.Dispatch<React.SetStateAction<string | null>>;
+  setProfile: React.Dispatch<React.SetStateAction<string | null>>; // Ensure this is correctly typed
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
   customProfile: string;
   setCustomProfile: React.Dispatch<React.SetStateAction<string>>;
 }
+
 
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
   step,
@@ -64,6 +65,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   } = useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [localResume, setLocalResume] = useState<File | null>(null); 
 
   const { token } = useUserStore();
 
@@ -79,6 +81,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       if (file.size > 1 * 1024 * 1024) {
         toast.error("File size should be less than 5MB");
         setUploading(false);
+        setLocalResume(file);
         return;
       }
 
@@ -220,6 +223,17 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       setUploading(false);
       return null;
     }
+  }
+
+  // Client-side rendering only to avoid hydration errors
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // or return a loading indicator
   }
 
   return (
@@ -458,23 +472,22 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               Choose your Interview Profile
             </h3>
 
-            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center max-h-[300px]">
+            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]">
               <div className="w-full  p-4 bg-white rounded-lg flex flex-col items-center justify-center ">
-                <select
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-                  value={manualJobDescription}
-                  onChange={(e) => setProfile(e.target.value)}
-                >
-                  <option value="" disabled>
-                    <div>Select a role</div>
-                  </option>
-                  <option value="SDE">SDE</option>
-                  <option value="AI/ML">AI/ML</option>
-                  <option value="Core">Core</option>
-                  <option value="Consulting">Consulting</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Other">Other</option>
-                </select>
+              <select
+  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
+  value={manualJobDescription}
+  onChange={(e) => setManualJobDescription(e.target.value)}  // Use setManualJobDescription here
+>
+  <option value="" disabled>Select a role</option>
+  <option value="SDE">SDE</option>
+  <option value="AI/ML">AI/ML</option>
+  <option value="Core">Core</option>
+  <option value="Consulting">Consulting</option>
+  <option value="Finance">Finance</option>
+  <option value="Other">Other</option>
+</select>
+
 
                 {manualJobDescription === "Other" && (
                   <input
