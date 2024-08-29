@@ -127,7 +127,7 @@ export default function Footer() {
                   Know everything about Wize in just 1 call
                 </div>
                 <div className="flex gap-4 w-full">
-                  <div className="flex gap-2 bg-white rounded-lg p-2 text-center text-xs w-1/2">
+                  <div className="flex gap-2 bg-white rounded-lg p-2 text-center items-center text-xs w-1/2">
                     <Image
                       src={"/home/desktop.svg"}
                       height={30}
@@ -136,7 +136,7 @@ export default function Footer() {
                     />
                     Connect Now
                   </div>
-                  <div className="flex gap-2 bg-white rounded-lg p-2 text-center text-xs w-1/2">
+                  <div className="flex gap-2 bg-white rounded-lg p-2 text-center items-center text-xs w-1/2">
                     <Image
                       src={"/home/schedule.svg"}
                       height={30}

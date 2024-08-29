@@ -325,9 +325,34 @@ const AuthForm: React.FC = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    console.log("HandleForgot password");
+    try {
+      const response = await fetch("/api/forgot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: credentials.email, }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Email Sent Successfully to your email for Resetting the Password.");
+      } else {
+        toast.success("Email not sent ");
+      }
+    } catch (error) {
+      console.error("Error sending password reset request:", error);
+    }
+  };
+
+
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0 h-screen">
-      <div className="absolute top-4 left-4 max-w-[180px]">
+      <div className="absolute top-4 left-0 max-w-32">
+        <Link href="/">
         <Image
           src={"/home/logo.svg"}
           width={180}
@@ -335,8 +360,9 @@ const AuthForm: React.FC = () => {
           alt="logo"
           className="w-full h-auto drop-shadow-md"
         />
+        </Link>
       </div>
-      <div className="bg-[#fcfcfc] rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center">
+      <div className="bg-[#fcfcfc] rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[45vw] 2xl:h-[35vw] ">
         <div className="hidden md:block w-full md:max-w-[350px] bg-purple-500 rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
           <Carousel
             showThumbs={false}
@@ -369,10 +395,10 @@ const AuthForm: React.FC = () => {
           </Carousel>
         </div>
 
-        <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 gap-2 flex flex-col justify-center ">
+        <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 flex flex-col justify-center">
           {isSignUp ? (
             <>
-              <div className="text-popover-foreground  flex flex-col">
+              <div className="text-popover-foreground  flex flex-col mt-5">
                 <div className="text-[#666] font-medium text-sm mb-1">
                   Hey Champ!
                 </div>
@@ -457,7 +483,7 @@ const AuthForm: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2 mt-6">
+                <div className="flex items-center space-x-2 mt-3">
                   <input
                     type="checkbox"
                     checked={agreeToTerms}
@@ -485,7 +511,7 @@ const AuthForm: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center mt-10 ml-8">
+                <div className="flex justify-between items-center mt-16 ">
                   <div className="text-gray-500 font-semibold">
                     <span className="text-sm">Already have an account? </span>{" "}
                     <button
@@ -495,10 +521,10 @@ const AuthForm: React.FC = () => {
                       Sign In
                     </button>
                   </div>
-                  <div className="flex space-x-6 mr-8 mb-1">
+                  <div className="flex space-x-6 mb-1">
                     <button
                       type="submit"
-                      className="bg-primary text-white px-6 py-3 rounded-full font-semibold flex items-center space-x-2 hover:scale-105 duration-200 text-2xl"
+                      className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center space-x-2 hover:scale-105 duration-200 md:text-xl h-1/2  "
                     >
                       <span>Sign Up</span>
                       <Image
@@ -516,7 +542,7 @@ const AuthForm: React.FC = () => {
           ) : (
             <>
               <div className="text-popover-foreground  flex flex-col">
-                <div className="text-[#666] font-medium text-sm mb-1 mt-8">
+                <div className="text-[#666] font-medium text-sm mb-1 mt-3">
                   Hey Champ!
                 </div>
                 <div className="font-semibold text-[#444] text-2xl mb-4 ">
@@ -552,7 +578,7 @@ const AuthForm: React.FC = () => {
 
               <form
                 onSubmit={isOtpLogin ? verifyOTPforlogin : handleSubmitLogin}
-                className="flex flex-col justify-between gap-4 h-full"
+                className="flex flex-col justify-between gap-4 lg:h-[60%] xl:h-1/2"
               >
                 <div className="flex flex-col gap-1">
                   <Input
@@ -608,23 +634,19 @@ const AuthForm: React.FC = () => {
                       value={credentials.password}
                       onChange={handleCredentialsChange}
                     />
-                    {/* <div className="flex items-center mt-3 ml-[-10px]"> */}
-                    {/* <Image
-                        src={Lock}
-                        alt="Image beside Forgot password"
-                        className="ml-2 w-3 h-3"
-                      /> */}
-                    <button className="font-semibold text-primary text-left px-4 ">
-                      Forgot Password
-                    </button>
-                    {/* </div> */}
-                  </div>
-                )}
+                      <div
+                        onClick={handleForgotPassword}
+                        className="font-semibold text-primary text-left px-4 "
+                      >
 
-                <div className="flex justify-between items-center mt-10">
-                  <div className="text-gray-500 font-semibold ">
+                        Forgot Password
+                      </div>
+                    </div>
+                )}
+                <div className="flex justify-between items-center mt-14">
+                  <div className="text-gray-500 font-semibold">
                     <span className="text-sm">
-                      Didn&apos;t have an account? &nbsp;
+                      Don&apos;t have an account? &nbsp;
                     </span>{" "}
                     <button
                       onClick={() => setIsSignUp(true)}
@@ -635,7 +657,7 @@ const AuthForm: React.FC = () => {
                   </div>
                   <button
                     type="submit"
-                    className="bg-primary text-white pl-4 pr-2 py-2 rounded-full font-bold flex items-center gap-2 hover:scale-105 duration-200 text-xl "
+                    className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:scale-105 duration-200 md:text-xl "
                   >
                     <span>Sign In</span>
                     <Image
