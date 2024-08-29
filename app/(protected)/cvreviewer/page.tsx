@@ -18,7 +18,7 @@ const Page: React.FC = () => {
   const [manualJobDescription, setManualJobDescription] = useState("");
   const [structuredData, setStructuredData] = useState<any>(null);
   const { token } = useUserStore();
-  const [profile, setProfile] = useState<string>("SOFTWARE");
+  const [profile, setProfile] = useState<string | null>(null);
   const [localResume, setLocalResume] = useState<File | null>(null);
 
   const handleDrop = (

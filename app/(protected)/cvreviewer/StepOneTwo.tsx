@@ -35,7 +35,6 @@ interface StepOneTwoProps {
   setCustomProfile: React.Dispatch<React.SetStateAction<string>>;
 }
 
-
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
   step,
   setStep,
@@ -65,7 +64,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   } = useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [localResume, setLocalResume] = useState<File | null>(null); 
+  const [localResume, setLocalResume] = useState<File | null>(null);
 
   const { token } = useUserStore();
 
@@ -79,16 +78,16 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
     if (file && file.type === "application/pdf") {
       if (file.size > 1 * 1024 * 1024) {
-        toast.error("File size should be less than 5MB");
+        toast.error("File size should be less than 1MB");
         setUploading(false);
         setLocalResume(file);
         return;
       }
+      
+      setResumeFile(file);
 
       const fileReader = new FileReader();
       let extractedText = "";
-
-      setResumeFile(file);
 
       fileReader.onload = async function () {
         const typedArray: ArrayBuffer = new Uint8Array(
@@ -235,6 +234,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   if (!isClient) {
     return null; // or return a loading indicator
   }
+  
 
   return (
     <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee]">
@@ -297,9 +297,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               <div className="relative">
                 <div
                   className={`w-8 h-8 ${
-                    profile
-                      ? "bg-primary"
-                      : "bg-gray-400"
+                    profile ? "bg-primary" : "bg-gray-400"
                   } rounded-full flex items-center justify-center`}
                 >
                   {profile && (
@@ -472,42 +470,39 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               Choose your Interview Profile
             </h3>
 
-            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]">
-              <div className="w-full  p-4 bg-white rounded-lg flex flex-col items-center justify-center ">
+            <div className={`p-8 gap-4 flex flex-col items-center justify-start bg-white rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]`}>
               <select
-  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-  value={manualJobDescription}
-  onChange={(e) => setManualJobDescription(e.target.value)}  // Use setManualJobDescription here
->
-  <option value="" disabled>Select a role</option>
-  <option value="SDE">SDE</option>
-  <option value="AI/ML">AI/ML</option>
-  <option value="Core">Core</option>
-  <option value="Consulting">Consulting</option>
-  <option value="Finance">Finance</option>
-  <option value="Other">Other</option>
-</select>
+                className={`w-full p-4 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${profile === "other" || profile === null ? "border-gray-300" : "border-primary ring-primary ring-1"}  `}
+                value={manualJobDescription}
+                onChange={(e) => {
+                  setManualJobDescription(e.target.value);
+                  if (e.target.value !== "other") setProfile(e.target.value);
+                  else setProfile(null);
+                }}
+              >
+                <option value="" disabled>
+                  Select a role
+                </option>
+                <option value="SOFTWARE">Software</option>
+                <option value="DATA">Data</option>
+                <option value="CORE">Core</option>
+                <option value="CONSULTING">Consulting</option>
+                <option value="FINANCE">Finance</option>
+                <option value="other">Other&apos;s</option>
+              </select>
 
-
-                {manualJobDescription === "Other" && (
-                  <input
-                    type="text"
-                    className="w-full mt-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-                    placeholder="Please specify your profile"
-                    value={customProfile}
-                    onChange={(e) => setProfile(e.target.value)}
-                  />
-                )}
-
-                <div className="w-full text-center mt-4">
-                  <button
-                    onClick={handleManualJDUpload}
-                    className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
-                  >
-                    Choose Profile
-                  </button>
-                </div>
-              </div>
+              {manualJobDescription === "other" && (
+                <input
+                  type="text"
+                  className={`w-full p-4 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${profile === "other" || profile === null ? "border-gray-300" : "border-primary ring-primary ring-1"}  `}
+                  placeholder="Please specify your profile"
+                  value={customProfile}
+                  onChange={(e) => {
+                    setManualJobDescription(e.target.value);
+                    setProfile(e.target.value);
+                  }}
+                />
+              )}
             </div>
 
             <div className="mt-8 w-full px-4 flex flex-col items-center">
