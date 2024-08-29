@@ -2,9 +2,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useInterviewStore } from "@/utils/store";
 import * as pdfjsLib from "pdfjs-dist/webpack";
-// import "pdfjs-dist/web/pdf_viewer.css";
 import { useUserStore } from "@/utils/userStore";
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import {
   Dialog,
@@ -33,8 +32,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const { extractedText, structuredData } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [reviewedData, setReviewedData] = useState<any>({});
-  const [selectedAnalysis, setSelectedAnalysis] = useState("");
-  const [atsScore, setAtsScore] = useState(56);
   const [resumeFile, setResumeFile] = useState<Uint8Array | null>(null);
   const { token } = useUserStore();
   const [loading, setLoading] = useState<boolean>(true); // Loading state
@@ -66,6 +63,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       let result: any = null;
 
       switch (analysisType) {
+        case "summary":
+          if (reviewedData.summary) break;
+          endpoint = "/summary";
+          data = {
+            cv_text: extractedText,
+          };
+          result = await analyzeResume(endpoint, data, query);
+          setReviewedData((prevData: any) => ({
+            ...prevData,
+            summary: result?.message,
+          }));
         case "quantification_checker":
           if (reviewedData.quantification_checker) break;
           endpoint = "/quantification";
@@ -252,7 +260,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     },
     [structuredData, extractedText, profile],
   );
-
+  console.log("Analysis Data", reviewedData?.summary?.Summary);
   useEffect(() => {
     const fetchCVs = async () => {
       setLoading(true); // Start loading
@@ -269,7 +277,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         }
 
         const data = await response.json();
-        console.log('API Response:', data);  // Inspect the response
+        console.log("API Response:", data); // Inspect the response
 
         // Check if the response contains the expected 'cv' object
         if (data.cv && data.cv.Resume) {
@@ -294,7 +302,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     fetchCVs();
   }, [token]);
 
-    const base64ToUint8Array = (base64: string): Uint8Array | null => {
+  const base64ToUint8Array = (base64: string): Uint8Array | null => {
     try {
       const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, "");
       const raw = atob(cleanedBase64);
@@ -313,61 +321,56 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     if (resumeFile) {
       const timer = setTimeout(() => {
         if (canvasRef.current) {
-          console.log('Canvas is ready, rendering PDF');
+          console.log("Canvas is ready, rendering PDF");
           renderPDF();
         } else {
-          console.error('Canvas reference is still not set.');
+          console.error("Canvas reference is still not set.");
         }
       }, 100); // Delay to ensure component is fully mounted
-  
+
       return () => clearTimeout(timer); // Cleanup the timer
     }
   }, [resumeFile]);
-  
+
   const renderPDF = async () => {
     if (resumeFile && canvasRef.current) {
       try {
-       
         const loadingTask = pdfjsLib.getDocument({ data: resumeFile });
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(1);
         const viewport = page.getViewport({ scale: 1 });
-  
+
         const canvas = canvasRef.current;
-        const context = canvas?.getContext('2d');
-  
+        const context = canvas?.getContext("2d");
+
         if (!context) {
-          console.error('No context found for canvas');
+          console.error("No context found for canvas");
           return;
         }
-  
+
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-  
+
         const renderContext = {
           canvasContext: context,
           viewport,
         };
-  
+
         await page.render(renderContext).promise;
-        console.log('PDF rendered successfully');
+        console.log("PDF rendered successfully");
       } catch (error) {
-        console.error('Error rendering PDF:', error);
+        console.error("Error rendering PDF:", error);
       } finally {
-      
       }
     } else {
       console.error("Canvas reference is null or resumeFile is not set.");
     }
   };
-  
-
-  console.log("Analysis Result:", reviewedData);
 
   useEffect(() => {
     runAnalysis("resume_score");
+    runAnalysis("summary");
   }, [runAnalysis]);
-
 
   return (
     <div className="flex h-full justify-between items-stretch gap-2 p-2">
@@ -413,6 +416,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         </div>
       </div>
       <div className="w-full bg-white p-2 rounded-lg min-h-[calc(100vh-5rem)]">
+        <h2 className="text-xl font-bold">Summary</h2>
+        <div className="px-2 mb-4">{reviewedData.summary && reviewedData.summary.Summary}</div>
         <h2 className="text-xl font-bold">Fixes or Corrections</h2>
 
         <div className="flex flex-wrap justify-center items-start gap-2 py-2">
@@ -800,17 +805,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         </div>
       </div>
       <div className="w-full bg-primary rounded-lg">
-    
-      {loading ? (
-  <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
-    <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
-  </div>
-) : (
-  <div className="h-[calc(100vh-5rem)] overflow-y-auto">
-    <canvas ref={canvasRef} className="w-full h-auto"></canvas>
-  </div>
-)}
-
+        {loading ? (
+          <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
+            <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
+          </div>
+        ) : (
+          <div className="h-[calc(100vh-5rem)] overflow-y-auto scrollbar-hide rounded-md">
+            <canvas ref={canvasRef} className="w-full h-auto"></canvas>
+          </div>
+        )}
       </div>
     </div>
   );
