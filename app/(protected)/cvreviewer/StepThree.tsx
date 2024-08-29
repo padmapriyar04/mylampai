@@ -4,6 +4,7 @@ import { useInterviewStore } from "@/utils/store";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 // import "pdfjs-dist/web/pdf_viewer.css";
 import { useUserStore } from "@/utils/userStore";
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import {
   Dialog,
@@ -36,6 +37,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const [atsScore, setAtsScore] = useState(56);
   const [resumeFile, setResumeFile] = useState<Uint8Array | null>(null);
   const { token } = useUserStore();
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
 
   async function analyzeResume(endpoint: string, data: any, query: string) {
     try {
@@ -253,6 +255,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
 
   useEffect(() => {
     const fetchCVs = async () => {
+      setLoading(true); // Start loading
       try {
         const response = await fetch("/api/interviewer/get_cv", {
           method: "GET",
@@ -266,49 +269,35 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         }
 
         const data = await response.json();
+        console.log('API Response:', data);  // Inspect the response
 
-        if (data.cvs.length > 0) {
-          const firstCV = data.cvs[0]; // Assuming you want to display the first CV
+        // Check if the response contains the expected 'cv' object
+        if (data.cv && data.cv.Resume) {
+          const firstCV = data.cv; // Accessing the cv object
 
-          if (firstCV && firstCV.fileData) {
-            const pdfData = base64ToUint8Array(firstCV.fileData); // Convert base64 to Uint8Array
-            if (pdfData) {
-              setResumeFile(pdfData);
-            } else {
-              console.error("Failed to convert base64 string to Uint8Array.");
-            }
+          const pdfData = base64ToUint8Array(firstCV.Resume); // Convert base64 to Uint8Array
+          if (pdfData) {
+            setResumeFile(pdfData);
           } else {
-            console.error("No valid fileData found in the response.");
+            console.error("Failed to convert base64 string to Uint8Array.");
           }
         } else {
-          console.error("No CVs found in the API response.");
+          console.error("No valid CV found in the API response.");
         }
       } catch (error) {
         console.error("Error fetching CVs:", error);
+      } finally {
+        setLoading(false); // End loading
       }
     };
 
     fetchCVs();
   }, [token]);
 
-  const base64ToUint8Array = (base64: string): Uint8Array | null => {
-    if (!base64) {
-      console.error("Invalid base64 input");
-      return null;
-    }
-
+    const base64ToUint8Array = (base64: string): Uint8Array | null => {
     try {
-      // Remove any characters that are not valid in a base64 string
       const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, "");
-
-      // Ensure the length of the base64 string is correct
-      if (cleanedBase64.length % 4 !== 0) {
-        console.error("Base64 string length is invalid.");
-        return null;
-      }
-
-      // Decode the base64 string
-      const raw = window.atob(cleanedBase64);
+      const raw = atob(cleanedBase64);
       const uint8Array = new Uint8Array(raw.length);
       for (let i = 0; i < raw.length; i++) {
         uint8Array[i] = raw.charCodeAt(i);
@@ -321,84 +310,64 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   };
 
   useEffect(() => {
-    const renderPDF = async () => {
-      if (resumeFile && canvasRef.current) {
-        const loadingTask = pdfjsLib.getDocument({ data: resumeFile });
-
-        loadingTask.promise
-          .then(async (pdf) => {
-            const page = await pdf.getPage(1);
-            const viewport = page.getViewport({ scale: 1.5 });
-            const canvas = canvasRef.current!;
-            const context = canvas.getContext("2d")!;
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            const renderContext = {
-              canvasContext: context,
-              viewport,
-            };
-
-            await page.render(renderContext).promise;
-          })
-          .catch((error) => {
-            console.error("Error loading PDF:", error);
-          });
-      }
-    };
+    if (resumeFile) {
+      const timer = setTimeout(() => {
+        if (canvasRef.current) {
+          console.log('Canvas is ready, rendering PDF');
+          renderPDF();
+        } else {
+          console.error('Canvas reference is still not set.');
+        }
+      }, 100); // Delay to ensure component is fully mounted
+  
+      return () => clearTimeout(timer); // Cleanup the timer
+    }
   }, [resumeFile]);
+  
+  const renderPDF = async () => {
+    if (resumeFile && canvasRef.current) {
+      try {
+       
+        const loadingTask = pdfjsLib.getDocument({ data: resumeFile });
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1 });
+  
+        const canvas = canvasRef.current;
+        const context = canvas?.getContext('2d');
+  
+        if (!context) {
+          console.error('No context found for canvas');
+          return;
+        }
+  
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+  
+        const renderContext = {
+          canvasContext: context,
+          viewport,
+        };
+  
+        await page.render(renderContext).promise;
+        console.log('PDF rendered successfully');
+      } catch (error) {
+        console.error('Error rendering PDF:', error);
+      } finally {
+      
+      }
+    } else {
+      console.error("Canvas reference is null or resumeFile is not set.");
+    }
+  };
+  
+
   console.log("Analysis Result:", reviewedData);
 
   useEffect(() => {
     runAnalysis("resume_score");
   }, [runAnalysis]);
 
-  // useEffect(() => {
-  //   const renderPDF = async () => {
-  //     if (resumeFile && canvasRef.current) {
-  //       let pdfData: Uint8Array | ArrayBuffer | string | undefined;
-
-  //       if (typeof resumeFile === "string") {
-  //         pdfData = base64ToUint8Array(resumeFile);
-  //       } else if (resumeFile instanceof Blob || resumeFile instanceof File) {
-  //         pdfData = await resumeFile.arrayBuffer();
-  //       } else if (
-  //         resumeFile instanceof Uint8Array ||
-  //         resumeFile instanceof ArrayBuffer
-  //       ) {
-  //         pdfData = resumeFile;
-  //       }
-
-  //       if (pdfData) {
-  //         const loadingTask = pdfjsLib.getDocument({ data: pdfData });
-
-  //         loadingTask.promise
-  //           .then(async (pdf) => {
-  //             const page = await pdf.getPage(1);
-  //             const viewport = page.getViewport({ scale: 1.5 });
-  //             const canvas = canvasRef.current!;
-  //             const context = canvas.getContext("2d")!;
-  //             canvas.height = viewport.height;
-  //             canvas.width = viewport.width;
-
-  //             const renderContext = {
-  //               canvasContext: context,
-  //               viewport,
-  //             };
-
-  //             await page.render(renderContext).promise;
-  //           })
-  //           .catch((error) => {
-  //             console.error("Error loading PDF:", error);
-  //           });
-  //       } else {
-  //         console.error("No valid data found for the resumeFile");
-  //       }
-  //     }
-  //   };
-
-  //   renderPDF();
-  // }, [resumeFile]);
 
   return (
     <div className="flex h-full justify-between items-stretch gap-2 p-2">
@@ -535,7 +504,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   <Accordion type="single" collapsible>
                     {reviewedData.bullet_points_improver &&
                       reviewedData.bullet_points_improver.bulletPoints.map(
-                        (data, ind: number) => (
+                        (data: any, ind: number) => (
                           <AccordionItem value={`item-${ind + 1}`} key={ind}>
                             <AccordionTrigger className="text-left">
                               Original: {data.original}
@@ -831,8 +800,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         </div>
       </div>
       <div className="w-full bg-primary rounded-lg">
-        <h2 className="text-xl font-bold">Uploaded CV Preview</h2>
-        <canvas ref={canvasRef} className="w-full h-auto max-h-full"></canvas>
+    
+      {loading ? (
+  <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
+    <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
+  </div>
+) : (
+  <div className="h-[calc(100vh-5rem)] overflow-y-auto">
+    <canvas ref={canvasRef} className="w-full h-auto"></canvas>
+  </div>
+)}
+
       </div>
     </div>
   );

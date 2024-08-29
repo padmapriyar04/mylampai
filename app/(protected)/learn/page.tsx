@@ -10,10 +10,10 @@ export default function Learn() {
   const [cardOpen, setCardOpen] = useState(-1);
 
   return (
-      <div className="flex min-h-screen w-full max-w-[1300px] m-auto relative rounded-lg">
+      <div className="flex min-h-[calc(100vh-4rem)] w-full max-w-[1300px] m-auto relative rounded-lg">
 
-          <div className="w-full justify-between rounded-lg  mt-4  p-6">
-            <div className="flex  md:h-96   h-fit mb-10  rounded-lg md:w-full w-full sm:w-[80%]  mx-auto md:mx-0 sm:mb-5 flex-row justify-center md:justify-between">
+          <div className="w-full justify-between rounded-lg  p-6">
+            <div className="flex  md:h-96   h-fit   rounded-lg md:w-full w-full sm:w-[80%]  mx-auto md:mx-0 sm:mb-5 flex-row justify-center md:justify-between">
               <div className="w-full  lg:w-8/12 mr-0 mt-0  sm:mb-0 bg-white  rounded-lg ... ">
 
                 <IntroCard />

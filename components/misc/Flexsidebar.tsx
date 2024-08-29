@@ -49,7 +49,7 @@ export default function Flexsidebar() {
     <>
       <div
         ref={sidebarRef}
-        className={`bg-white shadow-inner py-2 h-[calc(100vh-4rem)] z-10 transition-all duration-300 w-full max-w-[220px] flex flex-row items-center gap-2 ${isSmallScreen && !isSidebarOpen ? "hidden" : "flex"} flex flex-col w-full transition-all duration-300 z-10 ${isSmallScreen ? "w-screen" : "w-[270px]"}`}
+        className={`bg-white sticky top-[4rem] shadow-inner py-2 h-[calc(100vh-4rem)] z-10 transition-all duration-300 w-full max-w-[220px] flex flex-row items-center gap-2 ${isSmallScreen && !isSidebarOpen ? "hidden" : "flex"} flex flex-col w-full transition-all duration-300 z-10 ${isSmallScreen ? "w-screen" : "w-[270px]"}`}
       >
         <button
           className="absolute top-4 left-4 block sm:hidden"
@@ -57,7 +57,7 @@ export default function Flexsidebar() {
         >
           ☰
         </button>
-        <div className="w-full h-[70vh] flex flex-col justify-evenly pb-4 gap-4 overflow-y-auto scrollbar-hide ">
+        <div className="w-full h-[70vh] flex flex-col justify-evenly mb-0 overflow-y-auto scrollbar-hide ">
           {navRender.map((item, index) => {
             const isActive = pathname === navData[index].Link;
             return (
@@ -71,7 +71,7 @@ export default function Flexsidebar() {
             );
           })}
         </div>
-        <div className="w-full flex flex-col px-2 items-center relative ">
+        <div className="w-full flex flex-col px-2 items-center relative h-28">
           <div className="w-12 h-12 border-4 rounded-full absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 z-10">
             <Image
               src="/avtar.svg"
