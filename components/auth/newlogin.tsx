@@ -321,6 +321,30 @@ const AuthForm: React.FC = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    console.log("HandleForgot password");
+    try {
+      const response = await fetch("/api/forgot", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: credentials.email, }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Email Sent Successfully to your email for Resetting the Password.");
+      } else {
+        toast.success("Email not sent ");
+      }
+    } catch (error) {
+      console.error("Error sending password reset request:", error);
+    }
+  };
+
+
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0">
       <div className="bg-[#fcfcfc] rounded-sm md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center">
@@ -581,12 +605,14 @@ const AuthForm: React.FC = () => {
                         alt="Image beside Forgot password"
                         className="ml-2 w-3 h-3"
                       />
-                      <Link
-                        href="/forgot-password"
+
+                      <div
+                        onClick={handleForgotPassword}
                         className="text-blue-500 font-semibold text-left ml-1 hover:text-blue-700 transition-colors duration-300"
                       >
+
                         Forgot Password
-                      </Link>
+                      </div>
                     </div>
                   </div>
                 )}
