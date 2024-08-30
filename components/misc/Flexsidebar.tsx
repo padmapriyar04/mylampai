@@ -57,7 +57,7 @@ export default function Flexsidebar() {
         >
           ☰
         </button>
-        <div className="w-full h-[70vh] flex flex-col justify-evenly pb-4 gap-4 overflow-y-auto scrollbar-hide ">
+        <div className="w-full h-[70vh] flex flex-col justify-evenly mb-0 overflow-y-auto scrollbar-hide ">
           {navRender.map((item, index) => {
             const isActive = pathname === navData[index].Link;
             return (
@@ -71,7 +71,7 @@ export default function Flexsidebar() {
             );
           })}
         </div>
-        <div className="w-full flex flex-col px-2 items-center relative ">
+        <div className="w-full flex flex-col px-2 items-center relative h-28">
           <div className="w-12 h-12 border-4 rounded-full absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 z-10">
             <Image
               src="/avtar.svg"

@@ -38,7 +38,7 @@ const Practice = () => {
         </div>
       </div>
       <div className="w-full lg:w-[37%]">
-        <div className="lg:sticky lg:top-[4.25rem]">
+        <div className="lg:sticky lg:top-[5.5rem] ">
           <div className="mb-5">
             <ProgressSection />
           </div>

@@ -1,22 +1,30 @@
 "use client";
-import React, { useState, DragEvent, ChangeEvent } from 'react';
-import StepOneTwo from './StepOneTwo'; // Adjust the path if necessary
-import { useInterviewStore } from '@/utils/store';
-import PDFViewer from './StepThree';
-import { useUserStore } from '@/utils/userStore';
-import { toast } from 'sonner';
+import React, { useState, DragEvent, ChangeEvent } from "react";
+import StepOneTwo from "./StepOneTwo"; // Adjust the path if necessary
+import { useInterviewStore } from "@/utils/store";
+import PDFViewer from "./StepThree";
+import { useUserStore } from "@/utils/userStore";
+import { toast } from "sonner";
 
 const Page: React.FC = () => {
-  const { setResumeFile, setJobDescriptionFile, resumeFile, jobDescriptionFile } = useInterviewStore();
+  const {
+    setResumeFile,
+    setJobDescriptionFile,
+    resumeFile,
+    jobDescriptionFile,
+  } = useInterviewStore();
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
-  const [manualJobDescription, setManualJobDescription] = useState('');
+  const [manualJobDescription, setManualJobDescription] = useState("");
   const [structuredData, setStructuredData] = useState<any>(null);
   const { token } = useUserStore();
-  const [profile, setProfile] = useState<string>("SOFTWARE");
+  const [profile, setProfile] = useState<string | null>(null);
   const [localResume, setLocalResume] = useState<File | null>(null);
 
-  const handleDrop = (event: DragEvent<HTMLDivElement>, setFile: (file: File) => void) => {
+  const handleDrop = (
+    event: DragEvent<HTMLDivElement>,
+    setFile: (file: File) => void,
+  ) => {
     event.preventDefault();
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
@@ -37,7 +45,9 @@ const Page: React.FC = () => {
   };
 
   const triggerFileInput = (inputId: string) => {
-    const inputElement = document.getElementById(inputId) as HTMLInputElement | null;
+    const inputElement = document.getElementById(
+      inputId,
+    ) as HTMLInputElement | null;
     if (inputElement) {
       inputElement.click();
     }
@@ -55,7 +65,9 @@ const Page: React.FC = () => {
     setStep((prevStep) => prevStep - 1);
   };
 
-  const handleJobDescriptionUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleJobDescriptionUpload = async (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target?.files?.[0];
     if (file) {
       const extractedText = await extractTextFromFile(file);
@@ -83,18 +95,18 @@ const Page: React.FC = () => {
   const extractTextFromFile = async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-  
+
     try {
       const response = await fetch(`${baseUrl}/extract_text_from_file`, {
         method: "POST",
         body: formData,
       });
       const result = await response.json();
-      return result.text || ''; // Adjust this depending on your API response structure
+      return result.text || ""; // Adjust this depending on your API response structure
     } catch (error) {
       console.error("Error extracting text from file:", error);
       toast.error("Failed to extract text from file");
-      return '';
+      return "";
     }
   };
 
@@ -105,7 +117,7 @@ const Page: React.FC = () => {
 
   const handleUploadJDToggle = () => {
     setIsManualEntry(false);
-    setManualJobDescription('');
+    setManualJobDescription("");
   };
 
   const handleManualJDUpload = async () => {
@@ -115,7 +127,10 @@ const Page: React.FC = () => {
     }
   };
 
-  const uploadCVAndJobDescription = async (resumeFileBinary: ArrayBuffer, jobDescriptionText: string) => {
+  const uploadCVAndJobDescription = async (
+    resumeFileBinary: ArrayBuffer,
+    jobDescriptionText: string,
+  ) => {
     try {
       if (!token) {
         toast.error("Unauthorized");
@@ -125,7 +140,7 @@ const Page: React.FC = () => {
       const jobDescriptionBase64 = btoa(jobDescriptionText);
 
       // Convert binary data to a Base64 string
-      const resumeBase64 = Buffer.from(resumeFileBinary).toString('base64');
+      const resumeBase64 = Buffer.from(resumeFileBinary).toString("base64");
 
       const response = await fetch("/api/interviewer/post_cv", {
         method: "POST",
@@ -142,7 +157,6 @@ const Page: React.FC = () => {
       const result = await response.json();
 
       if (response.ok) {
-        
       } else {
         toast.error(result.error || "Failed to upload CV and Job Description");
       }
@@ -153,7 +167,7 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="w-full">
       {step === 1 || step === 2 ? (
         <StepOneTwo
           step={step}
@@ -172,14 +186,14 @@ const Page: React.FC = () => {
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
           setStructuredData={setStructuredData}
-          profile={profile}           // Pass the profile
-          setProfile={setProfile}     // Pass the setProfile function
+          profile={profile} // Pass the profile
+          setProfile={setProfile} // Pass the setProfile function
         />
       ) : step === 3 ? (
         <PDFViewer
           profile={profile}
           structuredData={structuredData}
-          localResume={localResume} 
+          localResume={localResume}
         />
       ) : null}
     </div>
