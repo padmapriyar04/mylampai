@@ -3,7 +3,6 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useInterviewStore } from "@/utils/store";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 import { useUserStore } from "@/utils/userStore";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import Mark from "mark.js";
 import "./highlight.css"
