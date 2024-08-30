@@ -6,6 +6,9 @@ import * as pdfjsLib from "pdfjs-dist/webpack";
 import { useUserStore } from "@/utils/userStore";
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
+import Mark from "mark.js";
+import "./highlight.css"
+
 import {
   Dialog,
   DialogContent,
@@ -37,7 +40,45 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const [atsScore, setAtsScore] = useState(56);
   const [resumeFile, setResumeFile] = useState<Uint8Array | null>(null);
   const { token } = useUserStore();
-  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [sentencesToHighlight, setSentencesToHighlight] = useState<string[]>([]);
+  const textLayerRef = useRef<HTMLDivElement>(null); // <-- Initialize textLayerRef here
+
+  // const [loading, setLoading] = useState<boolean>(true); // Loading state
+
+
+  const fetchResumeFromLocalStorage = () => {
+    try {
+      const base64Data = localStorage.getItem("resumeFile");
+      if (base64Data) {
+        const byteString = atob(base64Data.split(',')[1]); // Decode base64 to binary string
+        const uint8Array = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) {
+          uint8Array[i] = byteString.charCodeAt(i);
+        }
+        setResumeFile(uint8Array);
+      }
+    } catch (error) {
+      console.error("Error fetching resume from local storage:", error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchResumeFromLocalStorage(); // Fetch the resume when the component mounts
+  }, []);
+
+  useEffect(() => {
+    if (resumeFile) {
+      const timer = setTimeout(() => {
+        if (canvasRef.current) {
+          renderPDF();
+        }
+      }, 100); // Delay to ensure component is fully mounted
+
+      return () => clearTimeout(timer); // Cleanup the timer
+    }
+  }, [resumeFile]);
 
   async function analyzeResume(endpoint: string, data: any, query: string) {
     try {
@@ -73,6 +114,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             extracted_data: structuredData,
           };
           result = await analyzeResume(endpoint, data, query);
+          if (result?.message?.["Not Quantify"]) {
+            setSentencesToHighlight(result.message["Not Quantify"]);
+            highlightSentences(result.message["Not Quantify"], "highlighted", false);
+          }
+
           setReviewedData((prevData: any) => ({
             ...prevData,
             quantification_checker: result?.message,
@@ -253,93 +299,94 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     [structuredData, extractedText, profile],
   );
 
-  useEffect(() => {
-    const fetchCVs = async () => {
-      setLoading(true); // Start loading
-      try {
-        const response = await fetch("/api/interviewer/get_cv", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch CVs");
-        }
-
-        const data = await response.json();
-        console.log('API Response:', data);  // Inspect the response
-
-        // Check if the response contains the expected 'cv' object
-        if (data.cv && data.cv.Resume) {
-          const firstCV = data.cv; // Accessing the cv object
-
-          const pdfData = base64ToUint8Array(firstCV.Resume); // Convert base64 to Uint8Array
-          if (pdfData) {
-            setResumeFile(pdfData);
-          } else {
-            console.error("Failed to convert base64 string to Uint8Array.");
-          }
-        } else {
-          console.error("No valid CV found in the API response.");
-        }
-      } catch (error) {
-        console.error("Error fetching CVs:", error);
-      } finally {
-        setLoading(false); // End loading
-      }
+  const highlightSentences = (list_of_sentences, class_name, case_sensitive_flag) => {
+    const options_general = {
+      ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
+      separateWordSearch: false,
+      accuracy: "partially",
+      className: class_name,
+      acrossElements: true,
+      caseSensitive: case_sensitive_flag,
     };
-
-    fetchCVs();
-  }, [token]);
-
-    const base64ToUint8Array = (base64: string): Uint8Array | null => {
-    try {
-      const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, "");
-      const raw = atob(cleanedBase64);
-      const uint8Array = new Uint8Array(raw.length);
-      for (let i = 0; i < raw.length; i++) {
-        uint8Array[i] = raw.charCodeAt(i);
-      }
-      return uint8Array;
-    } catch (error) {
-      console.error("Failed to convert base64 string to Uint8Array:", error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    if (resumeFile) {
-      const timer = setTimeout(() => {
-        if (canvasRef.current) {
-          console.log('Canvas is ready, rendering PDF');
-          renderPDF();
-        } else {
-          console.error('Canvas reference is still not set.');
-        }
-      }, 100); // Delay to ensure component is fully mounted
   
-      return () => clearTimeout(timer); // Cleanup the timer
-    }
-  }, [resumeFile]);
+    list_of_sentences.forEach((sentence) => {
+      if (textLayerRef.current) {
+        const instance = new Mark(textLayerRef.current);  // Create a new Mark.js instance
+        instance.mark(sentence, options_general);
+      }
+    });
+  };
+  
+  
+  // useEffect(() => {
+  //   const fetchCVs = async () => {
+  //     setLoading(true); // Start loading
+  //     try {
+  //       const response = await fetch("/api/interviewer/get_cv", {
+  //         method: "GET",
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
+
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch CVs");
+  //       }
+
+  //       const data = await response.json();
+  //       console.log('API Response:', data);  // Inspect the response
+
+  //       // Check if the response contains the expected 'cv' object
+  //       if (data.cv && data.cv.Resume) {
+  //         const firstCV = data.cv; // Accessing the cv object
+
+  //         const pdfData = base64ToUint8Array(firstCV.Resume); // Convert base64 to Uint8Array
+  //         if (pdfData) {
+  //           setResumeFile(pdfData);
+  //         } else {
+  //           console.error("Failed to convert base64 string to Uint8Array.");
+  //         }
+  //       } else {
+  //         console.error("No valid CV found in the API response.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching CVs:", error);
+  //     } finally {
+  //       setLoading(false); // End loading
+  //     }
+  //   };
+
+  //   fetchCVs();
+  // }, [token]);
+
+  //   const base64ToUint8Array = (base64: string): Uint8Array | null => {
+  //   try {
+  //     const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, "");
+  //     const raw = atob(cleanedBase64);
+  //     const uint8Array = new Uint8Array(raw.length);
+  //     for (let i = 0; i < raw.length; i++) {
+  //       uint8Array[i] = raw.charCodeAt(i);
+  //     }
+  //     return uint8Array;
+  //   } catch (error) {
+  //     console.error("Failed to convert base64 string to Uint8Array:", error);
+  //     return null;
+  //   }
+  // };
+
+
   
   const renderPDF = async () => {
     if (resumeFile && canvasRef.current) {
       try {
-       
         const loadingTask = pdfjsLib.getDocument({ data: resumeFile });
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1 });
+        const viewport = page.getViewport({ scale: 1.5 });
   
         const canvas = canvasRef.current;
-        const context = canvas?.getContext('2d');
-  
-        if (!context) {
-          console.error('No context found for canvas');
-          return;
-        }
+        const context = canvas.getContext("2d");
   
         canvas.height = viewport.height;
         canvas.width = viewport.width;
@@ -350,11 +397,26 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         };
   
         await page.render(renderContext).promise;
-        console.log('PDF rendered successfully');
+  
+        // Render text layer
+        if (textLayerRef.current) {
+          textLayerRef.current.innerHTML = "";
+  
+          const textContent = await page.getTextContent();
+          textLayerRef.current.style.width = `${canvas.offsetWidth}px`;
+          textLayerRef.current.style.height = `${canvas.offsetHeight}px`;
+  
+          pdfjsLib.renderTextLayer({
+            textContent: textContent,
+            container: textLayerRef.current,
+            viewport: viewport,
+            textDivs: [],
+          }).promise.then(() => {
+            highlightSentences(sentencesToHighlight, "highlighted", false);
+          });
+        }
       } catch (error) {
         console.error('Error rendering PDF:', error);
-      } finally {
-      
       }
     } else {
       console.error("Canvas reference is null or resumeFile is not set.");
@@ -362,12 +424,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   };
   
 
-  console.log("Analysis Result:", reviewedData);
 
   useEffect(() => {
-    runAnalysis("resume_score");
+    runAnalysis("quantification_checker");
   }, [runAnalysis]);
-
 
   return (
     <div className="flex h-full justify-between items-stretch gap-2 p-2">
@@ -800,17 +860,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         </div>
       </div>
       <div className="w-full bg-primary rounded-lg">
-    
-      {loading ? (
-  <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
-    <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
-  </div>
-) : (
-  <div className="h-[calc(100vh-5rem)] overflow-y-auto">
-    <canvas ref={canvasRef} className="w-full h-auto"></canvas>
-  </div>
-)}
-
+        {/* {loading ? (
+          <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
+            <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
+          </div>
+        ) : ( */}
+          <div className="pdf-viewer-container" style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <canvas ref={canvasRef} className={"pdfCanvas"} />
+        <div ref={textLayerRef} className={"textLayer"}  />
+      </div>
+    </div>
+        {/* )} */}
       </div>
     </div>
   );
