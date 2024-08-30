@@ -496,7 +496,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       <div className="w-full bg-white p-2 rounded-lg h-[calc(100vh-5rem)] overflow-auto scrollbar-hide text-[#202020] ">
         <div>
           <h3 className="text-md font-semibold text-[#666]">
-            Hello, {userData?.name.trim().split(" ")[0]}
+            Hello, {userData?.name?.trim().split(" ")[0] || "User"}
           </h3>
           <h2 className="text-xl font-bold">Summary</h2>
           <div
