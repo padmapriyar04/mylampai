@@ -22,7 +22,7 @@ import {
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const baseUrl = "https://cv-judger.onrender.com";
+const baseUrl = "https://mylampai-interviewer-cth2bzecbzc2gvgq.centralindia-01.azurewebsites.net/";
 
 interface PDFViewerProps {
   profile: string | null;
@@ -34,7 +34,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [reviewedData, setReviewedData] = useState<any>({});
   const { token } = useUserStore();
-  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [loading, setLoading] = useState<boolean>(true); 
 
   const analyzeResume = async (endpoint: string, data: any, query: string) => {
     try {
