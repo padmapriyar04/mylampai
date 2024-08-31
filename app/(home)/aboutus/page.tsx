@@ -33,31 +33,31 @@ export default function About() {
             </p>
           </div>
 
-          <div className="bg-primary-foreground h-[calc(30vh-2rem)] w-full p-6 rounded-lg shadow-lg flex flex-row justify-evenly">
+          <div className="bg-primary-foreground h-[calc(30vh-2rem)] w-full p-4 gap-4 rounded-lg shadow-lg flex flex-row justify-evenly">
             <div className="w-1/2 bg-white flex justify-center items-center">
               img
             </div>
-            <div className="relative flex flex-col justify-evenly gap-6 w-1/2">
+            <div className="relative flex flex-col justify-evenly w-1/2">
               <p className="w-full relative max-h-1/2 2xl:text-sm  md:text-[0.9vw] ">
                 Just relax and take the interview. Have your skills evaluated.
                 All the best!
               </p>
-              <button className="bg-primary w-full relative md:top-[-1vw] 2xl:top-[2vh] rounded-lg px-4 py-2 font-semibold 2xl:text-lg md:text-[1vw] text-white ">
+              <button className="bg-primary w-full relative 2xl:top-[2vh] rounded-lg px-4 py-2 font-semibold 2xl:text-lg md:text-[1vw] text-white">
                 Contact us
               </button>
             </div>
           </div>
 
-          <div className="bg-violet-400 h-[calc(30vh-2rem)] w-full p-6 rounded-lg flex shadow-lg flex-row justify-evenly">
+          <div className="bg-violet-400 h-[calc(30vh-2rem)] w-full p-4 gap-4 rounded-lg flex shadow-lg flex-row justify-evenly">
             <div className="w-1/2 bg-white flex justify-center items-center">
               img
             </div>
-            <div className="relative flex flex-col justify-evenly gap-6 w-1/2">
+            <div className="relative flex flex-col justify-evenly  w-1/2">
               <p className="w-full relative max-h-1/2 2xl:text-sm  md:text-[0.9vw] text-gray-600">
                 Just relax and take the interview. Have your skills evaluated.
                 All the best!
               </p>
-              <button className="bg-primary-foreground w-full relative md:top-[-1vw] 2xl:top-[2vh] rounded-lg px-4 py-2 font-semibold 2xl:text-lg  md:text-[1vw] text-primary">
+              <button className="bg-primary-foreground w-full relative 2xl:top-[2vh] rounded-lg px-4 py-2 font-semibold 2xl:text-lg  md:text-[1vw] text-primary">
                 Join us
               </button>
             </div>
