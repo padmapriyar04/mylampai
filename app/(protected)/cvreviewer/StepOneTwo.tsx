@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import * as pdfjsLib from "pdfjs-dist";
 import { useUserStore } from "@/utils/userStore";
 
-const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
+const baseUrl = "https://cv-judger.onrender.com";
 
 interface StepOneTwoProps {
   step: number;
@@ -63,11 +63,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [otherProfile, setOtherProfile] = useState("");
-  const [localResume, setLocalResume] = useState<File | null>(null);
 
   const { token } = useUserStore();
 
-  console.log("Resume File:", resumeFile);
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -85,10 +83,15 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         return;
       }
 
-      setResumeFile(file);
-      setLocalResume(file);
+      const reader = new FileReader();
 
-      console.log("File:", file);
+      reader.onload = async () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        const typedArray = new Uint8Array(arrayBuffer);
+        setResumeFile(typedArray);
+      };
+
+      reader.readAsArrayBuffer(file); 
 
       const fileReader = new FileReader();
       let extractedText = "";
