@@ -32,8 +32,6 @@ interface StepOneTwoProps {
   manualJobDescription: string;
   setProfile: React.Dispatch<React.SetStateAction<string | null>>; // Ensure this is correctly typed
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
-  customProfile: string;
-  setCustomProfile: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
@@ -44,6 +42,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   handleDragOver,
   handleNextClick,
   handleBackClick,
+
   setProfile,
   handleJobDescriptionUpload,
   handleManualEntryToggle,
@@ -53,8 +52,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   isManualEntry,
   manualJobDescription,
   setManualJobDescription,
-  customProfile,
-  setCustomProfile,
 }) => {
   const {
     resumeFile,
@@ -65,6 +62,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   } = useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [otherProfile, setOtherProfile] = useState("");
   const [localResume, setLocalResume] = useState<File | null>(null);
 
   const { token } = useUserStore();
@@ -487,10 +485,11 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                       : "border-primary ring-primary ring-1"
                   }  `}
                   placeholder="Please specify your profile"
-                  value={customProfile}
+                  value={otherProfile}
                   onChange={(e) => {
                     setManualJobDescription(e.target.value);
                     setProfile(e.target.value);
+                    setOtherProfile(e.target.value);
                   }}
                 />
               )}

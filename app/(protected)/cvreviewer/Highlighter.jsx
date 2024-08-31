@@ -4,12 +4,12 @@ import "mark.js";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-const Highlighter:React.FC = () => {
-  const [pdfDocument, setPdfDocument] = useState<pdfjs.PDFDocumentProxy | null>(null);
+const Highlighter = () => {
+  const [pdfDocument, setPdfDocument] = useState(null);
 
-  const handleFileUpload = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFileUpload = async (e) => {
     e.preventDefault();
-    const file = (e.target as HTMLFormElement).elements.namedItem("pdf") as HTMLInputElement;
+    const file = (e.target).elements.namedItem("pdf");
     
     if (file.files && file.files[0]) {
       const fileUrl = URL.createObjectURL(file.files[0]);
@@ -17,7 +17,7 @@ const Highlighter:React.FC = () => {
     }
   };
 
-  const displayPDF = async (url: string) => {
+  const displayPDF = async () => {
     const pdfDoc = await pdfjs.getDocument(url).promise;
     setPdfDocument(pdfDoc);
     const pdfContainer = document.getElementById("pdf-container");
@@ -34,7 +34,7 @@ const Highlighter:React.FC = () => {
         pageContainer.style.height = `${viewport.height}px`;
 
         const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d")!;
+        const context = canvas.getContext("2d");
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
@@ -69,7 +69,7 @@ const Highlighter:React.FC = () => {
     }
   };
 
-  const highlightSentences = (list_of_sentences: string[], class_name: string, case_sensitive_flag: boolean) => {
+  const highlightSentences = (list_of_sentences, class_name, case_sensitive_flag) => {
     const options_general = {
       ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
       separateWordSearch: false,
@@ -77,19 +77,19 @@ const Highlighter:React.FC = () => {
       className: class_name,
       acrossElements: true,
       caseSensitive: case_sensitive_flag,
-      noMatch: function (node: HTMLElement) {
+      noMatch: function (node) {
         highlightSentenceBackup(node.textContent || "", class_name, case_sensitive_flag);
       },
     };
 
     list_of_sentences.forEach((sentence) => {
       document.querySelectorAll(".textLayer").forEach((layer) => {
-        new (window as any).Mark(layer).mark(sentence, options_general);
+        new (window).Mark(layer).mark(sentence, options_general);
       });
     });
   };
 
-  const highlightSentenceBackup = (sentence: string, class_name: string, case_sensitive_flag: boolean) => {
+  const highlightSentenceBackup = (sentence, class_name, case_sensitive_flag) => {
     const options_general = {
       ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
       separateWordSearch: false,
@@ -97,17 +97,17 @@ const Highlighter:React.FC = () => {
       className: class_name,
       acrossElements: true,
       caseSensitive: case_sensitive_flag,
-      noMatch: function (node: HTMLElement) {
+      noMatch: function (node) {
         highlightSentenceBackupTwo(node.textContent || "", class_name, case_sensitive_flag, 0);
       },
     };
 
     document.querySelectorAll(".textLayer").forEach((layer) => {
-      new (window as any).Mark(layer).mark(sentence, options_general);
+      new (window).Mark(layer).mark(sentence, options_general);
     });
   };
 
-  const highlightSentenceBackupTwo = (node: string, class_name: string, case_sensitive_flag: boolean, level: number) => {
+  const highlightSentenceBackupTwo = (node, class_name, case_sensitive_flag, level) => {
     // Implement the backup highlighting logic if necessary
   };
 

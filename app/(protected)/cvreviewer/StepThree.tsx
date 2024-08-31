@@ -28,6 +28,8 @@ const baseUrl =
 
 interface PDFViewerProps {
   profile: string | null;
+  structuredData: any;
+  localResume: any;
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
@@ -288,20 +290,20 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   );
 
   const highlightSentences = (
-    list_of_sentences,
-    class_name,
-    case_sensitive_flag
+    list_of_sentences: any,
+    class_name: any,
+    case_sensitive_flag: any
   ) => {
     const options_general = {
       ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
       separateWordSearch: false,
-      accuracy: "partially",
+      accuracy: "partially" as any,
       className: class_name,
       acrossElements: true,
       caseSensitive: case_sensitive_flag,
     };
 
-    list_of_sentences.forEach((sentence) => {
+    list_of_sentences.forEach((sentence: any) => {
       if (textLayerRef.current) {
         const instance = new Mark(textLayerRef.current); // Create a new Mark.js instance
         instance.mark(sentence, options_general);

@@ -6,6 +6,8 @@ import PDFViewer from "./StepThree";
 import { useUserStore } from "@/utils/userStore";
 import { toast } from "sonner";
 
+const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
+
 const Page: React.FC = () => {
   const {
     setResumeFile,
@@ -21,7 +23,7 @@ const Page: React.FC = () => {
   const [profile, setProfile] = useState<string | null>(null);
   const [localResume, setLocalResume] = useState<File | null>(null);
 
-  const handleDrop = (
+  const handleDrop = async (
     event: DragEvent<HTMLDivElement>,
     setFile: (file: File) => void,
   ) => {
@@ -30,11 +32,14 @@ const Page: React.FC = () => {
     if (files && files.length > 0) {
       const file = files[0];
       setFile(file);
-      uploadCVAndJobDescription(file, manualJobDescription);
+      setLocalResume(file);
+      const fileBinary = await getBinaryData(file);
+      uploadCVAndJobDescription(fileBinary, manualJobDescription);
     }
   };
 
   const handleResumeUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     const file = event.target?.files?.[0];
     if (file) {
       setResumeFile(file);
@@ -185,7 +190,6 @@ const Page: React.FC = () => {
           isManualEntry={isManualEntry}
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
-          setStructuredData={setStructuredData}
           profile={profile} // Pass the profile
           setProfile={setProfile} // Pass the setProfile function
         />
