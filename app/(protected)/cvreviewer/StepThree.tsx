@@ -66,17 +66,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     fetchResumeFromLocalStorage(); // Fetch the resume when the component mounts
   }, []);
 
-  useEffect(() => {
-    if (resumeFile) {
-      const timer = setTimeout(() => {
-        if (canvasRef.current) {
-          renderPDF();
-        }
-      }, 100); // Delay to ensure component is fully mounted
-
-      return () => clearTimeout(timer); // Cleanup the timer
-    }
-  }, [resumeFile]);
 
 
   const analyzeResume = async (endpoint: string, data: any, query: string) => {
