@@ -34,13 +34,50 @@ interface PDFViewerProps {
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const { userData } = useUserStore();
-  const { extractedText, structuredData, resumeFile } = useInterviewStore();
+  const { extractedText, structuredData } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
+  const [resumeFile, setResumeFile] = useState<Uint8Array | null>(null);
   const [reviewedData, setReviewedData] = useState<any>({});
   const [sentencesToHighlight, setSentencesToHighlight] = useState<string[]>(
     []
   );
+
+
+  const fetchResumeFromLocalStorage = () => {
+    try {
+      const base64Data = localStorage.getItem("resumeFile");
+      if (base64Data) {
+        const byteString = atob(base64Data.split(',')[1]); // Decode base64 to binary string
+        const uint8Array = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) {
+          uint8Array[i] = byteString.charCodeAt(i);
+        }
+        setResumeFile(uint8Array);
+      }
+    } catch (error) {
+      console.error("Error fetching resume from local storage:", error);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchResumeFromLocalStorage(); // Fetch the resume when the component mounts
+  }, []);
+
+  useEffect(() => {
+    if (resumeFile) {
+      const timer = setTimeout(() => {
+        if (canvasRef.current) {
+          renderPDF();
+        }
+      }, 100); // Delay to ensure component is fully mounted
+
+      return () => clearTimeout(timer); // Cleanup the timer
+    }
+  }, [resumeFile]);
+
 
   const analyzeResume = async (endpoint: string, data: any, query: string) => {
     try {
@@ -114,6 +151,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               },
             };
             result = await analyzeResume(endpoint, data, query);
+            if (result?.message?.["Result"]) {
+            setSentencesToHighlight(result.message["Result"]);
+            highlightSentences(
+              result.message["Result"],
+              "highlighted",
+              false
+            );
+          }
             setReviewedData((prevData: any) => ({
               ...prevData,
               resume_score: result?.message,
@@ -222,6 +267,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             };
             query = `?profile=${profile}`;
             result = await analyzeResume(endpoint, data, query);
+            if (result?.message?.["HARD"]) {
+              setSentencesToHighlight(result.message["HARD"]);
+              highlightSentences(
+                result.message["HARD"],
+                "highlighted",
+                false
+              );
+            }
+            if (result?.message?.["SOFT"]) {
+              setSentencesToHighlight(result.message["SOFT"]);
+              highlightSentences(
+                result.message["SOFT"],
+                "highlighted",
+                false
+              );
+            }
             setReviewedData((prevData: any) => ({
               ...prevData,
               skill_checker: result?.message,
@@ -275,6 +336,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               extracted_data: structuredData,
             };
             result = await analyzeResume(endpoint, data, query);
+            if (result?.message?.["Result"]) {
+              setSentencesToHighlight(result.message["Result"]);
+              highlightSentences(
+                result.message["Result"],
+                "highlighted",
+                false
+              );
+            }
             setReviewedData((prevData: any) => ({
               ...prevData,
               spelling_checker: result?.message,
