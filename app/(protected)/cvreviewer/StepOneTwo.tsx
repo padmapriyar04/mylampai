@@ -13,7 +13,7 @@ interface StepOneTwoProps {
   setStep: (step: number) => void;
   handleDrop: (
     event: DragEvent<HTMLDivElement>,
-    setFile: (file: File) => void,
+    setFile: (file: File) => void
   ) => void;
   handleResumeUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   triggerFileInput: (inputId: string) => void;
@@ -21,7 +21,7 @@ interface StepOneTwoProps {
   handleNextClick: () => void;
   handleBackClick: () => void;
   handleJobDescriptionUpload: (
-    event: ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>
   ) => Promise<void>;
   handleManualEntryToggle: () => void;
   handleUploadJDToggle: () => void;
@@ -69,7 +69,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   const { token } = useUserStore();
 
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     event.preventDefault();
     const file = event.target.files?.[0];
@@ -83,7 +83,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         setLocalResume(file);
         return;
       }
-      
+
       setResumeFile(file);
 
       const fileReader = new FileReader();
@@ -91,7 +91,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
       fileReader.onload = async function () {
         const typedArray: ArrayBuffer = new Uint8Array(
-          this.result as ArrayBuffer,
+          this.result as ArrayBuffer
         );
 
         // Load the PDF document
@@ -118,8 +118,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           if (base64String && extractedText) {
             try {
               setExtractedText(extractedText);
-              const structuredDataResult =
-                await extractStructuredData(extractedText);
+              const structuredDataResult = await extractStructuredData(
+                extractedText
+              );
 
               if (structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
@@ -146,34 +147,15 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     }
   };
 
-  const extractTextFromPDF = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch(`${baseUrl}/extract_text_from_pdf`, {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error("Error extracting text from PDF:", error);
-      return null;
-    }
-  };
-
   const uploadCVAndJobDescription = async (
     base64String: string,
-    extractedText: string,
+    extractedText: string
   ) => {
     try {
       if (!token) {
-        toast.error("Unauthorized");
         return;
       }
-
-      const response = await fetch("/api/interviewer/post_cv", {
+      fetch("/api/interviewer/post_cv", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -184,17 +166,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
         }),
       });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        // toast.success("CV and Job Description uploaded successfully");
-        // Handle successful upload
-      } else {
-        toast.error(result.error || "Failed to upload CV and Job Description");
-      }
     } catch (error) {
-      toast.error("An error occurred while uploading CV and Job Description");
       console.error("Error:", error);
     }
   };
@@ -234,7 +206,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   if (!isClient) {
     return null; // or return a loading indicator
   }
-  
 
   return (
     <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee]">
@@ -271,7 +242,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             <div className="flex mx-auto items-center max-w-[250px] justify-center mb-2 w-full">
               <div className="relative flex-1">
                 <div
-                  className={`w-8 h-8 ${resumeFile ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
+                  className={`w-8 h-8 ${
+                    resumeFile ? "bg-primary" : "bg-gray-400"
+                  } rounded-full flex items-center justify-center`}
                 >
                   {resumeFile && (
                     <svg
@@ -381,8 +354,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                   {isResumeUploaded
                     ? "Upload again"
                     : uploading
-                      ? "Uploading..."
-                      : "Upload Resume"}
+                    ? "Uploading..."
+                    : "Upload Resume"}
                 </button>
               </div>
             </div>
@@ -412,7 +385,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                 {/* Progress Bar */}
                 <div className="relative flex-1">
                   <div
-                    className={`w-8 h-8 ${resumeFile ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
+                    className={`w-8 h-8 ${
+                      resumeFile ? "bg-primary" : "bg-gray-400"
+                    } rounded-full flex items-center justify-center`}
                   >
                     {resumeFile ? (
                       <svg
@@ -470,9 +445,15 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               Choose your Interview Profile
             </h3>
 
-            <div className={`p-8 gap-4 flex flex-col items-center justify-start bg-white rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]`}>
+            <div
+              className={`p-8 gap-4 flex flex-col items-center justify-start bg-white rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]`}
+            >
               <select
-                className={`w-full p-4 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${profile === "other" || profile === null ? "border-gray-300" : "border-primary ring-primary ring-1"}  `}
+                className={`w-full p-4 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${
+                  profile === "other" || profile === null
+                    ? "border-gray-300"
+                    : "border-primary ring-primary ring-1"
+                }  `}
                 value={manualJobDescription}
                 onChange={(e) => {
                   setManualJobDescription(e.target.value);
@@ -494,7 +475,11 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               {manualJobDescription === "other" && (
                 <input
                   type="text"
-                  className={`w-full p-4 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${profile === "other" || profile === null ? "border-gray-300" : "border-primary ring-primary ring-1"}  `}
+                  className={`w-full p-4 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${
+                    profile === "other" || profile === null
+                      ? "border-gray-300"
+                      : "border-primary ring-primary ring-1"
+                  }  `}
                   placeholder="Please specify your profile"
                   value={customProfile}
                   onChange={(e) => {

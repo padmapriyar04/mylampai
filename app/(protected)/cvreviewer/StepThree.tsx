@@ -24,6 +24,7 @@ import {
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
+// const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
 const baseUrl = "https://cv-judger.onrender.com";
 
 interface PDFViewerProps {
@@ -41,40 +42,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
 
   // const [loading, setLoading] = useState<boolean>(true); // Loading state
 
-
-  const fetchResumeFromLocalStorage = () => {
-    try {
-      const base64Data = localStorage.getItem("resumeFile");
-      if (base64Data) {
-        const byteString = atob(base64Data.split(',')[1]); // Decode base64 to binary string
-        const uint8Array = new Uint8Array(byteString.length);
-        for (let i = 0; i < byteString.length; i++) {
-          uint8Array[i] = byteString.charCodeAt(i);
-        }
-        setResumeFile(uint8Array);
-      }
-    } catch (error) {
-      console.error("Error fetching resume from local storage:", error);
-    } finally {
-      // setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchResumeFromLocalStorage(); // Fetch the resume when the component mounts
-  }, []);
-
-  useEffect(() => {
-    if (resumeFile) {
-      const timer = setTimeout(() => {
-        if (canvasRef.current) {
-          renderPDF();
-        }
-      }, 100); // Delay to ensure component is fully mounted
-
-      return () => clearTimeout(timer); // Cleanup the timer
-    }
-  }, [resumeFile]);
 
   const analyzeResume = async (endpoint: string, data: any, query: string) => {
     try {
@@ -443,11 +410,24 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     }
   };
   
+  useEffect(() => {
+    if (resumeFile) {
+      const timer = setTimeout(() => {
+        if (canvasRef.current) {
+          renderPDF();
+        }
+      }, 100); 
+
+      return () => clearTimeout(timer); 
+    }
+  }, [resumeFile]);
+  
 
 
   useEffect(() => {
-    runAnalysis("quantification_checker");
-  }, [runAnalysis]);
+    runAnalysis("resume_score");
+    runAnalysis("summary");
+  }, []);
 
   return (
     <div className="flex h-full justify-between items-stretch gap-2 p-2">
