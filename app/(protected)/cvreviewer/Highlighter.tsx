@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { pdfjs } from "pdfjs-dist";
+import * as pdfjs from "pdfjs-dist";
 import "mark.js";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-const Highlighter: React.FC = () => {
+const Highlighter:React.FC = () => {
   const [pdfDocument, setPdfDocument] = useState<pdfjs.PDFDocumentProxy | null>(null);
 
   const handleFileUpload = async (e: React.FormEvent<HTMLFormElement>) => {
