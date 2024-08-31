@@ -5,8 +5,7 @@ import * as pdfjsLib from "pdfjs-dist/webpack";
 import { useUserStore } from "@/utils/userStore";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import Mark from "mark.js";
-import "./highlight.css"
-
+import "./highlight.css";
 import {
   Dialog,
   DialogContent,
@@ -24,8 +23,8 @@ import {
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-// const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
-const baseUrl = "https://cv-judger.onrender.com";
+const baseUrl =
+  "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
 
 interface PDFViewerProps {
   profile: string | null;
@@ -35,13 +34,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const { userData } = useUserStore();
   const { extractedText, structuredData, resumeFile } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const textLayerRef = useRef<HTMLDivElement>(null);
   const [reviewedData, setReviewedData] = useState<any>({});
-  const { token } = useUserStore();
-  const [sentencesToHighlight, setSentencesToHighlight] = useState<string[]>([]);
-  const textLayerRef = useRef<HTMLDivElement>(null); // <-- Initialize textLayerRef here
-
-  // const [loading, setLoading] = useState<boolean>(true); // Loading state
-
+  const [sentencesToHighlight, setSentencesToHighlight] = useState<string[]>(
+    []
+  );
 
   const analyzeResume = async (endpoint: string, data: any, query: string) => {
     try {
@@ -91,7 +88,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           result = await analyzeResume(endpoint, data, query);
           if (result?.message?.["Not Quantify"]) {
             setSentencesToHighlight(result.message["Not Quantify"]);
-            highlightSentences(result.message["Not Quantify"], "highlighted", false);
+            highlightSentences(
+              result.message["Not Quantify"],
+              "highlighted",
+              false
+            );
           }
 
           setReviewedData((prevData: any) => ({
@@ -283,11 +284,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           return;
       }
     },
-    [structuredData, extractedText, profile, reviewedData],
+    [structuredData, extractedText, profile, reviewedData]
   );
 
-
-  const highlightSentences = (list_of_sentences, class_name, case_sensitive_flag) => {
+  const highlightSentences = (
+    list_of_sentences,
+    class_name,
+    case_sensitive_flag
+  ) => {
     const options_general = {
       ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
       separateWordSearch: false,
@@ -296,16 +300,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       acrossElements: true,
       caseSensitive: case_sensitive_flag,
     };
-  
+
     list_of_sentences.forEach((sentence) => {
       if (textLayerRef.current) {
-        const instance = new Mark(textLayerRef.current);  // Create a new Mark.js instance
+        const instance = new Mark(textLayerRef.current); // Create a new Mark.js instance
         instance.mark(sentence, options_general);
       }
     });
   };
-  
-  
+
   // useEffect(() => {
   //   const fetchCVs = async () => {
   //     setLoading(true); // Start loading
@@ -362,8 +365,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   //   }
   // };
 
-
-  
   const renderPDF = async () => {
     if (resumeFile && canvasRef.current) {
       try {
@@ -421,8 +422,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       return () => clearTimeout(timer); 
     }
   }, [resumeFile]);
-  
-
 
   useEffect(() => {
     runAnalysis("resume_score");
@@ -558,7 +557,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                       reviewedData.bullet_point_length.Result.map(
                         (data: string, ind: number) => {
                           return <div key={ind}>{data}</div>;
-                        },
+                        }
                       )
                     ) : (
                       <div>Nothing to Show</div>
@@ -590,7 +589,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                                 Improved: {data.improved}
                               </AccordionContent>
                             </AccordionItem>
-                          ),
+                          )
                         )}
                     </Accordion>
                   </DialogDescription>
@@ -654,7 +653,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                                   {reviewedData.verb_tense_checker[key].impact}
                                 </AccordionContent>
                               </AccordionItem>
-                            ),
+                            )
                           )}
                         </div>
                       )}
@@ -686,7 +685,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                                 {reviewedData.weak_verb_checker[key].join(", ")}
                               </AccordionContent>
                             </AccordionItem>
-                          ),
+                          )
                         )}
                     </Accordion>
                   </DialogDescription>
@@ -716,7 +715,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                                 {reviewedData.section_checker[key]}
                               </AccordionContent>
                             </AccordionItem>
-                          ),
+                          )
                         )}
                     </Accordion>
                   </DialogDescription>
@@ -746,7 +745,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                                 {reviewedData.skill_checker[key].join(", ")}
                               </AccordionContent>
                             </AccordionItem>
-                          ),
+                          )
                         )}
                     </Accordion>
                   </DialogDescription>
@@ -790,7 +789,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                                 </>
                               )}
                             </AccordionItem>
-                          ),
+                          )
                         )}
                     </Accordion>
                   </DialogDescription>
@@ -819,7 +818,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                               {reviewedData.personal_info[key]}
                             </AccordionContent>
                           </AccordionItem>
-                        ),
+                        )
                       )}
                   </Accordion>
                 </DialogDescription>
@@ -859,7 +858,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                                 }
                               </AccordionContent>
                             </AccordionItem>
-                          ),
+                          )
                         )}
                     </Accordion>
                   </DialogDescription>
@@ -892,12 +891,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
           </div>
         ) : ( */}
-          <div className="pdf-viewer-container" style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-        <canvas ref={canvasRef} className={"pdfCanvas"} />
-        <div ref={textLayerRef} className={"textLayer"}  />
-      </div>
-    </div>
+        <div
+          className="pdf-viewer-container"
+          style={{ position: "relative", width: "100%", height: "100%" }}
+        >
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            <canvas ref={canvasRef} className={"pdfCanvas"} />
+            <div ref={textLayerRef} className={"textLayer"} />
+          </div>
+        </div>
         {/* )} */}
       </div>
     </div>

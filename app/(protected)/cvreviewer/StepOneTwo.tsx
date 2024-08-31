@@ -6,7 +6,8 @@ import { useInterviewStore } from "@/utils/store";
 import { toast } from "sonner";
 import * as pdfjsLib from "pdfjs-dist";
 import { useUserStore } from "@/utils/userStore";
-const baseUrl = "https://cv-judger.onrender.com";
+
+const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
 
 interface StepOneTwoProps {
   step: number;
@@ -68,6 +69,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
   const { token } = useUserStore();
 
+  console.log("Resume File:", resumeFile);
+
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -77,14 +80,17 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     setUploading(true);
 
     if (file && file.type === "application/pdf") {
+
       if (file.size > 1 * 1024 * 1024) {
         toast.error("File size should be less than 1MB");
         setUploading(false);
-        setLocalResume(file);
         return;
       }
 
       setResumeFile(file);
+      setLocalResume(file);
+
+      console.log("File:", file);
 
       const fileReader = new FileReader();
       let extractedText = "";
@@ -113,7 +119,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         // Convert the file to base64
         const base64Reader = new FileReader();
         base64Reader.onloadend = async () => {
-          const base64String = base64Reader.result?.toString().split(",")[1]; // Convert to base64 string
+          const base64String = base64Reader.result?.toString().split(",")[1]; 
 
           if (base64String && extractedText) {
             try {
