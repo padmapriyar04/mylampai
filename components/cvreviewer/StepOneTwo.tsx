@@ -231,7 +231,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                         <div className="mt-8 w-full px-4 flex flex-col items-center">
                             <button
                                 className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-                                    resumeFile ? "bg-gray-600 text-black hover:bg-gray-800 text-white" : "bg-gray-300 text-gray-800 cursor-not-allowed"
+                                    resumeFile ? "bg-gray-600 hover:bg-gray-800 text-white" : "bg-gray-300 text-gray-800 cursor-not-allowed"
                                 }`}
                                 disabled={!resumeFile}
                                 onClick={handleNextClick}

@@ -6,14 +6,15 @@ import { useInterviewStore } from "@/utils/store";
 import { toast } from "sonner";
 import * as pdfjsLib from "pdfjs-dist";
 import { useUserStore } from "@/utils/userStore";
-const baseUrl = "https://cv-judger.onrender.com";
+
+const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
 
 interface StepOneTwoProps {
   step: number;
   setStep: (step: number) => void;
   handleDrop: (
     event: DragEvent<HTMLDivElement>,
-    setFile: (file: File) => void,
+    setFile: (file: File) => void
   ) => void;
   handleResumeUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   triggerFileInput: (inputId: string) => void;
@@ -21,7 +22,7 @@ interface StepOneTwoProps {
   handleNextClick: () => void;
   handleBackClick: () => void;
   handleJobDescriptionUpload: (
-    event: ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>
   ) => Promise<void>;
   handleManualEntryToggle: () => void;
   handleUploadJDToggle: () => void;
@@ -31,10 +32,7 @@ interface StepOneTwoProps {
   manualJobDescription: string;
   setProfile: React.Dispatch<React.SetStateAction<string | null>>; // Ensure this is correctly typed
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
-  customProfile: string;
-  setCustomProfile: React.Dispatch<React.SetStateAction<string>>;
 }
-
 
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
   step,
@@ -44,6 +42,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   handleDragOver,
   handleNextClick,
   handleBackClick,
+
   setProfile,
   handleJobDescriptionUpload,
   handleManualEntryToggle,
@@ -53,8 +52,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   isManualEntry,
   manualJobDescription,
   setManualJobDescription,
-  customProfile,
-  setCustomProfile,
 }) => {
   const {
     resumeFile,
@@ -65,12 +62,15 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   } = useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [localResume, setLocalResume] = useState<File | null>(null); 
+  const [otherProfile, setOtherProfile] = useState("");
+  const [localResume, setLocalResume] = useState<File | null>(null);
 
   const { token } = useUserStore();
 
+  console.log("Resume File:", resumeFile);
+
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     event.preventDefault();
     const file = event.target.files?.[0];
@@ -78,21 +78,24 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     setUploading(true);
 
     if (file && file.type === "application/pdf") {
+
       if (file.size > 1 * 1024 * 1024) {
-        toast.error("File size should be less than 5MB");
+        toast.error("File size should be less than 1MB");
         setUploading(false);
-        setLocalResume(file);
         return;
       }
+
+      setResumeFile(file);
+      setLocalResume(file);
+
+      console.log("File:", file);
 
       const fileReader = new FileReader();
       let extractedText = "";
 
-      setResumeFile(file);
-
       fileReader.onload = async function () {
         const typedArray: ArrayBuffer = new Uint8Array(
-          this.result as ArrayBuffer,
+          this.result as ArrayBuffer
         );
 
         // Load the PDF document
@@ -114,13 +117,14 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         // Convert the file to base64
         const base64Reader = new FileReader();
         base64Reader.onloadend = async () => {
-          const base64String = base64Reader.result?.toString().split(",")[1]; // Convert to base64 string
+          const base64String = base64Reader.result?.toString().split(",")[1]; 
 
           if (base64String && extractedText) {
             try {
               setExtractedText(extractedText);
-              const structuredDataResult =
-                await extractStructuredData(extractedText);
+              const structuredDataResult = await extractStructuredData(
+                extractedText
+              );
 
               if (structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
@@ -147,34 +151,15 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     }
   };
 
-  const extractTextFromPDF = async (file: File) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch(`${baseUrl}/extract_text_from_pdf`, {
-        method: "POST",
-        body: formData,
-      });
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error("Error extracting text from PDF:", error);
-      return null;
-    }
-  };
-
   const uploadCVAndJobDescription = async (
     base64String: string,
-    extractedText: string,
+    extractedText: string
   ) => {
     try {
       if (!token) {
-        toast.error("Unauthorized");
         return;
       }
-
-      const response = await fetch("/api/interviewer/post_cv", {
+      fetch("/api/interviewer/post_cv", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -185,17 +170,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
         }),
       });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        // toast.success("CV and Job Description uploaded successfully");
-        // Handle successful upload
-      } else {
-        toast.error(result.error || "Failed to upload CV and Job Description");
-      }
     } catch (error) {
-      toast.error("An error occurred while uploading CV and Job Description");
       console.error("Error:", error);
     }
   };
@@ -271,7 +246,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             <div className="flex mx-auto items-center max-w-[250px] justify-center mb-2 w-full">
               <div className="relative flex-1">
                 <div
-                  className={`w-8 h-8 ${resumeFile ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
+                  className={`w-8 h-8 ${
+                    resumeFile ? "bg-primary" : "bg-gray-400"
+                  } rounded-full flex items-center justify-center`}
                 >
                   {resumeFile && (
                     <svg
@@ -297,9 +274,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               <div className="relative">
                 <div
                   className={`w-8 h-8 ${
-                    profile
-                      ? "bg-primary"
-                      : "bg-gray-400"
+                    profile ? "bg-primary" : "bg-gray-400"
                   } rounded-full flex items-center justify-center`}
                 >
                   {profile && (
@@ -383,8 +358,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                   {isResumeUploaded
                     ? "Upload again"
                     : uploading
-                      ? "Uploading..."
-                      : "Upload Resume"}
+                    ? "Uploading..."
+                    : "Upload Resume"}
                 </button>
               </div>
             </div>
@@ -414,7 +389,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                 {/* Progress Bar */}
                 <div className="relative flex-1">
                   <div
-                    className={`w-8 h-8 ${resumeFile ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
+                    className={`w-8 h-8 ${
+                      resumeFile ? "bg-primary" : "bg-gray-400"
+                    } rounded-full flex items-center justify-center`}
                   >
                     {resumeFile ? (
                       <svg
@@ -472,42 +449,50 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               Choose your Interview Profile
             </h3>
 
-            <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]">
-              <div className="w-full  p-4 bg-white rounded-lg flex flex-col items-center justify-center ">
+            <div
+              className={`p-8 gap-4 flex flex-col items-center justify-start bg-white rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[321px]`}
+            >
               <select
-  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-  value={manualJobDescription}
-  onChange={(e) => setManualJobDescription(e.target.value)}  // Use setManualJobDescription here
->
-  <option value="" disabled>Select a role</option>
-  <option value="SDE">SDE</option>
-  <option value="AI/ML">AI/ML</option>
-  <option value="Core">Core</option>
-  <option value="Consulting">Consulting</option>
-  <option value="Finance">Finance</option>
-  <option value="Other">Other</option>
-</select>
+                className={`w-full p-4 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${
+                  profile === "other" || profile === null
+                    ? "border-gray-300"
+                    : "border-primary ring-primary ring-1"
+                }  `}
+                value={manualJobDescription}
+                onChange={(e) => {
+                  setManualJobDescription(e.target.value);
+                  if (e.target.value !== "other") setProfile(e.target.value);
+                  else setProfile(null);
+                }}
+              >
+                <option value="" disabled>
+                  Select a role
+                </option>
+                <option value="SOFTWARE">Software</option>
+                <option value="DATA">Data</option>
+                <option value="CORE">Core</option>
+                <option value="CONSULTING">Consulting</option>
+                <option value="FINANCE">Finance</option>
+                <option value="other">Other&apos;s</option>
+              </select>
 
-
-                {manualJobDescription === "Other" && (
-                  <input
-                    type="text"
-                    className="w-full mt-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center placeholder:text-gray-500"
-                    placeholder="Please specify your profile"
-                    value={customProfile}
-                    onChange={(e) => setProfile(e.target.value)}
-                  />
-                )}
-
-                <div className="w-full text-center mt-4">
-                  <button
-                    onClick={handleManualJDUpload}
-                    className="bg-purple-500 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-purple-600 focus:outline-none"
-                  >
-                    Choose Profile
-                  </button>
-                </div>
-              </div>
+              {manualJobDescription === "other" && (
+                <input
+                  type="text"
+                  className={`w-full p-4 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${
+                    profile === "other" || profile === null
+                      ? "border-gray-300"
+                      : "border-primary ring-primary ring-1"
+                  }  `}
+                  placeholder="Please specify your profile"
+                  value={otherProfile}
+                  onChange={(e) => {
+                    setManualJobDescription(e.target.value);
+                    setProfile(e.target.value);
+                    setOtherProfile(e.target.value);
+                  }}
+                />
+              )}
             </div>
 
             <div className="mt-8 w-full px-4 flex flex-col items-center">

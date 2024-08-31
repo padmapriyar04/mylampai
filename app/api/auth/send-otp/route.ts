@@ -5,17 +5,14 @@ import transporter from "@/lib/nodemailer";
 
 export async function POST(req: Request) {
   try {
-    if (req.method !== "POST") {
-      return NextResponse.json({ message: "Method Not Allowed" }, { status: 405 });
-    }
-
     const { email } = await req.json();
 
     if (!email) {
-      return NextResponse.json({ error: "Email is required." }, { status: 422 });
+      return NextResponse.json(
+        { error: "Email is required." },
+        { status: 422 },
+      );
     }
-
-    await connectToDatabase();
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
@@ -30,7 +27,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // Update or create the OTP for the given email
     await prisma.oTP.upsert({
       where: { email },
       update: {
@@ -45,7 +41,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // Send the OTP via email
     try {
       const info = await transporter.sendMail({
         from: process.env.EMAIL_USER, // Sender address
@@ -54,15 +49,22 @@ export async function POST(req: Request) {
         text: `Your OTP code is ${otp}. It is valid for 15 minutes.`, // Plain text body
       });
 
-      console.log("Message sent: %s", info.messageId);
-
-      return NextResponse.json({ message: "OTP sent successfully!" }, { status: 200 });
+      return NextResponse.json(
+        { message: "OTP sent successfully!", otpSent: true },
+        { status: 200 },
+      );
     } catch (error) {
       console.error("Error sending OTP:", error);
-      return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to send OTP", otpSent: false },
+        { status: 500 },
+      );
     }
   } catch (error) {
     console.error("Internal Server Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

@@ -82,7 +82,7 @@ const ExclusiveAssessements = (props: { exclusiveAssements: ExclusiveAssementsTy
 			</div>
 			<div
 				ref={scrollContainerRef}
-				className="flex justify-start mt-4 w-full h-[300px] overflow-x-auto scroll-snap-x-mandatory snap-x no-scrollbar"
+				className="flex justify-start mt-4 w-full h-[300px] overflow-x-auto scroll-snap-x-mandatory snap-x scrollbar-hide"
 			>
 				{exclusiveAssements.map((value, index) => (
 					<div
