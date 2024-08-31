@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
       console.log("Message sent: %s", info.messageId);
 
-      return NextResponse.json({ message: "OTP sent successfully!", otp }, { status: 200 });
+      return NextResponse.json({ message: "OTP sent successfully!" }, { status: 200 });
     } catch (error) {
       console.error("Error sending OTP:", error);
       return NextResponse.json({ error: "Failed to send OTP" }, { status: 500 });
