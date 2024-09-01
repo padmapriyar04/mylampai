@@ -11,6 +11,14 @@ export default function WizeCamp() {
     setIsContactOpen(!isContactOpen);
   };
 
+  useEffect(() => {
+    if (!isContactOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+  }, [!isContactOpen]);
+
 
   return (
     <>
@@ -25,7 +33,7 @@ export default function WizeCamp() {
       </div>
 
       <div className={` transition ${!isContactOpen ? "blur-sm" : "blur-none"}`}>
-        <div className="bg-primary min-h-[calc(100vh-4rem)] w-full flex justify-evenly items-center text-white p-4">
+        <div className={`bg-primary min-h-[calc(100vh-4rem)] w-full flex justify-evenly items-center text-white p-4 `}>
           <div className="element xl:max-w-[1220px] max-w-[650px] sm:m-auto bg-transperent flex flex-col xl:flex-row justify-around items-center rounded-2xl p-4 sm:p-8 gap-36">
             <div className="bg-[#8C52FF] w-full h-full max-w-[600px] min-h-[500px] flex flex-col items-center justify-evenly rounded-2xl p-4">
               <Image

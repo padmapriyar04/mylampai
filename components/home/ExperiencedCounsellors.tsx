@@ -96,11 +96,11 @@ const ExperiencedCounsellors: React.FC = () => {
           insights from experienced industry and subject matter experts, guiding
           you to your dream path.
         </p>
-        <div className="w-full my-8 rounded-2xl shadow-md ">
-          <Carousel>
-            <CarouselContent className="px-2 pb-8">
+        <div className="w-full my-8 rounded-2xl">
+          <Carousel> 
+            <CarouselContent className="px-4 pb-8">
               {carouselData.map((item, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 xl:basis-1/3">
+                <CarouselItem key={index} className="basis-1/2 xl:basis-1/3">
                   <CounsellorCard
                     name={item.name}
                     image={item.image}
@@ -111,7 +111,7 @@ const ExperiencedCounsellors: React.FC = () => {
               ))}
             </CarouselContent>
           </Carousel>
-          <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground py-8 px-4">
+          <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground py-8 px-4 mx-6 rounded-lg shadow-lg">
             <BulletCard title="10k+" description="Successful Premium Admits" />
             <BulletCard title="10k+" description="Successful Premium Admits" />
             <BulletCard title="10k+" description="Successful Premium Admits" />

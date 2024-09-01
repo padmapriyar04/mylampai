@@ -76,7 +76,7 @@ export default function WhyWize() {
             ref={(el) => {
               sectionsRef.current[0] = el;
             }}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               ALL ROUND GUIDANCE
@@ -99,7 +99,7 @@ export default function WhyWize() {
             ref={(el) => {
               sectionsRef.current[1] = el;
             }}
-            className="pb-[100px] min-h-screen"
+            className="pb-[100px] min-h-screen px-6"
           >
             <PracticeCoding />
           </div>
@@ -109,7 +109,7 @@ export default function WhyWize() {
             ref={(el) => {
               sectionsRef.current[2] = el;
             }}
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px]"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               SMARTEST PLATFORM
@@ -143,7 +143,7 @@ export default function WhyWize() {
             ref={(el) => {
               sectionsRef.current[4] = el;
             }}
-            className=" sm:min-h-[700px]"
+            className=" sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               ADVANCED FEATURES

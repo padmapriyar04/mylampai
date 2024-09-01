@@ -8,6 +8,14 @@ export default function WizeCamp() {
     const toggleForm = () => {
       setIsFormOpen(!isFormOpen);
   };
+  
+  useEffect(() => {
+    if (!isFormOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+  }, [!isFormOpen]);
 
   return (
     

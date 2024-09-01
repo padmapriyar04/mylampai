@@ -109,7 +109,7 @@ const HomeNavbar = () => {
     >
       <Link
         href={"/"}
-        className="grid place-items-center max-w-[220px] w-full "
+        className="grid place-items-center max-w-[220px] w-full"
       >
         <Image
           src={"/home/logo.svg"}
