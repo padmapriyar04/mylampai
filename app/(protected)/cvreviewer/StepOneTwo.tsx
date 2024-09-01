@@ -72,67 +72,55 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   ) => {
     event.preventDefault();
     const file = event.target.files?.[0];
-
+  
     setUploading(true);
-
+  
     if (file && file.type === "application/pdf") {
-
+  
       if (file.size > 1 * 1024 * 1024) {
         toast.error("File size should be less than 1MB");
         setUploading(false);
         return;
       }
-
-      const reader = new FileReader();
-
-      reader.onload = async () => {
-        const arrayBuffer = reader.result as ArrayBuffer;
-        const typedArray = new Uint8Array(arrayBuffer);
-        setResumeFile(typedArray);
-      };
-
-      reader.readAsArrayBuffer(file); 
-
+  
+      setResumeFile(file);
+    
       const fileReader = new FileReader();
       let extractedText = "";
-
+  
       fileReader.onload = async function () {
-        const typedArray: ArrayBuffer = new Uint8Array(
-          this.result as ArrayBuffer
-        );
-
+        const typedArray: ArrayBuffer = new Uint8Array(this.result as ArrayBuffer);
+  
         // Load the PDF document
         const pdf = await pdfjsLib.getDocument(typedArray).promise;
-
+  
         // Loop through each page
         for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
           const page = await pdf.getPage(pageNumber);
           const textContent = await page.getTextContent();
-
+  
           // Extract text
-          const pageText = textContent.items
-            .map((item: any) => item.str)
-            .join(" ");
-
+          const pageText = textContent.items.map((item: any) => item.str).join(" ");
           extractedText += pageText + "\n";
         }
-
+  
         // Convert the file to base64
         const base64Reader = new FileReader();
         base64Reader.onloadend = async () => {
           const base64String = base64Reader.result?.toString().split(",")[1]; 
-
+  
           if (base64String && extractedText) {
             try {
               setExtractedText(extractedText);
-              const structuredDataResult = await extractStructuredData(
-                extractedText
-              );
-
-              if (structuredDataResult.message) {
+              const structuredDataResult = await extractStructuredData(extractedText);
+  
+              // Check if structuredDataResult and structuredDataResult.message exist before accessing
+              if (structuredDataResult && structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
+              } else {
+                toast.error("Failed to extract structured data");
               }
-
+  
               // Trigger the upload of CV and Job Description with base64 string and extracted text
               await uploadCVAndJobDescription(base64String, extractedText);
             } catch (err) {
@@ -143,41 +131,17 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             toast.error("Error converting file to base64 or extracting text");
           }
         };
-
+  
         base64Reader.readAsDataURL(file); // Start reading the file as a data URL
       };
-
+  
       fileReader.readAsArrayBuffer(file);
     } else {
       toast.error("Please upload a PDF file");
       setUploading(false);
     }
   };
-
-  const uploadCVAndJobDescription = async (
-    base64String: string,
-    extractedText: string
-  ) => {
-    try {
-      if (!token) {
-        return;
-      }
-      fetch("/api/interviewer/post_cv", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Resume: base64String, // Sending base64 string of the PDF
-          JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
-        }),
-      });
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
+  
   async function extractStructuredData(text: string) {
     try {
       const response = await fetch(`${baseUrl}/extract_structured_data`, {
@@ -187,9 +151,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         },
         body: JSON.stringify({ cv_text: text }),
       });
-
+  
       const result = await response.json();
-      if (response.ok) {
+      if (response.ok && result) {
         setIsResumeUploaded(true);
         toast.success("Resume uploaded successfully");
         return result;
@@ -202,6 +166,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       return null;
     }
   }
+  
 
   // Client-side rendering only to avoid hydration errors
   const [isClient, setIsClient] = useState(false);
