@@ -141,6 +141,30 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       setUploading(false);
     }
   };
+
+  const uploadCVAndJobDescription = async (
+    base64String: string,
+    extractedText: string
+  ) => {
+    try {
+      if (!token) {
+        return;
+      }
+      fetch("/api/interviewer/post_cv", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Resume: base64String, // Sending base64 string of the PDF
+          JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
+        }),
+      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
   
   async function extractStructuredData(text: string) {
     try {
