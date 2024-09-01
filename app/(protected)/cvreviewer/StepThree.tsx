@@ -23,8 +23,7 @@ import {
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const baseUrl =
-  "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
+const baseUrl = "https://cv-judger.onrender.com";
 
 interface PDFViewerProps {
   profile: string | null;
@@ -34,49 +33,38 @@ interface PDFViewerProps {
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const { userData } = useUserStore();
-  const { extractedText, structuredData } = useInterviewStore();
+  const { extractedText, structuredData ,resumeFile } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
-  const [resumeFile, setResumeFile] = useState<Uint8Array | null>(null);
+  // const [resumeFile, setResumeFile] = useState<Uint8Array | null>(null);
   const [reviewedData, setReviewedData] = useState<any>({});
   const [sentencesToHighlight, setSentencesToHighlight] = useState<string[]>(
     []
   );
 
 
-  const fetchResumeFromLocalStorage = () => {
-    try {
-      const base64Data = localStorage.getItem("resumeFile");
-      if (base64Data) {
-        const byteString = atob(base64Data.split(',')[1]); // Decode base64 to binary string
-        const uint8Array = new Uint8Array(byteString.length);
-        for (let i = 0; i < byteString.length; i++) {
-          uint8Array[i] = byteString.charCodeAt(i);
-        }
-        setResumeFile(uint8Array);
-      }
-    } catch (error) {
-      console.error("Error fetching resume from local storage:", error);
-    } finally {
-      // setLoading(false);
-    }
-  };
+  // const fetchResumeFromLocalStorage = () => {
+  //   try {
+  //     const base64Data = localStorage.getItem("resumeFile");
+  //     if (base64Data) {
+  //       const byteString = atob(base64Data.split(',')[1]); // Decode base64 to binary string
+  //       const uint8Array = new Uint8Array(byteString.length);
+  //       for (let i = 0; i < byteString.length; i++) {
+  //         uint8Array[i] = byteString.charCodeAt(i);
+  //       }
+  //       setResumeFile(uint8Array);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching resume from local storage:", error);
+  //   } finally {
+  //     // setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchResumeFromLocalStorage(); // Fetch the resume when the component mounts
-  }, []);
+  // useEffect(() => {
+  //   fetchResumeFromLocalStorage();
+  // }, []);
 
-  useEffect(() => {
-    if (resumeFile) {
-      const timer = setTimeout(() => {
-        if (canvasRef.current) {
-          renderPDF();
-        }
-      }, 100); // Delay to ensure component is fully mounted
-
-      return () => clearTimeout(timer); // Cleanup the timer
-    }
-  }, [resumeFile]);
 
 
   const analyzeResume = async (endpoint: string, data: any, query: string) => {
@@ -112,10 +100,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               cv_text: extractedText,
             };
             result = await analyzeResume(endpoint, data, query);
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              summary: result?.message,
-            }));
+
+            if (!reviewedData.summary) {
+              setReviewedData((prevData: any) => ({
+                ...prevData,
+                summary: result?.message,
+              }));
+            }
           }
           break;
         case "quantification_checker":
@@ -151,18 +142,20 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               },
             };
             result = await analyzeResume(endpoint, data, query);
-            if (result?.message?.["Result"]) {
-            setSentencesToHighlight(result.message["Result"]);
-            highlightSentences(
-              result.message["Result"],
-              "highlighted",
-              false
-            );
-          }
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              resume_score: result?.message,
-            }));
+            if (!reviewedData.resume_score) {
+              if (result?.message?.["Result"]) {
+                setSentencesToHighlight(result.message["Result"]);
+                highlightSentences(
+                  result.message["Result"],
+                  "highlighted",
+                  false
+                );
+              }
+              setReviewedData((prevData: any) => ({
+                ...prevData,
+                resume_score: result?.message,
+              }));
+            }
           }
           break;
         case "resume_length":
@@ -269,19 +262,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             result = await analyzeResume(endpoint, data, query);
             if (result?.message?.["HARD"]) {
               setSentencesToHighlight(result.message["HARD"]);
-              highlightSentences(
-                result.message["HARD"],
-                "highlighted",
-                false
-              );
+              highlightSentences(result.message["HARD"], "highlighted", false);
             }
             if (result?.message?.["SOFT"]) {
               setSentencesToHighlight(result.message["SOFT"]);
-              highlightSentences(
-                result.message["SOFT"],
-                "highlighted",
-                false
-              );
+              highlightSentences(result.message["SOFT"], "highlighted", false);
             }
             setReviewedData((prevData: any) => ({
               ...prevData,
@@ -420,79 +405,86 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
 
   //   fetchCVs();
   // }, [token]);
-
-  //   const base64ToUint8Array = (base64: string): Uint8Array | null => {
-  //   try {
-  //     const cleanedBase64 = base64.replace(/[^A-Za-z0-9+/=]/g, "");
-  //     const raw = atob(cleanedBase64);
-  //     const uint8Array = new Uint8Array(raw.length);
-  //     for (let i = 0; i < raw.length; i++) {
-  //       uint8Array[i] = raw.charCodeAt(i);
-  //     }
-  //     return uint8Array;
-  //   } catch (error) {
-  //     console.error("Failed to convert base64 string to Uint8Array:", error);
-  //     return null;
-  //   }
-  // };
+  function base64ToUint8Array(base64: string): Uint8Array {
+    // Remove data URL prefix if present
+    const base64Data = base64.split(',').pop();
+    
+    if (!base64Data) {
+      throw new Error("Invalid base64 string");
+    }
+  
+    const binaryString = window.atob(base64Data);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  }
+  
 
   const renderPDF = async () => {
     if (resumeFile && canvasRef.current) {
       try {
-        const loadingTask = pdfjsLib.getDocument({ data: resumeFile });
+        const pdfData = base64ToUint8Array(resumeFile);
+        const loadingTask = pdfjsLib.getDocument({ data: pdfData });
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1.5 });
-  
+        const viewport = page.getViewport({ scale: 1 });
+
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
-  
+
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-
+  
         const renderContext = {
           canvasContext: context,
           viewport,
         };
-
+  
         await page.render(renderContext).promise;
   
-        // Render text layer
         if (textLayerRef.current) {
           textLayerRef.current.innerHTML = "";
-  
+
           const textContent = await page.getTextContent();
           textLayerRef.current.style.width = `${canvas.offsetWidth}px`;
           textLayerRef.current.style.height = `${canvas.offsetHeight}px`;
-  
-          pdfjsLib.renderTextLayer({
-            textContent: textContent,
-            container: textLayerRef.current,
-            viewport: viewport,
-            textDivs: [],
-          }).promise.then(() => {
-            highlightSentences(sentencesToHighlight, "highlighted", false);
-          });
+
+          pdfjsLib
+            .renderTextLayer({
+              textContent: textContent,
+              container: textLayerRef.current,
+              viewport: viewport,
+              textDivs: [],
+            })
+            .promise.then(() => {
+              highlightSentences(sentencesToHighlight, "highlighted", false);
+            });
         }
       } catch (error) {
-        console.error('Error rendering PDF:', error);
+        console.error("Error rendering PDF:", error);
       }
     } else {
       console.error("Canvas reference is null or resumeFile is not set.");
     }
   };
   
+  
+  
   useEffect(() => {
-    if (resumeFile) {
+    if (resumeFile && !isRendered) {
       const timer = setTimeout(() => {
         if (canvasRef.current) {
-          renderPDF();
+          renderPDF(); // Render the PDF using the resumeFile from interviewStore
         }
-      }, 100); 
-
-      return () => clearTimeout(timer); 
+      }, 100); // Delay to ensure the component is fully mounted
+  
+      return () => clearTimeout(timer); // Cleanup the timer
     }
   }, [resumeFile]);
+  
 
   useEffect(() => {
     runAnalysis("resume_score");
@@ -956,23 +948,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           </div>
         </div>
       </div>
-      <div className="w-full bg-primary rounded-lg">
-        {/* {loading ? (
+      {/* <div classNam e="w-full bg-primary rounded-lg">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */}
+      {/* {loading ? (
           <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
             <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
           </div>
         ) : ( */}
-        <div
-          className="pdf-viewer-container"
-          style={{ position: "relative", width: "100%", height: "100%" }}
-        >
-          <div style={{ position: "relative", width: "100%", height: "100%" }}>
-            <canvas ref={canvasRef} className={"pdfCanvas"} />
-            <div ref={textLayerRef} className={"textLayer"} />
-          </div>
-        </div>
-        {/* )} */}
+      <div className="relative w-full shadow-md rounded-lg h-[calc(100vh-5rem)] overflow-auto scrollbar-hide">
+        <canvas ref={canvasRef} className={"pdfCanvas"} />
+        <div ref={textLayerRef} className={"textLayer"} />
       </div>
+      {/* )} */}
+      {/* </div>xxxxxxx  */}
     </div>
   );
 };

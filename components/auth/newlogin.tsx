@@ -250,7 +250,7 @@ const AuthForm: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signIn("google");
-      if (result?.ok) router.push("/");
+      if (result?.ok) router.push("/achieve");
       if (result?.error) {
         console.error("Google sign-in error:", result.error);
         toast.error("Google sign-in failed. Please try again.");

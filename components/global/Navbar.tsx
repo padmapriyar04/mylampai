@@ -10,7 +10,7 @@ import { useSession, signOut } from "next-auth/react";
 
 const Navbar = () => {
   const { data: session } = useSession();
-  const { userData, setUserData, clearUser } = useUserStore();
+  const { userData, setUserData, token, clearUser } = useUserStore();
   const { bears } = useRouterStore();
   const router = useRouter();
   const [initials, setInitials] = useState("Profile");
@@ -59,7 +59,7 @@ const Navbar = () => {
   }, [session]);
 
   useEffect(() => {
-    if (session) {
+    if (session && !token) {
       getToken();
     }
   }, [session]);

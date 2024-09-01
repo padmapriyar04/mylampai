@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 export default function ResetPassword() {
@@ -12,12 +12,16 @@ export default function ResetPassword() {
   const [message, setMessage] = useState("");
 
   const router = useRouter();
+  const pathname = usePathname();
+  console.log(pathname);
+  
 
   const handleResetPassword = async () => {
     if (password !== confirmPassword) {
       setMessage("Passwords do not match.");
       return;
     }
+
 
     try {
       const response = await fetch("/api/auth/resetPassword", {
