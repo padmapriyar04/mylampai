@@ -8,12 +8,13 @@ import "../globals.css";
 import { Open_Sans } from "next/font/google";
 import AuthProvider from "@/components/auth/AuthProvider";
 import Flexsidebar from "@/components/misc/Flexsidebar";
+import Head from "next/head";
 
 const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "MyLampAi - Home",
-  description: "MyLampAi - Home Page",
+  title: "MyLampAi",
+  description: "wiZe - MyLampAi",
 };
 
 export default function ProtectedLayout({
@@ -38,6 +39,10 @@ export default function ProtectedLayout({
 
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
+      <Head>
+        <title>MyLampAi</title>
+        <meta property="og:title" content="My page title" key="title" />
+      </Head>
       <body className={`${openSans.className} bg-primary-foreground`}>
         <AuthProvider>
           <Navbar />
