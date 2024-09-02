@@ -204,8 +204,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   }
 
   return (
-    <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee]">
-      <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">
+    <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
+      <div className="max-w-[1200px] gap-16 w-full flex flex-col items-center md:flex-row justify-centre">
         {/* Left Section */}
         <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
           <Image
@@ -217,18 +217,17 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           ></Image>
           <div className="relative flex flex-col items-center mt-auto">
             <h2 className="text-xl font-bold text-center leading-snug">
-              Take the wiZe AI mock Interview
+              Take the wiZe CV Review
             </h2>
             <p className="mt-2 text-center text-sm leading-relaxed">
-              You&apos;ll be taking a 20-minute interview to have your skills
-              evaluated. Just relax and take the interview.{" "}
+            Our AI CV review offers instant, personalized feedback, helping you enhance your resume for better job prospects. Submit you CV and Job Profile and get started!{" "}
               <span className="font-semibold"> All the best!</span>
             </p>
           </div>
         </div>
 
         {step === 1 && (
-          <div className="w-full md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
+          <div className="w-full md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[600px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground md:mr-8 lg:mr-0">
             <div>
               <p className="text-2xl font-bold text-primary mb-2">
                 Get Started!
