@@ -36,8 +36,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const { extractedText, structuredData ,resumeFile } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
-  // const [resumeFile, setResumeFile] = useState<Uint8Array | null>(null);
+
   const [reviewedData, setReviewedData] = useState<any>({});
+  const [isRendered, setIsRendered] = useState(false); // Define isRendered state
+  const [isTextLayerReady, setIsTextLayerReady] = useState(false);
+
   const [sentencesToHighlight, setSentencesToHighlight] = useState<string[]>(
     []
   );
@@ -87,10 +90,16 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
 
   const runAnalysis = useCallback(
     async (analysisType: string) => {
+      setIsTextLayerReady(false);
       let endpoint = "";
       let data: any = {};
       let query = "";
       let result: any = null;
+
+      if (textLayerRef.current) {
+        const instance = new Mark(textLayerRef.current);
+        instance.unmark();
+      }
 
       switch (analysisType) {
         case "summary":
@@ -123,6 +132,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               "highlighted",
               false
             );
+            console.log(result.message["Not Quantify"])
           }
 
           setReviewedData((prevData: any) => ({
@@ -179,6 +189,16 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               extracted_data: structuredData,
             };
             result = await analyzeResume(endpoint, data, query);
+            if (!reviewedData.resume_score) {
+              if (result?.message?.["Result"]) {
+                setSentencesToHighlight(result.message["Result"]);
+                highlightSentences(
+                  result.message["Result"],
+                  "highlighted",
+                  false
+                );
+              }
+            }
             setReviewedData((prevData: any) => ({
               ...prevData,
               bullet_point_length: result?.message,
@@ -192,6 +212,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               extracted_data: structuredData,
             };
             result = await analyzeResume(endpoint, data, query);
+            if (result?.message?.bulletPoints) {
+              // Loop through each object in the bulletPoints array
+              result.message.bulletPoints.forEach(bulletPoint => {
+                  const textToHighlight = [bulletPoint.original]; // Wrap in array
+                  setSentencesToHighlight(prevState => [...prevState, ...textToHighlight]);
+                  highlightSentences(textToHighlight, "highlighted", false);
+              });
+          
+          
+          
+          
+            }
             setReviewedData((prevData: any) => ({
               ...prevData,
               bullet_points_improver: result?.message,
@@ -220,6 +252,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             };
             query = "";
             result = await analyzeResume(endpoint, data, query);
+            if (result?.message) {
+              const sentencesToHighlight = Object.values(result.message)
+                  .flatMap(item => item.correction)
+             
+  
+              if (sentencesToHighlight.length > 0) {
+                  console.log('Highlighting these sentences:', sentencesToHighlight);
+                  setSentencesToHighlight(sentencesToHighlight);
+                  highlightSentences(sentencesToHighlight, "highlighted", false);
+              }
+          }
+  
             setReviewedData((prevData: any) => ({
               ...prevData,
               verb_tense_checker: result?.message,
@@ -233,6 +277,20 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               extracted_data: structuredData,
             };
             result = await analyzeResume(endpoint, data, query);
+            if (result?.message) {
+             
+              const sentencesToHighlight = Object.keys(result.message);
+              console.log('Sentences to Highlight:', sentencesToHighlight);
+          
+          
+              if (sentencesToHighlight.length > 0) {
+                  setSentencesToHighlight(sentencesToHighlight);
+                  highlightSentences(sentencesToHighlight, "highlighted", false);
+              } else {
+                  console.error('No sentences to highlight found.');
+              }
+          }
+          
             setReviewedData((prevData: any) => ({
               ...prevData,
               weak_verb_checker: result?.message,
@@ -282,6 +340,19 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             };
             query = "";
             result = await analyzeResume(endpoint, data, query);
+            if (result?.message) {
+          
+              const sentencesToHighlight = Object.values(result.message)
+                  .flatMap(item => item.text);
+          
+            
+              if (sentencesToHighlight.length > 0) {
+                  setSentencesToHighlight(sentencesToHighlight);
+                  highlightSentences(sentencesToHighlight, "highlighted", false);
+              }
+          }
+          
+            
             setReviewedData((prevData: any) => ({
               ...prevData,
               repetition_checker: result?.message,
@@ -308,6 +379,21 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               extracted_data: structuredData,
             };
             result = await analyzeResume(endpoint, data, query);
+            if (result?.message) {
+          
+              const sentencesToHighlight = Object.values(result.message)
+                  .flatMap(item => item.correction);
+          
+          
+              if (sentencesToHighlight.length > 0) {
+                  setSentencesToHighlight(sentencesToHighlight);
+                  highlightSentences(sentencesToHighlight, "highlighted", false);
+              }
+          }
+          
+            
+          
+          
             setReviewedData((prevData: any) => ({
               ...prevData,
               responsibility_checker: result?.message,
@@ -339,31 +425,48 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           console.log("Unknown analysis type");
           return;
       }
+      setIsTextLayerReady(true);
     },
     [structuredData, extractedText, profile, reviewedData]
   );
 
-  const highlightSentences = (
-    list_of_sentences: any,
-    class_name: any,
-    case_sensitive_flag: any
-  ) => {
-    const options_general = {
-      ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
-      separateWordSearch: false,
-      accuracy: "partially" as any,
-      className: class_name,
-      acrossElements: true,
-      caseSensitive: case_sensitive_flag,
-    };
-
-    list_of_sentences.forEach((sentence: any) => {
-      if (textLayerRef.current) {
-        const instance = new Mark(textLayerRef.current); // Create a new Mark.js instance
-        instance.mark(sentence, options_general);
-      }
-    });
+ const highlightSentences = (
+  list_of_sentences: any,
+  class_name: string,
+  case_sensitive_flag: boolean
+) => {
+  const options_general = {
+    ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
+    separateWordSearch: false,
+    accuracy: "partially" as any,
+    className: class_name,
+    acrossElements: true,
+    caseSensitive: case_sensitive_flag,
   };
+
+  // Ensure list_of_sentences is an array
+  if (!Array.isArray(list_of_sentences)) {
+    console.error('Expected list_of_sentences to be an array, but got:', list_of_sentences);
+    return;
+  }
+
+  list_of_sentences.forEach((sentence: string) => {
+    if (typeof sentence === 'string') {
+      if (textLayerRef.current) {
+        const normalizedSentence = sentence.trim().replace(/\s+/g, ' ');
+        const instance = new Mark(textLayerRef.current);
+        // Debugging: Log before highlighting
+        console.log(`Highlighting sentence: "${normalizedSentence}"`);
+        instance.mark(normalizedSentence, options_general);
+      }
+    } else {
+      console.warn('Skipping non-string sentence:', sentence);
+    }
+  });
+};
+
+
+
 
   // useEffect(() => {
   //   const fetchCVs = async () => {
@@ -430,11 +533,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         const loadingTask = pdfjsLib.getDocument({ data: pdfData });
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1 });
-
+        const viewport = page.getViewport({ scale: 1.5 });
+  
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
-
+  
         canvas.height = viewport.height;
         canvas.width = viewport.width;
   
@@ -447,21 +550,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   
         if (textLayerRef.current) {
           textLayerRef.current.innerHTML = "";
-
+  
           const textContent = await page.getTextContent();
           textLayerRef.current.style.width = `${canvas.offsetWidth}px`;
           textLayerRef.current.style.height = `${canvas.offsetHeight}px`;
-
-          pdfjsLib
+  
+          await pdfjsLib
             .renderTextLayer({
               textContent: textContent,
               container: textLayerRef.current,
               viewport: viewport,
               textDivs: [],
             })
-            .promise.then(() => {
-              highlightSentences(sentencesToHighlight, "highlighted", false);
-            });
+            .promise;
+  
+          // Set text layer ready after rendering
+          setIsTextLayerReady(true);
         }
       } catch (error) {
         console.error("Error rendering PDF:", error);
@@ -478,13 +582,19 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       const timer = setTimeout(() => {
         if (canvasRef.current) {
           renderPDF(); // Render the PDF using the resumeFile from interviewStore
+          setIsRendered(true);
         }
       }, 100); // Delay to ensure the component is fully mounted
   
       return () => clearTimeout(timer); // Cleanup the timer
     }
   }, [resumeFile]);
-  
+
+  useEffect(() => {
+    if (isTextLayerReady) {
+      highlightSentences(sentencesToHighlight, "highlighted", false);
+    }
+  }, [isTextLayerReady, sentencesToHighlight]);
 
   useEffect(() => {
     runAnalysis("resume_score");
@@ -948,18 +1058,23 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           </div>
         </div>
       </div>
-      {/* <div classNam e="w-full bg-primary rounded-lg">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */}
-      {/* {loading ? (
+      <div className="w-full bg-primary rounded-lg">
+        {/* {loading ? (
           <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
             <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
           </div>
         ) : ( */}
-      <div className="relative w-full shadow-md rounded-lg h-[calc(100vh-5rem)] overflow-auto scrollbar-hide">
-        <canvas ref={canvasRef} className={"pdfCanvas"} />
-        <div ref={textLayerRef} className={"textLayer"} />
+        <div
+          className="pdf-viewer-container"
+          style={{ position: "relative", width: "100%", height: "100%" }}
+        >
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            <canvas ref={canvasRef} className={"pdfCanvas"} />
+            <div ref={textLayerRef} className={"textLayer"} />
+          </div>
+        </div>
+        {/* )} */}
       </div>
-      {/* )} */}
-      {/* </div>xxxxxxx  */}
     </div>
   );
 };

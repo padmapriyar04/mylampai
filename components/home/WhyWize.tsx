@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { motion, useAnimation } from "framer-motion";
 import ExperiencedCounsellors from "./ExperiencedCounsellors";
 import PracticeCoding from "./PractiseCoding";
 import WizeCampLink from "./WizeCampLink";
@@ -19,6 +20,9 @@ export default function WhyWize() {
   // Create a ref array for each section
   const sectionsRef = useRef(new Array(whyWizeLinks.length).fill(null));
 
+  // Create animation controls for each section
+  const controls = useRef(whyWizeLinks.map(() => useAnimation()));
+
   useEffect(() => {
     // Intersection Observer setup
     const observer = new IntersectionObserver(
@@ -26,6 +30,27 @@ export default function WhyWize() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setActive(entry.target.id);
+            const index = whyWizeLinks.findIndex(
+              (link) => link.id === entry.target.id
+            );
+            if (index !== -1) {
+              controls.current[index].start({
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.6 },
+              });
+            }
+          } else {
+            const index = whyWizeLinks.findIndex(
+              (link) => link.id === entry.target.id
+            );
+            if (index !== -1) {
+              controls.current[index].start({
+                opacity: 0.5,
+                y: 50,
+                transition: { duration: 0.6 },
+              });
+            }
           }
         });
       },
@@ -33,7 +58,7 @@ export default function WhyWize() {
         root: null, // viewport
         rootMargin: "0px", // no margin
         threshold: 0.5, // trigger when 50% of the section is visible
-      },
+      }
     );
 
     // Observe each section
@@ -50,7 +75,7 @@ export default function WhyWize() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center mb-4 ">
+    <div className="flex flex-col items-center mb-4">
       <div className="max-w-[1300px] h-[100px] flex justify-center items-center w-full gap-4 mb-8">
         <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] bg-gradient-to-r from-white to-primary"></div>
         <div className="w-full text-3xl md:text-4xl font-medium text-center">
@@ -70,12 +95,14 @@ export default function WhyWize() {
             />
           ))}
         </div>
-        <div className="md:border-l-4 md:border-[#baa1eb]  lg:px-[60px] xl:px-[100px] relative">
-          <div
+        <div className="md:border-l-4 md:border-[#baa1eb] lg:px-[60px] xl:px-[100px] relative">
+          <motion.div
             id="allroundguidance"
             ref={(el) => {
               sectionsRef.current[0] = el;
             }}
+            animate={controls.current[0]}
+            initial={{ opacity: 0.5, y: 50 }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
@@ -92,23 +119,27 @@ export default function WhyWize() {
               Interview prep - in-house AI!
             </p>
             <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
-          </div>
+          </motion.div>
 
-          <div
+          <motion.div
             id="pathtosuccess"
             ref={(el) => {
               sectionsRef.current[1] = el;
             }}
+            animate={controls.current[1]}
+            initial={{ opacity: 0.5, y: 50 }}
             className="pb-[100px] min-h-screen px-6"
           >
             <PracticeCoding />
-          </div>
+          </motion.div>
 
-          <div
+          <motion.div
             id="smartestplatform"
             ref={(el) => {
               sectionsRef.current[2] = el;
             }}
+            animate={controls.current[2]}
+            initial={{ opacity: 0.5, y: 50 }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
@@ -126,24 +157,22 @@ export default function WhyWize() {
               you!
             </p>
             <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
-          </div>
+          </motion.div>
 
-          <div
+          <motion.div
             id="expertsinsights"
             ref={(el) => {
               sectionsRef.current[3] = el;
             }}
+            animate={controls.current[3]}
+            initial={{ opacity: 0.5, y: 50 }}
             className="pb-[100px] min-h-screen"
           >
             <ExperiencedCounsellors />
-          </div>
+          </motion.div>
 
           <div
-            id="advancedfeatures"
-            ref={(el) => {
-              sectionsRef.current[4] = el;
-            }}
-            className=" sm:min-h-[700px] px-6"
+            className="sm:min-h-[700px] px-6"
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               ADVANCED FEATURES
@@ -168,7 +197,7 @@ export default function WhyWize() {
                   width={100}
                   height={100}
                   className="w-full"
-                ></Image>
+                />
               </div>
               <div className="bg-white w-full max-w-[300px] lg:max-w-[100vw] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
                 <Image
@@ -177,7 +206,7 @@ export default function WhyWize() {
                   width={100}
                   height={100}
                   className="w-full"
-                ></Image>
+                />
               </div>
               <div className="bg-white w-full max-w-[300px] lg:max-w-[100vw] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
                 <Image
@@ -186,7 +215,7 @@ export default function WhyWize() {
                   width={100}
                   height={100}
                   className="w-full"
-                ></Image>
+                />
               </div>
               <div className="bg-white w-full max-w-[300px] lg:max-w-[100vw] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
                 <Image
@@ -195,7 +224,7 @@ export default function WhyWize() {
                   width={100}
                   height={100}
                   className="w-full"
-                ></Image>
+                />
               </div>
             </div>
           </div>
@@ -204,3 +233,4 @@ export default function WhyWize() {
     </div>
   );
 }
+

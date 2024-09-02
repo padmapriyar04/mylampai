@@ -4,7 +4,7 @@
     inset: 0;
     overflow: hidden;
     opacity: 0.33;
-    line-height: 1;
+    line-height:1 ;
     -webkit-text-size-adjust: none;
     -moz-text-size-adjust: none;
     text-size-adjust: none;
@@ -12,6 +12,8 @@
     transform-origin: 0 0;
     z-index: 2;
     color: transparent;
+    font-size: 18px;
+ 
 }
 
 .textLayer :is(span, br) {
@@ -26,6 +28,7 @@
     top: 0;
     height: 0;
 }
+
 
 .textLayer .highlighted {
     --highlight-bg-color: yellow;
@@ -114,7 +117,7 @@
     margin-bottom: 20px;
   }
 
-.textLayer {
+  .textLayer {
     position: absolute;
     top: 0;
     left: 0;
