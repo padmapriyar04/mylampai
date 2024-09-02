@@ -14,7 +14,7 @@ const HandleInterviewClick = () => {
 
 export default function Achieve() {
   return (
-    <div className="bg-primary-foreground w-full gap-4 p-4 md:grid md:grid-cols-2 md:grid-rows-12 max-h-[calc(100vh-4rem)] flex flex-col">
+    <div className="bg-primary-foreground w-full gap-4 p-4 md:grid md:grid-cols-2 md:grid-rows-12 md:max-h-[calc(100vh-4rem)] flex flex-col h-[calc(100vh-4rem)]">
       <div className="w-full bg-white rounded-lg row-span-8 h-full shadow-lg justify-center items-center flex flex-col gap-[1vw] max-h-[40vh] md:max-h-[80vh]">
         <div className="h-full flex flex-col justify-evenly items-center">
         <HiOutlineDocumentCheck className="md:h-20 md:w-20 md:border-2 border-primary rounded-full md:p-[1vw] text-primary mt-4 text-8xl my-8" />

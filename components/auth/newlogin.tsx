@@ -250,7 +250,7 @@ const AuthForm: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signIn("google");
-      if (result?.ok) router.push("/");
+      if (result?.ok) router.push("/achieve");
       if (result?.error) {
         console.error("Google sign-in error:", result.error);
         toast.error("Google sign-in failed. Please try again.");
@@ -362,7 +362,7 @@ const AuthForm: React.FC = () => {
         />
         </Link>
       </div>
-      <div className="bg-[#fcfcfc] rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[45vw] 2xl:h-[35vw] ">
+      <div className="bg-[#fcfcfc] rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
         <div className="hidden md:block w-full md:max-w-[350px] bg-purple-500 rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
           <Carousel
             showThumbs={false}
@@ -541,7 +541,7 @@ const AuthForm: React.FC = () => {
             </>
           ) : (
             <>
-              <div className="text-popover-foreground  flex flex-col">
+              <div className="text-popover-foreground flex flex-col">
                 <div className="text-[#666] font-medium text-sm mb-1 mt-3">
                   Hey Champ!
                 </div>
@@ -643,7 +643,7 @@ const AuthForm: React.FC = () => {
                       </div>
                     </div>
                 )}
-                <div className="flex justify-between items-center mt-14">
+                <div className="flex justify-between items-center mt-12 mb-4">
                   <div className="text-gray-500 font-semibold">
                     <span className="text-sm">
                       Don&apos;t have an account? &nbsp;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib'; // Adjust the path as per your project structure
+import prisma from '@/lib';
 import jwt from 'jsonwebtoken';
 
 export const GET = async (req: NextRequest) => {
@@ -33,7 +33,6 @@ export const GET = async (req: NextRequest) => {
     }
 
     return NextResponse.json({ message: 'CV retrieved successfully', cv }, { status: 200 });
-
   } catch (error) {
     console.error('Error fetching CV:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

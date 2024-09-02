@@ -9,13 +9,20 @@ export const useInterviewStore = create(
       extractedText: '',
       structuredData: null,
       setStructuredData: (data) => set({ structuredData: data }),
-      setResumeFile: (file) => set({ resumeFile: file }),
+      setResumeFile: (file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64File = reader.result;
+          set({ resumeFile: base64File });
+        };
+        reader.readAsDataURL(file); // Convert the file to a base64 string
+      },
       setJobDescriptionFile: (file) => set({ jobDescriptionFile: file }),
       setExtractedText: (text) => set({ extractedText: text }),
     }),
     {
       name: "interview-storage", // unique name for the storage (localStorage key)
       getStorage: () => localStorage, // default localStorage
-    },
-  ),
+    }
+  )
 );

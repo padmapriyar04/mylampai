@@ -193,13 +193,13 @@ const Page: React.FC = () => {
           profile={profile} // Pass the profile
           setProfile={setProfile} // Pass the setProfile function
         />
-      ) : step === 3 ? (
+      ) : (
         <PDFViewer
           profile={profile}
           structuredData={structuredData}
           localResume={localResume}
         />
-      ) : null}
+      )}
     </div>
   );
 };
