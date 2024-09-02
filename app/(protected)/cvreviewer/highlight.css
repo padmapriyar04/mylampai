@@ -1,3 +1,7 @@
+:root {
+    --scale-factor: 1;
+}
+
 .textLayer {
     position: absolute;
     text-align: initial;
@@ -13,7 +17,7 @@
     z-index: 2;
     color: transparent;
     font-size: 18px;
- 
+    pointer-events: auto !important;
 }
 
 .textLayer :is(span, br) {
@@ -31,7 +35,7 @@
 
 
 .textLayer .highlighted {
-    --highlight-bg-color: yellow;
+    --highlight-bg-color: red;
     --highlight-selected-bg-color: yellowgreen;
 
     margin: -1px;
@@ -69,12 +73,12 @@
 }
 
 .textLayer ::-moz-selection {
-    background: blue;
+    background: #8c52ff;
     background: AccentColor;
 }
 
 .textLayer ::selection {
-    background: blue;
+    background: #8c52ff;
     background: AccentColor;
 }
 

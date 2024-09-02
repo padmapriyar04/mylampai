@@ -13,8 +13,8 @@ export default function Footer() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    toast.info("Subscribing..")
+
+    toast.info("Subscribing..");
 
     try {
       const res = await fetch("/api/newsletteremails", {
@@ -34,7 +34,7 @@ export default function Footer() {
       console.log(err);
     }
   };
-  
+
   return (
     <>
       <div className="flex flex-col lg:flex-row gap-8 bg-gradient-to-tr shadow-br from-[#8C52FF] to-[#b7cdfb] p-[40px] mt-[100px]">
@@ -70,8 +70,8 @@ export default function Footer() {
                   alt="mail"
                 />
                 <div>
-                  info@wize.co.in <br />
-                  admin@mylampai.in
+                  <a href="mailto:info@wize.co.in">info@wize.co.in</a> <br />
+                  <a href="mailto:admin@mylamp.in">admin@mylamp.in</a>
                 </div>
               </div>
               <div className="flex gap-4 items-center text-[#00000090] text-[0.9rem] ">
@@ -83,8 +83,8 @@ export default function Footer() {
                   alt="phone"
                 />
                 <div>
-                  +91-92441 60441 <br />
-                  +91-90279 32821
+                  <a href="tel:+91-9244160441"> +91-92441 60441</a> <br />
+                  <a href="tel:+91-8233240517"> +91-82332 40517</a>
                 </div>
               </div>
               <div className="flex gap-4 items-center text-[#00000090] text-[0.9rem] ">
@@ -95,17 +95,20 @@ export default function Footer() {
                   width={30}
                   alt="location"
                 />
-                <div>
+                <a href="https://maps.app.goo.gl/33CKfsXymGancg7fA" target="_blank">
                   IIT Kharagpur <br />
                   Kharagpur (West Bengal), 721302
-                </div>
+                </a>
               </div>
             </div>
             <div className="w-full hidden sm:flex flex-col items-start justify-between py-4 gap-4 text-[0.9rem] text-[#00000090]">
               <h3 className="text-[#8C52FF] font-semibold text-xl">
                 Stay Updated
               </h3>
-              <form onSubmit={handleSubmit} className="flex items-center justify-start w-full overflow-hidden rounded-lg ">
+              <form
+                onSubmit={handleSubmit}
+                className="flex items-center justify-start w-full overflow-hidden rounded-lg "
+              >
                 <input
                   placeholder="Sign Up for our Newsletter"
                   type="email"

@@ -8,7 +8,6 @@ import "../globals.css";
 import { Open_Sans } from "next/font/google";
 import AuthProvider from "@/components/auth/AuthProvider";
 import Flexsidebar from "@/components/misc/Flexsidebar";
-import Head from "next/head";
 
 const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
 
@@ -22,27 +21,23 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
-  const token = cookieStore.get("token");
+  // const cookieStore = cookies();
+  // const token = cookieStore.get("token");
 
-  if (!token) {
-    redirect("/login");
-  }
+  // if (!token) {
+  //   redirect("/login");
+  // }
 
-  try {
-    if (token.value)
-      jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
-    else redirect("/login");
-  } catch (error) {
-    redirect("/login");
-  }
+  // try {
+  //   if (token.value)
+  //     jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
+  //   else redirect("/login");
+  // } catch (error) {
+  //   redirect("/login");
+  // }
 
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
-      <Head>
-        <title>MyLampAi</title>
-        <meta property="og:title" content="My page title" key="title" />
-      </Head>
       <body className={`${openSans.className} bg-primary-foreground`}>
         <AuthProvider>
           <Navbar />

@@ -13,7 +13,6 @@ const Page: React.FC = () => {
     setResumeFile,
     setJobDescriptionFile,
     resumeFile,
-    jobDescriptionFile,
   } = useInterviewStore();
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
@@ -22,21 +21,6 @@ const Page: React.FC = () => {
   const { token } = useUserStore();
   const [profile, setProfile] = useState<string | null>(null);
   const [localResume, setLocalResume] = useState<File | null>(null);
-
-  const handleDrop = async (
-    event: DragEvent<HTMLDivElement>,
-    setFile: (file: File) => void,
-  ) => {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      setFile(file);
-      setLocalResume(file);
-      const fileBinary = await getBinaryData(file);
-      uploadCVAndJobDescription(fileBinary, manualJobDescription);
-    }
-  };
 
   const handleResumeUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -58,9 +42,6 @@ const Page: React.FC = () => {
     }
   };
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  };
 
   const handleNextClick = () => {
     setStep((prevStep) => prevStep + 1);
@@ -176,11 +157,8 @@ const Page: React.FC = () => {
       {step === 1 || step === 2 ? (
         <StepOneTwo
           step={step}
-          setStep={setStep}
-          handleDrop={handleDrop}
           handleResumeUpload={handleResumeUpload}
           triggerFileInput={triggerFileInput}
-          handleDragOver={handleDragOver}
           handleNextClick={handleNextClick}
           handleBackClick={handleBackClick}
           handleJobDescriptionUpload={handleJobDescriptionUpload}
@@ -190,8 +168,8 @@ const Page: React.FC = () => {
           isManualEntry={isManualEntry}
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
-          profile={profile} // Pass the profile
-          setProfile={setProfile} // Pass the setProfile function
+          profile={profile} 
+          setProfile={setProfile} 
         />
       ) : (
         <PDFViewer

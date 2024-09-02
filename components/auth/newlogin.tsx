@@ -263,7 +263,7 @@ const AuthForm: React.FC = () => {
 
   useEffect(() => {
     if (session?.user || userData) {
-      router.push("/");
+      router.push("/achieve");
     } else {
       clearUser();
     }
@@ -351,7 +351,7 @@ const AuthForm: React.FC = () => {
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0 h-screen">
-      <div className="absolute top-4 left-0 max-w-32">
+      <div className="absolute top-2 left-0 max-w-[220px]">
         <Link href="/">
         <Image
           src={"/home/logo.svg"}
@@ -372,9 +372,9 @@ const AuthForm: React.FC = () => {
             interval={5000}
             showArrows={false}
             showIndicators={false}
-            className="w-full  md:h-full flex flex-col justify-between"
+            className="w-full  md:h-full flex flex-col pt-4 justify-between"
           >
-            <div className="flex justify-center items-center h-full">
+            <div className="flex justify-center p-4 items-center h-full">
               <Image
                 src={"/images/Globe.svg"}
                 alt="Carousel Image 1"
@@ -383,7 +383,7 @@ const AuthForm: React.FC = () => {
                 height={100}
               />
             </div>
-            <div className="flex justify-center items-center h-full">
+            <div className="flex justify-center p-4 items-center h-full">
               <Image
                 src={"/images/Globe.svg"}
                 alt="Carousel Image 1"

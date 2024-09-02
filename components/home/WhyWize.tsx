@@ -173,6 +173,9 @@ export default function WhyWize() {
 
           <div
             className="sm:min-h-[700px] px-6"
+            ref={(el) => {
+              sectionsRef.current[4] = el;
+            }}
           >
             <h4 className="pt-4 font-semibold text-[#8C52FF]">
               ADVANCED FEATURES
@@ -190,7 +193,7 @@ export default function WhyWize() {
               career path smooth.
             </p>
             <div className="flex flex-wrap justify-center gap-4 gap-y-5 min-h-[400px] w-full my-8 rounded-2xl">
-              <div className="bg-white w-full max-w-[300px] lg:max-w-[100vw] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
                 <Image
                   src="./home/whywize/4.svg"
                   alt="winningrecord"
@@ -199,7 +202,7 @@ export default function WhyWize() {
                   className="w-full"
                 />
               </div>
-              <div className="bg-white w-full max-w-[300px] lg:max-w-[100vw] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
                 <Image
                   src="./home/whywize/2.svg"
                   alt="winningrecord"
@@ -208,7 +211,7 @@ export default function WhyWize() {
                   className="w-full"
                 />
               </div>
-              <div className="bg-white w-full max-w-[300px] lg:max-w-[100vw] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
                 <Image
                   src="./home/whywize/3.svg"
                   alt="winningrecord"
@@ -217,7 +220,7 @@ export default function WhyWize() {
                   className="w-full"
                 />
               </div>
-              <div className="bg-white w-full max-w-[300px] lg:max-w-[100vw] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
                 <Image
                   src="./home/whywize/1.svg"
                   alt="winningrecord"

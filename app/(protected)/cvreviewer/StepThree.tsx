@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useInterviewStore } from "@/utils/store";
 import * as pdfjsLib from "pdfjs-dist/webpack";
+import Image from "next/image";
 import { useUserStore } from "@/utils/userStore";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import Mark from "mark.js";
@@ -33,7 +34,7 @@ interface PDFViewerProps {
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const { userData } = useUserStore();
-  const { extractedText, structuredData ,resumeFile } = useInterviewStore();
+  const { extractedText, structuredData, resumeFile } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
 
@@ -45,48 +46,26 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     []
   );
 
-
-  // const fetchResumeFromLocalStorage = () => {
-  //   try {
-  //     const base64Data = localStorage.getItem("resumeFile");
-  //     if (base64Data) {
-  //       const byteString = atob(base64Data.split(',')[1]); // Decode base64 to binary string
-  //       const uint8Array = new Uint8Array(byteString.length);
-  //       for (let i = 0; i < byteString.length; i++) {
-  //         uint8Array[i] = byteString.charCodeAt(i);
-  //       }
-  //       setResumeFile(uint8Array);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching resume from local storage:", error);
-  //   } finally {
-  //     // setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchResumeFromLocalStorage();
-  // }, []);
-
-
-
-  const analyzeResume = async (endpoint: string, data: any, query: string) => {
-    try {
-      const response = await fetch(`${baseUrl}${endpoint}${query}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (response.ok) return result;
-      return null;
-    } catch (error) {
-      console.error("Error:", error);
-      return null;
-    }
-  };
+  const analyzeResume = useCallback(
+    async (endpoint: string, data: any, query: string) => {
+      try {
+        const response = await fetch(`${baseUrl}${endpoint}${query}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        if (response.ok) return result;
+        return null;
+      } catch (error) {
+        console.error("Error:", error);
+        return null;
+      }
+    },
+    []
+  );
 
   const runAnalysis = useCallback(
     async (analysisType: string) => {
@@ -119,26 +98,34 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           }
           break;
         case "quantification_checker":
-          if (reviewedData.quantification_checker) break;
-          endpoint = "/quantification";
-          data = {
-            extracted_data: structuredData,
-          };
-          result = await analyzeResume(endpoint, data, query);
-          if (result?.message?.["Not Quantify"]) {
-            setSentencesToHighlight(result.message["Not Quantify"]);
-            highlightSentences(
-              result.message["Not Quantify"],
-              "highlighted",
-              false
-            );
-            console.log(result.message["Not Quantify"])
-          }
+          if (!reviewedData.quantification_checker) {
+            endpoint = "/quantification";
+            data = {
+              extracted_data: structuredData,
+            };
+            result = await analyzeResume(endpoint, data, query);
+            if (result?.message?.["Not Quantify"]) {
+              setSentencesToHighlight(result.message["Not Quantify"]);
+              highlightSentences(
+                result.message["Not Quantify"],
+                "highlighted",
+                false
+              );
+            }
 
-          setReviewedData((prevData: any) => ({
-            ...prevData,
-            quantification_checker: result?.message,
-          }));
+            setReviewedData((prevData: any) => ({
+              ...prevData,
+              quantification_checker: result?.message,
+            }));
+          } else {
+            console.log(
+              "Sentences to highlight:",
+              reviewedData.quantification_checker["Not Quantify"]
+            );
+            setSentencesToHighlight(
+              reviewedData.quantification_checker["Not Quantify"]
+            );
+          }
           break;
         case "resume_score":
           if (!reviewedData.resume_score) {
@@ -203,6 +190,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               ...prevData,
               bullet_point_length: result?.message,
             }));
+          } else {
+            setSentencesToHighlight(reviewedData.bullet_point_length.Result);
           }
           break;
         case "bullet_points_improver":
@@ -214,20 +203,29 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             result = await analyzeResume(endpoint, data, query);
             if (result?.message?.bulletPoints) {
               // Loop through each object in the bulletPoints array
-              result.message.bulletPoints.forEach(bulletPoint => {
-                  const textToHighlight = [bulletPoint.original]; // Wrap in array
-                  setSentencesToHighlight(prevState => [...prevState, ...textToHighlight]);
-                  highlightSentences(textToHighlight, "highlighted", false);
+              result.message.bulletPoints.forEach((bulletPoint) => {
+                const textToHighlight = [bulletPoint.original]; // Wrap in array
+                setSentencesToHighlight((prevState) => [
+                  ...prevState,
+                  ...textToHighlight,
+                ]);
+                highlightSentences(textToHighlight, "highlighted", false);
               });
-          
-          
-          
-          
             }
             setReviewedData((prevData: any) => ({
               ...prevData,
               bullet_points_improver: result?.message,
             }));
+          } else {
+            const bulletPoints =
+              reviewedData.bullet_points_improver.bulletPoints;
+            bulletPoints.forEach((bulletPoint: any) => {
+              const textToHighlight = [bulletPoint.original]; // Wrap in array
+              setSentencesToHighlight((prevState) => [
+                ...prevState,
+                ...textToHighlight,
+              ]);
+            });
           }
           break;
         case "total_bullet_points":
@@ -253,21 +251,32 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             query = "";
             result = await analyzeResume(endpoint, data, query);
             if (result?.message) {
-              const sentencesToHighlight = Object.values(result.message)
-                  .flatMap(item => item.correction)
-             
-  
+              const sentencesToHighlight = Object.values(
+                result.message
+              ).flatMap((item) => item.correction);
+
               if (sentencesToHighlight.length > 0) {
-                  console.log('Highlighting these sentences:', sentencesToHighlight);
-                  setSentencesToHighlight(sentencesToHighlight);
-                  highlightSentences(sentencesToHighlight, "highlighted", false);
+                console.log(
+                  "Highlighting these sentences:",
+                  sentencesToHighlight
+                );
+                setSentencesToHighlight(sentencesToHighlight);
+                highlightSentences(sentencesToHighlight, "highlighted", false);
               }
-          }
-  
+            }
+
             setReviewedData((prevData: any) => ({
               ...prevData,
               verb_tense_checker: result?.message,
             }));
+          } else {
+            const sentencesToHighlight = Object.values(
+              reviewedData.verb_tense_checker
+            ).flatMap((item) => item.correction);
+
+            if (sentencesToHighlight.length > 0) {
+              setSentencesToHighlight(sentencesToHighlight);
+            }
           }
           break;
         case "weak_verb_checker":
@@ -278,23 +287,29 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             };
             result = await analyzeResume(endpoint, data, query);
             if (result?.message) {
-             
               const sentencesToHighlight = Object.keys(result.message);
-              console.log('Sentences to Highlight:', sentencesToHighlight);
-          
-          
+              console.log("Sentences to Highlight:", sentencesToHighlight);
+
               if (sentencesToHighlight.length > 0) {
-                  setSentencesToHighlight(sentencesToHighlight);
-                  highlightSentences(sentencesToHighlight, "highlighted", false);
+                setSentencesToHighlight(sentencesToHighlight);
+                highlightSentences(sentencesToHighlight, "highlighted", false);
               } else {
-                  console.error('No sentences to highlight found.');
+                console.error("No sentences to highlight found.");
               }
-          }
-          
+            }
+
             setReviewedData((prevData: any) => ({
               ...prevData,
               weak_verb_checker: result?.message,
             }));
+          } else {
+            const sentencesToHighlight = Object.keys(
+              reviewedData.weak_verb_checker
+            );
+
+            if (sentencesToHighlight.length > 0) {
+              setSentencesToHighlight(sentencesToHighlight);
+            }
           }
           break;
         case "section_checker":
@@ -330,6 +345,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               ...prevData,
               skill_checker: result?.message,
             }));
+          } else {
+            const hardSkills = reviewedData.skill_checker.HARD;
+            const softSkills = reviewedData.skill_checker.SOFT;
+
+            if (hardSkills.length > 0) {
+              setSentencesToHighlight(hardSkills);
+              highlightSentences(hardSkills, "highlighted", false);
+            }
+            if (softSkills.length > 0) {
+              setSentencesToHighlight(softSkills);
+              highlightSentences(softSkills, "highlighted", false);
+            }
           }
           break;
         case "repetition_checker":
@@ -341,22 +368,28 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             query = "";
             result = await analyzeResume(endpoint, data, query);
             if (result?.message) {
-          
-              const sentencesToHighlight = Object.values(result.message)
-                  .flatMap(item => item.text);
-          
-            
+              const sentencesToHighlight = Object.values(
+                result.message
+              ).flatMap((item) => item.text);
+
               if (sentencesToHighlight.length > 0) {
-                  setSentencesToHighlight(sentencesToHighlight);
-                  highlightSentences(sentencesToHighlight, "highlighted", false);
+                setSentencesToHighlight(sentencesToHighlight);
+                highlightSentences(sentencesToHighlight, "highlighted", false);
               }
-          }
-          
-            
+            }
+
             setReviewedData((prevData: any) => ({
               ...prevData,
               repetition_checker: result?.message,
             }));
+          } else {
+            const sentencesToHighlight = Object.values(
+              reviewedData.repetition_checker
+            ).flatMap((item) => item.text);
+
+            if (sentencesToHighlight.length > 0) {
+              setSentencesToHighlight(sentencesToHighlight);
+            }
           }
           break;
         case "personal_info":
@@ -380,24 +413,28 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             };
             result = await analyzeResume(endpoint, data, query);
             if (result?.message) {
-          
-              const sentencesToHighlight = Object.values(result.message)
-                  .flatMap(item => item.correction);
-          
-          
+              const sentencesToHighlight = Object.values(
+                result.message
+              ).flatMap((item) => item?.correction);
+
               if (sentencesToHighlight.length > 0) {
-                  setSentencesToHighlight(sentencesToHighlight);
-                  highlightSentences(sentencesToHighlight, "highlighted", false);
+                setSentencesToHighlight(sentencesToHighlight);
+                highlightSentences(sentencesToHighlight, "highlighted", false);
               }
-          }
-          
-            
-          
-          
+            }
+
             setReviewedData((prevData: any) => ({
               ...prevData,
               responsibility_checker: result?.message,
             }));
+          } else {
+            const sentencesToHighlight = Object.values(
+              reviewedData.responsibility_checker
+            ).flatMap((item) => item.correction);
+
+            if (sentencesToHighlight.length > 0) {
+              setSentencesToHighlight(sentencesToHighlight);
+            }
           }
           break;
         case "spelling_checker":
@@ -419,6 +456,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               ...prevData,
               spelling_checker: result?.message,
             }));
+          } else {
+            setSentencesToHighlight(reviewedData.spelling_checker.Result);
           }
           break;
         default:
@@ -430,92 +469,53 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     [structuredData, extractedText, profile, reviewedData]
   );
 
- const highlightSentences = (
-  list_of_sentences: any,
-  class_name: string,
-  case_sensitive_flag: boolean
-) => {
-  const options_general = {
-    ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
-    separateWordSearch: false,
-    accuracy: "partially" as any,
-    className: class_name,
-    acrossElements: true,
-    caseSensitive: case_sensitive_flag,
-  };
+  const highlightSentences = useCallback(
+    (
+      list_of_sentences: any,
+      class_name: string,
+      case_sensitive_flag: boolean
+    ) => {
+      const options_general = {
+        ignorePunctuation: ":;.,-–—‒_(){}[]!'\"+=".split(""),
+        separateWordSearch: false,
+        accuracy: "partially" as any,
+        className: class_name,
+        acrossElements: true,
+        caseSensitive: case_sensitive_flag,
+      };
 
-  // Ensure list_of_sentences is an array
-  if (!Array.isArray(list_of_sentences)) {
-    console.error('Expected list_of_sentences to be an array, but got:', list_of_sentences);
-    return;
-  }
-
-  list_of_sentences.forEach((sentence: string) => {
-    if (typeof sentence === 'string') {
-      if (textLayerRef.current) {
-        const normalizedSentence = sentence.trim().replace(/\s+/g, ' ');
-        const instance = new Mark(textLayerRef.current);
-        // Debugging: Log before highlighting
-        console.log(`Highlighting sentence: "${normalizedSentence}"`);
-        instance.mark(normalizedSentence, options_general);
+      // Ensure list_of_sentences is an array
+      if (!Array.isArray(list_of_sentences)) {
+        console.error(
+          "Expected list_of_sentences to be an array, but got:",
+          list_of_sentences
+        );
+        return;
       }
-    } else {
-      console.warn('Skipping non-string sentence:', sentence);
-    }
-  });
-};
 
+      list_of_sentences.forEach((sentence: string) => {
+        if (typeof sentence === "string") {
+          if (textLayerRef.current) {
+            const normalizedSentence = sentence.trim().replace(/\s+/g, " ");
+            const instance = new Mark(textLayerRef.current);
+            instance.mark(normalizedSentence, options_general);
+          }
+        } else {
+          console.warn("Skipping non-string sentence:", sentence);
+        }
+      });
+    },
+    []
+  );
 
-
-
-  // useEffect(() => {
-  //   const fetchCVs = async () => {
-  //     setLoading(true); // Start loading
-  //     try {
-  //       const response = await fetch("/api/interviewer/get_cv", {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch CVs");
-  //       }
-
-  //       const data = await response.json();
-  //       console.log('API Response:', data);  // Inspect the response
-
-  //       // Check if the response contains the expected 'cv' object
-  //       if (data.cv && data.cv.Resume) {
-  //         const firstCV = data.cv; // Accessing the cv object
-
-  //         const pdfData = base64ToUint8Array(firstCV.Resume); // Convert base64 to Uint8Array
-  //         if (pdfData) {
-  //           setResumeFile(pdfData);
-  //         } else {
-  //           console.error("Failed to convert base64 string to Uint8Array.");
-  //         }
-  //       } else {
-  //         console.error("No valid CV found in the API response.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching CVs:", error);
-  //     } finally {
-  //       setLoading(false); // End loading
-  //     }
-  //   };
-
-  //   fetchCVs();
-  // }, [token]);
-  function base64ToUint8Array(base64: string): Uint8Array {
+  const base64ToUint8Array = useCallback((base64: string): Uint8Array => {
     // Remove data URL prefix if present
-    const base64Data = base64.split(',').pop();
-    
+    const base64Data = base64.split(",").pop();
+
     if (!base64Data) {
       throw new Error("Invalid base64 string");
     }
-  
+
     const binaryString = window.atob(base64Data);
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
@@ -523,48 +523,44 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       bytes[i] = binaryString.charCodeAt(i);
     }
     return bytes;
-  }
-  
+  }, []);
 
-  const renderPDF = async () => {
+  const renderPDF = useCallback(async () => {
     if (resumeFile && canvasRef.current) {
       try {
         const pdfData = base64ToUint8Array(resumeFile);
         const loadingTask = pdfjsLib.getDocument({ data: pdfData });
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1.5 });
-  
+        const viewport = page.getViewport({ scale: 1 });
+
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
-  
+
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-  
+
         const renderContext = {
           canvasContext: context,
           viewport,
         };
-  
+
         await page.render(renderContext).promise;
-  
+
         if (textLayerRef.current) {
           textLayerRef.current.innerHTML = "";
-  
+
           const textContent = await page.getTextContent();
           textLayerRef.current.style.width = `${canvas.offsetWidth}px`;
           textLayerRef.current.style.height = `${canvas.offsetHeight}px`;
-  
-          await pdfjsLib
-            .renderTextLayer({
-              textContent: textContent,
-              container: textLayerRef.current,
-              viewport: viewport,
-              textDivs: [],
-            })
-            .promise;
-  
-          // Set text layer ready after rendering
+
+          await pdfjsLib.renderTextLayer({
+            textContent: textContent,
+            container: textLayerRef.current,
+            viewport: viewport,
+            textDivs: [],
+          }).promise;
+
           setIsTextLayerReady(true);
         }
       } catch (error) {
@@ -573,10 +569,28 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     } else {
       console.error("Canvas reference is null or resumeFile is not set.");
     }
-  };
-  
-  
-  
+  }, [resumeFile, base64ToUint8Array]);
+
+  const getColor = useCallback(
+    (score: number | undefined) => {
+      if (score === undefined) return "#FF0000";
+      if (score < 50) return "#FF0000";
+      if (score < 70) return "#FFA500";
+      return "#00FF00";
+    },
+    [reviewedData.resume_score]
+  );
+
+  const getColorClass = useCallback(
+    (score: number | undefined) => {
+      if (score === undefined) return "text-red-500";
+      if (score < 50) return "text-red-500";
+      if (score < 70) return "text-yellow-500";
+      return "text-green-500";
+    },
+    [reviewedData.resume_score]
+  );
+
   useEffect(() => {
     if (resumeFile && !isRendered) {
       const timer = setTimeout(() => {
@@ -585,7 +599,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           setIsRendered(true);
         }
       }, 100); // Delay to ensure the component is fully mounted
-  
+
       return () => clearTimeout(timer); // Cleanup the timer
     }
   }, [resumeFile]);
@@ -596,15 +610,26 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     }
   }, [isTextLayerReady, sentencesToHighlight]);
 
+  console.log("Reviewed Data:", reviewedData);
+
   useEffect(() => {
     runAnalysis("resume_score");
     runAnalysis("summary");
   }, []);
 
   return (
-    <div className="flex h-full justify-between items-stretch gap-2 p-2">
-      <div className="w-full max-w-[250px] flex flex-col gap-2">
-        <div className="bg-white w-full p-8 rounded-lg">
+    <div className="flex h-full justify-between bg-primary-foreground items-stretch gap-2 px-2 pl-0">
+      <div
+        className="w-full bg-[#fafafa] rounded-tr-lg max-w-[220px] flex flex-col gap-2 "
+        style={{
+          boxShadow: "0px 0px 15px -5px rgba(0, 0, 0, 0.3)",
+        }}
+      >
+        <div
+          className={`w-full p-8 text-[1.6rem] font-semibold ${getColorClass(
+            reviewedData.resume_score?.FINAL_SCORE
+          )} rounded-lg`}
+        >
           <CircularProgressbarWithChildren
             strokeWidth={6}
             value={
@@ -612,70 +637,146 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 ? reviewedData.resume_score.FINAL_SCORE.toFixed(1)
                 : 0
             }
-            styles={{ path: { stroke: "#8C52FF", strokeLinecap: "round" } }}
+            styles={{
+              path: {
+                stroke: getColor(reviewedData.resume_score?.FINAL_SCORE),
+                strokeLinecap: "round",
+              },
+            }}
           >
             {reviewedData.resume_score &&
-              reviewedData.resume_score.FINAL_SCORE.toFixed(1) + "%"}
+              reviewedData.resume_score.FINAL_SCORE.toFixed(0)}
           </CircularProgressbarWithChildren>
         </div>
-        <div className="bg-white h-full p-4 rounded-lg flex-grow">
-          <h2 className="text-xl font-bold">Options</h2>
-          <div className="flex flex-col w-full gap-2 py-2">
-            <div className="">
-              Hard Skill:{" "}
-              {reviewedData.resume_score &&
-                reviewedData.resume_score.DETAILS.HARD_SKILLS_SCORE.score}
+        <div className="h-full p-4 rounded-lg flex-grow">
+          <h2 className="text-lg font-semibold">Resume Evaluation</h2>
+          <div className="h-[1px] bg-slate-300 w-full mb-4"></div>
+          <div className="flex flex-col w-full">
+            <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
+              <span className="font-medium">Hard Skill:</span>
+              <span
+                className={`ml-2 ${getColorClass(
+                  reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE?.score
+                )}`}
+              >
+                {reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE?.score ??
+                  "N/A"}
+                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                  {reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE
+                    ?.reason ?? "No details available"}
+                </div>
+              </span>
             </div>
-            <div className="">
-              Soft Skill:{" "}
-              {reviewedData.resume_score &&
-                reviewedData.resume_score.DETAILS.SOFT_SKILLS_SCORE.score}
+            <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
+              <span className="font-medium">Soft Skill:</span>
+              <span
+                className={`ml-2 ${getColorClass(
+                  reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score
+                )}`}
+              >
+                {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score ??
+                  "N/A"}
+                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                    {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE
+                      ?.reason ?? "No details available"}
+                  </div>
+              </span>
             </div>
-            <div className="">
-              Experience Skill:{" "}
-              {reviewedData.resume_score &&
-                reviewedData.resume_score.DETAILS.EXPERIENCE_SCORE.score}
+            <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
+              <span className="font-medium">Experience:</span>
+              <span
+                className={`ml-2 ${getColorClass(
+                  reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE?.score
+                )}`}
+              >
+                {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE?.score ??
+                  "N/A"}
+                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                    {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE
+                      ?.reason ?? "No details available"}
+                  </div>
+              </span>
             </div>
-            <div className="">
-              Education Skill:{" "}
-              {reviewedData.resume_score &&
-                reviewedData.resume_score.DETAILS.EDUCATION_SCORE.score}
+            <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
+              <span className="font-medium">Education:</span>
+              <span
+                className={`ml-2 ${getColorClass(
+                  reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.score
+                )}`}
+              >
+                {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.score ??
+                  "N/A"}
+                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                    {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE
+                      ?.reason ?? "No details available"}
+                  </div>
+              </span>
             </div>
+            {!reviewedData.resume_score && (
+              <div className="text-sm text-gray-500">
+                Scores are not available at the moment.{" "}
+                <button
+                  onClick={() => runAnalysis("resume_score")}
+                  className="underline hover:text-primary"
+                >
+                  Please try again
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <div className="w-full bg-white p-2 rounded-lg h-[calc(100vh-5rem)] overflow-auto scrollbar-hide text-[#202020] ">
+      <div className="w-full px-2 py-4 rounded-lg h-[calc(100vh-5rem)] overflow-auto scrollbar-hide text-[#202020] ">
         <div>
-          <h3 className="text-md font-semibold text-[#666]">
-            Hello, {userData?.name?.trim().split(" ")[0] || "User"}
+          <h3 className="text-lg text-primary font-bold text-[#666]">
+            Hello, {userData?.name?.trim().split(" ")[0] || "User"}!
           </h3>
-          <h2 className="text-xl font-bold">Summary</h2>
-          <div
-            className="px-2 mb-1 h-full overflow-auto scrollbar-hide max-h-[150px]"
-            style={{
-              maskImage:
-                "linear-gradient(to bottom, black 70%, transparent 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, black 70%, transparent 100%)",
-            }}
-          >
-            {reviewedData.summary && reviewedData.summary.Summary}
-          </div>
+          <p className="pl-2 text-[#888] font-semibold text-sm">
+            Click on different parameters to get detailed analysis
+          </p>
+          <h2 className="text-xl font-bold mt-2">Summary</h2>
+          <Dialog>
+            <DialogTrigger className="px-4 py-2 bg-white shadow rounded-lg">
+              <div className="line-clamp-3 rounded-lg text-left text-sm font-medium text-[#333]">
+                {reviewedData.summary && reviewedData.summary.Summary}
+              </div>
+            </DialogTrigger>
+            <DialogContent className="">
+              <DialogHeader>
+                <DialogTitle>Summary</DialogTitle>
+                <DialogDescription className="text-sm">
+                  {reviewedData.summary && reviewedData.summary.Summary}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </div>
         <div>
           <h2 className="text-xl font-bold h-full">Fixes or Corrections</h2>
-          <div className="flex flex-wrap justify-center items-start gap-2 py-2">
+          <div className="flex flex-wrap justify-between bg-[#fafafa] shadow rounded-lg items-start gap-y-4 gap-x-2 p-4">
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("quantification_checker")}
               >
-                Quantification Checker
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/2.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Quantification Checker
+                  </div>
+                </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="">
                 <DialogHeader>
                   <DialogTitle>Quantification Checker</DialogTitle>
-                  <DialogDescription>
+                  <DialogDescription className="">
                     <Accordion type="single" collapsible>
                       <AccordionItem value={`item-1`}>
                         {reviewedData["quantification_checker"] && (
@@ -716,10 +817,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("bullet_point_length")}
               >
-                Bullet Point Length
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/3.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Bullet Point Length
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -741,10 +854,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("bullet_points_improver")}
               >
-                Bullet Points Improver
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/4.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Bullet Points Improver
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -771,10 +896,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("total_bullet_points")}
               >
-                Total Bullet Points
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/5.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Total Bullet Points
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -788,10 +925,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("verb_tense_checker")}
               >
-                Verb Tense Checker
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/6.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Verb Tense Checker
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -837,10 +986,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("weak_verb_checker")}
               >
-                Weak Verb Checker
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/7.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Weak Verb Checker
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -867,10 +1028,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("section_checker")}
               >
-                Section Checker
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/8.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Section Checker
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -897,10 +1070,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("skill_checker")}
               >
-                Skill Checker
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/9.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Skill Checker
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -927,10 +1112,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("repetition_checker")}
               >
-                Repetition Checker
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/10.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Repetition Checker
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -971,10 +1168,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("personal_info")}
               >
-                Personal Info
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/11.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Personal Info
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogTitle> Personal Info </DialogTitle>
@@ -999,10 +1208,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("responsibility_checker")}
               >
-                Responsibilty
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/12.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Responsibilty
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -1040,10 +1261,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             </Dialog>
             <Dialog>
               <DialogTrigger
-                className="max-w-[140px] bg-primary rounded-lg font-semibold uppercase text-white w-full h-[130px] flex items-center justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
                 onClick={() => runAnalysis("spelling_checker")}
               >
-                Spelling Checker
+                <div className="flex items-center justify-center flex-col">
+                  <Image
+                    src="/cvreviewer/13.svg"
+                    height={30}
+                    width={30}
+                    alt="icon"
+                    className="-translate-y-5"
+                  ></Image>
+                  <div className="absolute top-[70px] w-full text-sm px-3 ">
+                    {" "}
+                    Spelling Checker
+                  </div>
+                </div>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -1058,22 +1291,19 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           </div>
         </div>
       </div>
-      <div className="w-full bg-primary rounded-lg">
-        {/* {loading ? (
-          <div className="flex justify-center items-center h-[calc(100vh-5rem)]">
-            <AiOutlineLoading3Quarters className="animate-spin text-white text-4xl" />
-          </div>
-        ) : ( */}
+      <div className=" py-2">
         <div
-          className="pdf-viewer-container"
+          className="pdf-viewer-container shadow-lg rounded-md  overflow-hidden"
           style={{ position: "relative", width: "100%", height: "100%" }}
         >
-          <div style={{ position: "relative", width: "100%", height: "100%" }}>
-            <canvas ref={canvasRef} className={"pdfCanvas"} />
+          <div
+            className="h-[calc(100vh-5rem)] max-w-[595px] overflow-auto scrollbar-hide"
+            style={{ position: "relative", width: "100%" }}
+          >
+            <canvas ref={canvasRef} className={"pdfCanvas "} />
             <div ref={textLayerRef} className={"textLayer"} />
           </div>
         </div>
-        {/* )} */}
       </div>
     </div>
   );
