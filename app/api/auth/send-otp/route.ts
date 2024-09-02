@@ -41,25 +41,26 @@ export async function POST(req: Request) {
       },
     });
 
-    try {
-      const info = await transporter.sendMail({
-        from: process.env.EMAIL_USER, // Sender address
-        to: email, // Recipient's email
-        subject: "Your OTP Code", // Subject line
-        text: `Your OTP code is ${otp}. It is valid for 15 minutes.`, // Plain text body
-      });
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "MyLamp AI - Your OTP Code",
+      text: `Hello,
 
-      return NextResponse.json(
-        { message: "OTP sent successfully!", otpSent: true },
-        { status: 200 },
-      );
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      return NextResponse.json(
-        { error: "Failed to send OTP", otpSent: false },
-        { status: 500 },
-      );
-    }
+Your one-time password (OTP) for MyLamp AI is ${otp}. This code is valid for the next 15 minutes.
+
+If you did not request this code, please ignore this email.
+
+Thank you for choosing MyLamp AI!
+
+Best regards,
+The MyLamp AI Team`,
+    });
+
+    return NextResponse.json(
+      { message: "OTP sent successfully!", otpSent: true },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Internal Server Error:", error);
     return NextResponse.json(
