@@ -98,7 +98,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
 
       if (textLayerRef.current) {
         const instance = new Mark(textLayerRef.current);
-        instance.unmark();  // Remove all existing highlights
+        instance.unmark();
       }
 
       switch (analysisType) {
@@ -254,7 +254,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             result = await analyzeResume(endpoint, data, query);
             if (result?.message) {
               const sentencesToHighlight = Object.values(result.message)
-                  .map(item => item.correction)
+                  .flatMap(item => item.correction)
              
   
               if (sentencesToHighlight.length > 0) {
@@ -278,14 +278,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             };
             result = await analyzeResume(endpoint, data, query);
             if (result?.message) {
-              // Flatten all phrases from all arrays into one array
+             
               const sentencesToHighlight = Object.keys(result.message);
-
-          
-              // Log the sentences to be highlighted for debugging
               console.log('Sentences to Highlight:', sentencesToHighlight);
           
-              // Check if sentencesToHighlight is an array and not empty
+          
               if (sentencesToHighlight.length > 0) {
                   setSentencesToHighlight(sentencesToHighlight);
                   highlightSentences(sentencesToHighlight, "highlighted", false);
@@ -383,11 +380,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             };
             result = await analyzeResume(endpoint, data, query);
             if (result?.message) {
-              // Flatten all sentences from all "text" arrays into one array
+          
               const sentencesToHighlight = Object.values(result.message)
                   .flatMap(item => item.correction);
           
-              // Check if sentencesToHighlight is an array and not empty
+          
               if (sentencesToHighlight.length > 0) {
                   setSentencesToHighlight(sentencesToHighlight);
                   highlightSentences(sentencesToHighlight, "highlighted", false);
