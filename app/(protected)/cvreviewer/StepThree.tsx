@@ -736,7 +736,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           </p>
           <h2 className="text-xl font-bold mt-2">Summary</h2>
           <Dialog>
-            <DialogTrigger className="px-4 py-2 bg-white shadow rounded-lg">
+            <DialogTrigger className="px-4 py-2 bg-white shadow rounded-lg ">
               <div className="line-clamp-3 rounded-lg text-left text-sm font-medium text-[#333]">
                 {reviewedData.summary && reviewedData.summary.Summary}
               </div>
@@ -753,7 +753,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         </div>
         <div>
           <h2 className="text-xl font-bold h-full">Fixes or Corrections</h2>
-          <div className="flex flex-wrap justify-between bg-[#fafafa] shadow rounded-lg items-start gap-y-4 gap-x-2 p-4">
+          <div className="flex flex-wrap justify-between bg-[#fafafa] shadow rounded-lg items-start gap-y-4 gap-x-2 p-4 ">
             <Dialog>
               <DialogTrigger
                 className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
@@ -773,7 +773,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent className="">
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle>Quantification Checker</DialogTitle>
                   <DialogDescription className="">
@@ -834,7 +834,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle>Bullet Point Length</DialogTitle>
                   <DialogDescription>
@@ -871,7 +871,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle> Bullet Points Improver </DialogTitle>
                   <DialogDescription>
@@ -913,7 +913,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle> Total Bullet Points </DialogTitle>
                   <DialogDescription>
@@ -942,7 +942,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle> Verb Tense Checker </DialogTitle>
                   <DialogDescription>
@@ -1003,7 +1003,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle> Weak Verb Checker </DialogTitle>
                   <DialogDescription>
@@ -1045,7 +1045,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle> Section Checker </DialogTitle>
                   <DialogDescription>
@@ -1087,7 +1087,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle> Skill Checker </DialogTitle>
                   <DialogDescription>
@@ -1129,7 +1129,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle> Repetition Checker </DialogTitle>
                   <DialogDescription>
@@ -1185,7 +1185,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogTitle> Personal Info </DialogTitle>
                 <DialogDescription>
                   <Accordion type="single" collapsible>
@@ -1225,7 +1225,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle> Responsibility Checker </DialogTitle>
                   <DialogDescription>
@@ -1278,7 +1278,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                 <DialogHeader>
                   <DialogTitle>Spelling Checker</DialogTitle>
                   <DialogDescription>
