@@ -86,7 +86,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       >
         <video
           ref={videoRef}
-          className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75"
+          className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75 relative md:top-[-10vh] lg:top-[-6.5vh] xl:top-[-6vh]"
           autoPlay
           muted
         />
