@@ -29,7 +29,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'conversation' | 'audioToText'>('conversation');
-  const [showAnalysis, setShowAnalysis] = useState(false); 
+  const [showAnalysis, setShowAnalysis] = useState(false); // State to show Analysis component
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -46,12 +46,23 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 
     startVideoStream();
 
+    // Cleanup video stream on component unmount
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());
       }
     };
+  }, []);
+
+  // Timer to show Analysis component after 20 minutes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowAnalysis(true);
+    }, 20 * 60 * 1000); // 20 minutes in milliseconds
+
+    // Cleanup timer on component unmount
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -65,7 +76,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         <div className="flex items-center">
           <button
             className="bg-primary text-white px-4 py-3 rounded-full font-semibold"
-            onClick={() => setShowAnalysis(true)} 
+            onClick={() => setShowAnalysis(true)}
           >
             VIEW ANALYSIS
           </button>
@@ -209,7 +220,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         </div>
       )}
 
-      
+     
       {showAnalysis && <Analysis />}
     </div>
   );
