@@ -1,6 +1,7 @@
 // InterviewPage.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import AudioToText from './recording'; // Assuming you have an AudioToText component
+import Analysis from './Analysis'; // Import the Analysis component
 import { PiChatsThin } from 'react-icons/pi'; // Assuming this icon is from react-icons, adjust as necessary.
 
 interface InterviewPageProps {
@@ -28,13 +29,12 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'conversation' | 'audioToText'>('conversation');
+  const [showAnalysis, setShowAnalysis] = useState(false); 
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Initialize video stream when component mounts
   useEffect(() => {
     const startVideoStream = async () => {
       try {
-        // Request access to the user's camera
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -46,7 +46,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 
     startVideoStream();
 
-    // Cleanup video stream on component unmount
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
@@ -57,7 +56,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground">
-      {/* Navbar */}
       <nav className="flex justify-between items-center bg-white shadow-md p-4">
         <div className="flex items-center">
           <img src="/home/logo.svg" alt="wiZe Logo" className="h-auto w-48 ml-2" />
@@ -65,13 +63,19 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         <div className="font-medium text-lg">Technical Interview 1st round</div>
 
         <div className="flex items-center">
+          <button
+            className="bg-primary text-white px-4 py-3 rounded-full font-semibold"
+            onClick={() => setShowAnalysis(true)} 
+          >
+            VIEW ANALYSIS
+          </button>
           <span className="text-gray-600 text-sm mr-4" id="status"></span>
           <button className="mr-6" onClick={() => setIsChatOpen(!isChatOpen)}>
             <PiChatsThin className="w-10 h-10 text-gray-600" />
           </button>
           <button
             className="bg-red-500 text-white px-4 py-3 rounded-full font-semibold"
-            onClick={() => window.close()} // Close the tab
+            onClick={() => window.close()}
           >
             END INTERVIEW
           </button>
@@ -92,7 +96,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         />
       </div>
 
-      {/* Microphone enabled: Display AudioToText */}
       {isMicEnabled && (
         <AudioToText
           onTextSubmit={handleTextSubmit}
@@ -101,7 +104,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         />
       )}
 
-      {/* Prompt Box */}
       {isChatOpen && (
         <div className="absolute top-[5.7rem] right-6 bg-white border border-gray-300 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
           <div className="flex justify-between items-center bg-primary text-white p-4 rounded-t-lg">
@@ -111,7 +113,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
             </button>
           </div>
 
-          {/* Tabs for switching between sections */}
           <div className="flex border-b border-gray-300 rounded-b-lg">
             <button
               className={`flex-1 text-center p-2 rounded-bl-lg ${
@@ -131,7 +132,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
             </button>
           </div>
 
-          {/* Content Sections */}
           <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
             {activeTab === 'conversation' && (
               <div>
@@ -154,7 +154,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
             )}
           </div>
 
-          {/* Input and Buttons Container */}
           <div className="p-4 bg-gray-100 border-t border-b border-gray-300 rounded-lg">
             <input
               id="answerInput"
@@ -204,12 +203,14 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         </div>
       )}
 
-      {/* Loading Spinner */}
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
           <div className="border-t-4 border-blue-500 border-solid w-16 h-16 rounded-full animate-spin"></div>
         </div>
       )}
+
+      
+      {showAnalysis && <Analysis />}
     </div>
   );
 };
