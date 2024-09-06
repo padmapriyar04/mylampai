@@ -1,7 +1,7 @@
-// InterviewPage.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import AudioToText from './recording'; // Assuming you have an AudioToText component
 import Analysis from './Analysis'; // Import the Analysis component
+import OnlineCompiler from './OnlineCompiler'; // Import the OnlineCompiler component
 import { PiChatsThin } from 'react-icons/pi'; // Assuming this icon is from react-icons, adjust as necessary.
 
 interface InterviewPageProps {
@@ -14,6 +14,7 @@ interface InterviewPageProps {
   handleTextSubmit: (text: string) => void;
   handleSendMessage: (message: string) => void;
   websocketRef: React.MutableRefObject<WebSocket | null>;
+  analysisData: any; // Analysis data is passed here
 }
 
 const InterviewPage: React.FC<InterviewPageProps> = ({
@@ -26,10 +27,13 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   handleTextSubmit,
   handleSendMessage,
   websocketRef,
+  analysisData, // Destructure analysisData
 }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'conversation' | 'audioToText'>('conversation');
   const [showAnalysis, setShowAnalysis] = useState(false); // State to show Analysis component
+  const [showCompiler, setShowCompiler] = useState(false); // State to show Online Compiler component (slide in/out)
+
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -55,7 +59,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     };
   }, []);
 
-  // Timer to show Analysis component after 20 minutes
+  // Timer to show Analysis component after 20 minutes (optional)
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowAnalysis(true);
@@ -74,11 +78,25 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         <div className="font-medium text-lg">Technical Interview 1st round</div>
 
         <div className="flex items-center">
+          {/* View Analysis Button */}
           <button
             className="bg-primary text-white px-4 py-3 rounded-full font-semibold"
-            onClick={() => setShowAnalysis(true)}
+            onClick={() => {
+              websocketRef.current?.send(
+                JSON.stringify({
+                  type: 'get_analysis', // Sending request to get analysis
+                })
+              );
+              setShowAnalysis(true); // Show Analysis component when clicked
+            }}
           >
             VIEW ANALYSIS
+          </button>
+          <button
+            className="bg-indigo-500 text-white px-4 py-3 rounded-full font-semibold ml-4"
+            onClick={() => setShowCompiler(!showCompiler)} // Toggle the compiler modal (slide)
+          >
+            {showCompiler ? 'Close Compiler' : 'Open Online Compiler'}
           </button>
           <span className="text-gray-600 text-sm mr-4" id="status"></span>
           <button className="mr-6" onClick={() => setIsChatOpen(!isChatOpen)}>
@@ -220,8 +238,37 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         </div>
       )}
 
-     
-      {showAnalysis && <Analysis />}
+      {/* Show Analysis Component */}
+      {showAnalysis && analysisData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-11/12 h-5/6 overflow-auto">
+            <button
+              className="absolute top-4 right-4 text-xl font-bold text-gray-700 hover:text-gray-900"
+              onClick={() => setShowAnalysis(false)}
+            >
+              &times;
+            </button>
+            <Analysis analysisData={analysisData} /> {/* Show Analysis here */}
+          </div>
+        </div>
+      )}
+
+      {/* Sliding Online Compiler */}
+      <div
+        className={`fixed inset-y-0 right-0 w-1/2 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
+          showCompiler ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="relative p-6">
+          <button
+            className="absolute top-4 right-4 text-xl font-bold text-gray-700 hover:text-gray-900"
+            onClick={() => setShowCompiler(false)}
+          >
+            &times;
+          </button>
+          <OnlineCompiler /> {/* Display Online Compiler inside the sliding panel */}
+        </div>
+      </div>
     </div>
   );
 };

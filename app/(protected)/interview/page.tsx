@@ -44,6 +44,7 @@ const InterviewComponent = () => {
   const [isMicEnabled, setIsMicEnabled] = useState(false);
   const [isMicTestEnabled, setIsMicTestEnabled] = useState(false);
   const [isMicTestCompleted, setIsMicTestCompleted] = useState(false);
+  const [analysisData, setAnalysisData] = useState(null); // Step 1: State for storing analysis data
 
   const [cvText, setCvText] = useState("");
   const [JD, setJD] = useState("");
@@ -176,6 +177,7 @@ const InterviewComponent = () => {
           ]);
         } else if (data.type === "analysis") {
           console.log("Analysis result received:", data.result);
+          setAnalysisData(data.result); // Store analysis data
           setChatMessages((prevMessages) => [
             ...prevMessages,
             { user: "Analysis", message: JSON.stringify(data.result) },
@@ -649,6 +651,7 @@ const InterviewComponent = () => {
       handleTextSubmit={handleTextSubmit}
       handleSendMessage={handleSendMessage}
       websocketRef={websocketRef}
+      analysisData={analysisData}
     />
     );
   }
@@ -720,6 +723,7 @@ const InterviewComponent = () => {
           allDevicesConfigured={allDevicesConfigured}
           onMicTestComplete={() => setIsMicTestCompleted(true)}
         />
+
       )}
     </div>
   );
