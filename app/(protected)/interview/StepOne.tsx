@@ -132,7 +132,7 @@ const StepOne: React.FC<StepOneProps> = ({
           </h3>
         </div>
 
-        <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] lg:max-h-[300px] shadow-lg text-center">
+        <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] lg:max-h-[280px] shadow-lg text-center">
           <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-3xl">
             <IoDocumentAttach />
           </div>

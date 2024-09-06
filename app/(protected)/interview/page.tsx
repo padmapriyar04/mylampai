@@ -416,10 +416,9 @@ const InterviewComponent = () => {
 
   const handleNextClick = () => {
     if (step === 3 && allDevicesConfigured) {
+      // Check if both CV and Job Description are uploaded
       if (!cvText || !JD) {
-        alert(
-          "Please upload both the CV and Job Description before starting the interview.",
-        );
+        alert('Please upload both the CV and Job Description before starting the interview.');
         return;
       }
       changeRoute(false);
@@ -527,23 +526,23 @@ const InterviewComponent = () => {
   }
 
   const handleManualJDUpload = () => {
-    const jobDescription = manualJobDescription === "Other" ? customProfile.trim() : manualJobDescription.trim();
+    // Set job description based on manual entry or custom profile for "Other"
+    const jobDescription = manualJobDescription === 'Other' ? customProfile.trim() : manualJobDescription.trim();
   
-    if (jobDescription !== "") {
-      setJD(jobDescription);
-  
+    if (jobDescription !== '') {
+      setJD(jobDescription); // Set JD for manual job descriptions
       websocketRef.current?.send(
         JSON.stringify({
-          type: "analyze_jd",
+          type: 'analyze_jd',
           job_description: jobDescription,
         }),
       );
   
-      if (cvText && JD) {
-        toast.success("Job Description uploaded successfully");
+      if (cvText && jobDescription) {
+        toast.success('Job Description uploaded successfully');
       }
     } else {
-      alert("Please fill in the job description.");
+      alert('Please fill in the job description.');
     }
   };
   
@@ -679,12 +678,14 @@ const InterviewComponent = () => {
       {/* Step 2: Upload Job Description */}
       {step === 2 && (
         <StepTwo
+        JD={JD}
         isResumeUploaded={isResumeUploaded}
         jobDescriptionFile={jobDescriptionFile}
         isManualEntry={isManualEntry}
         manualJobDescription={manualJobDescription}
         selectedJobProfile={selectedJobProfile}
         jobProfiles={jobProfiles}
+        setJD={setJD}
         handleManualJDUpload={handleManualJDUpload}
         handleNextClick={handleNextClick}
         handleBackClick={handleBackClick}
