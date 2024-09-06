@@ -16,7 +16,7 @@ const Analysis: React.FC = () => {
           <div className='h-full w-[120px] bg-white text-black flex justify-center items-center'>
             img
           </div>
-          <div className='text-xl flex flex-col gap-2 top-4 relative'>
+          <div className='text-lg flex flex-col gap-2 top-4 relative'>
           <div>
             Name and Info
           </div>
@@ -27,15 +27,15 @@ const Analysis: React.FC = () => {
         </div>
         <div className='w-full h-[40%] flex gap-4'>
           <div className='w-[70%]'>
-            <div className='text-black text-2xl font-semibold pt-2 w-full h-[33%]'>
+            <div className='text-black text-xl font-semibold pt-2 w-full h-[33%]'>
               Your Score:
             </div>  
-            <div className='text-black text-2xl font-semibold pt-2 w-full h-[66%]'>
+            <div className='text-black text-xl font-semibold pt-2 w-full h-[66%]'>
               Summary:
             </div>
           </div> 
           
-          <div className='w-[30%] bg-primary h-[47%] rounded-lg border-2 border-primary-foreground text-white font-semibold text-xl p-4 shadow-lg'>
+          <div className='w-[30%] bg-primary h-[47%] rounded-lg border-3 border-primary-foreground text-white font-semibold text-md p-2 shadow-lg text-center'>
             You are better than 60% other user from this domain who gave the AI interview!
           </div>
           
