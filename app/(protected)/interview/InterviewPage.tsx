@@ -261,10 +261,10 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       >
         <div className="relative p-6">
           <button
-            className="absolute top-4 right-4 text-xl font-bold text-gray-700 hover:text-gray-900"
+           className="absolute right-4 mt-8 mr-4 py-2 px-4 text-sm md:text-base rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-lg"
             onClick={() => setShowCompiler(false)}
           >
-            &times;
+            Close
           </button>
           <OnlineCompiler /> {/* Display Online Compiler inside the sliding panel */}
         </div>

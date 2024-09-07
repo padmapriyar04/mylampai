@@ -691,6 +691,7 @@ const InterviewComponent = () => {
         handleBackClick={handleBackClick}
         setSelectedJobProfile={setSelectedJobProfile}
         setManualJobDescription={setManualJobDescription}
+        websocketRef={websocketRef}
       />
       )}
 
