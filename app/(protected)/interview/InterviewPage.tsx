@@ -3,6 +3,8 @@ import AudioToText from './recording'; // Assuming you have an AudioToText compo
 import Analysis from './Analysis'; // Import the Analysis component
 import OnlineCompiler from './OnlineCompiler'; // Import the OnlineCompiler component
 import { PiChatsThin } from 'react-icons/pi'; // Assuming this icon is from react-icons, adjust as necessary.
+import Link from "next/link";
+import { RiEmotionUnhappyLine, RiEmotionNormalLine, RiEmotionLine } from "react-icons/ri";
 
 interface InterviewPageProps {
   isMicEnabled: boolean;
@@ -27,12 +29,13 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   handleTextSubmit,
   handleSendMessage,
   websocketRef,
-  analysisData, // Destructure analysisData
+  analysisData,
 }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'conversation' | 'audioToText'>('conversation');
-  const [showAnalysis, setShowAnalysis] = useState(false); // State to show Analysis component
-  const [showCompiler, setShowCompiler] = useState(false); // State to show Online Compiler component (slide in/out)
+  const [showCompiler, setShowCompiler] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false); // State to show feedback pop-up
+  const [feedbackIconClicked, setFeedbackIconClicked] = useState(false); // State for feedback icon click
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -50,7 +53,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 
     startVideoStream();
 
-    // Cleanup video stream on component unmount
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
@@ -59,13 +61,12 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     };
   }, []);
 
-  // Timer to show Analysis component after 20 minutes (optional)
   useEffect(() => {
     const timer = setTimeout(() => {
-      setShowAnalysis(true);
-    }, 20 * 60 * 1000); // 20 minutes in milliseconds
+      setShowFeedback(true);
+      setFeedbackIconClicked(true); // Mark feedback icon as clicked
+    }, 20 * 60 * 10000); // 20 minutes in milliseconds
 
-    // Cleanup timer on component unmount
     return () => clearTimeout(timer);
   }, []);
 
@@ -78,7 +79,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         <div className="font-medium text-lg">Technical Interview 1st round</div>
 
         <div className="flex items-center">
-          {/* View Analysis Button */}
           <button
             className="bg-primary text-white px-4 py-3 rounded-full font-semibold"
             onClick={() => {
@@ -87,7 +87,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
                   type: 'get_analysis', // Sending request to get analysis
                 })
               );
-              setShowAnalysis(true); // Show Analysis component when clicked
             }}
           >
             VIEW ANALYSIS
@@ -224,17 +223,45 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         </div>
       )}
 
-      {/* Show Analysis Component */}
-      {showAnalysis && analysisData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-11/12 h-5/6 overflow-auto scrollbar-hide">
-            <button
-              className="absolute top-4 right-4 text-xl font-bold text-gray-700 hover:text-gray-900"
-              onClick={() => setShowAnalysis(false)}
-            >
-              &times;
-            </button>
-            <Analysis analysisData={analysisData} /> {/* Show Analysis here */}
+      {/* Feedback Pop-Up */}
+      {
+      showFeedback && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-[40vw] min-w-[400px] min-h-[500px]">
+            {feedbackIconClicked && (
+              <Link
+                className="absolute transition top-4 right-4 text-3xl font-bold text-white hover:text-primary-foreground"
+                href="/analysis"
+              >
+                &times;
+              </Link>
+            )}
+            <div className='text-center'>
+            <h2 className="text-2xl font-bold mb-4 inline">A quick feedback and we'll guide you to your interview</h2>
+            <h2 className="text-2xl font-bold mb-4 inline text-primary"> Analysis!</h2>
+            </div>
+            <div className='flex flex-col justify-evenly'>
+              <div className='flex flex-col my-6'>
+                <div>How was your experience?</div>
+                <div className='flex justify-evenly p-10 text-6xl'>
+                  <button onClick={() => setFeedbackIconClicked(true)}> <RiEmotionLine /> </button>
+                  <button onClick={() => setFeedbackIconClicked(true)}> <RiEmotionNormalLine /> </button>
+                  <button onClick={() => setFeedbackIconClicked(true)}> <RiEmotionUnhappyLine /> </button>
+                </div>
+              </div>
+
+              <p className="mb-4">Please provide your feedback about the interview experience.</p>
+              <textarea
+                className="w-full h-20 p-2 border border-gray-300 rounded-lg resize-none mb-4"
+                placeholder="Your feedback here(optional)..."
+              />
+              <button
+                className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-600 transition"
+                onClick={() => setShowFeedback(false)}
+              >
+                Submit Feedback
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -252,7 +279,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
           >
             &times;
           </button>
-          <OnlineCompiler /> {/* Display Online Compiler inside the sliding panel */}
+          <OnlineCompiler />
         </div>
       </div>
     </div>
