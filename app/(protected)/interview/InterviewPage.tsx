@@ -213,20 +213,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
               >
                 Send Answer
               </button>
-
-              <button
-                id="getAnalysisButton"
-                className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 transition"
-                onClick={() => {
-                  websocketRef.current?.send(
-                    JSON.stringify({
-                      type: 'get_analysis',
-                    })
-                  );
-                }}
-              >
-                Get Analysis
-              </button>
             </div>
           </div>
         </div>
@@ -240,8 +226,8 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 
       {/* Show Analysis Component */}
       {showAnalysis && analysisData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-11/12 h-5/6 overflow-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-11/12 h-5/6 overflow-auto scrollbar-hide">
             <button
               className="absolute top-4 right-4 text-xl font-bold text-gray-700 hover:text-gray-900"
               onClick={() => setShowAnalysis(false)}
@@ -255,7 +241,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 
       {/* Sliding Online Compiler */}
       <div
-        className={`fixed inset-y-0 right-0 w-1/2 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
+        className={`fixed inset-y-0 right-0 w-3/4 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
           showCompiler ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

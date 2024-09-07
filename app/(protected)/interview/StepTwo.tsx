@@ -182,9 +182,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
         </div>
         <div className="mt-8 w-full px-4 flex flex-col items-center">
           <button
-            className={`w-[40vw] max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-              isNextEnabled ? 'bg-gray-600 hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'
-            }`}
+            className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] lg:max-h-[70px] flex justify-center items-center h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${isNextEnabled ? "bg-gray-600 text-white hover:bg-gray-800" : "bg-gray-300 text-gray-800 cursor-not-allowed"}`}
             disabled={!isNextEnabled}
             onClick={handleNextClick}
           >

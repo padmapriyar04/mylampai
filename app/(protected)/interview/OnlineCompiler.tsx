@@ -104,7 +104,7 @@ export default function OnlineCompiler() {
       </div>
 
       {/* Main Layout for Editor and Output */}
-      <div className="grid grid-cols-1 md:grid-cols-[70%,30%] gap-12 min-h-[calc(100vh-10rem)]">
+      <div className="grid grid-cols-1 md:grid-cols-[70%,30%] gap-4 min-h-[calc(100vh-10rem)]">
         {/* Code Editor Section */}
         <div className="bg-white dark:bg-gray-800 dark:text-white p-6 shadow-2xl rounded-lg flex flex-col justify-between border border-gray-300 dark:border-gray-600">
           <div className="mb-6">
