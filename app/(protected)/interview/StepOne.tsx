@@ -13,6 +13,7 @@ interface StepOneProps {
   handleDeleteResume: () => void;
   handleNextClick: () => void;
   handleBackClick: () => void;
+  setResumeFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
 const StepOne: React.FC<StepOneProps> = ({
@@ -24,7 +25,8 @@ const StepOne: React.FC<StepOneProps> = ({
   handleDrop,
   handleDeleteResume,
   handleNextClick,
-  handleBackClick
+  handleBackClick,
+  setResumeFile,
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -132,13 +134,13 @@ const StepOne: React.FC<StepOneProps> = ({
           </h3>
         </div>
 
-        <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] lg:max-h-[280px] shadow-lg text-center">
+        <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] lg:max-h-[260px] shadow-lg text-center">
           <div className="flex items-center justify-center text-primary mb-5 relative top-0 text-3xl">
             <IoDocumentAttach />
           </div>
 
           {resumeFile ? (
-            <div className="text-center text-gray-600 font-semibold relative h-[150px] flex items-center justify-center">
+            <div className="text-center text-gray-600 font-semibold relative h-[135px] flex items-center justify-center">
               Resume Uploaded: {resumeFile.name}
               <button
                 className="absolute top-[44%] right-6 text-gray-600 hover:text-red-600 focus:outline-none"
@@ -149,14 +151,14 @@ const StepOne: React.FC<StepOneProps> = ({
             </div>
           ) : (
             <div
-              className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white h-[150px]"
+              className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white h-[150px] lg:h-[135px]"
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, setResumeFile)}
             >
-              <p className="text-gray-500 mt-2 text-sm">Drag & Drop or</p>
+              <p className="text-gray-500 mt-2 text-sm lg:text-xs">Drag & Drop or</p>
               <label
                 htmlFor="resumeUpload"
-                className="text-gray-500 cursor-pointer text-sm"
+                className="text-gray-500 cursor-pointer text-sm lg:text-xs"
               >
                 Click to <span className="font-semibold text-gray-700">Upload Resume</span>
               </label>
@@ -173,7 +175,7 @@ const StepOne: React.FC<StepOneProps> = ({
                 <IoCloudUploadOutline />
               </div>
 
-              <p className="text-gray-400 text-sm mt-3">
+              <p className="text-gray-400 text-sm mt-3 lg:text-xs">
                 Supported file formats: DOC, DOCX, PDF. File size limit 10 MB.
               </p>
             </div>
@@ -182,7 +184,7 @@ const StepOne: React.FC<StepOneProps> = ({
           {/* Upload Button */}
           <div className="flex justify-center mt-2">
             <button
-              className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl ${resumeFile ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
+              className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px] flex items-center justify-center ${resumeFile ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
               onClick={handleUploadClick}
               disabled={!!resumeFile || isUploading}
             >
@@ -193,7 +195,7 @@ const StepOne: React.FC<StepOneProps> = ({
 
         <div className="mt-8 w-full px-4 flex flex-col items-center">
           <button
-            className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? "bg-gray-600 text-black hover:bg-gray-800 text-white" : "bg-gray-300 text-gray-800 cursor-not-allowed"}`}
+            className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] lg:max-h-[70px] flex justify-center items-center h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile ? "bg-gray-600 text-white hover:bg-gray-800" : "bg-gray-300 text-gray-800 cursor-not-allowed"}`}
             disabled={!resumeFile || isUploading}
             onClick={handleNextClick}
           >

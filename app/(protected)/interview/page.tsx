@@ -293,12 +293,12 @@ const InterviewComponent = () => {
 
     if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
         setIsUploading(true); // Set uploading to true when starting upload
-
+        
         setResumeFile(file);
         const base64 = await fileToBase64(file);
         localStorage.setItem('resumeFile', base64);
         setCvText(file.name); // Update the display text to show the uploaded file name
-
+        
         // Send the resume to the WebSocket
         const reader = new FileReader();
         reader.onload = async (e) => {
@@ -311,6 +311,7 @@ const InterviewComponent = () => {
                         cv_data: Array.from(new Uint8Array(binaryData)),
                     })
                 );
+                toast.success("Resume uploaded successfully!");       
             } else {
                 console.error("WebSocket is not initialized");
             }
@@ -671,6 +672,7 @@ const InterviewComponent = () => {
           handleDeleteResume={handleDeleteResume}
           handleNextClick={handleNextClick}
           handleBackClick={handleBackClick}
+          setResumeFile={setResumeFile}
         />
       </div>
       )}
