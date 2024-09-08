@@ -65,7 +65,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     const timer = setTimeout(() => {
       setShowFeedback(true);
       setFeedbackIconClicked(true); // Mark feedback icon as clicked
-    }, 20 * 1000); // 20 minutes in milliseconds
+    }, 20 * 60 * 1000); // 20 minutes in milliseconds
 
     return () => clearTimeout(timer);
   }, []);
