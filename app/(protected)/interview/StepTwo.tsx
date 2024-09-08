@@ -160,7 +160,65 @@ const StepTwo: React.FC<StepTwoProps> = ({
       </div>
 
       <div className="w-full md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
-        
+      <div className="w-full flex flex-col items-center mb-2">
+          <div>
+            <p className="text-2xl font-bold text-primary mb-2">Get Started!</p>
+          </div>
+          <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
+            {/* Progress Bar */}
+            <div className="relative flex-1">
+              <div className={`w-8 h-8 ${isResumeUploaded ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
+                {isResumeUploaded ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-white"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                ) : (
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                )}
+              </div>
+              <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${isResumeUploaded ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+            </div>
+            {/* Step 2 */}
+            <div className="relative flex-1">
+              <div
+                className={`w-8 h-8 ${isNextEnabled || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}
+              >
+                {isNextEnabled || isManualEntry ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-white"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                ) : (
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                )}
+              </div>
+              <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${isNextEnabled || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+            </div>
+            {/* Step 3 */}
+            <div className="relative flex items-center">
+              <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                <div className="w-3 h-3 bg-white rounded-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
         <h3 className="text-sm xl:text-2xl mb-6 font-bold text-gray-800">Choose your Interview Profile</h3>
 
         {/* Combined Dropdown and Upload/Other Section */}
