@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, DragEvent } from 'react';
 import { IoCloudUploadOutline, IoDocumentAttach } from 'react-icons/io5';
 import { FiX } from 'react-icons/fi';
 import * as pdfjsLib from 'pdfjs-dist';
+import Image from 'next/image';
 
 interface StepTwoProps {
   JD: string;
@@ -154,9 +155,25 @@ const StepTwo: React.FC<StepTwoProps> = ({
   };
 
   return (
-    <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row md:justify-between">
-      <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
-        {/* Some content for left section */}
+    <div className="max-w-[1200px] w-full flex flex-col items-center md:flex-row md:justify-between">
+      <div className="max-w-[410px] w-[90vw] md:mt-[8vh] md:w-[29vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative md:left-[35px]">
+        <Image
+          src={"/images/Globe.svg"}
+          className="w-full h-auto"
+          alt="image"
+          width={100}
+          height={100}
+        />
+        <div className="relative flex flex-col items-center mt-auto">
+          <h2 className="text-xl font-bold text-center leading-snug">
+            Take the wiZe AI mock Interview
+          </h2>
+          <p className="mt-2 text-center text-sm leading-relaxed">
+            You&apos;ll be taking a 20-minute interview to have your skills
+            evaluated. Just relax and take the interview.{" "}
+            <span className="font-semibold"> All the best!</span>
+          </p>
+        </div>
       </div>
 
       <div className="w-full md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
@@ -284,9 +301,9 @@ const StepTwo: React.FC<StepTwoProps> = ({
             <textarea
               value={manualJobDescription}
               onChange={(e) => handleManualDescriptionChange(e.target.value)}
-              className="mt-4 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary w-full"
+              className="mt-4 p-4 border text-center flex items-center justify-center border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary w-full"
               rows={5}
-              placeholder="Enter Job Description"
+              placeholder="Please Enter Job Description (word limit is 1000 words)."
             />
           )}
 
