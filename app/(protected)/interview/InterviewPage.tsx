@@ -36,8 +36,37 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   const [showCompiler, setShowCompiler] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false); // State to show feedback pop-up
   const [feedbackIconClicked, setFeedbackIconClicked] = useState(false); // State for feedback icon click
+  const [timeRemaining, setTimeRemaining] = useState(25); // 20 minutes in seconds
+  const [interviewEnded, setInterviewEnded] = useState(false); // To track if interview ended
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false); // Track if feedback is submitted
 
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Start timer when the loading element disappears
+  useEffect(() => {
+    if (!loading && timeRemaining > 0 && !interviewEnded) {
+      const timer = setInterval(() => {
+        setTimeRemaining((prev) => prev - 1);
+      }, 1000); // Decrement every second
+
+      return () => clearInterval(timer); // Cleanup on unmount
+    } else if (timeRemaining === 0 && !interviewEnded) {
+      // Trigger actions when the time is up
+      setInterviewEnded(true);  // Mark interview as ended
+      websocketRef.current?.send(
+        JSON.stringify({
+          type: 'get_analysis', // Request analysis
+        })
+      );
+      setShowFeedback(true); // Show feedback form
+    }
+  }, [loading, timeRemaining, interviewEnded]);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     const startVideoStream = async () => {
@@ -61,15 +90,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowFeedback(true);
-      setFeedbackIconClicked(true); // Mark feedback icon as clicked
-    }, 20 * 60 * 1000); // 20 minutes in milliseconds
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground">
       <nav className="flex justify-between items-center bg-white shadow-md p-4">
@@ -79,7 +99,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         <div className="font-medium text-lg">Technical Interview 1st round</div>
 
         <div className="flex items-center">
-          <button
+          {/* <button
             className="bg-primary text-white px-4 py-3 rounded-full font-semibold"
             onClick={() => {
               websocketRef.current?.send(
@@ -90,7 +110,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
             }}
           >
             VIEW ANALYSIS
-          </button>
+          </button> */}
           <button
             className="bg-indigo-500 text-white px-4 py-3 rounded-full font-semibold ml-4"
             onClick={() => setShowCompiler(!showCompiler)} // Toggle the compiler modal (slide)
@@ -101,9 +121,21 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
           <button className="mr-6" onClick={() => setIsChatOpen(!isChatOpen)}>
             <PiChatsThin className="w-10 h-10 text-gray-600" />
           </button>
+          <span className="text-gray-600 text-sm mr-4">
+            Time Remaining: {formatTime(timeRemaining)}
+          </span>
+
           <button
             className="bg-red-500 text-white px-4 py-3 rounded-full font-semibold"
-            onClick={() => window.close()}
+            onClick={() => {
+              setInterviewEnded(true);
+              websocketRef.current?.send(
+                JSON.stringify({
+                  type: 'get_analysis', // Request analysis when manually ended
+                })
+              );
+              setShowFeedback(true); // Show feedback form
+            }}
           >
             END INTERVIEW
           </button>
@@ -224,8 +256,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       )}
 
       {/* Feedback Pop-Up */}
-      {
-      showFeedback && (
+      {showFeedback && !feedbackSubmitted && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-[40vw] min-w-[400px] min-h-[500px]">
             {feedbackIconClicked && (
@@ -236,32 +267,50 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
                 &times;
               </Link>
             )}
-            <div className='text-center'>
-            <h2 className="text-2xl font-bold mb-4 inline">A quick feedback and we'll guide you to your interview</h2>
-            <h2 className="text-2xl font-bold mb-4 inline text-primary"> Analysis!</h2>
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-4 inline">A quick feedback and we'll guide you to your interview</h2>
+              <h2 className="text-2xl font-bold mb-4 inline text-primary"> Analysis!</h2>
             </div>
-            <div className='flex flex-col justify-evenly'>
-              <div className='flex flex-col my-6'>
+            <div className="flex flex-col justify-evenly">
+              <div className="flex flex-col my-6">
                 <div>How was your experience?</div>
-                <div className='flex justify-evenly p-10 text-6xl'>
-                  <button onClick={() => setFeedbackIconClicked(true)}> <RiEmotionLine /> </button>
-                  <button onClick={() => setFeedbackIconClicked(true)}> <RiEmotionNormalLine /> </button>
-                  <button onClick={() => setFeedbackIconClicked(true)}> <RiEmotionUnhappyLine /> </button>
+                <div className="flex justify-evenly p-10 text-6xl">
+                  <button onClick={() => setFeedbackIconClicked(true)}>
+                    <RiEmotionLine />
+                  </button>
+                  <button onClick={() => setFeedbackIconClicked(true)}>
+                    <RiEmotionNormalLine />
+                  </button>
+                  <button onClick={() => setFeedbackIconClicked(true)}>
+                    <RiEmotionUnhappyLine />
+                  </button>
                 </div>
               </div>
 
               <p className="mb-4">Please provide your feedback about the interview experience.</p>
               <textarea
                 className="w-full h-20 p-2 border border-gray-300 rounded-lg resize-none mb-4"
-                placeholder="Your feedback here(optional)..."
+                placeholder="Your feedback here (optional)..."
               />
               <button
                 className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-600 transition"
-                onClick={() => setShowFeedback(false)}
+                onClick={() => {
+                  setShowFeedback(false); // Hide feedback form
+                  setFeedbackSubmitted(true); // Mark feedback as submitted
+                }}
               >
                 Submit Feedback
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Show Analysis after Feedback */}
+      {feedbackSubmitted && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-[80vw] min-w-[600px]">
+            <Analysis analysisData={analysisData} />
           </div>
         </div>
       )}
@@ -274,7 +323,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       >
         <div className="relative p-6">
           <button
-           className="absolute right-4 mt-8 mr-4 py-2 px-4 text-sm md:text-base rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-lg"
+            className="absolute right-4 mt-8 mr-4 py-2 px-4 text-sm md:text-base rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-lg"
             onClick={() => setShowCompiler(false)}
           >
             Close
