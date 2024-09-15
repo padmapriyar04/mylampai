@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "/subscriptions/3875401d-c909-44be-9637-cb0c181b6ef1/resourceGroups/AI_Tools/providers/Microsoft.Web/sites/mylamp-ai",
-    "appService.deploySubpath": "."
-}
