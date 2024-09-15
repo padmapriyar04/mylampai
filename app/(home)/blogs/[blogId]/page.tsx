@@ -4,6 +4,7 @@ import { FaHome } from "react-icons/fa";
 import Image from 'next/image';
 import Footer from '@/components/home/Footer';
 import Carousel from "./crousal";
+
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn, FaThumbsUp, FaShare, FaDownload } from 'react-icons/fa';
 interface BlogPostbyId {
     title: string;
@@ -31,6 +32,7 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
     const [blog, setBlog] = useState<Blog[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
     const [newerror, setNewError] = useState<string | null>(null);
     const { blogId } = params;
 
@@ -90,11 +92,7 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
     }, [showMore]);
 
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error}</p>;
-    if (!blogPost) return <p>No blog post found.</p>;
 
-    const [currentIndex, setCurrentIndex] = useState(0);
     const itemsToShow = 4;
     const numberOfItems = blog.length;
 
@@ -105,13 +103,16 @@ export default function BlogId({ params }: { params: { blogId: string } }) {
         return () => clearInterval(interval);
     }, [numberOfItems, itemsToShow]);
 
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error}</p>;
+    if (!blogPost) return <p>No blog post found.</p>;
 
     return (
-        <div className='w-full min-h-[100vh] bg-[#000000] flex flex-col'>
+        <div className='w-full min-h-[100vh] bg-[#202020] flex flex-col'>
             <div className='w-full h-fit border-b-[2px] border-b-white fixed top-0 left-0 z-10'>
             </div>
             <div className='w-full flex-1 text-white flex flex-col md:flex-row justify-between mt-[4rem] px-8 md:px-32 py-16'>
-                <div className='text-white w-full md:w-[40%] flex flex-col gap-4 bg-black mx-2 p-4 rounded-xl'>
+                <div className='text-white w-full md:w-[40%] flex flex-col gap-4 mx-2 p-4 rounded-xl'>
                     <div className='w-full flex flex-col gap-1'>
                         <div className='w-full flex flex-row gap-1 my-8'>
                             <FaHome size={24} color='#8C52FF' />

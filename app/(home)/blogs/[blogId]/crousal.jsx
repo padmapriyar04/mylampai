@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 
 const carouselItems = [
@@ -7,7 +8,6 @@ const carouselItems = [
   { id: 4, title: 'Resource 4', description: 'Description for Resource 4', image: '/blog/instructor.svg ' },
   { id: 5, title: 'Resource 5', description: 'Description for Resource 5', image: '/blog/instructor.svg' },
   { id: 5, title: 'Resource 5', description: 'Description for Resource 5', image: '/blog/instructor.svg' },
-  // Add more items if needed
 ];
 
 const Carousel = () => {
@@ -30,7 +30,7 @@ const Carousel = () => {
           {carouselItems.map((item) => (
             <div key={item.id} className='flex-none w-[calc(100% / 4)] shadow-xl p-4'>
               <div className='bg-white shadow-xl rounded-sm overflow-hidden flex flex-col items-center'>
-                <img src={item.image} alt={item.title} className='w-full rounded-lg max-w-[300px] h-48 object-cover mb-3' />
+                <Image height={100} width={100} src={item.image} alt={item.title} className='w-full rounded-lg max-w-[300px] h-48 object-cover mb-3' />
                 <div className='p-4 text-center'>
                   <h3 className='text-lg font-semibold text-gray-800 mb-2'>{item.title}</h3>
                   <p className='text-gray-600'>{item.description}</p>

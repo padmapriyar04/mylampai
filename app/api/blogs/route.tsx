@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
 import { NextRequest, NextResponse } from "next/server";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
+import prisma from "@/lib";
 
-export const GET = async (request: NextRequest, res: NextResponse) => {
+export const GET = async (req: NextRequest) => {
   try {
     const posts = await prisma.blog.findMany({
       include: {
@@ -16,21 +15,40 @@ export const GET = async (request: NextRequest, res: NextResponse) => {
   }
 };
 
-export const POST = async (req: NextRequest, res: NextResponse) => {
-  const authHeader = req.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return NextResponse.json({ message: "Authorization header missing or malformed" }, { status: 401 });
-  }
-  const token = authHeader.split(' ')[1];
-  const { title, description, authorName, position, readtime, sections, tags } = await req.json();
+export const POST = async (req: NextRequest) => {
   try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string) as { role: string };
+    const authHeader = req.headers.get("authorization");
 
-    // Check if the user has admin privileges
-    if (decodedToken.role !== 'admin') {
-      return NextResponse.json({ message: "Forbidden: Admins only" }, { status: 403 });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { message: "Unauthorized: Missing token" },
+        { status: 401 }
+      );
     }
-    const post = await prisma.blog.create({
+    const token = authHeader.split(" ")[1];
+    const {
+      title,
+      description,
+      authorName,
+      position,
+      readtime,
+      sections,
+      tags,
+    } = await req.json();
+
+    const decodedToken = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as { role: string };
+
+    if (decodedToken.role !== "admin") {
+      return NextResponse.json(
+        { message: "Unauthorized: Insufficient privileges" },
+        { status: 403 }
+      );
+    }
+
+    await prisma.blog.create({
       data: {
         title,
         description,
@@ -46,11 +64,10 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         },
       },
     });
-    return NextResponse.json({ message: "Success", post }, { status: 201 });
+
+    return NextResponse.json({ message: "Blog created successfully", isCreated: true }, { status: 201 });
   } catch (err) {
-    if (err instanceof jwt.JsonWebTokenError) {
-      return NextResponse.json({ message: "Unauthorized: Invalid token" }, { status: 401 });
-    }
+    console.log(err);
     return NextResponse.json({ message: "Error", err }, { status: 500 });
   }
 };

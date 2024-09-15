@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 interface BlogPost {
   id: string;
@@ -70,9 +71,10 @@ export default function BlogList() {
           </h2>
         </div>
         <div className="w-full h-full flex flex-wrap justify-center items-center gap-10 p-6">
-          {blogPosts.map((post) => (
-            <div
-              key={post.id}
+          {blogPosts && blogPosts.map((post, ind) => (
+            <Link
+              href={`/blogs/${post.id}`}
+              key={ind}
               className="bg-white overflow-hidden w-full sm:w-80 md:w-72 lg:w-64 xl:w-96 h-auto lg:h-[32rem] p-4 space-y-4"
             >
               <Image
@@ -123,7 +125,7 @@ export default function BlogList() {
                   Read More
                 </button>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
