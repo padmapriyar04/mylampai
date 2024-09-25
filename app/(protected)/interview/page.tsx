@@ -22,13 +22,6 @@ import InterviewPage from './InterviewPage';
 import StepOne from './StepOne';
 import StepTwo from './StepTwo';
 
-// import type { Metadata } from "next";
-
-// export const metadata: Metadata = {
-//     title: "MyLampAi - Interview",
-//     description: "MyLampAi - Home Page",
-// };
-
 const InterviewComponent = () => {
   const { changeRoute } = useRouterStore(); // for hiding the default navbar in interview section
   const [isMounted, setIsMounted] = useState(false);
