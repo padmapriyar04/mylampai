@@ -36,7 +36,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   const [showCompiler, setShowCompiler] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false); // State to show feedback pop-up
   const [feedbackIconClicked, setFeedbackIconClicked] = useState(false); // State for feedback icon click
-  const [timeRemaining, setTimeRemaining] = useState(25); // 20 minutes in seconds
+  const [timeRemaining, setTimeRemaining] = useState(1200); // 20 minutes in seconds
   const [interviewEnded, setInterviewEnded] = useState(false); // To track if interview ended
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false); // Track if feedback is submitted
 

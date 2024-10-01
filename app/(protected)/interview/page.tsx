@@ -21,6 +21,8 @@ import { FiX } from "react-icons/fi"; // Import the FiX icon
 import InterviewPage from './InterviewPage';
 import StepOne from './StepOne';
 import StepTwo from './StepTwo';
+import OnlineCompiler from './OnlineCompiler';
+
 
 // import type { Metadata } from "next";
 
@@ -73,6 +75,9 @@ const InterviewComponent = () => {
     isCameraEnabled && isMicEnabled && isSoundEnabled;
 
   const websocketRef = useRef<WebSocket | null>(null);
+  const [codingQuestion, setCodingQuestion] = useState<string | null>(null);
+const [isCompilerOpen, setIsCompilerOpen] = useState(false);
+
 
   const jobProfiles = [
     "Software Engineer",
@@ -169,7 +174,12 @@ const InterviewComponent = () => {
           ]);
           setTextToSpeak(data.question);
           setLoading(false); // Stop loading when the question is received
-        } else if (data.type === "interview_end") {
+        } 
+        else if (data.type === "coding_question") {
+          console.log("Coding question received:", data.message);
+          setCodingQuestion(data.message);
+          setIsCompilerOpen(true);
+        }else if (data.type === "interview_end") {
           console.log("Interview ended:", data.message);
           setChatMessages((prevMessages) => [
             ...prevMessages,
@@ -639,22 +649,40 @@ const InterviewComponent = () => {
     }
   };
 
-  if (isInterviewStarted) {
+  if (isInterviewStarted && !isCompilerOpen) {
     return (
       <InterviewPage
-      isMicEnabled={isMicEnabled}
-      isSpeaking={isSpeaking}
-      isMicTestCompleted={isMicTestCompleted}
-      chatMessages={chatMessages}
-      audioTextInputs={audioTextInputs}
-      loading={loading}
-      handleTextSubmit={handleTextSubmit}
-      handleSendMessage={handleSendMessage}
-      websocketRef={websocketRef}
-      analysisData={analysisData}
-    />
+        isMicEnabled={isMicEnabled}
+        isSpeaking={isSpeaking}
+        isMicTestCompleted={isMicTestCompleted}
+        chatMessages={chatMessages}
+        audioTextInputs={audioTextInputs}
+        loading={loading}
+        handleTextSubmit={handleTextSubmit}
+        handleSendMessage={handleSendMessage}
+        websocketRef={websocketRef}
+        analysisData={analysisData}
+      />
     );
   }
+
+  if (isCompilerOpen) {
+    return (
+      <div className="min-h-screen p-6 md:p-8 bg-light-gray">
+        <h2 className="text-2xl font-bold mb-4">Coding Question</h2>
+        <p className="mb-6">{codingQuestion}</p>
+        <OnlineCompiler />
+       
+        <button
+          onClick={() => setIsCompilerOpen(false)}
+          className="mt-4 py-2 px-4 bg-red-500 text-white rounded"
+        >
+          Close Compiler
+        </button>
+      </div>
+    );
+  }
+  
   
 
   return (
