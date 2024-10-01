@@ -11,6 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import Link from "next/link";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -107,19 +108,29 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
   };
 
   return (
-    <div className="p-8 bg-white rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Your Analysis</h2>
+    <div className="p-8 bg-white rounded-lg h-[100vh] w-full">
+      <div className='flex justify-center items-center mb-8'>
+      <div className="flex items-center justify-center absolute left-8">
+        <Link href="/">
+          <img src="/home/logo.svg" alt="wiZe Logo" className="h-auto w-48 ml-2" />
+        </Link>
+      </div>
+      <h2 className="text-3xl font-bold  flex justify-center flex-col">Your Analysis
+      <div className='w-full h-1 bg-primary rounded-full'></div>
+      </h2>
+      
+      </div>
 
       {/* Add a scrollable container */}
       <div
-        style={{ maxHeight: '400px', overflowY: 'scroll' }}
-        className="scrollbar-thin scrollbar-thumb-rounded-lg scrollbar-thumb-gray-400"
+        style={{ maxHeight: '600px', overflowY: 'scroll' }}
+        className="scrollbar-thin scrollbar-thumb-rounded-lg scrollbar-thumb-gray-400 scrollbar-hide border-2 rounded-lg border-primary p-6"
       >
         {/* Loop through all analysis data */}
         {analysisData.map((analysisItem, index) => (
           <div
             key={index}
-            className="mb-8 border-2 p-10 rounded-xl border-primary-foreground"
+            className="mb-8 border-2 p-10 rounded-xl border-primary-foreground shadow-lg"
           >
             {/* Answer and Question */}
             <div className="mt-6 bg-primary rounded-lg border-4 border-primary-foreground shadow-lg p-4 text-lg text-white">

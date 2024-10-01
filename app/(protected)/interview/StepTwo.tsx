@@ -250,10 +250,10 @@ const StepTwo: React.FC<StepTwoProps> = ({
         <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] lg:max-h-[280px] shadow-lg text-center flex flex-col items-center">
           <select
             id="jobProfileDropdown"
-            className="w-full p-4 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full transition p-4 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             value={selectedJobProfile}
             onChange={(e) => handleProfileChange(e.target.value)}
-          >
+          > 
             <option value="" disabled={!!selectedJobProfile}>
               Select a profile
             </option>
@@ -264,6 +264,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
             ))}
             <option value="Upload JD as PDF">Upload JD as PDF</option>
             <option value="Other">Other</option>
+            
           </select>
 
           {/* Show PDF upload box when selected */}
@@ -309,7 +310,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
             <textarea
               value={manualJobDescription}
               onChange={(e) => handleManualDescriptionChange(e.target.value)}
-              className="mt-4 p-4 border text-center flex items-center justify-center border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary w-full"
+              className="mt-4 p-4 border text-center flex items-center justify-center border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary w-full transition"
               rows={5}
               placeholder="Please Enter Job Description (word limit is 1000 words)."
             />
