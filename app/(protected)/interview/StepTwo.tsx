@@ -294,7 +294,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                     onChange={handleJDUpload}
                   />
 
-                  <div className="text-4xl mt-3 text-gray-300">
+                  <div className="text-4xl mt-3 flex justify-center text-gray-300">
                     <IoCloudUploadOutline />
                   </div>
 

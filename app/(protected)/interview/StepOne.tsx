@@ -184,7 +184,7 @@ const StepOne: React.FC<StepOneProps> = ({
           {/* Upload Button */}
           <div className="flex justify-center mt-2">
             <button
-              className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px] flex items-center justify-center ${resumeFile ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
+              className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px] flex items-center justify-center ${resumeFile && !isUploading ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
               onClick={handleUploadClick}
               disabled={!!resumeFile || isUploading}
             >

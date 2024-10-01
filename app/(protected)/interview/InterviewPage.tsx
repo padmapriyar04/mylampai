@@ -97,11 +97,13 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground">
-      <nav className="flex justify-between items-center bg-white shadow-md p-4">
-        <div className="flex items-center">
+      <nav className="flex items-center justify-between bg-white shadow-md p-4">
+        <div className='flex gap-8'>
+        <div className="flex items-center justify-center">
           <img src="/home/logo.svg" alt="wiZe Logo" className="h-auto w-48 ml-2" />
         </div>
-        <div className="font-medium text-lg">Technical Interview 1st round</div>
+        <div className="font-semibold text-xl flex justify-center items-center ">Technical Interview 1st round</div>
+        </div>
 
         <div className="flex items-center">
           {/* <button
