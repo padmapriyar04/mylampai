@@ -268,7 +268,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
 
           {/* Show PDF upload box when selected */}
           {showUploadBox && (
-            <div className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white h-[150px] mt-4">
+            <div className="border-dashed border-2 border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center bg-white h-[160px] mt-4">
               {jdFile ? (
                 <div className="text-center text-gray-600 font-semibold relative h-[150px] flex items-center justify-center">
                   Job Description Uploaded: {jdFile.name}
@@ -294,7 +294,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                     onChange={handleJDUpload}
                   />
 
-                  <div className="text-4xl mt-3 text-gray-300">
+                  <div className="text-4xl mt-3 flex justify-center text-gray-300">
                     <IoCloudUploadOutline />
                   </div>
 

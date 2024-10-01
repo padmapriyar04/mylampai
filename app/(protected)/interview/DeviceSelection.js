@@ -134,17 +134,26 @@ const DeviceSelection = ({
           </div>
           {/* Step 2 */}
           <div className="relative flex-1">
-            <div className={`w-8 h-8 ${isMicEnabled ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}>
-              {isMicEnabled ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                </svg>
-              ) : (
-                <div className="w-3 h-3 bg-white rounded-full"></div>
-              )}
+              <div
+                className={`w-8 h-8 bg-primary rounded-full flex items-center justify-center`}
+              >
+                
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-white"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                
+              </div>
+              <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-primary w-full z-0`}></div>
             </div>
-            <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${isMicEnabled ? "bg-primary w-full" : "bg-gray-400 w-full"} z-0`}></div>
-          </div>
           {/* Step 3 */}
           <div className="relative">
             <div className={`w-8 h-8 ${allDevicesConfigured ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}>

@@ -95,7 +95,7 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
     if (savedResume) {
       const file = base64ToFile(savedResume, 'resume.pdf');
       setResumeFile(file);
-      setIsUploading(true); // Set uploading to true if a resume is found on reload
+      setIsUploading(true);  // Set uploading to true if a resume is found on reload
       sendResumeToWebSocket(file);
     }
   
@@ -162,6 +162,7 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
         if (data.type === "cv_uploaded") {
           console.log("CV uploaded:", data.message);
           setIsUploading(false);
+          toast.success("Resume uploaded successfully!"); 
           setCvText(data.cv_text); // Update the state with CV text
         } else if (data.type === "jd_analyzed") {
           console.log("Job description analyzed:", data.message);
@@ -321,7 +322,7 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
                         cv_data: Array.from(new Uint8Array(binaryData)),
                     })
                 );
-                toast.success("Resume uploaded successfully!");       
+                      
             } else {
                 console.error("WebSocket is not initialized");
             }
@@ -331,7 +332,8 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
         alert("Please upload a valid DOC, DOCX, or PDF file.");
         setResumeFile(null);
         setCvText("");
-        setIsUploading(false); // Ensure uploading is turned off on error
+        setIsUploading(false);
+        // Ensure uploading is turned off on error
     }
 };
 
