@@ -39,7 +39,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   const [timeRemaining, setTimeRemaining] = useState(25); // 20 minutes in seconds
   const [interviewEnded, setInterviewEnded] = useState(false); // To track if interview ended
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false); // Track if feedback is submitted
-
+  const [clickedIndex, setClickedIndex] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Start timer when the loading element disappears
@@ -89,6 +89,11 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       }
     };
   }, []);
+  
+  const handleButtonClick = (index: number) => {
+    setClickedIndex(index); // Track which button was clicked
+    setFeedbackIconClicked(true); // Trigger feedback icon clicked state
+  };  
 
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground">
@@ -258,47 +263,54 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       {/* Feedback Pop-Up */}
       {showFeedback && !feedbackSubmitted && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-[40vw] min-w-[400px] min-h-[500px]">
-            {feedbackIconClicked && (
-              <Link
-                className="absolute transition top-4 right-4 text-3xl font-bold text-white hover:text-primary-foreground"
-                href="/analysis"
-              >
-                &times;
-              </Link>
-            )}
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-[40vw] min-w-[400px] min-h-[400px]">
+            
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-4 inline">A quick feedback and we'll guide you to your interview</h2>
               <h2 className="text-2xl font-bold mb-4 inline text-primary"> Analysis!</h2>
             </div>
             <div className="flex flex-col justify-evenly">
-              <div className="flex flex-col my-6">
-                <div>How was your experience?</div>
-                <div className="flex justify-evenly p-10 text-6xl">
-                  <button onClick={() => setFeedbackIconClicked(true)}>
-                    <RiEmotionLine />
-                  </button>
-                  <button onClick={() => setFeedbackIconClicked(true)}>
-                    <RiEmotionNormalLine />
-                  </button>
-                  <button onClick={() => setFeedbackIconClicked(true)}>
-                    <RiEmotionUnhappyLine />
-                  </button>
-                </div>
-              </div>
+            <div className="flex justify-evenly p-10 text-6xl">
+              <button
+                className={`hover:scale-110 hover:translate-y-[-10px] hover:text-primary transition ${
+                  clickedIndex === 0 ? 'text-primary scale-125' : ''
+                }`}
+                onClick={() => handleButtonClick(0)}
+              >
+                <RiEmotionLine />
+              </button>
+              <button
+                className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
+                  clickedIndex === 1 ? 'text-primary scale-125' : ''
+                }`}
+                onClick={() => handleButtonClick(1)}
+              >
+                <RiEmotionNormalLine />
+              </button>
+              <button
+                className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
+                  clickedIndex === 2 ? 'text-primary scale-125' : ''
+                }`}
+                onClick={() => handleButtonClick(2)}
+              >
+                <RiEmotionUnhappyLine />
+              </button>
+            </div>
 
               <p className="mb-4">Please provide your feedback about the interview experience.</p>
               <textarea
-                className="w-full h-20 p-2 border border-gray-300 rounded-lg resize-none mb-4"
+                className="w-full h-32 p-2 border border-gray-300 rounded-lg resize-none mb-4"
                 placeholder="Your feedback here (optional)..."
               />
               <button
-                className="bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-600 transition"
+                className={`text-white px-4 py-3 rounded-lg font-semibold transition ${feedbackIconClicked? "bg-primary hover:bg-purple-600" : "bg-gray-400"}`}
+                disabled={!feedbackIconClicked}
                 onClick={() => {
                   setShowFeedback(false); // Hide feedback form
                   setFeedbackSubmitted(true); // Mark feedback as submitted
                 }}
-              >
+              > 
+              
                 Submit Feedback
               </button>
             </div>
