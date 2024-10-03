@@ -22,7 +22,7 @@ export default function Career() {
           <div
             key={index}
             className={`bg-white w-full rounded-lg shadow-lg transition-all duration-300 ease-in-out overflow-hidden p-4 ${
-              expandedDiv === index ? "h-auto" : "h-[200px]"
+              expandedDiv === index ? "h-fit" : "h-[200px]"
             }`}
           >
             <div className="w-full flex mb-4">
@@ -32,7 +32,7 @@ export default function Career() {
               </div>
               <button
                 onClick={() => toggleExpand(index)}
-                className="bg-primary font-bold flex gap-[2px] justify-center items-center text-white px-2 py-2 text-[0.87vw] rounded absolute right-8 hover:bg-purple-600 transition w-24"
+                className="bg-primary font-bold flex gap-[2px] justify-center items-center text-white px-2 py-2 text-[0.87vw] rounded absolute right-8 hover:bg-purple-600 transition w-28"
               >
                 {expandedDiv === index ? "Show Less" : "Show More"}
                 <IoIosArrowDown />
