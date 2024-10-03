@@ -18,12 +18,12 @@ export default function Learn() {
 
                 <IntroCard />
 
-                <div className="md:h-full  w-full  md:justify-between p-4 md:flex hidden ">
-                  <div className="md:h-full  lg:w-[30%] h-52 md:w-[42%] w-full rounded-lg flex justify-center  md:flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden" title="Woman holding a mug">
+                <div className="md:h-full w-full  md:justify-between p-4 md:flex hidden ">
+                  <div className="md:h-full lg:w-[30%] h-52 md:w-[42%] w-full rounded-lg flex justify-center md:flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden" title="Woman holding a mug">
                     <Image
                       src="/robot002.svg"
                       alt="Verceldcjncn Logo"
-                      className="md:object-cover md:w-[400px] md:h-full h-40  rounded-lg "
+                      className="md:object-cover md:w-[400px] md:h-full h-40 rounded-lg "
                       width={200}
                       height={96}
                     />

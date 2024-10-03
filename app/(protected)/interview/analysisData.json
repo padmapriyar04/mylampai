@@ -1,0 +1,102 @@
+[
+    {
+        "question": "INTRODUCTION",
+        "answer": {},
+        "analysis": {
+            "line_analysis": [],
+            "overall_assessment": {
+                "overall_score": 0,
+                "strengths": [],
+                "areas_for_improvement": [],
+                "suggestions": []
+            }
+        }
+    },
+    {
+        "question": "PROJECT",
+        "answer": {},
+        "analysis": {
+            "line_analysis": [],
+            "overall_assessment": {
+                "overall_score": 0,
+                "strengths": [],
+                "areas_for_improvement": [],
+                "suggestions": []
+            }
+        }
+    },
+    {
+        "question": "CODING",
+        "answer": {},
+        "analysis": {
+            "line_analysis": [
+                {
+                    "line": "{}",
+                    "relevance": {
+                        "score": 0,
+                        "reasoning": "The answer is completely irrelevant to the question asked, which was about coding."
+                    },
+                    "clarity": {
+                        "score": 10,
+                        "reasoning": "The answer is clear and concise, consisting of a single pair of curly braces."
+                    },
+                    "depth": {
+                        "score": 0,
+                        "reasoning": "The answer provides no depth or detail about coding."
+                    },
+                    "professionalism": {
+                        "score": 10,
+                        "reasoning": "The answer is professional in its brevity and lack of unnecessary language."
+                    },
+                    "technical_accuracy": {
+                        "score": 0,
+                        "reasoning": "The answer is not technically accurate as it does not provide any information about coding."
+                    }
+                }
+            ],
+            "overall_assessment": {
+                "overall_score": 2,
+                "strengths": [
+                    "Clarity",
+                    "Professionalism"
+                ],
+                "areas_for_improvement": [
+                    "Relevance",
+                    "Depth",
+                    "Technical Accuracy"
+                ],
+                "suggestions": [
+                    "Provide a more relevant answer that demonstrates your knowledge of coding.",
+                    "Expand on your answer to provide more depth and detail.",
+                    "Ensure that your answer is technically accurate and reflects your understanding of the subject matter."
+                ]
+            }
+        }
+    },
+    {
+        "question": "TECHNICAL",
+        "answer": {},
+        "analysis": {
+            "line_analysis": [],
+            "overall_assessment": {
+                "overall_score": 0,
+                "strengths": [],
+                "areas_for_improvement": [],
+                "suggestions": []
+            }
+        }
+    },
+    {
+        "question": "OUTRO",
+        "answer": {},
+        "analysis": {
+            "line_analysis": [],
+            "overall_assessment": {
+                "overall_score": 0,
+                "strengths": [],
+                "areas_for_improvement": [],
+                "suggestions": []
+            }
+        }
+    }
+]

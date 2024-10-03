@@ -92,7 +92,6 @@ const DeviceSelection = ({
   return (
     <div className="md:h-[calc(100vh)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
     <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row md:justify-between">
-      {/* Left Section */}
       <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative ">
         <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-[19vh] md:h-[22vh] mb-2"></video>
         <div className="flex justify-between w-full text-sm mb-32">
@@ -110,7 +109,7 @@ const DeviceSelection = ({
           </span>
         </div>
         <p className="text-center text-lg font-bold leading-relaxed">
-          Take the wiinZe AI mock Interview
+          Take the wiZe AI mock Interview
         </p>
         <p className="text-center text-sm mt-2 leading-relaxed">
           You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
