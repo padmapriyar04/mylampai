@@ -256,7 +256,7 @@ const DeviceSelection = ({
                 </div>
                 <audio ref={videoRef} className="hidden" autoPlay></audio>
                 <div className="relative mb-4">
-                  <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
+                  <select className="block w-full pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
                     {audioOutputDevices.map((device) => (
                       <option key={device.deviceId} value={device.deviceId}>
                         {device.label || `Speaker ${device.deviceId}`}
@@ -279,7 +279,7 @@ const DeviceSelection = ({
           <button
            
               className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-              allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+              allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
 
             disabled={!allDevicesConfigured}
             onClick={handleNextClick}
