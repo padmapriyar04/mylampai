@@ -97,7 +97,7 @@ const StepOne: React.FC<StepOneProps> = ({
           {/* Step 2 */}
           <div className="relative flex-1">
             <div
-              className={`w-8 h-8 ${resumeFile ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}
+              className={`w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center`}
             >
               {resumeFile ? (
                 <svg
@@ -117,7 +117,7 @@ const StepOne: React.FC<StepOneProps> = ({
               )}
             </div>
             <div
-              className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? "bg-primary w-full" : "bg-gray-400 w-full"} z-0`}
+              className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-gray-400 w-full z-0`}
             ></div>
           </div>
           {/* Step 3 */}
@@ -184,7 +184,7 @@ const StepOne: React.FC<StepOneProps> = ({
           {/* Upload Button */}
           <div className="flex justify-center mt-2">
             <button
-              className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px] flex items-center justify-center ${resumeFile ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
+              className={`bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px] flex items-center justify-center ${resumeFile && !isUploading ? 'cursor-not-allowed bg-gray-400' : 'hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition'}`}
               onClick={handleUploadClick}
               disabled={!!resumeFile || isUploading}
             >
@@ -202,11 +202,10 @@ const StepOne: React.FC<StepOneProps> = ({
             Next
           </button>
           <button
-            className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
-            onClick={handleBackClick}
-            disabled={isUploading}
+            className="bg-transparent text-gray-700 w-full font-semibold h-12 py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
+            
           >
-            Back
+            
           </button>
         </div>
       </div>
