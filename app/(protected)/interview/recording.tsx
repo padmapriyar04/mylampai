@@ -69,7 +69,7 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit }) => {
   let recognition: SpeechRecognition | null = null;
 
   if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition ;
     recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -150,7 +150,7 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit }) => {
   return (
     <div className='absolute bottom-0 right-1/2 translate-x-1/2 '>
       {/* <p>Interim: {interimTranscript}</p> */}
-      <p>Final: {transcript}</p>
+      {/* <p>Final: {transcript}</p> */}
     </div>
   );
 };

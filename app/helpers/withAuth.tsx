@@ -2,7 +2,6 @@
 
 import { useEffect, ComponentType } from "react";
 import { useRouter } from "next/navigation";
-// import Cookies from "js-cookie";
 
 interface DecodedToken {
   role: string;
