@@ -1,3 +1,5 @@
+
+"use client"
 import React, { useState, ChangeEvent, DragEvent } from 'react';
 import Image from 'next/image';
 import { IoDocumentAttach, IoCloudUploadOutline } from 'react-icons/io5';

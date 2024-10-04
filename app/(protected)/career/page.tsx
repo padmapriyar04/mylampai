@@ -2,18 +2,29 @@
 import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import Link from "next/link";
+import { useRouter } from 'next/navigation'; // Updated import
 
 export default function Career() {
   const [expandedDiv, setExpandedDiv] = useState<number | null>(null);
   const [isRegistered, setISRegistered] = useState<number | null>(null);
+  const [isRegistering, setIsRegistering] = useState<number | null>(null);
+  const [isInterviewEnabled, setIsInterviewEnabled] = useState<number | null>(null);
 
   const toggleExpand = (index: number) => {
     setExpandedDiv(expandedDiv === index ? null : index);
   };
 
   const handleRegister = (index: number) => {
-    setISRegistered(isRegistered === index ? null : index);
+    setIsRegistering(index); // Start showing "Registering..."
+
+    // After 3 seconds, complete the registration
+    setTimeout(() => {
+      setIsRegistering(null); // Stop showing "Registering..."
+      setISRegistered(index); // Mark the registration as complete
+    }, 3000);
   };
+
+  const router = useRouter();
 
   return (
     <div className="bg-primary-foreground w-full flex justify-center p-4">
@@ -54,20 +65,7 @@ export default function Career() {
               <>
                 <div className="flex flex-col justify-evenly gap-6 h-[50%]">
                   <div className="w-full mt-4 text-sm font-light h-[90%]">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Pellentesque semper lectus urna. Proin orci nibh, porttitor
-                    rhoncus mauris sed, mollis vulputate dolor. Integer congue
-                    quam est, ac ornare tortor bibendum sit amet. Etiam rhoncus
-                    sem eu elit hendrerit faucibus. Sed lectus justo, euismod eu
-                    condimentum sed, imperdiet eu turpis. Fusce libero massa,
-                    sagittis et faucibus in, ultricies vel nisi. Aliquam in
-                    laoreet dolor, imperdiet luctus tellus. Suspendisse pretium
-                    pharetra neque a scelerisque. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Pellentesque semper lectus urna. Proin orci nibh, porttitor
-                    rhoncus mauris sed, mollis vulputate dolor. Integer congue
-                    quam est, ac ornare tortor bibendum sit amet. Etiam rhoncus
-                    sem eu elit hendrerit faucibus. Sed lectus justo, euismod eu
-                    condimentum sed, imperdiet eu turpis.
+                    yo
                   </div>
 
                   <div className="w-full h-[10%] flex items-center relative gap-2">
@@ -75,24 +73,18 @@ export default function Career() {
                       onClick={() => handleRegister(index)}
                       className="bg-green-500 font-bold flex gap-[2px] justify-center items-center text-white px-2 py-2 text-[0.93vw] rounded hover:bg-green-600 transition w-24"
                     >
-                      {isRegistered === index
-                        ? "Registering..."
-                        : "Register"}
+                      {/* Show "Registering..." if isRegistering is true, otherwise show "Register" */}
+                      {isRegistering === index ? "Registering..." : "Register"}
                     </button>
 
                     {/* CV Review Stage Link */}
                     <Link
-                      href="/cvreviewer"
+                      href={isRegistered === index ? "/stepone" : "#"}
                       className={`${
                         isRegistered === index
                           ? "bg-primary hover:bg-purple-600 cursor-pointer"
                           : "bg-gray-400 cursor-not-allowed"
                       } w-fit font-bold flex gap-[2px] justify-center items-center text-white px-2 py-2 text-[0.93vw] rounded transition`}
-                      onClick={(e) => {
-                        if (isRegistered !== index) {
-                          e.preventDefault();
-                        }
-                      }}
                     >
                       CV Review Stage
                     </Link>
@@ -101,13 +93,13 @@ export default function Career() {
                     <Link
                       href="/interview"
                       className={`${
-                        isRegistered === index
+                        isInterviewEnabled === index
                           ? "bg-primary hover:bg-purple-600 cursor-pointer"
                           : "bg-gray-400 cursor-not-allowed"
                       } w-fit font-bold flex gap-[2px] justify-center items-center text-white px-2 py-2 text-[0.93vw] rounded transition`}
                       onClick={(e) => {
-                        if (isRegistered !== index) {
-                          e.preventDefault();
+                        if (isInterviewEnabled !== index) {
+                          e.preventDefault(); // Prevent navigation if not enabled
                         }
                       }}
                     >
