@@ -2,30 +2,35 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 
 const CreateCV = () => {
-  const [resume, setResume] = useState(null);
-  const [jobDescription, setJobDescription] = useState("");
+  const [resume, setResume] = useState<string | ArrayBuffer | null>(null); // Type adjusted for base64
+  const [jobDescription, setJobDescription] = useState<string | ArrayBuffer | null>(null);
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  // Define the type for the event parameter
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; // Safe access with optional chaining
     const { name } = e.target;
+
     if (file) {
       const reader = new FileReader();
       reader.readAsDataURL(file); // Convert file to base64 string
+
       reader.onload = () => {
-        if (name === "cv")
-        setResume(reader.result);
-        else 
-        setJobDescription(reader.result)
+        if (name === "cv") {
+          setResume(reader.result); // Assign the base64 string to the resume
+        } else {
+          setJobDescription(reader.result); // Assign the base64 string to the job description
+        }
       };
+
       reader.onerror = () => {
         setMessage("Error reading file");
       };
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const token = localStorage.getItem("token"); // Assuming JWT is stored in localStorage
@@ -76,7 +81,6 @@ const CreateCV = () => {
         </div>
         <div>
           <label>Job Description</label>
-
           <input
             name="jd"
             type="file"

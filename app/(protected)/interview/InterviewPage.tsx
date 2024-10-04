@@ -3,8 +3,9 @@ import AudioToText from './recording'; // Assuming you have an AudioToText compo
 import Analysis from './Analysis'; // Import the Analysis component
 import OnlineCompiler from './OnlineCompiler'; // Import the OnlineCompiler component
 import { PiChatsThin } from 'react-icons/pi'; // Assuming this icon is from react-icons, adjust as necessary.
-import Link from "next/link";
-import { RiEmotionUnhappyLine, RiEmotionNormalLine, RiEmotionLine } from "react-icons/ri";
+import Link from 'next/link';
+import Image from 'next/image';
+import { RiEmotionUnhappyLine, RiEmotionNormalLine, RiEmotionLine } from 'react-icons/ri';
 
 interface InterviewPageProps {
   isMicEnabled: boolean;
@@ -34,33 +35,31 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'conversation' | 'audioToText'>('conversation');
   const [showCompiler, setShowCompiler] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false); // State to show feedback pop-up
-  const [feedbackIconClicked, setFeedbackIconClicked] = useState(false); // State for feedback icon click
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackIconClicked, setFeedbackIconClicked] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(1200); // 20 minutes in seconds
-  const [interviewEnded, setInterviewEnded] = useState(false); // To track if interview ended
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false); // Track if feedback is submitted
+  const [interviewEnded, setInterviewEnded] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Start timer when the loading element disappears
   useEffect(() => {
     if (!loading && timeRemaining > 0 && !interviewEnded) {
       const timer = setInterval(() => {
         setTimeRemaining((prev) => prev - 1);
-      }, 1000); // Decrement every second
+      }, 1000);
 
-      return () => clearInterval(timer); // Cleanup on unmount
+      return () => clearInterval(timer);
     } else if (timeRemaining === 0 && !interviewEnded) {
-      // Trigger actions when the time is up
-      setInterviewEnded(true);  // Mark interview as ended
+      setInterviewEnded(true);
       websocketRef.current?.send(
         JSON.stringify({
-          type: 'get_analysis', // Request analysis
+          type: 'get_analysis',
         })
       );
-      setShowFeedback(true); // Show feedback form
+      setShowFeedback(true);
     }
-  }, [loading, timeRemaining, interviewEnded]);
+  }, [loading, timeRemaining, interviewEnded, websocketRef]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -72,8 +71,9 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     const startVideoStream = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+        const videoElement = videoRef.current;
+        if (videoElement) {
+          videoElement.srcObject = stream;
         }
       } catch (error) {
         console.error('Error accessing video stream:', error);
@@ -83,26 +83,29 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     startVideoStream();
 
     return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
+      const videoElement = videoRef.current;
+      if (videoElement && videoElement.srcObject) {
+        const stream = videoElement.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
-  
+
   const handleButtonClick = (index: number) => {
-    setClickedIndex(index); // Track which button was clicked
-    setFeedbackIconClicked(true); // Trigger feedback icon clicked state
-  };  
+    setClickedIndex(index);
+    setFeedbackIconClicked(true);
+  };
 
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground">
       <nav className="flex items-center justify-between bg-white shadow-md p-4">
-        <div className='flex gap-8'>
-        <div className="flex items-center justify-center">
-          <img src="/home/logo.svg" alt="wiZe Logo" className="h-auto w-48 ml-2" />
-        </div>
-        <div className="font-semibold text-xl flex justify-center items-center ">Technical Interview 1st round</div>
+        <div className="flex gap-8">
+          <div className="flex items-center justify-center">
+            <Image src={"/home/logo.svg"}
+            width={180}
+            height={180} alt="wiZe Logo" className="h-auto w-48 ml-2" />
+          </div>
+          <div className="font-semibold text-xl flex justify-center items-center ">Technical Interview 1st round</div>
         </div>
 
         <div className="flex items-center">
@@ -149,15 +152,11 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         </div>
       </nav>
 
-      {/* Main Content */}
-      <div
-        className={`flex-1 flex min-h-[100vh] justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${
-          isChatOpen ? 'w-[80vw]' : 'w-full'
-        }`}
-      >
+
+      <div className={`flex-1 flex min-h-[100vh] justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${isChatOpen ? 'w-[80vw]' : 'w-full'}`}>
         <video
           ref={videoRef}
-          className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75 relative md:top-[-10vh] lg:top-[-6.5vh] xl:top-[-6vh]"
+          className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75 relative"
           autoPlay
           muted
         />
@@ -180,26 +179,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
             </button>
           </div>
 
-          <div className="flex border-b border-gray-300 rounded-b-lg">
-            <button
-              className={`flex-1 text-center p-2 rounded-bl-lg ${
-                activeTab === 'conversation' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'
-              }`}
-              onClick={() => setActiveTab('conversation')}
-            >
-              Conversation
-            </button>
-            <button
-              className={`flex-1 text-center p-2 rounded-br-lg ${
-                activeTab === 'audioToText' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700'
-              }`}
-              onClick={() => setActiveTab('audioToText')}
-            >
-              Audio-to-Text
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto p-4">
             {activeTab === 'conversation' && (
               <div>
                 {chatMessages.map((chat, index) => (
@@ -266,53 +246,42 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       {showFeedback && !feedbackSubmitted && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-[40vw] min-w-[400px] min-h-[400px]">
-            
             <div className="text-center">
-              <h2 className="text-2xl font-bold mb-4 inline">A quick feedback and we'll guide you to your interview</h2>
+              <h2 className="text-2xl font-bold mb-4 inline">A quick feedback and we&#39;ll guide you to your interview</h2>
               <h2 className="text-2xl font-bold mb-4 inline text-primary"> Analysis!</h2>
             </div>
             <div className="flex flex-col justify-evenly">
-            <div className="flex justify-evenly p-10 text-6xl">
-              <button
-                className={`hover:scale-110 hover:translate-y-[-10px] hover:text-primary transition ${
-                  clickedIndex === 0 ? 'text-primary scale-125' : ''
-                }`}
-                onClick={() => handleButtonClick(0)}
-              >
-                <RiEmotionLine />
-              </button>
-              <button
-                className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
-                  clickedIndex === 1 ? 'text-primary scale-125' : ''
-                }`}
-                onClick={() => handleButtonClick(1)}
-              >
-                <RiEmotionNormalLine />
-              </button>
-              <button
-                className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
-                  clickedIndex === 2 ? 'text-primary scale-125' : ''
-                }`}
-                onClick={() => handleButtonClick(2)}
-              >
-                <RiEmotionUnhappyLine />
-              </button>
-            </div>
+              <div className="flex justify-evenly p-10 text-6xl">
+                <button
+                  className={`hover:scale-110 hover:translate-y-[-10px] hover:text-primary transition ${clickedIndex === 0 ? 'text-primary scale-125' : ''}`}
+                  onClick={() => handleButtonClick(0)}
+                >
+                  <RiEmotionLine />
+                </button>
+                <button
+                  className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${clickedIndex === 1 ? 'text-primary scale-125' : ''}`}
+                  onClick={() => handleButtonClick(1)}
+                >
+                  <RiEmotionNormalLine />
+                </button>
+                <button
+                  className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${clickedIndex === 2 ? 'text-primary scale-125' : ''}`}
+                  onClick={() => handleButtonClick(2)}
+                >
+                  <RiEmotionUnhappyLine />
+                </button>
+              </div>
 
               <p className="mb-4">Please provide your feedback about the interview experience.</p>
-              <textarea
-                className="w-full h-32 p-2 border border-gray-300 rounded-lg resize-none mb-4"
-                placeholder="Your feedback here (optional)..."
-              />
+              <textarea className="w-full h-32 p-2 border border-gray-300 rounded-lg resize-none mb-4" placeholder="Your feedback here (optional)..." />
               <button
-                className={`text-white px-4 py-3 rounded-lg font-semibold transition ${feedbackIconClicked? "bg-primary hover:bg-purple-600" : "bg-gray-400"}`}
+                className={`text-white px-4 py-3 rounded-lg font-semibold transition ${feedbackIconClicked ? 'bg-primary hover:bg-purple-600' : 'bg-gray-400'}`}
                 disabled={!feedbackIconClicked}
                 onClick={() => {
-                  setShowFeedback(false); // Hide feedback form
-                  setFeedbackSubmitted(true); // Mark feedback as submitted
+                  setShowFeedback(false);
+                  setFeedbackSubmitted(true);
                 }}
-              > 
-              
+              >
                 Submit Feedback
               </button>
             </div>
@@ -323,23 +292,16 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       {/* Show Analysis after Feedback */}
       {feedbackSubmitted && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full  min-w-[600px]">
+          <div className="bg-white rounded-lg shadow-lg w-full min-w-[600px]">
             <Analysis analysisData={analysisData} />
           </div>
         </div>
       )}
 
       {/* Sliding Online Compiler */}
-      <div
-        className={`fixed inset-y-0 right-0 w-3/4 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
-          showCompiler ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
+      <div className={`fixed inset-y-0 right-0 w-3/4 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${showCompiler ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="relative p-6">
-          <button
-            className="absolute right-4 mt-8 mr-4 py-2 px-4 text-sm md:text-base rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-lg"
-            onClick={() => setShowCompiler(false)}
-          >
+          <button className="absolute right-4 mt-8 mr-4 py-2 px-4 text-sm md:text-base rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-lg" onClick={() => setShowCompiler(false)}>
             Close
           </button>
           <OnlineCompiler />

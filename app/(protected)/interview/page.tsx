@@ -111,18 +111,27 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
       reader.onerror = (error) => reject(error);
     });
   };
-  
   const base64ToFile = (base64String: string, filename: string): File => {
     const arr = base64String.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
+    const match = arr[0].match(/:(.*?);/);
+  
+    if (!match) {
+      throw new Error('Invalid base64 string format');
+    }
+  
+    const mime = match[1];
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
+    
     while (n--) {
       u8arr[n] = bstr.charCodeAt(n);
     }
+    
     return new File([u8arr], filename, { type: mime });
   };
+  
+  
 
   type ChatMessage = {
     user: string;
@@ -177,9 +186,25 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
           setLoading(false); // Stop loading when the question is received
         } 
         else if (data.type === "coding_question") {
-          console.log("Coding question received:", data.message);
           setCodingQuestion(data.message);
-          setIsCompilerOpen(true);
+          
+          // Send dummy response to coding question
+          websocketRef.current?.send(
+            JSON.stringify({
+              type: "coding",
+              code: 'This is a dummy response to the coding question.',
+              ques: data.message
+            })
+          );
+        
+        // Handle code evaluation result
+        } else if (data.type === "code_evaluation") {
+          setChatMessages((prevMessages) => [
+            ...prevMessages,
+            { user: "System", message: "Code evaluation result: " + data.result }
+          ]);
+        
+     
         }else if (data.type === "interview_end") {
           console.log("Interview ended:", data.message);
           setChatMessages((prevMessages) => [
@@ -308,7 +333,7 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
         setResumeFile(file);
         const base64 = await fileToBase64(file);
         localStorage.setItem('resumeFile', base64);
-        setCvText(file.name); // Update the display text to show the uploaded file name
+        setCvText(file.name); // Update the display text to show thtoe uploaded file name
         
         // Send the resume to the WebSocket
         const reader = new FileReader();
@@ -565,11 +590,12 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
     setIsMicEnabled(true); // Mark microphone as enabled
     stopMicrophoneTest(); // Stop the microphone test
   
-    // Notify parent component that mic test is completed
-    if (typeof onMicTestComplete === 'function') {
-      onMicTestComplete(); // Call this prop function to notify the parent
-    }
+    // The following block should be removed, as it's causing the error:
+    // if (typeof onMicTestComplete === 'function') {
+    //   onMicTestComplete(); // Call this prop function to notify the parent
+    // }
   };
+  
   
   const handleSoundConfirmation = () => {
     stopTestSound(); // Stop the sound test
@@ -755,7 +781,7 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
           handleNextClick={handleNextClick}
           handleBackClick={handleBackClick}
           allDevicesConfigured={allDevicesConfigured}
-          onMicTestComplete={() => setIsMicTestCompleted(true)}
+          
         />
 
       )}

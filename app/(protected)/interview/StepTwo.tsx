@@ -4,36 +4,39 @@ import { FiX } from 'react-icons/fi';
 import * as pdfjsLib from 'pdfjs-dist';
 import Image from 'next/image';
 
+// StepTwo.tsx (or wherever StepTwoProps is defined)
 interface StepTwoProps {
   JD: string;
   isResumeUploaded: boolean;
+  jobDescriptionFile: File | null; // Add this line
   isManualEntry: boolean;
   manualJobDescription: string;
   selectedJobProfile: string;
   jobProfiles: string[];
-  setJD: (description: string) => void;
+  setJD: (jd: string) => void;
   handleManualJDUpload: () => void;
   handleNextClick: () => void;
   handleBackClick: () => void;
   setSelectedJobProfile: (profile: string) => void;
-  setManualJobDescription: (description: string) => void;
+  setManualJobDescription: (jd: string) => void;
   websocketRef: React.MutableRefObject<WebSocket | null>;
 }
 
 const StepTwo: React.FC<StepTwoProps> = ({
   JD,
   isResumeUploaded,
+  jobDescriptionFile, // Now this is properly typed
   isManualEntry,
   manualJobDescription,
   selectedJobProfile,
   jobProfiles,
+  setJD,
   handleManualJDUpload,
   handleNextClick,
   handleBackClick,
   setSelectedJobProfile,
   setManualJobDescription,
   websocketRef,
-  setJD,
 }) => {
   const [showTextbox, setShowTextbox] = useState(false);
   const [showUploadBox, setShowUploadBox] = useState(false); // New state to show upload box

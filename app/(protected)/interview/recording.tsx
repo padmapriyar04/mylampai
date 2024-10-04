@@ -2,74 +2,17 @@ import React, { useState, useEffect } from 'react';
 
 interface AudioToTextProps {
   onTextSubmit: (text: string) => void;
+  isSpeaking: boolean;
+  isMicTestCompleted: boolean;
 }
 
-declare global {
-  interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
-  }
-
-  // Define SpeechRecognition and SpeechRecognitionError if not present in the DOM types
-  var SpeechRecognition: {
-    prototype: SpeechRecognition;
-    new (): SpeechRecognition;
-  };
-
-  var webkitSpeechRecognition: {
-    prototype: SpeechRecognition;
-    new (): SpeechRecognition;
-  };
-
-  interface SpeechRecognition {
-    start(): void;
-    stop(): void;
-    abort(): void;
-    onresult: ((event: SpeechRecognitionEvent) => void) | null;
-    onerror: ((event: SpeechRecognitionError) => void) | null;
-    onend: (() => void) | null;
-    continuous: boolean;
-    interimResults: boolean;
-    lang: string;
-  }
-
-  interface SpeechRecognitionEvent {
-    resultIndex: number;
-    results: SpeechRecognitionResultList;
-  }
-
-  interface SpeechRecognitionResultList {
-    readonly length: number; // Make sure this is readonly and consistent
-    item(index: number): SpeechRecognitionResult;
-    [index: number]: SpeechRecognitionResult;
-  }
-
-  interface SpeechRecognitionResult {
-    readonly isFinal: boolean; // Consistent use of readonly
-    readonly length: number; // Make sure this is readonly and consistent
-    item(index: number): SpeechRecognitionAlternative;
-    [index: number]: SpeechRecognitionAlternative;
-  }
-
-  interface SpeechRecognitionAlternative {
-    readonly transcript: string; // Consistent use of readonly
-    readonly confidence: number; // Consistent use of readonly
-  }
-
-  interface SpeechRecognitionError {
-    error: string;
-    message: string;
-  }
-}
-
-const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit }) => {
+const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit, isSpeaking, isMicTestCompleted }) => {
   const [transcript, setTranscript] = useState('');
-  const [isListening, setIsListening] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   let recognition: SpeechRecognition | null = null;
 
   if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition ;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -106,12 +49,11 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit }) => {
         if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
           alert("Microphone access is blocked. Please allow access.");
         }
-        setIsListening(false);
       };
 
       recognition.onend = () => {
-        if (isListening) {
-          recognition.start(); // Restart recognition if it stops
+        if (isSpeaking) {
+          recognition.start(); // Restart recognition if it stops and isSpeaking is true
         }
       };
     }
@@ -119,38 +61,34 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit }) => {
     return () => {
       recognition?.stop(); // Stop recognition when the component unmounts
     };
-  }, [recognition, isListening, onTextSubmit]);
+  }, [recognition, isSpeaking, onTextSubmit]);
 
   const startListening = () => {
     if (recognition) {
       recognition.start();
-      setIsListening(true);
     }
   };
 
   const stopListening = () => {
     if (recognition) {
       recognition.stop();
-      setIsListening(false);
     }
   };
 
   useEffect(() => {
-    if (isListening) {
+    if (isSpeaking) {
       startListening();
     } else {
       stopListening();
     }
-  }, [isListening]);
-
-  useEffect(() => {
-    setIsListening(true); // Start listening as soon as the component mounts
-  }, []);
+  }, [isSpeaking]);
 
   return (
-    <div className='absolute bottom-0 right-1/2 translate-x-1/2 '>
+    <div className="absolute bottom-0 right-1/2 translate-x-1/2">
+      {/* Optionally render interim and final transcripts */}
       {/* <p>Interim: {interimTranscript}</p> */}
       {/* <p>Final: {transcript}</p> */}
+      <p>{isMicTestCompleted ? 'Mic Test Completed' : 'Mic Test In Progress'}</p>
     </div>
   );
 };

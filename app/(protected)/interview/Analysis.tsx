@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { Oval } from 'react-loader-spinner'; // Importing the loader component
+
+import Image from "next/image";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -112,7 +114,9 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
       <div className='flex justify-center items-center mb-8'>
       <div className="flex items-center justify-center absolute left-8">
         <Link href="/">
-          <img src="/home/logo.svg" alt="wiZe Logo" className="h-auto w-48 ml-2" />
+          <Image src={"/home/logo.svg"}
+            width={180}
+            height={180} alt="wiZe Logo" className="h-auto w-48 ml-2" />
         </Link>
       </div>
       <h2 className="text-3xl font-bold  flex justify-center flex-col">Your Analysis

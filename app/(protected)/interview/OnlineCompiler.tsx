@@ -12,8 +12,18 @@ int main() {
 }`,
 };
 
+
+interface CodeEditorProps {
+  language: string; // This could be 'javascript' | 'python' | 'cpp' if you want to restrict it
+  code: string;
+  setCode: (code: string) => void;
+  fontSize: number;
+}
+
+type Language = 'javascript' | 'python' | 'cpp'; // Define valid language types
+
 export default function OnlineCompiler() {
-  const [language, setLanguage] = useState('cpp');
+  const [language, setLanguage] = useState<Language>('cpp'); // Type the language state
   const [code, setCode] = useState(initialCode.cpp);
   const [output, setOutput] = useState('');
   const [fontSize, setFontSize] = useState(14);
@@ -40,7 +50,7 @@ export default function OnlineCompiler() {
     } else if (language === 'javascript') {
       version = '18.15.0'; // Known working JavaScript version
     }
-  
+
     try {
       const response = await fetch('https://emkc.org/api/v2/piston/execute', {
         method: 'POST',
@@ -49,20 +59,24 @@ export default function OnlineCompiler() {
         },
         body: JSON.stringify({
           language: language,
-          version: version,  
+          version: version,
           files: [
             {
-              name: `main.${language === 'cpp' ? 'cpp' : language === 'python' ? 'py' : 'js'}`,  
+              name: `main.${language === 'cpp' ? 'cpp' : language === 'python' ? 'py' : 'js'}`,
               content: code,
             },
           ],
         }),
       });
-  
+
       const result = await response.json();
       setOutput(result.run.stdout || result.run.stderr);
     } catch (error) {
-      setOutput(`Error: ${error.message}`);
+      if (error instanceof Error) {
+        setOutput(`Error: ${error.message}`);
+      } else {
+        setOutput('An unknown error occurred');
+      }
     }
   };
 
@@ -72,9 +86,9 @@ export default function OnlineCompiler() {
   };
 
   // Function to handle resizing of editor width
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: MouseEvent) => {
     const newWidth = (e.clientX / window.innerWidth) * 100;
-    if (newWidth > 20 && newWidth < 80) { // Limit editor width between 20% and 80%
+    if (newWidth > 20 && newWidth < 80) {
       setEditorWidth(newWidth);
     }
   };
@@ -94,7 +108,6 @@ export default function OnlineCompiler() {
       {/* Header Section */}
       <div className="flex justify-between items-center mb-6 md:mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-center text-gray-800">Online Compiler</h1>
-      
       </div>
 
       {isEditorVisible && (
@@ -128,8 +141,9 @@ export default function OnlineCompiler() {
                 <select
                   id="language"
                   onChange={(e) => {
-                    setLanguage(e.target.value);
-                    setCode(initialCode[e.target.value]);
+                    const selectedLanguage = e.target.value as Language; // Type assertion here
+                    setLanguage(selectedLanguage);
+                    setCode(initialCode[selectedLanguage]); // Now TypeScript understands this
                   }}
                   value={language}
                   className="w-full p-2 md:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-300"
@@ -175,7 +189,7 @@ export default function OnlineCompiler() {
   );
 }
 
-const CodeEditor = ({ language, code, setCode, fontSize }) => {
+const CodeEditor: React.FC<CodeEditorProps> = ({ language, code, setCode, fontSize }) => {
   return (
     <div className="editor-container">
       <Editor
@@ -183,7 +197,7 @@ const CodeEditor = ({ language, code, setCode, fontSize }) => {
         language={language}
         value={code}
         theme="light"
-        onChange={(value) => setCode(value)}
+        onChange={(value) => setCode(value || '')} // Ensure that value is not undefined
         options={{
           minimap: { enabled: false },
           fontSize: fontSize,

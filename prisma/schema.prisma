@@ -204,3 +204,4 @@ model NewsletterEmails {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }
+
