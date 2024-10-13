@@ -92,7 +92,6 @@ const DeviceSelection = ({
   return (
     <div className="md:h-[calc(100vh)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
     <div className="max-w-[1200px] gap-4 w-full flex flex-col  items-center md:flex-row md:justify-between">
-      {/* Left Section */}
       <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative ">
         <video ref={videoRef} autoPlay className="w-full bg-black rounded-lg h-[19vh] md:h-[22vh] mb-2"></video>
         <div className="flex justify-between w-full text-sm mb-32">
@@ -110,7 +109,7 @@ const DeviceSelection = ({
           </span>
         </div>
         <p className="text-center text-lg font-bold leading-relaxed">
-          Take the wiinZe AI mock Interview
+          Take the wiZe AI mock Interview
         </p>
         <p className="text-center text-sm mt-2 leading-relaxed">
           You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview. <span className="font-semibold"> All the best!</span>
@@ -134,17 +133,26 @@ const DeviceSelection = ({
           </div>
           {/* Step 2 */}
           <div className="relative flex-1">
-            <div className={`w-8 h-8 ${isMicEnabled ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}>
-              {isMicEnabled ? (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z" clipRule="evenodd" />
-                </svg>
-              ) : (
-                <div className="w-3 h-3 bg-white rounded-full"></div>
-              )}
+              <div
+                className={`w-8 h-8 bg-primary rounded-full flex items-center justify-center`}
+              >
+                
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-white"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                
+              </div>
+              <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-primary w-full z-0`}></div>
             </div>
-            <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${isMicEnabled ? "bg-primary w-full" : "bg-gray-400 w-full"} z-0`}></div>
-          </div>
           {/* Step 3 */}
           <div className="relative">
             <div className={`w-8 h-8 ${allDevicesConfigured ? "bg-primary" : "bg-gray-400"} rounded-full flex items-center justify-center`}>
@@ -248,7 +256,7 @@ const DeviceSelection = ({
                 </div>
                 <audio ref={videoRef} className="hidden" autoPlay></audio>
                 <div className="relative mb-4">
-                  <select className="block w-full py-2 pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
+                  <select className="block w-full pl-3 pr-10 text-base border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-3xl border-2 py-4">
                     {audioOutputDevices.map((device) => (
                       <option key={device.deviceId} value={device.deviceId}>
                         {device.label || `Speaker ${device.deviceId}`}
@@ -271,7 +279,7 @@ const DeviceSelection = ({
           <button
            
               className={`w-[40vw]  xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-              allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
+              allDevicesConfigured ? 'bg-gray-600 text-black hover:bg-gray-800' : 'bg-gray-300 text-gray-800 cursor-not-allowed'}`}
 
             disabled={!allDevicesConfigured}
             onClick={handleNextClick}

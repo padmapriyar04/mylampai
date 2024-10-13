@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, ReactNode } from "react"; // Import ReactNode from react
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import HeroSection from "@/components/home/HeroSection";
@@ -14,7 +14,12 @@ import HomeSlider from "@/components/home/HomeSlider";
 import HomeNavbar from "@/components/home/HomeNavbar";
 import './home.css';
 
-const SectionWrapper = ({ children }) => {
+// Define the type for the children prop
+interface SectionWrapperProps {
+  children: ReactNode;
+}
+
+const SectionWrapper = ({ children }: SectionWrapperProps) => {
   const controls = useAnimation();
   const { ref, inView } = useInView({
     triggerOnce: false, // This makes the animation trigger every time

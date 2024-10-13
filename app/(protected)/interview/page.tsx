@@ -21,6 +21,8 @@ import { FiX } from "react-icons/fi"; // Import the FiX icon
 import InterviewPage from './InterviewPage';
 import StepOne from './StepOne';
 import StepTwo from './StepTwo';
+import OnlineCompiler from './OnlineCompiler';
+
 
 const InterviewComponent = () => {
   const { changeRoute } = useRouterStore(); // for hiding the default navbar in interview section
@@ -66,6 +68,9 @@ const InterviewComponent = () => {
     isCameraEnabled && isMicEnabled && isSoundEnabled;
 
   const websocketRef = useRef<WebSocket | null>(null);
+  const [codingQuestion, setCodingQuestion] = useState<string | null>(null);
+const [isCompilerOpen, setIsCompilerOpen] = useState(false);
+
 
   const jobProfiles = [
     "Software Engineer",
@@ -83,7 +88,7 @@ const InterviewComponent = () => {
     if (savedResume) {
       const file = base64ToFile(savedResume, 'resume.pdf');
       setResumeFile(file);
-      setIsUploading(true); // Set uploading to true if a resume is found on reload
+      setIsUploading(true);  // Set uploading to true if a resume is found on reload
       sendResumeToWebSocket(file);
     }
   
@@ -99,18 +104,27 @@ const InterviewComponent = () => {
       reader.onerror = (error) => reject(error);
     });
   };
-  
   const base64ToFile = (base64String: string, filename: string): File => {
     const arr = base64String.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
+    const match = arr[0].match(/:(.*?);/);
+  
+    if (!match) {
+      throw new Error('Invalid base64 string format');
+    }
+  
+    const mime = match[1];
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
+    
     while (n--) {
       u8arr[n] = bstr.charCodeAt(n);
     }
+    
     return new File([u8arr], filename, { type: mime });
   };
+  
+  
 
   type ChatMessage = {
     user: string;
@@ -150,6 +164,7 @@ const InterviewComponent = () => {
         if (data.type === "cv_uploaded") {
           console.log("CV uploaded:", data.message);
           setIsUploading(false);
+          toast.success("Resume uploaded successfully!"); 
           setCvText(data.cv_text); // Update the state with CV text
         } else if (data.type === "jd_analyzed") {
           console.log("Job description analyzed:", data.message);
@@ -162,7 +177,28 @@ const InterviewComponent = () => {
           ]);
           setTextToSpeak(data.question);
           setLoading(false); // Stop loading when the question is received
-        } else if (data.type === "interview_end") {
+        } 
+        else if (data.type === "coding_question") {
+          setCodingQuestion(data.message);
+          
+          // Send dummy response to coding question
+          websocketRef.current?.send(
+            JSON.stringify({
+              type: "coding",
+              code: 'This is a dummy response to the coding question.',
+              ques: data.message
+            })
+          );
+        
+        // Handle code evaluation result
+        } else if (data.type === "code_evaluation") {
+          setChatMessages((prevMessages) => [
+            ...prevMessages,
+            { user: "System", message: "Code evaluation result: " + data.result }
+          ]);
+        
+     
+        }else if (data.type === "interview_end") {
           console.log("Interview ended:", data.message);
           setChatMessages((prevMessages) => [
             ...prevMessages,
@@ -290,7 +326,7 @@ const InterviewComponent = () => {
         setResumeFile(file);
         const base64 = await fileToBase64(file);
         localStorage.setItem('resumeFile', base64);
-        setCvText(file.name); // Update the display text to show the uploaded file name
+        setCvText(file.name); // Update the display text to show thtoe uploaded file name
         
         // Send the resume to the WebSocket
         const reader = new FileReader();
@@ -304,7 +340,7 @@ const InterviewComponent = () => {
                         cv_data: Array.from(new Uint8Array(binaryData)),
                     })
                 );
-                toast.success("Resume uploaded successfully!");       
+                      
             } else {
                 console.error("WebSocket is not initialized");
             }
@@ -314,7 +350,8 @@ const InterviewComponent = () => {
         alert("Please upload a valid DOC, DOCX, or PDF file.");
         setResumeFile(null);
         setCvText("");
-        setIsUploading(false); // Ensure uploading is turned off on error
+        setIsUploading(false);
+        // Ensure uploading is turned off on error
     }
 };
 
@@ -546,11 +583,12 @@ const InterviewComponent = () => {
     setIsMicEnabled(true); // Mark microphone as enabled
     stopMicrophoneTest(); // Stop the microphone test
   
-    // Notify parent component that mic test is completed
-    if (typeof onMicTestComplete === 'function') {
-      onMicTestComplete(); // Call this prop function to notify the parent
-    }
+    // The following block should be removed, as it's causing the error:
+    // if (typeof onMicTestComplete === 'function') {
+    //   onMicTestComplete(); // Call this prop function to notify the parent
+    // }
   };
+  
   
   const handleSoundConfirmation = () => {
     stopTestSound(); // Stop the sound test
@@ -632,22 +670,40 @@ const InterviewComponent = () => {
     }
   };
 
-  if (isInterviewStarted) {
+  if (isInterviewStarted && !isCompilerOpen) {
     return (
       <InterviewPage
-      isMicEnabled={isMicEnabled}
-      isSpeaking={isSpeaking}
-      isMicTestCompleted={isMicTestCompleted}
-      chatMessages={chatMessages}
-      audioTextInputs={audioTextInputs}
-      loading={loading}
-      handleTextSubmit={handleTextSubmit}
-      handleSendMessage={handleSendMessage}
-      websocketRef={websocketRef}
-      analysisData={analysisData}
-    />
+        isMicEnabled={isMicEnabled}
+        isSpeaking={isSpeaking}
+        isMicTestCompleted={isMicTestCompleted}
+        chatMessages={chatMessages}
+        audioTextInputs={audioTextInputs}
+        loading={loading}
+        handleTextSubmit={handleTextSubmit}
+        handleSendMessage={handleSendMessage}
+        websocketRef={websocketRef}
+        analysisData={analysisData}
+      />
     );
   }
+
+  if (isCompilerOpen) {
+    return (
+      <div className="min-h-screen p-6 md:p-8 bg-light-gray">
+        <h2 className="text-2xl font-bold mb-4">Coding Question</h2>
+        <p className="mb-6">{codingQuestion}</p>
+        <OnlineCompiler />
+       
+        <button
+          onClick={() => setIsCompilerOpen(false)}
+          className="mt-4 py-2 px-4 bg-red-500 text-white rounded"
+        >
+          Close Compiler
+        </button>
+      </div>
+    );
+  }
+  
   
 
   return (
@@ -718,7 +774,7 @@ const InterviewComponent = () => {
           handleNextClick={handleNextClick}
           handleBackClick={handleBackClick}
           allDevicesConfigured={allDevicesConfigured}
-          onMicTestComplete={() => setIsMicTestCompleted(true)}
+          
         />
 
       )}

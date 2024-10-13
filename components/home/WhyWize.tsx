@@ -20,8 +20,14 @@ export default function WhyWize() {
   // Create a ref array for each section
   const sectionsRef = useRef(new Array(whyWizeLinks.length).fill(null));
 
-  // Create animation controls for each section
-  const controls = useRef(whyWizeLinks.map(() => useAnimation()));
+  // Initialize animation controls for each section at the top level
+  const controls0 = useAnimation();
+  const controls1 = useAnimation();
+  const controls2 = useAnimation();
+  const controls3 = useAnimation();
+  const controls4 = useAnimation();
+
+  const controls = [controls0, controls1, controls2, controls3, controls4];
 
   useEffect(() => {
     // Intersection Observer setup
@@ -34,7 +40,7 @@ export default function WhyWize() {
               (link) => link.id === entry.target.id
             );
             if (index !== -1) {
-              controls.current[index].start({
+              controls[index].start({
                 opacity: 1,
                 y: 0,
                 transition: { duration: 0.6 },
@@ -45,7 +51,7 @@ export default function WhyWize() {
               (link) => link.id === entry.target.id
             );
             if (index !== -1) {
-              controls.current[index].start({
+              controls[index].start({
                 opacity: 0.5,
                 y: 50,
                 transition: { duration: 0.6 },
@@ -68,11 +74,12 @@ export default function WhyWize() {
 
     // Cleanup observer on component unmount
     return () => {
-      sectionsRef.current.forEach((section) => {
+      const currentSections = sectionsRef.current; // Store the ref in a variable during cleanup
+      currentSections.forEach((section) => {
         if (section) observer.unobserve(section);
       });
     };
-  }, []);
+  }, [controls]); // Dependency array should include 'controls'
 
   return (
     <div className="flex flex-col items-center mb-4">
@@ -101,7 +108,7 @@ export default function WhyWize() {
             ref={(el) => {
               sectionsRef.current[0] = el;
             }}
-            animate={controls.current[0]}
+            animate={controls[0]}
             initial={{ opacity: 0.5, y: 50 }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
@@ -126,7 +133,7 @@ export default function WhyWize() {
             ref={(el) => {
               sectionsRef.current[1] = el;
             }}
-            animate={controls.current[1]}
+            animate={controls[1]}
             initial={{ opacity: 0.5, y: 50 }}
             className="pb-[100px] min-h-screen px-6"
           >
@@ -138,7 +145,7 @@ export default function WhyWize() {
             ref={(el) => {
               sectionsRef.current[2] = el;
             }}
-            animate={controls.current[2]}
+            animate={controls[2]}
             initial={{ opacity: 0.5, y: 50 }}
             className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
           >
@@ -164,7 +171,7 @@ export default function WhyWize() {
             ref={(el) => {
               sectionsRef.current[3] = el;
             }}
-            animate={controls.current[3]}
+            animate={controls[3]}
             initial={{ opacity: 0.5, y: 50 }}
             className="pb-[100px] min-h-screen"
           >
@@ -182,11 +189,11 @@ export default function WhyWize() {
               <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
             </h4>
             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-              Important features that&apos;ll sometimes be your buddy, sometimes
+              Important features that&#39;ll sometimes be your buddy, sometimes
               your saviour
             </div>
             <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              Whether it&apos;s an AI-powered smart community that helps you
+              Whether it&#39;s an AI-powered smart community that helps you
               learn and grow with peers in a unique and engaging way, or
               assessments that aid in self-evaluation, these features will cover
               all the gaps in your career journey, making your college and
@@ -236,4 +243,3 @@ export default function WhyWize() {
     </div>
   );
 }
-
