@@ -3,14 +3,12 @@ import AudioToText from './recording'; // Assuming you have an AudioToText compo
 import Analysis from './Analysis'; // Import the Analysis component
 import OnlineCompiler from './OnlineCompiler'; // Import the OnlineCompiler component
 import { PiChatsThin } from 'react-icons/pi'; // Assuming this icon is from react-icons, adjust as necessary.
-import Link from 'next/link';
 import Image from 'next/image';
 import { RiEmotionUnhappyLine, RiEmotionNormalLine, RiEmotionLine } from 'react-icons/ri';
 
 interface InterviewPageProps {
   isMicEnabled: boolean;
   isSpeaking: boolean;
-  isMicTestCompleted: boolean;
   chatMessages: { user: string; message: string }[];
   audioTextInputs: string[];
   loading: boolean;
@@ -23,7 +21,6 @@ interface InterviewPageProps {
 const InterviewPage: React.FC<InterviewPageProps> = ({
   isMicEnabled,
   isSpeaking,
-  isMicTestCompleted,
   chatMessages,
   audioTextInputs,
   loading,
@@ -33,7 +30,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   analysisData,
 }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'conversation' | 'audioToText'>('conversation');
   const [showCompiler, setShowCompiler] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackIconClicked, setFeedbackIconClicked] = useState(false);
@@ -102,25 +98,13 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         <div className="flex gap-8">
           <div className="flex items-center justify-center">
             <Image src={"/home/logo.svg"}
-            width={180}
-            height={180} alt="wiZe Logo" className="h-auto w-48 ml-2" />
+              width={180}
+              height={180} alt="wiZe Logo" className="h-auto w-48 ml-2" />
           </div>
           <div className="font-semibold text-xl flex justify-center items-center ">Technical Interview 1st round</div>
         </div>
 
         <div className="flex items-center">
-          {/* <button
-            className="bg-primary text-white px-4 py-3 rounded-full font-semibold"
-            onClick={() => {
-              websocketRef.current?.send(
-                JSON.stringify({
-                  type: 'get_analysis', // Sending request to get analysis
-                })
-              );
-            }}
-          >
-            VIEW ANALYSIS
-          </button> */}
           <button
             className="bg-indigo-500 text-white px-4 py-3 rounded-full font-semibold ml-4"
             onClick={() => setShowCompiler(!showCompiler)} // Toggle the compiler modal (slide)
@@ -166,7 +150,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         <AudioToText
           onTextSubmit={handleTextSubmit}
           isSpeaking={isSpeaking}
-          isMicTestCompleted={isMicTestCompleted}
         />
       )}
 
@@ -180,25 +163,15 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">
-            {activeTab === 'conversation' && (
-              <div>
-                {chatMessages.map((chat, index) => (
-                  <div key={index} className="bg-gray-100 p-2 rounded-md mb-2">
-                    <span className="font-semibold">{chat.user}: </span>
-                    <span>{chat.message}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {activeTab === 'audioToText' && (
-              <div>
-                {audioTextInputs.map((text, index) => (
-                  <div key={index} className="bg-gray-200 p-2 rounded-md">
-                    <span>{text}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div>
+              {chatMessages.map((chat, index) => (
+                <div key={index} className="bg-gray-100 p-2 rounded-md mb-2">
+                  <span className="font-semibold">{chat.user}: </span>
+                  <span>{chat.message}</span>
+                </div>
+              ))}
+            </div>
+
           </div>
 
           <div className="p-4 bg-gray-100 border-t border-b border-gray-300 rounded-lg">

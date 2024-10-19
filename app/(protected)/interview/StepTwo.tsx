@@ -4,17 +4,11 @@ import { FiX } from 'react-icons/fi';
 import * as pdfjsLib from 'pdfjs-dist';
 import Image from 'next/image';
 
-// StepTwo.tsx (or wherever StepTwoProps is defined)
+
 interface StepTwoProps {
-  JD: string;
-  isResumeUploaded: boolean;
-  jobDescriptionFile: File | null; // Add this line
-  isManualEntry: boolean;
   manualJobDescription: string;
   selectedJobProfile: string;
-  jobProfiles: string[];
   setJD: (jd: string) => void;
-  handleManualJDUpload: () => void;
   handleNextClick: () => void;
   handleBackClick: () => void;
   setSelectedJobProfile: (profile: string) => void;
@@ -23,15 +17,9 @@ interface StepTwoProps {
 }
 
 const StepTwo: React.FC<StepTwoProps> = ({
-  JD,
-  isResumeUploaded,
-  jobDescriptionFile, // Now this is properly typed
-  isManualEntry,
   manualJobDescription,
   selectedJobProfile,
-  jobProfiles,
   setJD,
-  handleManualJDUpload,
   handleNextClick,
   handleBackClick,
   setSelectedJobProfile,
@@ -44,18 +32,29 @@ const StepTwo: React.FC<StepTwoProps> = ({
   const [jdFile, setJDFile] = useState<File | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
+
+  const jobProfiles = [
+    "Software Engineer",
+    "Data Scientist",
+    "Product Manager",
+    "UI/UX Designer",
+    "Business Analyst",
+    "DevOps Engineer",
+    "System Administrator",
+  ];
+
   const extractTextFromPDF = async (file: File): Promise<string> => {
     const reader = new FileReader();
     return new Promise((resolve, reject) => {
       reader.onload = async function (event) {
         const typedArray = new Uint8Array(event.target?.result as ArrayBuffer);
-        
+
         // Check if we are in the browser environment
         if (typeof window !== 'undefined') {
           // Dynamically import pdfjs-dist for browser-only usage
           const pdfjsLib = await import('pdfjs-dist/build/pdf');
           pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-          
+
           const pdf = await pdfjsLib.getDocument(typedArray).promise;
           let text = '';
           for (let i = 1; i <= pdf.numPages; i++) {
@@ -73,8 +72,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
       reader.readAsArrayBuffer(file);
     });
   };
-  
-  
+
+
 
   const handleJDUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -130,7 +129,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
   const handleProfileChange = (profile: string) => {
     setSelectedJobProfile(profile);
 
-    // Show PDF upload box or textbox based on selection
     if (profile === 'Upload JD as PDF') {
       setShowUploadBox(true);
       setShowTextbox(false);
@@ -159,12 +157,6 @@ const StepTwo: React.FC<StepTwoProps> = ({
     setIsNextEnabled(description.trim().length > 0);
   };
 
-  const handleUploadClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   return (
     <div className="max-w-[1200px] w-full flex flex-col items-center md:flex-row md:justify-between">
       <div className="max-w-[410px] w-[90vw] md:mt-[8vh] md:w-[29vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative md:left-[35px]">
@@ -188,39 +180,37 @@ const StepTwo: React.FC<StepTwoProps> = ({
       </div>
 
       <div className="w-full md:max-w-[500px] max-h-[89vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
-      <div className="w-full flex flex-col items-center mb-2">
+        <div className="w-full flex flex-col items-center mb-2">
           <div>
             <p className="text-2xl font-bold text-primary mb-2">Get Started!</p>
           </div>
           <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
             {/* Progress Bar */}
             <div className="relative flex-1">
-              <div className={`w-8 h-8 ${isResumeUploaded ? 'bg-purple-500' : 'bg-gray-400'} rounded-full flex items-center justify-center`}>
-                {isResumeUploaded ? (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-white"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                ) : (
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
-                )}
+              <div className={`w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center`}>
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 text-white"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l7-7a1 1 0 000-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+
               </div>
-              <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${isResumeUploaded ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out bg-primary w-full z-0`}></div>
             </div>
             {/* Step 2 */}
             <div className="relative flex-1">
               <div
-                className={`w-8 h-8 ${isNextEnabled || isManualEntry ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}
+                className={`w-8 h-8 ${isNextEnabled ? 'bg-primary' : 'bg-gray-400'} rounded-full flex items-center justify-center`}
               >
-                {isNextEnabled || isManualEntry ? (
+                {isNextEnabled ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 text-white"
@@ -237,7 +227,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
                   <div className="w-3 h-3 bg-white rounded-full"></div>
                 )}
               </div>
-              <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${isNextEnabled || isManualEntry ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
+              <div className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${isNextEnabled ? 'bg-primary w-full' : 'bg-gray-400 w-full'} z-0`}></div>
             </div>
             {/* Step 3 */}
             <div className="relative flex items-center">
@@ -256,7 +246,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
             className="w-full transition p-4 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             value={selectedJobProfile}
             onChange={(e) => handleProfileChange(e.target.value)}
-          > 
+          >
             <option value="" disabled={!!selectedJobProfile}>
               Select a profile
             </option>
@@ -267,7 +257,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
             ))}
             <option value="Upload JD as PDF">Upload JD as PDF</option>
             <option value="Other">Other</option>
-            
+
           </select>
 
           {/* Show PDF upload box when selected */}
@@ -319,26 +309,26 @@ const StepTwo: React.FC<StepTwoProps> = ({
             />
           )}
 
-          
+
         </div>
         <div className="flex flex-col justify-center items-center mt-6 w-full">
 
-            <button
-              onClick={handleNextClick}
-              disabled={!isNextEnabled}
-              className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] lg:max-h-[70px] flex justify-center items-center h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition 
+          <button
+            onClick={handleNextClick}
+            disabled={!isNextEnabled}
+            className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] lg:max-h-[70px] flex justify-center items-center h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition 
                 ${isNextEnabled ? "bg-gray-600 text-white hover:bg-gray-800" : "bg-gray-300 text-gray-800 cursor-not-allowed"} rounded-full px-4 py-2`}
-            >
-              Next
-            </button>
+          >
+            Next
+          </button>
 
-            <button
-              onClick={handleBackClick}
-              className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
-            >
-              Back
-            </button>
-          </div>
+          <button
+            onClick={handleBackClick}
+            className="bg-transparent text-gray-700 w-full font-semibold py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
+          >
+            Back
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,14 +1,147 @@
 [
     {
         "question": "INTRODUCTION",
-        "answer": {},
+        "answer": {
+            "hello! i'm sarah from the hr team  it's great to meet you today, reece  let's start by introducing yourself?": "my name is Ashutosh Kumar Singh I am a second year analysis to you",
+            "to stick to the interview questions, please  so, reece, let's start by introducing yourself?": " I am a student of it Kharagpur",
+            "let's start with you introducing yourself, reece  tell me a little bit about your background and what brought you to this interview today ": "hello hello"
+        },
         "analysis": {
-            "line_analysis": [],
+            "line_analysis": [
+                {
+                    "line": "hello! i'm sarah from the hr team  it's great to meet you today, reece  let's start by introducing yourself?",
+                    "relevance": {
+                        "score": 0,
+                        "reasoning": "This line is not relevant to the question as it is an introduction by the interviewer."
+                    },
+                    "clarity": {
+                        "score": 7,
+                        "reasoning": "The line is clear and easy to understand."
+                    },
+                    "depth": {
+                        "score": 0,
+                        "reasoning": "This line does not provide any depth or detail."
+                    },
+                    "professionalism": {
+                        "score": 8,
+                        "reasoning": "The language and content are professional and appropriate for an interview setting."
+                    },
+                    "technical_accuracy": {
+                        "score": 0,
+                        "reasoning": "This line does not contain any technical information."
+                    }
+                },
+                {
+                    "line": "my name is Ashutosh Kumar Singh I am a second year analysis to you",
+                    "relevance": {
+                        "score": 5,
+                        "reasoning": "This line is partially relevant as it provides the candidate's name but does not fully introduce them or explain their background."
+                    },
+                    "clarity": {
+                        "score": 5,
+                        "reasoning": "The line is somewhat clear but lacks proper grammar and structure."
+                    },
+                    "depth": {
+                        "score": 2,
+                        "reasoning": "This line provides minimal depth or detail about the candidate's background."
+                    },
+                    "professionalism": {
+                        "score": 5,
+                        "reasoning": "The language and content are somewhat professional but could be improved."
+                    },
+                    "technical_accuracy": {
+                        "score": 0,
+                        "reasoning": "This line does not contain any technical information."
+                    }
+                },
+                {
+                    "line": "to stick to the interview questions, please  so, reece, let's start by introducing yourself?",
+                    "relevance": {
+                        "score": 0,
+                        "reasoning": "This line is not relevant to the question as it is a prompt from the interviewer."
+                    },
+                    "clarity": {
+                        "score": 7,
+                        "reasoning": "The line is clear and easy to understand."
+                    },
+                    "depth": {
+                        "score": 0,
+                        "reasoning": "This line does not provide any depth or detail."
+                    },
+                    "professionalism": {
+                        "score": 8,
+                        "reasoning": "The language and content are professional and appropriate for an interview setting."
+                    },
+                    "technical_accuracy": {
+                        "score": 0,
+                        "reasoning": "This line does not contain any technical information."
+                    }
+                },
+                {
+                    "line": "I am a student of it Kharagpur",
+                    "relevance": {
+                        "score": 5,
+                        "reasoning": "This line is partially relevant as it provides the candidate's educational background but does not fully introduce them or explain their qualifications."
+                    },
+                    "clarity": {
+                        "score": 7,
+                        "reasoning": "The line is clear and easy to understand."
+                    },
+                    "depth": {
+                        "score": 2,
+                        "reasoning": "This line provides minimal depth or detail about the candidate's educational background."
+                    },
+                    "professionalism": {
+                        "score": 6,
+                        "reasoning": "The language and content are somewhat professional but could be improved."
+                    },
+                    "technical_accuracy": {
+                        "score": 0,
+                        "reasoning": "This line does not contain any technical information."
+                    }
+                },
+                {
+                    "line": "hello hello",
+                    "relevance": {
+                        "score": 0,
+                        "reasoning": "This line is not relevant to the question and is a repetition of the previous greeting."
+                    },
+                    "clarity": {
+                        "score": 1,
+                        "reasoning": "The line is unclear and lacks proper grammar and structure."
+                    },
+                    "depth": {
+                        "score": 0,
+                        "reasoning": "This line does not provide any depth or detail."
+                    },
+                    "professionalism": {
+                        "score": 1,
+                        "reasoning": "The language and content are unprofessional and inappropriate for an interview setting."
+                    },
+                    "technical_accuracy": {
+                        "score": 0,
+                        "reasoning": "This line does not contain any technical information."
+                    }
+                }
+            ],
             "overall_assessment": {
-                "overall_score": 0,
-                "strengths": [],
-                "areas_for_improvement": [],
-                "suggestions": []
+                "overall_score": 4,
+                "strengths": [
+                    "Clear and easy-to-understand language",
+                    "Professional and appropriate content"
+                ],
+                "areas_for_improvement": [
+                    "Relevance to the question",
+                    "Depth and detail of the answers",
+                    "Grammar and structure",
+                    "Professionalism of the language and content"
+                ],
+                "suggestions": [
+                    "Provide a clear and concise introduction that includes your name, role, and the purpose of the interview.",
+                    "Tailor your answers to the specific questions being asked, providing relevant and detailed information.",
+                    "Use proper grammar and structure in your responses.",
+                    "Maintain a professional and respectful tone throughout the interview."
+                ]
             }
         }
     },
@@ -38,15 +171,15 @@
                     },
                     "clarity": {
                         "score": 10,
-                        "reasoning": "The answer is clear and concise, consisting of a single pair of curly braces."
+                        "reasoning": "The answer is clear and easy to understand."
                     },
                     "depth": {
                         "score": 0,
-                        "reasoning": "The answer provides no depth or detail about coding."
+                        "reasoning": "The answer provides no depth or detail."
                     },
                     "professionalism": {
-                        "score": 10,
-                        "reasoning": "The answer is professional in its brevity and lack of unnecessary language."
+                        "score": 0,
+                        "reasoning": "The answer is not professional as it does not provide any meaningful information."
                     },
                     "technical_accuracy": {
                         "score": 0,
@@ -55,20 +188,21 @@
                 }
             ],
             "overall_assessment": {
-                "overall_score": 2,
+                "overall_score": 0,
                 "strengths": [
-                    "Clarity",
-                    "Professionalism"
+                    "The answer is clear and easy to understand."
                 ],
                 "areas_for_improvement": [
-                    "Relevance",
-                    "Depth",
-                    "Technical Accuracy"
+                    "The answer is completely irrelevant to the question asked.",
+                    "The answer provides no depth or detail.",
+                    "The answer is not professional.",
+                    "The answer is not technically accurate."
                 ],
                 "suggestions": [
-                    "Provide a more relevant answer that demonstrates your knowledge of coding.",
-                    "Expand on your answer to provide more depth and detail.",
-                    "Ensure that your answer is technically accurate and reflects your understanding of the subject matter."
+                    "The candidate should have provided a more relevant answer that demonstrates their knowledge of coding.",
+                    "The candidate should have provided more depth and detail in their answer.",
+                    "The candidate should have used more professional language and content.",
+                    "The candidate should have ensured that their answer was technically accurate."
                 ]
             }
         }

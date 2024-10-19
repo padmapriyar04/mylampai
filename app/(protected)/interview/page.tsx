@@ -6,31 +6,22 @@ import React, {
   DragEvent,
   ChangeEvent,
 } from "react";
-import { IoDocumentAttach } from "react-icons/io5";
-import AudioToText from "./recording";
-import { FiMic, FiSpeaker, FiVideo, FiMessageSquare } from "react-icons/fi";
-import { useInterviewStore } from "@/utils/store";
-import Image from "next/image";
-import { IoCloudUploadOutline } from "react-icons/io5";
-import { FaRegFileAlt } from "react-icons/fa";
-import DeviceSelection from "./DeviceSelection"; // Importing the DeviceSelection component
+import DeviceSelection from "./DeviceSelection";
 import { useRouterStore } from "@/utils/useRouteStore";
-import { toast } from "sonner";
-import { PiChatsThin } from "react-icons/pi";
-import { FiX } from "react-icons/fi"; // Import the FiX icon
 import InterviewPage from './InterviewPage';
 import StepOne from './StepOne';
 import StepTwo from './StepTwo';
-import OnlineCompiler from './OnlineCompiler';
+import { toast } from "sonner";
 
+type ChatMessage = {
+  user: string;
+  message: string;
+};
 
 const InterviewComponent = () => {
-  const { changeRoute } = useRouterStore(); // for hiding the default navbar in interview section
-  const [isMounted, setIsMounted] = useState(false);
+  const { changeRoute } = useRouterStore();
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [jobDescriptionFile, setJobDescriptionFile] = useState<File | null>(null);
   const [step, setStep] = useState(1);
-  const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState("");
   const [selectedJobProfile, setSelectedJobProfile] = useState("");
   const [isCameraEnabled, setIsCameraEnabled] = useState(false);
@@ -38,98 +29,33 @@ const InterviewComponent = () => {
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const [isMicEnabled, setIsMicEnabled] = useState(false);
   const [isMicTestEnabled, setIsMicTestEnabled] = useState(false);
-  const [isMicTestCompleted, setIsMicTestCompleted] = useState(false);
-  const [analysisData, setAnalysisData] = useState(null); // Step 1: State for storing analysis data
+  const [analysisData, setAnalysisData] = useState(null);
 
   const [cvText, setCvText] = useState("");
   const [JD, setJD] = useState("");
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(30 * 60);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const [audioTextInputs, setAudioTextInputs] = useState<string[]>([]);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef(null);
 
   const [textToSpeak, setTextToSpeak] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [micActive, setMicActive] = useState(false);
   const [volume, setVolume] = useState(0);
+
+  const [loading, setLoading] = useState(true)
+  const [isUploading, setIsUploading] = useState(false);
+
   const audioContextRef = useRef<AudioContext | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const rafIdRef = useRef<number | null>(null);
-  const [customProfile, setCustomProfile] = useState("");
+  const websocketRef = useRef<WebSocket | null>(null);
 
-  const [loading,setLoading] = useState(true)
-  const [isRecognitionActive, setIsRecognitionActive] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const allDevicesConfigured =
     isCameraEnabled && isMicEnabled && isSoundEnabled;
 
-  const websocketRef = useRef<WebSocket | null>(null);
-  const [codingQuestion, setCodingQuestion] = useState<string | null>(null);
-const [isCompilerOpen, setIsCompilerOpen] = useState(false);
-
-
-  const jobProfiles = [
-    "Software Engineer",
-    "Data Scientist",
-    "Product Manager",
-    "UI/UX Designer",
-    "Business Analyst",
-    "DevOps Engineer",
-    "System Administrator",
-  ];
-
-  useEffect(() => {
-    const savedResume = localStorage.getItem('resumeFile');
-    
-    if (savedResume) {
-      const file = base64ToFile(savedResume, 'resume.pdf');
-      setResumeFile(file);
-      setIsUploading(true);  // Set uploading to true if a resume is found on reload
-      sendResumeToWebSocket(file);
-    }
-  
-    setIsMounted(true);
-  }, []);
-  
-
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
-  const base64ToFile = (base64String: string, filename: string): File => {
-    const arr = base64String.split(',');
-    const match = arr[0].match(/:(.*?);/);
-  
-    if (!match) {
-      throw new Error('Invalid base64 string format');
-    }
-  
-    const mime = match[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    
-    return new File([u8arr], filename, { type: mime });
-  };
-  
-  
-
-  type ChatMessage = {
-    user: string;
-    message: string;
-  };
 
   const waitForSocketConnection = (socket: WebSocket) => {
     return new Promise<void>((resolve) => {
@@ -137,51 +63,46 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
         resolve();
       } else {
         socket.onopen = () => {
-          console.log("WebSocket connection opened");
           resolve();
         };
       }
     });
   };
 
-  
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
-    if (isMounted && !websocketRef.current) {
+    if (!websocketRef.current) {
       websocketRef.current = new WebSocket(
         "wss://ai-interviewer-c476.onrender.com/ws",
       );
 
       waitForSocketConnection(websocketRef.current).then(() => {
-        console.log("WebSocket is ready to send messages");
       });
 
       websocketRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
+
         if (data.type === "cv_uploaded") {
-          console.log("CV uploaded:", data.message);
           setIsUploading(false);
-          toast.success("Resume uploaded successfully!"); 
+          toast.success("Resume uploaded successfully!");
           setCvText(data.cv_text); // Update the state with CV text
-        } else if (data.type === "jd_analyzed") {
-          console.log("Job description analyzed:", data.message);
-          setJD(data.job_description); // Update the state with JD text
-        } else if (data.type === "interview_question") {
-          console.log("Interview question received:", data.question);
+        } 
+        else if (data.type === "jd_analyzed") {
+          setJD(data.job_description);
+        } 
+        else if (data.type === "interview_started") {
+          setIsInterviewStarted(true)
+        }
+        else if (data.type === "interview_question") {
           setChatMessages((prevMessages) => [
             ...prevMessages,
             { user: "Interviewer", message: data.question },
           ]);
           setTextToSpeak(data.question);
-          setLoading(false); // Stop loading when the question is received
-        } 
+          setLoading(false);
+        }
         else if (data.type === "coding_question") {
-          setCodingQuestion(data.message);
-          
-          // Send dummy response to coding question
+
           websocketRef.current?.send(
             JSON.stringify({
               type: "coding",
@@ -189,23 +110,20 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
               ques: data.message
             })
           );
-        
-        // Handle code evaluation result
+
         } else if (data.type === "code_evaluation") {
           setChatMessages((prevMessages) => [
             ...prevMessages,
             { user: "System", message: "Code evaluation result: " + data.result }
           ]);
-        
-     
-        }else if (data.type === "interview_end") {
-          console.log("Interview ended:", data.message);
+
+
+        } else if (data.type === "interview_end") {
           setChatMessages((prevMessages) => [
             ...prevMessages,
             { user: "System", message: data.message },
           ]);
         } else if (data.type === "analysis") {
-          console.log("Analysis result received:", data.result);
           setAnalysisData(data.result); // Store analysis data
           setChatMessages((prevMessages) => [
             ...prevMessages,
@@ -215,14 +133,13 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
       };
 
       websocketRef.current.onclose = () => {
-        console.log("WebSocket connection closed");
       };
 
       websocketRef.current.onerror = (error) => {
         console.error("WebSocket error:", error);
       };
     }
-  }, [isMounted]);
+  }, []);
 
   const handleSendMessage = (message: string) => {
     if (message.trim() !== "") {
@@ -235,9 +152,9 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
       );
     }
   };
-  
 
-  
+
+
 
   const handleTextSubmit = (text: string) => {
     setAudioTextInputs((prevInputs) => [...prevInputs, text]); // Store the audio-to-text input
@@ -253,28 +170,21 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
     ]);
   };
 
-  const handleUploadJDToggle = () => {
-    setIsManualEntry(false);
-    setManualJobDescription("");
-  };
-
   const handleSpeak = () => {
     if (!textToSpeak) return;
-  
-    console.log("Speak function called with text:", textToSpeak);
+
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     setIsSpeaking(true); // Set isSpeaking to true when TTS starts
-  
+
     utterance.onend = () => {
       setIsSpeaking(false); // Reset isSpeaking to false when TTS ends
     };
-  
+
     window.speechSynthesis.speak(utterance);
   };
-  
+
   useEffect(() => {
     if (textToSpeak) {
-      console.log("Text to Speak:", textToSpeak);
       handleSpeak();
     }
   }, [textToSpeak]);
@@ -297,7 +207,7 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
         (file.type === "application/pdf" ||
           file.type === "application/msword" ||
           file.type ===
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
       ) {
         // Update the state with the file
         setFile(file);
@@ -311,119 +221,53 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
         // Call the function as if it were handling a real file input change
         handleResumeUpload(customEvent);
       } else {
-        alert("Please upload a valid DOC, DOCX, or PDF file.");
+        toast.success("Please upload a valid DOC, DOCX, or PDF file.");
       }
     }
   };
 
-  // Make sure you define handleResumeUpload in a way that can handle file input
+
   const handleResumeUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target?.files?.[0];
 
     if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-        setIsUploading(true); // Set uploading to true when starting upload
-        
-        setResumeFile(file);
-        const base64 = await fileToBase64(file);
-        localStorage.setItem('resumeFile', base64);
-        setCvText(file.name); // Update the display text to show thtoe uploaded file name
-        
-        // Send the resume to the WebSocket
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const binaryData = e.target?.result as ArrayBuffer;
-            if (binaryData && websocketRef.current) {
-                await waitForSocketConnection(websocketRef.current);
-                websocketRef.current.send(
-                    JSON.stringify({
-                        type: "upload_cv",
-                        cv_data: Array.from(new Uint8Array(binaryData)),
-                    })
-                );
-                      
-            } else {
-                console.error("WebSocket is not initialized");
-            }
-        };
-        reader.readAsArrayBuffer(file);
-    } else {
-        alert("Please upload a valid DOC, DOCX, or PDF file.");
-        setResumeFile(null);
-        setCvText("");
-        setIsUploading(false);
-        // Ensure uploading is turned off on error
-    }
-};
+      setIsUploading(true);
 
-  const sendResumeToWebSocket = async (file: File) => {
-    const reader = new FileReader();
-  
-    reader.onload = async (e) => {
-      const binaryData = e.target?.result as ArrayBuffer;
-  
-      if (binaryData && websocketRef.current) {
-        await waitForSocketConnection(websocketRef.current);
-        
-        websocketRef.current.send(
-          JSON.stringify({
-            type: "upload_cv",
-            cv_data: Array.from(new Uint8Array(binaryData)),
-          }),
-        );
-      }
-    };
-  
-    reader.readAsArrayBuffer(file);
-  };
+      setResumeFile(file);
+      setCvText(file.name);
 
-  const isResumeUploaded = !!resumeFile;
-
-  const handleJobDescriptionUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (file && (file.type === "application/pdf" || file.type === "application/msword" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document")) {
-      setJobDescriptionFile(file);
-      const base64 = await fileToBase64(file);
-      localStorage.setItem('jobDescriptionFile', base64);
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const binaryData = e.target?.result as ArrayBuffer; // Ensure the result is treated as ArrayBuffer
-        console.log("JD binary data:", binaryData); // Debugging log
-
-        if (websocketRef.current) {
-          await waitForSocketConnection(websocketRef.current); // Ensure WebSocket is ready
-
+        const binaryData = e.target?.result as ArrayBuffer;
+        if (binaryData && websocketRef.current) {
+          await waitForSocketConnection(websocketRef.current);
           websocketRef.current.send(
             JSON.stringify({
-              type: "analyze_jd",
-              job_description: Array.from(new Uint8Array(binaryData)),
-            }),
+              type: "upload_cv",
+              cv_data: Array.from(new Uint8Array(binaryData)),
+            })
           );
-          setJD("Uploaded");
-          toast.success("Job Description Uploaded successfully");
 
-          // Check if CV is also uploaded
-          if (cvText) {
-            startInterview();
-          }
         } else {
           console.error("WebSocket is not initialized");
         }
       };
       reader.readAsArrayBuffer(file);
     } else {
-      alert("Please upload a valid DOC, DOCX, or PDF file.");
+      toast.success("Please upload a valid DOC, DOCX, or PDF file.");
+      setResumeFile(null);
+      setCvText("");
+      setIsUploading(false);
     }
   };
 
+
   const startInterview = () => {
     if (cvText && JD) {
-      console.log("Starting interview with:", { cvText, JD });
 
       if (websocketRef.current) {
         waitForSocketConnection(websocketRef.current)
           .then(() => {
-            console.log("WebSocket is ready to send start_interview");
             websocketRef.current?.send(
               JSON.stringify({
                 type: "start_interview",
@@ -431,8 +275,6 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
                 job_description: JD, // Use actual JD
               }),
             );
-            setIsInterviewStarted(true); // Set interview started state
-            setLoading(true);
           })
           .catch((err) => {
             console.error("Failed to start interview:", err);
@@ -449,7 +291,7 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
     if (step === 3 && allDevicesConfigured) {
       // Check if both CV and Job Description are uploaded
       if (!cvText || !JD) {
-        alert('Please upload both the CV and Job Description before starting the interview.');
+        toast.success('Please upload both the CV and Job Description before starting the interview.');
         return;
       }
       changeRoute(false);
@@ -467,42 +309,9 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
-    event.stopPropagation(); // Prevent default behavior to allow dropping
+    event.stopPropagation();
   };
 
-  const handleManualEntryToggle = () => {
-    setIsManualEntry(true);
-    setJobDescriptionFile(null);
-  };
-
-  const triggerFileInput = (inputId: string) => {
-    // Trigger the file input click
-    const inputElement = document.getElementById(
-      inputId,
-    ) as HTMLInputElement | null;
-
-    if (inputElement) {
-      inputElement.click();
-
-      // Check if both CV and Job Description are uploaded
-      if (cvText && JD) {
-        // Start the interview and set the state
-        startInterview();
-      } else {
-        console.error("CV or JD not uploaded, cannot start the interview.");
-      }
-    } else {
-      console.error(`Input element with id ${inputId} not found.`);
-    }
-  };
-
-  useEffect(() => {
-    const timerInterval = setInterval(() => {
-      setTimeRemaining((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timerInterval);
-  }, []);
 
   useEffect(() => {
     const enableCamera = async () => {
@@ -511,16 +320,15 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
           const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
           });
-          console.log("Camera enabled: Stream acquired");
           videoRef.current.srcObject = stream; // No need for '!' as videoRef is typed
           videoRef.current.play(); // TypeScript now knows play() exists on HTMLVideoElement
         } catch (err) {
           if (err instanceof Error) {
             console.error("Error accessing camera:", err.message);
-            alert("Unable to access camera: " + err.message);
+            toast.success("Unable to access camera: " + err.message);
           } else {
             console.error("Unknown error accessing camera");
-            alert("Unable to access camera due to an unknown error.");
+            toast.success("Unable to access camera due to an unknown error.");
           }
         }
       }
@@ -544,56 +352,11 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
     };
   }, [isCameraEnabled, isInterviewStarted]);
 
-  const formatTime = (timeInSeconds: number): string => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  };
 
-  const [activeTab, setActiveTab] = useState("conversation");
-
-  if (!isMounted) {
-    return null;
-  }
-
-  const handleManualJDUpload = () => {
-    // Set job description based on manual entry or custom profile for "Other"
-    const jobDescription = manualJobDescription === 'Other' ? customProfile.trim() : manualJobDescription.trim();
-  
-    if (jobDescription !== '') {
-      setJD(jobDescription); // Set JD for manual job descriptions
-      websocketRef.current?.send(
-        JSON.stringify({
-          type: 'analyze_jd',
-          job_description: jobDescription,
-        }),
-      );
-  
-      if (cvText && jobDescription) {
-        toast.success('Job Description uploaded successfully');
-      }
-    } else {
-      alert('Please fill in the job description.');
-    }
-  };
-  
-
-  const handleMicTestConfirmation = () => {
-    setIsMicTestEnabled(false); // Disable mic test mode
-    setIsMicEnabled(true); // Mark microphone as enabled
-    stopMicrophoneTest(); // Stop the microphone test
-  
-    // The following block should be removed, as it's causing the error:
-    // if (typeof onMicTestComplete === 'function') {
-    //   onMicTestComplete(); // Call this prop function to notify the parent
-    // }
-  };
-  
-  
   const handleSoundConfirmation = () => {
-    stopTestSound(); // Stop the sound test
-    setIsSoundEnabled(true); // Mark sound as enabled
-    setIsSoundTesting(false); // Disable sound testing mode
+    stopTestSound();
+    setIsSoundEnabled(true);
+    setIsSoundTesting(false);
   };
 
   const startMicrophoneTest = () => {
@@ -601,7 +364,7 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
       window.AudioContext || (window as any).webkitAudioContext;
 
     if (!AudioContext) {
-      alert("Web Audio API is not supported in this browser");
+      toast.success("Web Audio API is not supported in this browser");
       return;
     }
 
@@ -625,9 +388,9 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
       .catch((err: unknown) => {
         console.error("Error accessing microphone:", err);
         if (err instanceof Error) {
-          alert("Unable to access microphone: " + err.message);
+          toast.error("Unable to access microphone: " + err.message);
         } else {
-          alert("Unable to access microphone due to an unknown error.");
+          toast.error("Unable to access microphone due to an unknown error.");
         }
       });
   };
@@ -635,19 +398,16 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
   const updateVolume = () => {
     if (analyserRef.current && dataArrayRef.current) {
       analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+
       const volume =
         dataArrayRef.current.reduce((a, b) => a + b, 0) /
         dataArrayRef.current.length;
+
       setVolume(volume);
       rafIdRef.current = requestAnimationFrame(updateVolume);
     }
   };
 
-  const handleDeleteResume = () => {
-    setResumeFile(null);
-    setCvText("");
-    localStorage.removeItem('resumeFile'); // Also remove the file from local storage
-  };
 
   const stopMicrophoneTest = () => {
     if (rafIdRef.current !== null) {
@@ -670,12 +430,11 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
     }
   };
 
-  if (isInterviewStarted && !isCompilerOpen) {
+  if (isInterviewStarted) {
     return (
       <InterviewPage
         isMicEnabled={isMicEnabled}
         isSpeaking={isSpeaking}
-        isMicTestCompleted={isMicTestCompleted}
         chatMessages={chatMessages}
         audioTextInputs={audioTextInputs}
         loading={loading}
@@ -687,63 +446,31 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
     );
   }
 
-  if (isCompilerOpen) {
-    return (
-      <div className="min-h-screen p-6 md:p-8 bg-light-gray">
-        <h2 className="text-2xl font-bold mb-4">Coding Question</h2>
-        <p className="mb-6">{codingQuestion}</p>
-        <OnlineCompiler />
-       
-        <button
-          onClick={() => setIsCompilerOpen(false)}
-          className="mt-4 py-2 px-4 bg-red-500 text-white rounded"
-        >
-          Close Compiler
-        </button>
-      </div>
-    );
-  }
-  
-  
-
   return (
-    <div className="md:h-[calc(100vh-4rem)] h-[132vh] overflow-y-scroll bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] ">
-      {/* Step 1: Upload Resume */}
+    <>
       {step === 1 && (
-        <div>
         <StepOne
-          isResumeUploaded={!!resumeFile}
           resumeFile={resumeFile}
           isUploading={isUploading}
           handleResumeUpload={handleResumeUpload}
           handleDragOver={handleDragOver}
           handleDrop={(e) => handleDrop(e, setResumeFile)}
-          handleDeleteResume={handleDeleteResume}
           handleNextClick={handleNextClick}
-          handleBackClick={handleBackClick}
           setResumeFile={setResumeFile}
         />
-      </div>
       )}
 
-      {/* Step 2: Upload Job Description */}
       {step === 2 && (
         <StepTwo
-        JD={JD}
-        isResumeUploaded={isResumeUploaded}
-        jobDescriptionFile={jobDescriptionFile}
-        isManualEntry={isManualEntry}
-        manualJobDescription={manualJobDescription}
-        selectedJobProfile={selectedJobProfile}
-        jobProfiles={jobProfiles}
-        setJD={setJD}
-        handleManualJDUpload={handleManualJDUpload}
-        handleNextClick={handleNextClick}
-        handleBackClick={handleBackClick}
-        setSelectedJobProfile={setSelectedJobProfile}
-        setManualJobDescription={setManualJobDescription}
-        websocketRef={websocketRef}
-      />
+          manualJobDescription={manualJobDescription}
+          selectedJobProfile={selectedJobProfile}
+          setJD={setJD}
+          handleNextClick={handleNextClick}
+          handleBackClick={handleBackClick}
+          setSelectedJobProfile={setSelectedJobProfile}
+          setManualJobDescription={setManualJobDescription}
+          websocketRef={websocketRef}
+        />
       )}
 
       {/* Step 3: Configure Devices */}
@@ -760,25 +487,18 @@ const [isCompilerOpen, setIsCompilerOpen] = useState(false);
           setIsSoundTesting={setIsSoundTesting}
           isMicTestEnabled={isMicTestEnabled}
           isSoundTesting={isSoundTesting}
-          handleMicTestConfirmation={handleMicTestConfirmation}
           handleSoundConfirmation={handleSoundConfirmation}
           startMicrophoneTest={startMicrophoneTest}
           stopMicrophoneTest={stopMicrophoneTest}
           volume={volume}
-          setVolume={setVolume}
-          updateVolume={updateVolume}
-          rafIdRef={rafIdRef}
-          audioContextRef={audioContextRef}
-          analyserRef={analyserRef}
-          dataArrayRef={dataArrayRef}
           handleNextClick={handleNextClick}
           handleBackClick={handleBackClick}
           allDevicesConfigured={allDevicesConfigured}
-          
+
         />
 
       )}
-    </div>
+    </>
   );
 };
 

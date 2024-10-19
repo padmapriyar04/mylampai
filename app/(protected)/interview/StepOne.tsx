@@ -6,31 +6,33 @@ import { IoDocumentAttach, IoCloudUploadOutline } from 'react-icons/io5';
 import { FiX } from 'react-icons/fi';
 
 interface StepOneProps {
-  isResumeUploaded: boolean;
   resumeFile: File | null;
   isUploading: boolean;
   handleResumeUpload: (e: ChangeEvent<HTMLInputElement>) => void;
   handleDragOver: (e: DragEvent<HTMLDivElement>) => void;
   handleDrop: (e: DragEvent<HTMLDivElement>, setResumeFile: React.Dispatch<React.SetStateAction<File | null>>) => void;
-  handleDeleteResume: () => void;
+
   handleNextClick: () => void;
-  handleBackClick: () => void;
   setResumeFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
 const StepOne: React.FC<StepOneProps> = ({
-  isResumeUploaded,
   resumeFile,
   isUploading,
   handleResumeUpload,
   handleDragOver,
   handleDrop,
-  handleDeleteResume,
   handleNextClick,
-  handleBackClick,
   setResumeFile,
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const isResumeUploaded = !!resumeFile;
+
+
+  const handleDeleteResume = () => {
+    setResumeFile(null);
+  };
 
   const handleUploadClick = () => {
     if (fileInputRef.current) {
@@ -40,7 +42,6 @@ const StepOne: React.FC<StepOneProps> = ({
 
   return (
     <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">
-      {/* Left Section */}
       <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
         <Image
           src={"/images/Globe.svg"}
@@ -145,7 +146,7 @@ const StepOne: React.FC<StepOneProps> = ({
             <div className="text-center text-gray-600 font-semibold relative h-[135px] flex items-center justify-center">
               Resume Uploaded: {resumeFile.name}
               <button
-                className="absolute top-[44%] right-6 text-gray-600 hover:text-red-600 focus:outline-none"
+                className="absolute top-0 right-4 text-gray-600 hover:text-red-600 focus:outline-none"
                 onClick={handleDeleteResume}
               >
                 <FiX className="w-5 h-5" />
@@ -205,9 +206,9 @@ const StepOne: React.FC<StepOneProps> = ({
           </button>
           <button
             className="bg-transparent text-gray-700 w-full font-semibold h-12 py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"
-            
+
           >
-            
+
           </button>
         </div>
       </div>

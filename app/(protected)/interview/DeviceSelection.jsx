@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiMic, FiSpeaker, FiVideo } from "react-icons/fi";
+
 
 const DeviceSelection = ({
   videoRef,
@@ -13,35 +14,28 @@ const DeviceSelection = ({
   setIsSoundTesting,
   isMicTestEnabled,
   isSoundTesting,
-  handleMicTestConfirmation,
   handleSoundConfirmation,
   startMicrophoneTest,
   stopMicrophoneTest,
   volume,
-  setVolume,
-  updateVolume,
-  rafIdRef,
-  audioContextRef,
-  analyserRef,
-  dataArrayRef,
   handleNextClick,
   handleBackClick,
   allDevicesConfigured,
 }) => {
-  const [audioInputDevices, setAudioInputDevices] = useState([]);
   const [audioOutputDevices, setAudioOutputDevices] = useState([]);
-  const [videoInputDevices, setVideoInputDevices] = useState([]);
+
+  const handleMicTestConfirmation = () => {
+    setIsMicTestEnabled(false);
+    setIsMicEnabled(true);
+    stopMicrophoneTest();
+  };
 
   useEffect(() => {
     // Fetch available devices
     navigator.mediaDevices.enumerateDevices().then((devices) => {
-      const audioInputs = devices.filter((device) => device.kind === "audioinput");
       const audioOutputs = devices.filter((device) => device.kind === "audiooutput");
-      const videoInputs = devices.filter((device) => device.kind === "videoinput");
 
-      setAudioInputDevices(audioInputs);
       setAudioOutputDevices(audioOutputs);
-      setVideoInputDevices(videoInputs);
     });
   }, []);
 

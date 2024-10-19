@@ -1,14 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 interface AudioToTextProps {
   onTextSubmit: (text: string) => void;
   isSpeaking: boolean;
-  isMicTestCompleted: boolean;
 }
 
-const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit, isSpeaking, isMicTestCompleted }) => {
-  const [transcript, setTranscript] = useState('');
-  const [interimTranscript, setInterimTranscript] = useState('');
+const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit, isSpeaking }) => {
   let recognition: SpeechRecognition | null = null;
 
   if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
@@ -35,9 +32,6 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit, isSpeaking, isM
             interimText += transcriptSegment;
           }
         }
-
-        setTranscript((prev) => prev + finalText);
-        setInterimTranscript(interimText);
 
         if (finalText) {
           onTextSubmit(finalText); // Send final recognized text to parent component
@@ -85,10 +79,6 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit, isSpeaking, isM
 
   return (
     <div className="absolute bottom-0 right-1/2 translate-x-1/2">
-      {/* Optionally render interim and final transcripts */}
-      {/* <p>Interim: {interimTranscript}</p> */}
-      {/* <p>Final: {transcript}</p> */}
-      <p>{isMicTestCompleted ? 'Mic Test Completed' : 'Mic Test In Progress'}</p>
     </div>
   );
 };
