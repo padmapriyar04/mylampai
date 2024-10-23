@@ -12,32 +12,6 @@ export const authOptions: NextAuthOptions = {
       allowDangerousEmailAccountLinking: true,
     })
   ],
-  // callbacks: {
-      // async signIn({ account, profile }) {
-        // if (account?.provider === "google" && profile?.email) {
-        //   // Check if email exists
-        //   const existingUser = await prisma.user.findUnique({
-        //     where: { email: profile.email },
-        //   });
-
-        //   if (existingUser) {
-        //     console.log("User already exists:", existingUser);
-        //   } else {
-        //     // User does not exist, create a new user with the profile data
-        //     const newUser = await prisma.user.create({
-        //       data: {
-        //         name: profile.name || "",
-        //         email: profile.email,
-        //         role:"user",
-        //       },
-        //     });
-        //     console.log("User created:", newUser);
-        //   }
-        // }
-
-      //   return true;
-      // },
-  // },
   session: {
     strategy: "jwt",
   },

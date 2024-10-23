@@ -3,6 +3,7 @@ import React, {
   useState,
   useRef,
   useEffect,
+  useCallback,
   DragEvent,
   ChangeEvent,
 } from "react";
@@ -14,7 +15,6 @@ import StepTwo from './StepTwo';
 import { toast } from "sonner";
 import { useWebSocketContext } from '@/hooks/webSocketContext';
 
-
 type ChatMessage = {
   user: string;
   message: string;
@@ -23,12 +23,12 @@ type ChatMessage = {
 const InterviewComponent = () => {
   const { ws } = useWebSocketContext();
   const { changeRoute } = useRouterStore();
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [step, setStep] = useState(1);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [manualJobDescription, setManualJobDescription] = useState("");
   const [selectedJobProfile, setSelectedJobProfile] = useState("");
-  const [isCameraEnabled, setIsCameraEnabled] = useState(false);
   const [isSoundTesting, setIsSoundTesting] = useState(false);
+  const [isCameraEnabled, setIsCameraEnabled] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const [isMicEnabled, setIsMicEnabled] = useState(false);
   const [isMicTestEnabled, setIsMicTestEnabled] = useState(false);
@@ -63,7 +63,6 @@ const InterviewComponent = () => {
   useEffect(() => {
 
     if (ws) {
-
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
 

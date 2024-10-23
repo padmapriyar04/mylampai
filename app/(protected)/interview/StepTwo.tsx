@@ -1,10 +1,10 @@
-import React, { useState, ChangeEvent, DragEvent } from 'react';
-import { IoCloudUploadOutline, IoDocumentAttach } from 'react-icons/io5';
+import React, { useState, ChangeEvent, DragEvent, useCallback } from 'react';
+import { IoCloudUploadOutline } from 'react-icons/io5';
 import { FiX } from 'react-icons/fi';
 import * as pdfjsLib from 'pdfjs-dist';
 import Image from 'next/image';
 import { useWebSocketContext } from '@/hooks/webSocketContext';
-
+import { toast } from 'sonner';
 
 interface StepTwoProps {
   manualJobDescription: string;
@@ -75,7 +75,42 @@ const StepTwo: React.FC<StepTwoProps> = ({
     });
   };
 
+  const checkMediaDevices = useCallback(async () => {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        toast.error("Media devices are not supported.");
+        return;
+      }
 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
+
+      console.log("Camera and microphone are enabled.");
+
+      const audioTracks = stream.getAudioTracks();
+      const videoTracks = stream.getVideoTracks();
+
+      console.log("Audio tracks:", audioTracks);
+      console.log("Video tracks:", videoTracks);
+
+      stream.getTracks().forEach(track => track.stop());
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          toast.error("Camera and/or microphone access denied.");
+        } else if (error.name === 'NotFoundError') {
+          toast.error("No media devices found.");
+        } else {
+          toast.error("Error accessing media devices:");
+          console.log("Error accessing media devices: ", error)
+        }
+      } else {
+        console.error("An unknown error occurred:", error);
+      }
+    }
+  }, [])
 
   const handleJDUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -16,20 +16,20 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
-  const token = cookieStore.get("token");
+  // const cookieStore = cookies();
+  // const token = cookieStore.get("token");
 
-  if (!token) {
-    redirect("/login");
-  }
+  // if (!token) {
+  //   redirect("/login");
+  // }
 
-  try {
-    if (token.value)
-      jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
-    else redirect("/login");
-  } catch (error) {
-    redirect("/login");
-  }
+  // try {
+  //   if (token.value)
+  //     jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
+  //   else redirect("/login");
+  // } catch (error) {
+  //   redirect("/login");
+  // }
 
   return (
     <>
