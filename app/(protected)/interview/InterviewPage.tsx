@@ -137,12 +137,12 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       </nav>
 
 
-      <div className={`flex-1 flex min-h-[100vh] justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${isChatOpen ? 'w-[80vw]' : 'w-full'}`}>
+      <div className={`flex-1 flex justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${isChatOpen ? 'w-[80vw]' : 'w-full'}`}>
         <video
           ref={videoRef}
-          className="w-full h-full max-w-screen max-h-screen object-cover rounded-lg shadow-lg transform scale-75 relative"
+          className="w-full  object-cover rounded-lg shadow-lg  relative"
           autoPlay
-          muted
+          
         />
       </div>
 

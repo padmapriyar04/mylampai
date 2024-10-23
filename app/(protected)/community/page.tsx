@@ -19,11 +19,11 @@ interface Community {
   comm_type: "exclusive" | "normal";
 }
 
-interface Sender {
+type Sender = {
   id: string;
   first_name: string;
 }
-interface Message {
+type Message = {
   id: string;
   type: "image" | "video" | "document" | "text";
   content: string;

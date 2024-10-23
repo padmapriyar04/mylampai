@@ -9,6 +9,9 @@
 
 @layer base {
   :root {
+
+    --custom-height: calc(100vh - 4rem);
+
     --navbar-height: 4rem;
     --navbar-mobile-height: 3.5rem;
 
@@ -44,6 +47,9 @@
   }
 
   .dark {
+
+    --custom-height: calc(100vh - 4rem);
+
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
