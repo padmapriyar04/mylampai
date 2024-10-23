@@ -3,6 +3,7 @@ import { IoCloudUploadOutline, IoDocumentAttach } from 'react-icons/io5';
 import { FiX } from 'react-icons/fi';
 import * as pdfjsLib from 'pdfjs-dist';
 import Image from 'next/image';
+import { useWebSocketContext } from '@/hooks/webSocketContext';
 
 
 interface StepTwoProps {
@@ -26,6 +27,7 @@ const StepTwo: React.FC<StepTwoProps> = ({
   setManualJobDescription,
   websocketRef,
 }) => {
+  const { ws } = useWebSocketContext();
   const [showTextbox, setShowTextbox] = useState(false);
   const [showUploadBox, setShowUploadBox] = useState(false); // New state to show upload box
   const [isNextEnabled, setIsNextEnabled] = useState(false);
@@ -87,8 +89,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
         extractedText = await file.text();
       }
 
-      if (extractedText && websocketRef?.current) {
-        websocketRef.current.send(
+      if (extractedText && ws) {
+        ws.send(
           JSON.stringify({ type: 'analyze_jd', job_description: extractedText })
         );
         setJD("Uploaded");
@@ -116,8 +118,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
         extractedText = await file.text();
       }
 
-      if (extractedText) {
-        websocketRef.current?.send(
+      if (extractedText && ws) {
+        ws.send(
           JSON.stringify({ type: 'analyze_jd', data: extractedText })
         );
         setJD("Uploaded");
@@ -140,8 +142,8 @@ const StepTwo: React.FC<StepTwoProps> = ({
       setShowUploadBox(false);
       setJD(profile);
 
-      if (websocketRef.current) {
-        websocketRef.current.send(
+      if (ws) {
+        ws.send(
           JSON.stringify({
             type: 'analyze_jd',
             job_description: profile,

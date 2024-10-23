@@ -5,6 +5,7 @@ import OnlineCompiler from './OnlineCompiler'; // Import the OnlineCompiler comp
 import { PiChatsThin } from 'react-icons/pi'; // Assuming this icon is from react-icons, adjust as necessary.
 import Image from 'next/image';
 import { RiEmotionUnhappyLine, RiEmotionNormalLine, RiEmotionLine } from 'react-icons/ri';
+import { useWebSocketContext } from '@/hooks/webSocketContext';
 
 interface InterviewPageProps {
   isMicEnabled: boolean;
@@ -15,7 +16,7 @@ interface InterviewPageProps {
   handleTextSubmit: (text: string) => void;
   handleSendMessage: (message: string) => void;
   websocketRef: React.MutableRefObject<WebSocket | null>;
-  analysisData: any; // Analysis data is passed here
+  analysisData: any; 
 }
 
 const InterviewPage: React.FC<InterviewPageProps> = ({
@@ -29,6 +30,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   websocketRef,
   analysisData,
 }) => {
+  const { ws } = useWebSocketContext();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showCompiler, setShowCompiler] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -48,14 +50,14 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       return () => clearInterval(timer);
     } else if (timeRemaining === 0 && !interviewEnded) {
       setInterviewEnded(true);
-      websocketRef.current?.send(
+      ws?.send(
         JSON.stringify({
           type: 'get_analysis',
         })
       );
       setShowFeedback(true);
     }
-  }, [loading, timeRemaining, interviewEnded, websocketRef]);
+  }, [loading, timeRemaining, interviewEnded]);
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -123,7 +125,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
             className="bg-red-500 text-white px-4 py-3 rounded-full font-semibold"
             onClick={() => {
               setInterviewEnded(true);
-              websocketRef.current?.send(
+              ws?.send(
                 JSON.stringify({
                   type: 'get_analysis', // Request analysis when manually ended
                 })
@@ -142,7 +144,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
           ref={videoRef}
           className="w-full  object-cover rounded-lg shadow-lg  relative"
           autoPlay
-          
+
         />
       </div>
 

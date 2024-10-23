@@ -1,9 +1,12 @@
+"use client"
+import { WebSocketProvider } from "@/hooks/webSocketContext"
 
-
-export default async function InterviewLayout({ children }: { children: React.ReactNode }) {
+export default function InterviewLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="h-custom bg-primary-foreground flex items-center md:justify-center justify-top w-full" >
-            {children}
-        </div>
+        <WebSocketProvider>
+            <div className="h-custom bg-primary-foreground flex items-center md:justify-center justify-top w-full" >
+                {children}
+            </div>
+        </WebSocketProvider>
     )
 }

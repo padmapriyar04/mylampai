@@ -12,7 +12,6 @@ export const authOptions: NextAuthOptions = {
       allowDangerousEmailAccountLinking: true,
     })
   ],
-
   // callbacks: {
       // async signIn({ account, profile }) {
         // if (account?.provider === "google" && profile?.email) {
@@ -39,7 +38,6 @@ export const authOptions: NextAuthOptions = {
       //   return true;
       // },
   // },
-  debug: process.env.NODE_ENV === "development",
   session: {
     strategy: "jwt",
   },

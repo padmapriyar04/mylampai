@@ -12,6 +12,8 @@ import InterviewPage from './InterviewPage';
 import StepOne from './StepOne';
 import StepTwo from './StepTwo';
 import { toast } from "sonner";
+import { useWebSocketContext } from '@/hooks/webSocketContext';
+
 
 type ChatMessage = {
   user: string;
@@ -19,6 +21,7 @@ type ChatMessage = {
 };
 
 const InterviewComponent = () => {
+  const { ws } = useWebSocketContext();
   const { changeRoute } = useRouterStore();
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [step, setStep] = useState(1);
@@ -57,39 +60,21 @@ const InterviewComponent = () => {
     isCameraEnabled && isMicEnabled && isSoundEnabled;
 
 
-  const waitForSocketConnection = (socket: WebSocket) => {
-    return new Promise<void>((resolve) => {
-      if (socket.readyState === WebSocket.OPEN) {
-        resolve();
-      } else {
-        socket.onopen = () => {
-          resolve();
-        };
-      }
-    });
-  };
-
-
   useEffect(() => {
-    if (!websocketRef.current) {
-      websocketRef.current = new WebSocket(
-        "wss://ai-interviewer-c476.onrender.com/ws",
-      );
 
-      waitForSocketConnection(websocketRef.current).then(() => {
-      });
+    if (ws) {
 
-      websocketRef.current.onmessage = (event) => {
+      ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
         if (data.type === "cv_uploaded") {
           setIsUploading(false);
           toast.success("Resume uploaded successfully!");
-          setCvText(data.cv_text); // Update the state with CV text
-        } 
+          setCvText(data.cv_text);
+        }
         else if (data.type === "jd_analyzed") {
           setJD(data.job_description);
-        } 
+        }
         else if (data.type === "interview_started") {
           setIsInterviewStarted(true)
         }
@@ -103,7 +88,7 @@ const InterviewComponent = () => {
         }
         else if (data.type === "coding_question") {
 
-          websocketRef.current?.send(
+          ws.send(
             JSON.stringify({
               type: "coding",
               code: 'This is a dummy response to the coding question.',
@@ -131,15 +116,9 @@ const InterviewComponent = () => {
           ]);
         }
       };
-
-      websocketRef.current.onclose = () => {
-      };
-
-      websocketRef.current.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
     }
-  }, []);
+
+  }, [ws]);
 
   const handleSendMessage = (message: string) => {
     if (message.trim() !== "") {
@@ -147,18 +126,15 @@ const InterviewComponent = () => {
         ...prevMessages,
         { user: "You", message },
       ]);
-      websocketRef.current?.send(
+      ws?.send(
         JSON.stringify({ type: "answer", answer: message }),
       );
     }
   };
 
-
-
-
   const handleTextSubmit = (text: string) => {
     setAudioTextInputs((prevInputs) => [...prevInputs, text]); // Store the audio-to-text input
-    websocketRef.current?.send(
+    ws?.send(
       JSON.stringify({
         type: "answer",
         answer: text,
@@ -239,9 +215,8 @@ const InterviewComponent = () => {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const binaryData = e.target?.result as ArrayBuffer;
-        if (binaryData && websocketRef.current) {
-          await waitForSocketConnection(websocketRef.current);
-          websocketRef.current.send(
+        if (binaryData && ws) {
+          ws.send(
             JSON.stringify({
               type: "upload_cv",
               cv_data: Array.from(new Uint8Array(binaryData)),
@@ -265,20 +240,14 @@ const InterviewComponent = () => {
   const startInterview = () => {
     if (cvText && JD) {
 
-      if (websocketRef.current) {
-        waitForSocketConnection(websocketRef.current)
-          .then(() => {
-            websocketRef.current?.send(
-              JSON.stringify({
-                type: "start_interview",
-                pdf_text: cvText, // Use actual cvText
-                job_description: JD, // Use actual JD
-              }),
-            );
-          })
-          .catch((err) => {
-            console.error("Failed to start interview:", err);
-          });
+      if (ws) {
+        ws.send(
+          JSON.stringify({
+            type: "start_interview",
+            pdf_text: cvText,
+            job_description: JD,
+          }),
+        )
       } else {
         console.error("WebSocket is not initialized");
       }
@@ -289,7 +258,6 @@ const InterviewComponent = () => {
 
   const handleNextClick = () => {
     if (step === 3 && allDevicesConfigured) {
-      // Check if both CV and Job Description are uploaded
       if (!cvText || !JD) {
         toast.success('Please upload both the CV and Job Description before starting the interview.');
         return;
@@ -494,7 +462,6 @@ const InterviewComponent = () => {
           handleNextClick={handleNextClick}
           handleBackClick={handleBackClick}
           allDevicesConfigured={allDevicesConfigured}
-
         />
 
       )}

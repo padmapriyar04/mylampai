@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiMic, FiSpeaker, FiVideo } from "react-icons/fi";
 
-
 const DeviceSelection = ({
   videoRef,
   isCameraEnabled,
