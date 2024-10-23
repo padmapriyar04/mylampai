@@ -11,11 +11,9 @@ interface InterviewPageProps {
   isMicEnabled: boolean;
   isSpeaking: boolean;
   chatMessages: { user: string; message: string }[];
-  audioTextInputs: string[];
   loading: boolean;
   handleTextSubmit: (text: string) => void;
   handleSendMessage: (message: string) => void;
-  websocketRef: React.MutableRefObject<WebSocket | null>;
   analysisData: any; 
 }
 
@@ -23,11 +21,9 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   isMicEnabled,
   isSpeaking,
   chatMessages,
-  audioTextInputs,
   loading,
   handleTextSubmit,
   handleSendMessage,
-  websocketRef,
   analysisData,
 }) => {
   const { ws } = useWebSocketContext();
