@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import Navbar from "@/components/global/Navbar";
 import type { Metadata } from "next";
-import Flexsidebar from "@/components/misc/Flexsidebar";
+import Flexsidebar from "@/components/global/Sidebar";
 
 
 export const metadata: Metadata = {

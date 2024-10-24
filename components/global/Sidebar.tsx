@@ -17,6 +17,11 @@ export default function Flexsidebar() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const notAllowedRoutes = [
+    "/interviewer",
+    "/cvreviewer"
+  ]
+
   const checkScreenSize = () => {
     setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
   };
@@ -43,7 +48,8 @@ export default function Flexsidebar() {
     };
   }, []);
 
-  if (pathname === "/interview" || pathname === "/cvreviewer") return null;
+  // Hiding sidebar in these routes
+  if (notAllowedRoutes.includes(pathname)) return null;
 
   return (
     <>

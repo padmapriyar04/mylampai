@@ -29,6 +29,6 @@
     "components/home/Typing.jsx", 
     "app/(protected)/cvreviewer/Highlighter.jsx",
     "types/pdfjs-dist.d.ts" // Added custom types folder for pdfjs-dist if needed
-, "app/(protected)/interview/DeviceSelection.jsx"  ],
+, "app/(protected)/interviewer/DeviceSelection.jsx"  ],
   "exclude": ["node_modules"]
 }

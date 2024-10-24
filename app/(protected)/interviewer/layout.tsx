@@ -1,5 +1,5 @@
 "use client"
-import { WebSocketProvider } from "@/hooks/webSocketContext"
+import { WebSocketProvider } from "@/hooks/interviewersocket/webSocketContext"
 
 export default function InterviewLayout({ children }: { children: React.ReactNode }) {
     return (

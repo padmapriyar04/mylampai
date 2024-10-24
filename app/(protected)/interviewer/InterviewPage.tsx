@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Analysis from "./Analysis";
-import OnlineCompiler from "./OnlineCompiler"; 
+import OnlineCompiler from "./OnlineCompiler";
 import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
 import AudioToText from "./recording";
@@ -9,9 +9,9 @@ import {
   RiEmotionNormalLine,
   RiEmotionLine,
 } from "react-icons/ri";
-import { useWebSocketContext } from "@/hooks/webSocketContext";
+import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 
-interface InterviewPageProps {
+type InterviewPageProps = {
   isMicEnabled: boolean;
   isSpeaking: boolean;
   chatMessages: { user: string; message: string }[];
@@ -33,7 +33,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   const [showCompiler, setShowCompiler] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackIconClicked, setFeedbackIconClicked] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(1200); 
+  const [timeRemaining, setTimeRemaining] = useState(1200);
   const [interviewEnded, setInterviewEnded] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null);
@@ -51,7 +51,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       ws?.send(
         JSON.stringify({
           type: "get_analysis",
-        })
+        }),
       );
       setShowFeedback(true);
     }
@@ -81,7 +81,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     };
 
     startVideoStream();
-    
+
     const videoElement = videoRef.current;
 
     return () => {
@@ -136,10 +136,10 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
               setInterviewEnded(true);
               ws?.send(
                 JSON.stringify({
-                  type: "get_analysis", // Request analysis when manually ended
-                })
+                  type: "get_analysis",
+                }),
               );
-              setShowFeedback(true); // Show feedback form
+              setShowFeedback(true);
             }}
           >
             END INTERVIEW
@@ -161,7 +161,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
 
       {isMicEnabled && (
         <>
-          {/* <AudioToText onTextSubmit={handleTextSubmit} isSpeaking={isSpeaking} /> */}
+          <AudioToText onTextSubmit={handleSendMessage} isSpeaking={isSpeaking} />
         </>
       )}
 
@@ -233,7 +233,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         </div>
       )}
 
-      {/* Feedback Pop-Up */}
       {showFeedback && !feedbackSubmitted && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-[40vw] min-w-[400px] min-h-[400px]">
@@ -300,7 +299,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         </div>
       )}
 
-      {/* Show Analysis after Feedback */}
       {feedbackSubmitted && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full min-w-[600px]">
@@ -309,7 +307,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         </div>
       )}
 
-      {/* Sliding Online Compiler */}
       <div
         className={`fixed inset-y-0 right-0 w-3/4 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
           showCompiler ? "translate-x-0" : "translate-x-full"
