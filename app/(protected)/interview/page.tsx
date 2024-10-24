@@ -11,12 +11,13 @@ import { useRouterStore } from "@/utils/useRouteStore";
 import InterviewPage from "./InterviewPage";
 import { toast } from "sonner";
 import { useWebSocketContext } from "@/hooks/webSocketContext";
-import * as pdfjsLib from "pdfjs-dist";
 import Image from "next/image";
 import { FiX } from "react-icons/fi";
 import { IoDocumentAttach, IoCloudUploadOutline } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import * as pdfjsLib from "pdfjs-dist";
+
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 type ChatMessage = {
@@ -33,8 +34,8 @@ const InterviewComponent = () => {
   const [jdFile, setJDFile] = useState<File | null>(null);
   const [selectedJobProfile, setSelectedJobProfile] = useState("");
   const [isCameraEnabled, setIsCameraEnabled] = useState(false);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const [isMicEnabled, setIsMicEnabled] = useState(false);
+  const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
   const [analysisData, setAnalysisData] = useState(null);
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
@@ -44,7 +45,6 @@ const InterviewComponent = () => {
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-
   const [textToSpeak, setTextToSpeak] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
 
@@ -53,9 +53,6 @@ const InterviewComponent = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
-
-  const allDevicesConfigured =
-    isCameraEnabled && isMicEnabled && isSoundEnabled;
 
   const jobProfiles = [
     "Software Engineer",
@@ -67,6 +64,8 @@ const InterviewComponent = () => {
     "System Administrator",
   ];
 
+  console.log("device list: ", deviceList);
+
   const updateDeviceList = useCallback(() => {
     try {
       if (!navigator.mediaDevices?.enumerateDevices) {
@@ -77,12 +76,16 @@ const InterviewComponent = () => {
       navigator.mediaDevices
         .enumerateDevices()
         .then((devices) => {
-          devices.forEach((device) => {
-            // console.log(
-            //   `${device.kind}: ${device.label} id = ${device.deviceId}`
-            // );
-            console.log(device);
-          });
+          console.log("Devices: ", devices);
+
+          const audioInputDevices = devices.filter(
+            (device) => device.kind === "audioinput"
+          );
+          const videoInputDevices = devices.filter(
+            (device) => device.kind === "videoinput"
+          );
+
+          setDeviceList([...audioInputDevices, ...videoInputDevices]);
         })
         .catch((err) => {
           console.error(`${err.name}: ${err.message}`);
@@ -102,6 +105,10 @@ const InterviewComponent = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    updateDeviceList();
+  }, [updateDeviceList]);
 
   useEffect(() => {
     if (ws) {
@@ -185,24 +192,7 @@ const InterviewComponent = () => {
     }
   };
 
-  const handleTextSubmit = (text: string) => {
-    ws?.send(
-      JSON.stringify({
-        type: "answer",
-        answer: text,
-      })
-    );
-    setChatMessages((prevMessages) => [
-      ...prevMessages,
-      { user: "You", message: text },
-    ]);
-  };
-
   useEffect(() => {
-    navigator.mediaDevices.ondevicechange = () => {
-      updateDeviceList();
-    };
-
     const handleSpeak = () => {
       if (!textToSpeak) return;
 
@@ -361,8 +351,8 @@ const InterviewComponent = () => {
         extractedText = await file.text();
       }
 
-      if (extractedText && ws) {
-        ws.send(JSON.stringify({ type: "analyze_jd", data: extractedText }));
+      if (extractedText) {
+        ws?.send(JSON.stringify({ type: "analyze_jd", data: extractedText }));
         setJD("Uploaded");
       }
     }
@@ -377,14 +367,12 @@ const InterviewComponent = () => {
       setShowTextbox(false);
       setJD(profile);
 
-      if (ws) {
-        ws.send(
-          JSON.stringify({
-            type: "analyze_jd",
-            job_description: profile,
-          })
-        );
-      }
+      ws?.send(
+        JSON.stringify({
+          type: "analyze_jd",
+          job_description: profile,
+        })
+      );
     }
   };
 
@@ -394,17 +382,13 @@ const InterviewComponent = () => {
 
   const startInterview = () => {
     if (cvText && JD) {
-      if (ws) {
-        ws.send(
-          JSON.stringify({
-            type: "start_interview",
-            pdf_text: cvText,
-            job_description: JD,
-          })
-        );
-      } else {
-        console.error("WebSocket is not initialized");
-      }
+      ws?.send(
+        JSON.stringify({
+          type: "start_interview",
+          pdf_text: cvText,
+          job_description: JD,
+        })
+      );
     } else {
       console.error("CV or JD not uploaded, cannot start interview.");
     }
@@ -490,7 +474,6 @@ const InterviewComponent = () => {
         isSpeaking={isSpeaking}
         chatMessages={chatMessages}
         loading={loading}
-        handleTextSubmit={handleTextSubmit}
         handleSendMessage={handleSendMessage}
         analysisData={analysisData}
       />
@@ -499,9 +482,6 @@ const InterviewComponent = () => {
 
   return (
     <>
-      {/* <Button className="hover:bg-slate-700" onClick={updateDeviceList}>
-        Check
-      </Button> */}
       {step === 1 && (
         <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">
           <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
