@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib';
 import jwt from 'jsonwebtoken';
 
+
 export const GET = async (req: NextRequest) => {
   try {
     const authHeader = req.headers.get('Authorization');
@@ -20,11 +21,10 @@ export const GET = async (req: NextRequest) => {
 
     const { id: userId } = decodedToken;
 
-    // Fetch the most recently uploaded CV for the authenticated user using findFirst
     const cv = await prisma.cV.findFirst({
       where: { userId },
       orderBy: {
-        createdAt: 'desc', // Fetch the most recent CV based on the createdAt field
+        createdAt: 'desc',
       },
     });
 

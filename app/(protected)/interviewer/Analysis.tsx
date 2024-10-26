@@ -38,8 +38,8 @@ interface AnalysisItem {
     line_analysis: LineAnalysis[];
     overall_assessment: OverallAssessment;
   };
-  answer: string; // Ensure this is a string
-  question: string; // Ensure this is a string
+  answer: string; 
+  question: string; 
 }
 
 interface AnalysisProps {

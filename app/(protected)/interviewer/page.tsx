@@ -31,7 +31,7 @@ const InterviewComponent = () => {
   const [isCameraEnabled, setIsCameraEnabled] = useState(false);
   const [isMicEnabled, setIsMicEnabled] = useState(false);
   const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
-  const [analysisData, setAnalysisData] = useState(null);
+
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
   const [selectedJobProfile, setSelectedJobProfile] = useState("");
@@ -42,10 +42,6 @@ const InterviewComponent = () => {
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const [textToSpeak, setTextToSpeak] = useState("");
-  const [isSpeaking, setIsSpeaking] = useState(false);
-
-  const [loading, setLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -124,50 +120,6 @@ const InterviewComponent = () => {
 
           case "interview_started":
             setIsInterviewStarted(true);
-            break;
-
-          case "interview_question":
-            setChatMessages((prevMessages) => [
-              ...prevMessages,
-              { user: "Interviewer", message: data.question },
-            ]);
-            setTextToSpeak(data.question);
-            setLoading(false);
-            break;
-
-          case "coding_question":
-            ws.send(
-              JSON.stringify({
-                type: "coding",
-                code: "This is a dummy response to the coding question.",
-                ques: data.message,
-              })
-            );
-            break;
-
-          case "code_evaluation":
-            setChatMessages((prevMessages) => [
-              ...prevMessages,
-              {
-                user: "System",
-                message: "Code evaluation result: " + data.result,
-              },
-            ]);
-            break;
-
-          case "interview_end":
-            setChatMessages((prevMessages) => [
-              ...prevMessages,
-              { user: "System", message: data.message },
-            ]);
-            break;
-
-          case "analysis":
-            setAnalysisData(data.result); // Store analysis data
-            setChatMessages((prevMessages) => [
-              ...prevMessages,
-              { user: "Analysis", message: JSON.stringify(data.result) },
-            ]);
             break;
 
           default:
@@ -405,44 +357,15 @@ const InterviewComponent = () => {
     }
   };
 
-  const handleSendMessage = (message: string) => {
-    if (message.trim() !== "") {
-      setChatMessages((prevMessages) => [
-        ...prevMessages,
-        { user: "You", message },
-      ]);
-      ws?.send(JSON.stringify({ type: "answer", answer: message }));
-    }
-  };
-
-  useEffect(() => {
-    const handleSpeak = () => {
-      if (!textToSpeak) return;
-
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      setIsSpeaking(true);
-
-      utterance.onend = () => {
-        setIsSpeaking(false);
-      };
-
-      window.speechSynthesis.speak(utterance);
-    };
-
-    if (textToSpeak) {
-      handleSpeak();
-    }
-  }, [textToSpeak]);
 
   if (isInterviewStarted) {
     return (
       <InterviewPage
         isMicEnabled={isMicEnabled}
-        isSpeaking={isSpeaking}
-        chatMessages={chatMessages}
-        loading={loading}
-        handleSendMessage={handleSendMessage}
-        analysisData={analysisData}
+        // isSpeaking={isSpeaking}
+        // chatMessages={chatMessages}
+        // loading={loading}
+        // handleSendMessage={handleSendMessage}
       />
     );
   }
@@ -471,12 +394,11 @@ const InterviewComponent = () => {
         </div>
 
         <div className="w-full md:max-w-[500px] max-h-[90vh] scrollbar-hide overflow-hidden lg:max-w-[700px] overflow-x-hidden flex flex-col items-center justify-center bg-primary-foreground p-10 md:mr-8 lg:mr-0">
+          <div className="text-2xl font-semibold mb-2 text-primary">
+            Get Started!
+          </div>
           {step === 1 ? (
             <>
-              <div className="text-2xl font-semibold mb-2 text-primary">
-                Get Started!
-              </div>
-
               <div className="flex mx-auto items-center max-w-[450px] justify-center w-full">
                 <div className="relative flex-1">
                   <div
@@ -598,7 +520,7 @@ const InterviewComponent = () => {
                 )}
 
                 <button
-                  className={`flex justify-center items-center mt-2 mx-auto bg-primary text-1vw md:w-[20vw] relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px]   ${resumeFile && !isUploading
+                  className={`flex justify-center items-center mt-2 mx-auto bg-primary text-lg md:w-full relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px]   ${resumeFile && !isUploading
                     ? "cursor-not-allowed bg-gray-400"
                     : "hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"}`}
                   onClick={handleUploadClick}
@@ -623,15 +545,10 @@ const InterviewComponent = () => {
                 >
                   Next
                 </button>
-                <button className="bg-transparent text-gray-700 w-full font-semibold h-12 py-3 mt-2 rounded-lg hover:text-gray-900 focus:ring-4 focus:ring-gray-200 transition"></button>
               </div>
             </>
           ) : (
             <>
-              <div className="text-2xl font-bold text-primary mb-2">
-                Get Started!
-              </div>
-
               <div className="flex mx-auto items-center max-w-[450px] justify-center mb-2 w-full">
                 <div className="relative flex-1">
                   <div

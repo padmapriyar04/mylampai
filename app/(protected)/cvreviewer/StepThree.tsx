@@ -203,7 +203,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             result = await analyzeResume(endpoint, data, query);
             if (result?.message?.bulletPoints) {
               // Loop through each object in the bulletPoints array
-              result.message.bulletPoints.forEach((bulletPoint) => {
+              result.message.bulletPoints.forEach((bulletPoint: any) => {
                 const textToHighlight = [bulletPoint.original]; // Wrap in array
                 setSentencesToHighlight((prevState) => [
                   ...prevState,
@@ -253,13 +253,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             if (result?.message) {
               const sentencesToHighlight = Object.values(
                 result.message
-              ).flatMap((item) => item.correction);
+              ).flatMap((item: any) => item.correction);
 
               if (sentencesToHighlight.length > 0) {
-                console.log(
-                  "Highlighting these sentences:",
-                  sentencesToHighlight
-                );
+                
                 setSentencesToHighlight(sentencesToHighlight);
                 highlightSentences(sentencesToHighlight, "highlighted", false);
               }
@@ -272,7 +269,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           } else {
             const sentencesToHighlight = Object.values(
               reviewedData.verb_tense_checker
-            ).flatMap((item) => item.correction);
+            ).flatMap((item: any) => item.correction);
 
             if (sentencesToHighlight.length > 0) {
               setSentencesToHighlight(sentencesToHighlight);
@@ -370,7 +367,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             if (result?.message) {
               const sentencesToHighlight = Object.values(
                 result.message
-              ).flatMap((item) => item.text);
+              ).flatMap((item: any) => item.text);
 
               if (sentencesToHighlight.length > 0) {
                 setSentencesToHighlight(sentencesToHighlight);
@@ -385,7 +382,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           } else {
             const sentencesToHighlight = Object.values(
               reviewedData.repetition_checker
-            ).flatMap((item) => item.text);
+            ).flatMap((item: any) => item.text);
 
             if (sentencesToHighlight.length > 0) {
               setSentencesToHighlight(sentencesToHighlight);
@@ -415,7 +412,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             if (result?.message) {
               const sentencesToHighlight = Object.values(
                 result.message
-              ).flatMap((item) => item?.correction);
+              ).flatMap((item: any) => item?.correction);
 
               if (sentencesToHighlight.length > 0) {
                 setSentencesToHighlight(sentencesToHighlight);
@@ -430,7 +427,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
           } else {
             const sentencesToHighlight = Object.values(
               reviewedData.responsibility_checker
-            ).flatMap((item) => item.correction);
+            ).flatMap((item: any) => item.correction);
 
             if (sentencesToHighlight.length > 0) {
               setSentencesToHighlight(sentencesToHighlight);

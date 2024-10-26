@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,12 +13,14 @@
             padding: 10px;
             margin-bottom: 10px;
         }
+
         #answerInput {
             width: 100%;
             margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
     <h1>Interview Bot</h1>
     <input type="file" id="cvInput" accept=".pdf">
@@ -40,12 +43,12 @@
     <button id="testCodingQuestion">Test Question</button>
 
     <script>
-        const socket = new WebSocket('wss://ai-interviewer-c476.onrender.com/ws');
+        const socket = new WebSocket('ws://localhost:8000/ws');
         let cvText = '';
         let JD = '';
         let que = '';
-        
-        socket.onmessage = function(event) {
+
+        socket.onmessage = function (event) {
             const data = JSON.parse(event.data);
             if (data.type === 'cv_uploaded') {
                 document.getElementById('status').innerText = data.message;
@@ -57,12 +60,12 @@
                 appendToChatBox('Interviewer: ' + data.question);
             } else if (data.type === 'interview_end') {
                 appendToChatBox('System: ' + data.message);
-            }else if (data.type=== 'coding_question') {
+            } else if (data.type === 'coding_question') {
                 appendToChatBox("STARTED INTERVIEW")
                 appendToChatBox('System: ' + data.message);
                 que = data.message
             }
-            else if (data.type=== 'code_evaluation') {
+            else if (data.type === 'code_evaluation') {
                 appendToChatBox("STARTED EVALUATED")
                 appendToChatBox('System: ' + data.result);
                 que = data.message
@@ -88,7 +91,7 @@
             }
             document.getElementById('status').innerText = 'CV UPLOADED';
             const reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = function (event) {
                 const binaryData = event.target.result;
                 socket.send(JSON.stringify({
                     type: 'upload_cv',
@@ -120,7 +123,7 @@
             }));
             document.getElementById('status').innerText = 'Interview started!';
         });
-    
+
 
         document.getElementById('sendAnswerButton').addEventListener('click', () => {
             const answer = document.getElementById('answerInput').value;
@@ -140,7 +143,7 @@
                 appendToChatBox('You: ' + answer);
                 socket.send(JSON.stringify({
                     type: 'coding',
-                    ques : que,
+                    ques: que,
                     code: answer
                 }));
                 document.getElementById('answerInput').value = '';
@@ -171,4 +174,5 @@
         });
     </script>
 </body>
+
 </html>

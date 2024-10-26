@@ -7,6 +7,7 @@ import { toast } from "sonner";
 export default function ResetPassword() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -25,7 +26,7 @@ export default function ResetPassword() {
 
     try {
       const response = await fetch("/api/auth/resetPassword", {
-        method: "PUT", // Use PUT method as per your backend route
+        method: "PUT", 
         headers: {
           "Content-Type": "application/json",
         },

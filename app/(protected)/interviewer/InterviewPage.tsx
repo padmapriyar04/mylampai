@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Analysis from "./Analysis";
 import OnlineCompiler from "./OnlineCompiler";
 import { PiChatsThin } from "react-icons/pi";
@@ -11,22 +11,27 @@ import {
 } from "react-icons/ri";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 
+type ChatMessage = {
+  user: string;
+  message: string;
+}
+
 type InterviewPageProps = {
   isMicEnabled: boolean;
-  isSpeaking: boolean;
-  chatMessages: { user: string; message: string }[];
-  loading: boolean;
-  handleSendMessage: (message: string) => void;
-  analysisData: any;
+  // isSpeaking: boolean;
+  // chatMessages: { user: string; message: string }[];
+  // loading: boolean;
+  // handleSendMessage: (message: string) => void;
+  // analysisData: any;
 }
 
 const InterviewPage: React.FC<InterviewPageProps> = ({
   isMicEnabled,
-  isSpeaking,
-  chatMessages,
-  loading,
-  handleSendMessage,
-  analysisData,
+  // isSpeaking,
+  // chatMessages,
+  // loading,
+  // handleSendMessage,
+  // analysisData,
 }) => {
   const { ws } = useWebSocketContext();
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -37,7 +42,104 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   const [interviewEnded, setInterviewEnded] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(true)
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [analysisData, setAnalysisData] = useState<any>(null);
+
+  const [textToSpeak, setTextToSpeak] = useState("");
+
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleSendMessage = useCallback((message: string) => {
+    if (message.trim() !== "") {
+      setChatMessages((prevMessages) => [
+        ...prevMessages,
+        { user: "You", message },
+      ]);
+      ws?.send(JSON.stringify({ type: "answer", answer: message }));
+    }
+  }, [ws])
+
+  useEffect(() => {
+
+    if (ws) {
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        switch (data.type) {
+
+          case "interview_question":
+            setChatMessages((prevMessages) => [
+              ...prevMessages,
+              { user: "Interviewer", message: data.question },
+            ]);
+
+            console.log("data: ", data.question);
+            setLoading(false);
+            setTextToSpeak(data.question);
+            break;
+
+          case "coding_question":
+            ws.send(
+              JSON.stringify({
+                type: "coding",
+                code: "This is a dummy response to the coding question.",
+                ques: data.message,
+              })
+            );
+            break;
+
+          case "code_evaluation":
+            setChatMessages((prevMessages) => [
+              ...prevMessages,
+              {
+                user: "System",
+                message: "Code evaluation result: " + data.result,
+              },
+            ]);
+            break;
+
+          case "interview_end":
+            setChatMessages((prevMessages) => [
+              ...prevMessages,
+              { user: "System", message: data.message },
+            ]);
+            break;
+
+          case "analysis":
+            setAnalysisData(data.result);
+            setChatMessages((prevMessages) => [
+              ...prevMessages,
+              { user: "Analysis", message: JSON.stringify(data.result) },
+            ]);
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+
+  }, [ws])
+
+  const handleSpeak = useCallback(() => {
+    console.log("hello speaking")
+    if (!textToSpeak) return;
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    setIsSpeaking(true);
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }, [textToSpeak]);
+
+  useEffect(() => {
+    handleSpeak();
+  }, [handleSpeak]);
 
   useEffect(() => {
     if (!loading && timeRemaining > 0 && !interviewEnded) {
@@ -148,9 +250,8 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       </nav>
 
       <div
-        className={`flex-1 flex justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${
-          isChatOpen ? "w-[80vw]" : "w-full"
-        }`}
+        className={`flex-1 flex justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${isChatOpen ? "w-[80vw]" : "w-full"
+          }`}
       >
         <video
           ref={videoRef}
@@ -248,25 +349,22 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
             <div className="flex flex-col justify-evenly">
               <div className="flex justify-evenly p-10 text-6xl">
                 <button
-                  className={`hover:scale-110 hover:translate-y-[-10px] hover:text-primary transition ${
-                    clickedIndex === 0 ? "text-primary scale-125" : ""
-                  }`}
+                  className={`hover:scale-110 hover:translate-y-[-10px] hover:text-primary transition ${clickedIndex === 0 ? "text-primary scale-125" : ""
+                    }`}
                   onClick={() => handleButtonClick(0)}
                 >
                   <RiEmotionLine />
                 </button>
                 <button
-                  className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
-                    clickedIndex === 1 ? "text-primary scale-125" : ""
-                  }`}
+                  className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${clickedIndex === 1 ? "text-primary scale-125" : ""
+                    }`}
                   onClick={() => handleButtonClick(1)}
                 >
                   <RiEmotionNormalLine />
                 </button>
                 <button
-                  className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
-                    clickedIndex === 2 ? "text-primary scale-125" : ""
-                  }`}
+                  className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${clickedIndex === 2 ? "text-primary scale-125" : ""
+                    }`}
                   onClick={() => handleButtonClick(2)}
                 >
                   <RiEmotionUnhappyLine />
@@ -281,11 +379,10 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
                 placeholder="Your feedback here (optional)..."
               />
               <button
-                className={`text-white px-4 py-3 rounded-lg font-semibold transition ${
-                  feedbackIconClicked
-                    ? "bg-primary hover:bg-purple-600"
-                    : "bg-gray-400"
-                }`}
+                className={`text-white px-4 py-3 rounded-lg font-semibold transition ${feedbackIconClicked
+                  ? "bg-primary hover:bg-purple-600"
+                  : "bg-gray-400"
+                  }`}
                 disabled={!feedbackIconClicked}
                 onClick={() => {
                   setShowFeedback(false);
@@ -308,9 +405,8 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       )}
 
       <div
-        className={`fixed inset-y-0 right-0 w-3/4 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${
-          showCompiler ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-y-0 right-0 w-3/4 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${showCompiler ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="relative p-6">
           <button
