@@ -3,7 +3,8 @@ import Analysis from "./Analysis";
 import OnlineCompiler from "./OnlineCompiler";
 import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
-import AudioToText from "./recording";
+// import AudioToText from "./recording";
+
 import {
   RiEmotionUnhappyLine,
   RiEmotionNormalLine,
@@ -37,7 +38,13 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [audioURL, setAudioURL] = useState("")
 
-  const [textToSpeak, setTextToSpeak] = useState("");
+
+  const [recordedUrl, setRecordedUrl] = useState('');
+  const mediaStream = useRef<MediaStream | null>(null);
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const chunks = useRef<Blob[]>([]);
+
+  // const [textToSpeak, setTextToSpeak] = useState("");
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -94,7 +101,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
 
             console.log("data: ", data.question);
             setLoading(false);
-            setTextToSpeak(data.question);
+            // setTextToSpeak(data.question);
             break;
 
           case "coding_question":
@@ -140,19 +147,19 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
 
   }, [ws, handleInterviewer])
 
-  const handleSpeak = useCallback(() => {
-    console.log("hello speaking")
-    if (!textToSpeak) return;
+  // const handleSpeak = useCallback((textToSpeak: string) => {
+  //   console.log("hello speaking")
+  //   if (!textToSpeak) return;
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    setIsSpeaking(true);
+  //   const utterance = new SpeechSynthesisUtterance(textToSpeak);
+  //   setIsSpeaking(true);
 
-    utterance.onend = () => {
-      setIsSpeaking(false);
-    };
+  //   utterance.onend = () => {
+  //     setIsSpeaking(false);
+  //   };
 
-    window.speechSynthesis.speak(utterance);
-  }, [textToSpeak]);
+  //   window.speechSynthesis.speak(utterance);
+  // }, []);
 
   const handleInterviewEnd = useCallback(() => {
     setInterviewEnded(true);
@@ -164,9 +171,49 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
     setShowFeedback(true);
   }, [ws])
 
-  useEffect(() => {
-    handleSpeak();
-  }, [handleSpeak]);
+  // useEffect(() => {
+  //   handleSpeak(textToSpeak);
+  // }, [handleSpeak, textToSpeak]);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(
+        { audio: true }
+      );
+      if (mediaRecorder && mediaStream) {
+        mediaStream.current = stream;
+        mediaRecorder.current = new MediaRecorder(stream);
+        mediaRecorder.current.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            chunks.current.push(e.data);
+          }
+        };
+        mediaRecorder.current.onstop = () => {
+          const recordedBlob = new Blob(
+            chunks.current, { type: 'audio/webm' }
+          );
+          const url = URL.createObjectURL(recordedBlob);
+          setRecordedUrl(url);
+          chunks.current = [];
+        };
+        mediaRecorder.current.start();
+      }
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
+      mediaRecorder.current.stop();
+    }
+    if (mediaStream.current) {
+      mediaStream.current.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+  };
+
 
   useEffect(() => {
     if (timeRef.current?.textContent === "00:00" && !interviewEnded) {
@@ -177,6 +224,11 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
         }),
       );
       setShowFeedback(true);
+
+      if (videoRef.current) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
+      }
     }
   }, [loading, ws, interviewEnded]);
 
@@ -227,7 +279,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
       }
     }, 1000);
 
-    return () => clearInterval(intervalId); 
+    return () => clearInterval(intervalId);
   }, []);
 
   useEffect(() => {
@@ -296,11 +348,22 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
           Your browser does not support the audio element.
         </audio>
       )}
-      {isMicEnabled && (
+
+      {/* {isMicEnabled && (
         <>
           <AudioToText onTextSubmit={handleSendMessage} isSpeaking={isSpeaking} />
         </>
-      )}
+      )} */}
+
+
+      <div>
+        <audio controls src={recordedUrl} > 
+          Your browser does not support the audio element
+        </audio>
+        <button onClick={startRecording}>Start Recording</button>
+        <button onClick={stopRecording}>Stop Recording</button>
+      </div>
+
 
       {isChatOpen && (
         <div className="absolute top-[5.7rem] right-6 bg-white border border-gray-300 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">

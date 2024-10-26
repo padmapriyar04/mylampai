@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface AudioToTextProps {
   onTextSubmit: (text: string) => void;
@@ -6,35 +6,33 @@ interface AudioToTextProps {
 }
 
 const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit, isSpeaking }) => {
+  const [finalText, setFinalText] = useState<string>('');
   let recognition: SpeechRecognition | null = null;
 
-  if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-  } else {
-    alert("Your browser does not support Speech Recognition");
-  }
-
   useEffect(() => {
-    if (recognition) {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
       recognition.onresult = (event) => {
         let interimText = '';
-        let finalText = '';
+        let tempFinalText = '';
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcriptSegment = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            finalText += transcriptSegment;
+            tempFinalText += transcriptSegment;
           } else {
             interimText += transcriptSegment;
           }
         }
 
-        if (finalText) {
-          onTextSubmit(finalText); // Send final recognized text to parent component
+        if (tempFinalText) {
+          setFinalText(tempFinalText);
+          onTextSubmit(tempFinalText); // Send final recognized text to parent component
         }
       };
 
@@ -47,29 +45,32 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit, isSpeaking }) =
 
       recognition.onend = () => {
         if (isSpeaking) {
-          recognition.start(); // Restart recognition if it stops and isSpeaking is true
+          recognition?.start(); // Restart recognition if it stops and isSpeaking is true
         }
       };
+    } else {
+      alert("Your browser does not support Speech Recognition");
     }
 
     return () => {
       recognition?.stop(); // Stop recognition when the component unmounts
     };
-  }, [recognition, isSpeaking, onTextSubmit]);
-
-  const startListening = () => {
-    if (recognition) {
-      recognition.start();
-    }
-  };
-
-  const stopListening = () => {
-    if (recognition) {
-      recognition.stop();
-    }
-  };
+  }, [isSpeaking, onTextSubmit]);
 
   useEffect(() => {
+
+    const startListening = () => {
+      if (recognition) {
+        recognition.start();
+      }
+    };
+
+    const stopListening = () => {
+      if (recognition) {
+        recognition.stop();
+      }
+    };
+
     if (isSpeaking) {
       startListening();
     } else {
@@ -79,6 +80,7 @@ const AudioToText: React.FC<AudioToTextProps> = ({ onTextSubmit, isSpeaking }) =
 
   return (
     <div className="absolute bottom-0 right-1/2 translate-x-1/2">
+      {finalText}
     </div>
   );
 };

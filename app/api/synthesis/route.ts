@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import client from "@/lib/text-to-speech";
+import textClient from "@/lib/text-to-speech";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       audioConfig: { audioEncoding: 'MP3' as "MP3" }
     }
 
-    const [response] = await client.synthesizeSpeech(request);
+    const [response] = await textClient.synthesizeSpeech(request);
 
     return NextResponse.json({
       audioResponse: response.audioContent

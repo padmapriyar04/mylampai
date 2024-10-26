@@ -1,5 +1,5 @@
 import textToSpeech from "@google-cloud/text-to-speech"
 
-const client = new textToSpeech.TextToSpeechClient();
+const textClient = new textToSpeech.TextToSpeechClient();
 
-export default client;
+export default textClient;
