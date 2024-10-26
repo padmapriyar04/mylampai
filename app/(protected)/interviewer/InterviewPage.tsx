@@ -18,27 +18,16 @@ type ChatMessage = {
 
 type InterviewPageProps = {
   isMicEnabled: boolean;
-  // isSpeaking: boolean;
-  // chatMessages: { user: string; message: string }[];
-  // loading: boolean;
-  // handleSendMessage: (message: string) => void;
-  // analysisData: any;
 }
 
-const InterviewPage: React.FC<InterviewPageProps> = ({
-  isMicEnabled,
-  // isSpeaking,
-  // chatMessages,
-  // loading,
-  // handleSendMessage,
-  // analysisData,
-}) => {
+const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
   const { ws } = useWebSocketContext();
+  const timeRef = useRef<HTMLDivElement>(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showCompiler, setShowCompiler] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackIconClicked, setFeedbackIconClicked] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(1200);
   const [interviewEnded, setInterviewEnded] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null);
@@ -46,6 +35,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
   const [loading, setLoading] = useState(true)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [analysisData, setAnalysisData] = useState<any>(null);
+  const [audioURL, setAudioURL] = useState("")
 
   const [textToSpeak, setTextToSpeak] = useState("");
 
@@ -61,6 +51,31 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     }
   }, [ws])
 
+  const handleInterviewer = useCallback(async (text: string) => {
+    try {
+      const res = await fetch('/api/synthesis', {
+        method: "POST",
+        headers: {
+          'Content-Type': "application/json"
+        },
+        body: JSON.stringify({ text })
+      })
+
+      if (!res.ok) {
+        throw new Error("Network response was not okay")
+      }
+      const { audioResponse } = await res.json();
+      const audioBuffer = new Uint8Array(audioResponse.data);
+      const audioBlob = new Blob([audioBuffer], { type: 'audio/mp3' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      setAudioURL(audioUrl);
+
+    } catch (error) {
+      console.error("Error synthesising speech: ", error);
+    }
+  }, [])
+
   useEffect(() => {
 
     if (ws) {
@@ -74,6 +89,8 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
               ...prevMessages,
               { user: "Interviewer", message: data.question },
             ]);
+
+            handleInterviewer(data.question)
 
             console.log("data: ", data.question);
             setLoading(false);
@@ -121,7 +138,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       }
     }
 
-  }, [ws])
+  }, [ws, handleInterviewer])
 
   const handleSpeak = useCallback(() => {
     console.log("hello speaking")
@@ -137,18 +154,22 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     window.speechSynthesis.speak(utterance);
   }, [textToSpeak]);
 
+  const handleInterviewEnd = useCallback(() => {
+    setInterviewEnded(true);
+    ws?.send(
+      JSON.stringify({
+        type: "get_analysis",
+      }),
+    );
+    setShowFeedback(true);
+  }, [ws])
+
   useEffect(() => {
     handleSpeak();
   }, [handleSpeak]);
 
   useEffect(() => {
-    if (!loading && timeRemaining > 0 && !interviewEnded) {
-      const timer = setInterval(() => {
-        setTimeRemaining((prev) => prev - 1);
-      }, 1000);
-
-      return () => clearInterval(timer);
-    } else if (timeRemaining === 0 && !interviewEnded) {
+    if (timeRef.current?.textContent === "00:00" && !interviewEnded) {
       setInterviewEnded(true);
       ws?.send(
         JSON.stringify({
@@ -157,15 +178,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       );
       setShowFeedback(true);
     }
-  }, [loading, ws, timeRemaining, interviewEnded]);
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
+  }, [loading, ws, interviewEnded]);
 
   useEffect(() => {
     const startVideoStream = async () => {
@@ -199,6 +212,32 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
     setFeedbackIconClicked(true);
   };
 
+  useEffect(() => {
+    let seconds = 1200;
+
+    const intervalId = setInterval(() => {
+      seconds -= 1;
+      const minutes = Math.floor(seconds / 60)
+        .toString()
+        .padStart(2, "0");
+      const secs = (seconds % 60).toString().padStart(2, "0");
+
+      if (timeRef.current) {
+        timeRef.current.textContent = `${minutes}:${secs}`;
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId); 
+  }, []);
+
+  useEffect(() => {
+    if (audioURL && audioRef.current) {
+      audioRef.current.src = audioURL;
+      audioRef.current.play()
+        .catch(error => console.error('Error playing audio:', error));
+    }
+  }, [audioURL]);
+
   return (
     <div className="min-h-[calc(100vh-4rem)] w-full h-full flex flex-col relative bg-primary-foreground">
       <nav className="flex items-center justify-between bg-white shadow-md p-4">
@@ -229,20 +268,12 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
             <PiChatsThin className="w-10 h-10 text-gray-600" />
           </button>
           <span className="text-gray-600 text-sm mr-4">
-            Time Remaining: {formatTime(timeRemaining)}
+            Time Remaining: <div ref={timeRef}>20:00</div>
           </span>
 
           <button
             className="bg-red-500 text-white px-4 py-3 rounded-full font-semibold"
-            onClick={() => {
-              setInterviewEnded(true);
-              ws?.send(
-                JSON.stringify({
-                  type: "get_analysis",
-                }),
-              );
-              setShowFeedback(true);
-            }}
+            onClick={handleInterviewEnd}
           >
             END INTERVIEW
           </button>
@@ -250,7 +281,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
       </nav>
 
       <div
-        className={`flex-1 flex justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${isChatOpen ? "w-[80vw]" : "w-full"
+        className={`flex flex-col justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${isChatOpen ? "w-[80vw]" : "w-full"
           }`}
       >
         <video
@@ -260,6 +291,11 @@ const InterviewPage: React.FC<InterviewPageProps> = ({
         />
       </div>
 
+      {audioURL && (
+        <audio controls src={audioURL} ref={audioRef} className="hidden">
+          Your browser does not support the audio element.
+        </audio>
+      )}
       {isMicEnabled && (
         <>
           <AudioToText onTextSubmit={handleSendMessage} isSpeaking={isSpeaking} />

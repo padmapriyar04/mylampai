@@ -9,8 +9,6 @@ export async function POST(req: NextRequest) {
       message: "text is required"
     }, { status: 404 })
 
-    console.log(text);
-
     const request = {
       input: { text },
       voice: {

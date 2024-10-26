@@ -40,11 +40,9 @@ const InterviewComponent = () => {
   const [JD, setJD] = useState("");
 
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const [isUploading, setIsUploading] = useState(false);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const jobProfiles = [
@@ -139,14 +137,18 @@ const InterviewComponent = () => {
       const binaryData = e.target?.result as ArrayBuffer;
 
       if (binaryData && ws) {
-        ws.send(
-          JSON.stringify({
-            type: "upload_cv",
-            cv_data: Array.from(new Uint8Array(binaryData)),
-          })
-        );
+        try {
+          ws?.send(
+            JSON.stringify({
+              type: "upload_cv",
+              cv_data: Array.from(new Uint8Array(binaryData)),
+            })
+          );
+        } catch (error) {
+          console.log("Socket is not initialised")
+        }
       } else {
-        toast.error("WebSocket is not initialized");
+        setIsUploading(false);
       }
     };
     reader.readAsArrayBuffer(file);
@@ -312,61 +314,15 @@ const InterviewComponent = () => {
     event.stopPropagation();
   };
 
-  useEffect(() => {
-    const enableCamera = async () => {
-      if (videoRef.current) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-          });
-          videoRef.current.srcObject = stream;
-          videoRef.current.play();
-        } catch (err) {
-          if (err instanceof Error) {
-            console.error("Error accessing camera:", err.message);
-            toast.error("Unable to access camera ");
-          } else {
-            console.error("Unknown error accessing camera");
-            toast.error("Unknown error occurred");
-          }
-        }
-      }
-    };
-
-    if ((isCameraEnabled || isInterviewStarted) && videoRef.current) {
-      enableCamera();
-    } else if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        const tracks = stream.getTracks();
-
-        // Stop all tracks to release the camera
-        tracks.forEach((track) => track.stop());
-        videoRef.current.srcObject = null;
-      }
-    };
-  }, [isCameraEnabled, isInterviewStarted]);
-
   const handleUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
 
-
   if (isInterviewStarted) {
     return (
-      <InterviewPage
-        isMicEnabled={isMicEnabled}
-        // isSpeaking={isSpeaking}
-        // chatMessages={chatMessages}
-        // loading={loading}
-        // handleSendMessage={handleSendMessage}
-      />
+      <InterviewPage isMicEnabled={isMicEnabled} />
     );
   }
 
@@ -611,7 +567,7 @@ const InterviewComponent = () => {
               </h3>
 
               <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[450px] lg:max-w-[450px] shadow-lg text-center flex flex-col items-center">
-                <Tabs defaultValue="account" className="w-[400px]">
+                <Tabs defaultValue="profile" className="w-[400px]">
                   <TabsList className="grid w-full grid-cols-2 bg-primary-foreground py-2 h-auto">
                     <TabsTrigger value="profile">Choose Profile</TabsTrigger>
                     <TabsTrigger value="jd">Upload JD</TabsTrigger>
