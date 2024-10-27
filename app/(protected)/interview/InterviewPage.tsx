@@ -85,7 +85,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
   }, [])
 
   useEffect(() => {
-
     if (ws) {
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -360,7 +359,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
           </span>
 
           <button
-            className="bg-red-500 text-white px-4 py-3 rounded-full font-semibold"
+            className="bg-destructive text-white px-4 py-3 rounded-full font-semibold"
             onClick={handleInterviewEnd}
           >
             END INTERVIEW

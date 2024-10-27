@@ -20,7 +20,7 @@ interface CodeEditorProps {
   fontSize: number;
 }
 
-type Language = 'javascript' | 'python' | 'cpp'; // Define valid language types
+type Language = 'javascript' | 'python' | 'cpp'; 
 
 export default function OnlineCompiler() {
   const [language, setLanguage] = useState<Language>('cpp'); // Type the language state

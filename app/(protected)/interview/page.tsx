@@ -5,22 +5,19 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { useRouterStore } from "@/utils/useRouteStore";
-import InterviewPage from "./InterviewPage";
-import { toast } from "sonner";
-import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 import Image from "next/image";
+import * as pdfJSLib from "pdfjs-dist";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { FiX } from "react-icons/fi";
 import { IoDocumentAttach, IoCloudUploadOutline } from "react-icons/io5";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import * as pdfJSLib from "pdfjs-dist";
-import { Button } from "@/components/ui/button";
+import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
+import InterviewPage from "./InterviewPage";
+import { useRouterStore } from "@/utils/useRouteStore";
+
 pdfJSLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJSLib.version}/pdf.worker.min.js`;
 
-type ChatMessage = {
-  user: string;
-  message: string;
-};
 
 const InterviewComponent = () => {
   const { ws } = useWebSocketContext();
@@ -31,6 +28,8 @@ const InterviewComponent = () => {
   const [isCameraEnabled, setIsCameraEnabled] = useState(false);
   const [isMicEnabled, setIsMicEnabled] = useState(false);
   const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
+
+  console.log(deviceList);
 
   const [isNextEnabled, setIsNextEnabled] = useState(false);
 
@@ -65,7 +64,6 @@ const InterviewComponent = () => {
       navigator.mediaDevices
         .enumerateDevices()
         .then((devices) => {
-          console.log("Devices: ", devices);
 
           const audioInputDevices = devices.filter(
             (device) => device.kind === "audioinput"
@@ -145,6 +143,7 @@ const InterviewComponent = () => {
             })
           );
         } catch (error) {
+          setIsUploading(false)
           console.log("Socket is not initialised")
         }
       } else {
