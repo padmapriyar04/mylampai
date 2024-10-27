@@ -6,7 +6,6 @@ import path from "path"
 import { v4 as uuidv4 } from 'uuid';
 
 async function saveFileToDisk(file: File): Promise<string> {
-  console.log("In save file")
   const buffer = Buffer.from(await file.arrayBuffer());
   const filePath = path.join("/tmp", `${uuidv4()}_${file.name}`);
   fs.writeFileSync(filePath, buffer);
@@ -33,9 +32,6 @@ export async function handleAudioTranscribe(formData: FormData) {
   try {
     const audioFile = formData.get("audio") as File;
 
-    console.log("formData: ", formData);
-    console.log("audioFile: ", audioFile);
-
     if (!audioFile) {
       return {
         status: "failed",
@@ -43,13 +39,9 @@ export async function handleAudioTranscribe(formData: FormData) {
       };
     }
 
-    // Save and convert the file to mono MP3
     inputFilePath = await saveFileToDisk(audioFile);
-    console.log("inputFilePath ", inputFilePath)
     monoFilePath = await convertToMonoMP3(inputFilePath);
-    console.log("monoFilePath ", monoFilePath)
 
-    // Read and encode the file to Base64
     const audioBuffer = fs.readFileSync(monoFilePath);
     const audioContent = audioBuffer.toString('base64');
 
@@ -62,28 +54,25 @@ export async function handleAudioTranscribe(formData: FormData) {
 
     const request = { audio, config };
 
-    // Detects speech in the audio file
     const [response] = await speechClient.recognize(request);
     const transcription = response.results
       ?.map(result => result.alternatives?.[0].transcript)
       .join('\n');
 
     console.log("transcription: ", transcription);
-
-    return {
-      status: "success",
-      transcript: transcription
-    };
-    
-  } catch (error) {
-    console.log(error);
-    return { status: "failed" };
-  } finally {
     if (inputFilePath && fs.existsSync(inputFilePath)) {
       fs.unlinkSync(inputFilePath);
     }
     if (monoFilePath && fs.existsSync(monoFilePath)) {
       fs.unlinkSync(monoFilePath);
     }
-  }
+    return {
+      status: "success",
+      transcript: transcription
+    };
+
+  } catch (error) {
+    console.log(error);
+    return { status: "failed" };
+  } 
 }

@@ -22,8 +22,10 @@ export default function Flexsidebar() {
     "/cvreviewer"
   ]
 
+  const isNotAllowed = notAllowedRoutes.some((route) => pathname.startsWith(route))
+
   const checkScreenSize = () => {
-    setIsSmallScreen(window.innerWidth < 640); // Tailwind's sm breakpoint is 640px
+    setIsSmallScreen(window.innerWidth < 640);
   };
 
   const toggleSidebar = () => {
@@ -36,6 +38,7 @@ export default function Flexsidebar() {
 
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
   const handleClickOutside = (event: any) => {
     if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
     }
@@ -48,8 +51,7 @@ export default function Flexsidebar() {
     };
   }, []);
 
-  // Hiding sidebar in these routes
-  if (notAllowedRoutes.includes(pathname)) return null;
+  if (isNotAllowed) return null;
 
   return (
     <>

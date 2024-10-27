@@ -63,7 +63,6 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
   }, [analysisData]);
 
   if (loading) {
-    // Show loader while data is being fetched
     return (
       <div className="flex justify-center items-center h-screen">
         <Oval color="#00BFFF" height={80} width={80} /> {/* Loader component */}

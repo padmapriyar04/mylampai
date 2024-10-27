@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "../../../../lib";
+import prisma from "@/lib";
 import { decodeToken } from "@/utils/jwt";
 
 export async function GET(req: NextRequest) {

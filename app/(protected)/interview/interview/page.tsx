@@ -1,7 +1,7 @@
 "use client"
 import { useCallback, useEffect, useRef, useState } from "react";
-import Analysis from "./interview/analysis"
-import OnlineCompiler from "./interview/OnlineCompiler"
+import Analysis from "./analysis"
+import OnlineCompiler from "./OnlineCompiler"
 import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
 import { handleAudioTranscribe } from "@/actions/transcribeAudioAction";
@@ -12,7 +12,7 @@ import {
   RiEmotionLine,
 } from "react-icons/ri";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
-import Caption from "./interview/caption";
+import Caption from "./caption";
 
 type ChatMessage = {
   user: string;
@@ -187,9 +187,8 @@ const InterviewPage = () => {
 
             if (res.status === "success" && res.transcript) {
               handleSendMessage(res.transcript)
-            } else {
-              startRecording();
             }
+
           } catch (error) {
             console.error('Error transcribing audio:', error);
           }
@@ -438,7 +437,7 @@ const InterviewPage = () => {
                 type="text"
                 placeholder="Type your answer here"
                 className="w-full px-4 py-4 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary focus:outline-none mb-4"
-
+                  
               />
 
               <div className="flex justify-between">
@@ -541,12 +540,12 @@ const InterviewPage = () => {
         )}
 
         <div
-          className={`fixed inset-y-0 right-0 w-full bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${showCompiler ? "translate-x-0" : "translate-x-full"
+          className={`fixed inset-y-0 right-0 w-3/4 bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${showCompiler ? "translate-x-0" : "translate-x-full"
             }`}
         >
           <div className="relative p-6">
             <button
-              className="absolute right-4 mt-8 mr-4 py-2 px-4 text-sm md:text-base rounded-md text-white bg-destructive hover:bg-destructive-foreground focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-lg"
+              className="absolute right-4 mt-8 mr-4 py-2 px-4 text-sm md:text-base rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-lg"
               onClick={() => setShowCompiler(false)}
             >
               Close
