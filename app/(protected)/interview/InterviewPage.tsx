@@ -227,6 +227,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
             if (res.status === "success") {
               console.log("transcription", res?.transcript)
             }
+            
           } catch (error) {
             console.error('Error transcribing audio:', error);
           }
