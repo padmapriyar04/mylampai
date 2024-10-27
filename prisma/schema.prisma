@@ -184,10 +184,18 @@ model Blog {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String
-  authorName  String
+  authorName  Author
   position    String
   sections    Section[]
-  image       String
+  imageUrl       String
+  tags        String[]
+}
+
+model Author {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  position    String
+  imageUrl?     String
 }
 
 model Section {

@@ -3,8 +3,8 @@ import prisma from "@/lib";
 
 export const GET = async (req: NextRequest) => {
   try {
-    const posts = await prisma.blog.findMany();
-    return NextResponse.json({ message: "Success", posts }, { status: 200 });
+    const blogs = await prisma.blog.findMany();
+    return NextResponse.json({ message: "Success", blogs }, { status: 200 });
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json({ message: "Error", error }, { status: 500 });
@@ -16,15 +16,18 @@ export const POST = async (req: NextRequest) => {
     const formData = await req.formData();
     const formDataObj: any = {};
     formData.forEach((value, key) => (formDataObj[key] = value));
-    console.log(formDataObj);
+    
+    console.log("formDataObj ", formDataObj);
+
     const { title, description, authorName, position, sections, image } =
       formDataObj;
+
     const sectionsData = JSON.parse(sections).map((section: any) => ({
       subheading: section.subheading,
       content: section.content,
     }));
     
-    const post = await prisma.blog.create({
+    await prisma.blog.create({
       data: {
         title,
         description,
@@ -36,7 +39,10 @@ export const POST = async (req: NextRequest) => {
         image,
       },
     });
-    return NextResponse.json({ message: "Success" }, { status: 201 });
+
+
+    return NextResponse.json({ message: "New blog created" }, { status: 201 });
+
   } catch (err) {
     console.log(err);
     return NextResponse.json({ message: "Error", err }, { status: 500 });

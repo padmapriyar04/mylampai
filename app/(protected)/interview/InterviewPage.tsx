@@ -4,6 +4,7 @@ import OnlineCompiler from "./OnlineCompiler";
 import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
 // import AudioToText from "./recording";
+import { handleAudioTranscribe } from "@/actions/transcribeAudioAction";
 
 import {
   RiEmotionUnhappyLine,
@@ -175,27 +176,63 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
   //   handleSpeak(textToSpeak);
   // }, [handleSpeak, textToSpeak]);
 
+  const convertWebMToBase64 = async (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+
+      reader.onloadend = () => {
+        const result = reader.result?.toString();
+        if (result) {
+          const base64String = result.split(',')[1]; // Extract only the Base64 part
+          resolve(base64String);
+        } else {
+          reject('FileReader result is null or undefined.');
+        }
+      };
+
+      reader.onerror = (error) => {
+        reject(`Failed to convert to Base64: ${error}`);
+      };
+    });
+  };
+
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia(
-        { audio: true }
-      );
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
       if (mediaRecorder && mediaStream) {
         mediaStream.current = stream;
         mediaRecorder.current = new MediaRecorder(stream);
-        mediaRecorder.current.ondataavailable = (e) => {
+
+        mediaRecorder.current.ondataavailable = (e: BlobEvent) => {
           if (e.data.size > 0) {
             chunks.current.push(e.data);
           }
         };
-        mediaRecorder.current.onstop = () => {
-          const recordedBlob = new Blob(
-            chunks.current, { type: 'audio/webm' }
-          );
+
+        mediaRecorder.current.onstop = async () => {
+          const recordedBlob = new Blob(chunks.current, { type: 'audio/webm' });
           const url = URL.createObjectURL(recordedBlob);
           setRecordedUrl(url);
           chunks.current = [];
+
+          const formData = new FormData();
+
+          formData.append("audio", recordedBlob);
+          formData.append("text", "hello world")
+
+          try {
+            const res = await handleAudioTranscribe(formData);
+
+            if (res.status === "success") {
+              console.log("transcription", res?.transcript)
+            }
+          } catch (error) {
+            console.error('Error transcribing audio:', error);
+          }
         };
+
         mediaRecorder.current.start();
       }
     } catch (error) {
@@ -213,7 +250,6 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
       });
     }
   };
-
 
   useEffect(() => {
     if (timeRef.current?.textContent === "00:00" && !interviewEnded) {
@@ -310,7 +346,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
 
         <div className="flex items-center">
           <button
-            className="bg-indigo-500 text-white px-4 py-3 rounded-full font-semibold ml-4"
+            className="bg-primary text-white px-4 py-3 rounded-full font-semibold ml-4"
             onClick={() => setShowCompiler(!showCompiler)} // Toggle the compiler modal (slide)
           >
             {showCompiler ? "Close Compiler" : "Open Online Compiler"}
@@ -357,7 +393,7 @@ const InterviewPage: React.FC<InterviewPageProps> = ({ isMicEnabled }) => {
 
 
       <div>
-        <audio controls src={recordedUrl} > 
+        <audio controls src={recordedUrl} >
           Your browser does not support the audio element
         </audio>
         <button onClick={startRecording}>Start Recording</button>

@@ -18,7 +18,7 @@ export default function Flexsidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const notAllowedRoutes = [
-    "/interviewer",
+    "/interview",
     "/cvreviewer"
   ]
 
