@@ -9,6 +9,8 @@ WORKDIR /app
 COPY . .
 RUN npm run build
 
+RUN apt-get update && \
+    apt-get install -y ffmpeg
 
 FROM base AS production
 WORKDIR /app

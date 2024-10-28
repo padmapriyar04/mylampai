@@ -9,13 +9,13 @@ const speechClient = new speech.SpeechClient();
 
 async function saveFileToDisk(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
-  const filePath = path.join("/tmp", `${uuidv4()}_${file.name}`);
+  const filePath = path.join("./tmp", `${uuidv4()}_${file.name}`);
   fs.writeFileSync(filePath, buffer);
   return filePath;
 }
 
 async function convertToMonoMP3(inputFile: string): Promise<string> {
-  const outputFile = path.join("/tmp", path.basename(inputFile, path.extname(inputFile)) + '_mono.mp3');
+  const outputFile = path.join("./tmp", path.basename(inputFile, path.extname(inputFile)) + '_mono.mp3');
 
   return new Promise<string>((resolve, reject) => {
     ffmpeg(inputFile)
