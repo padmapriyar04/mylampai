@@ -1,9 +1,11 @@
 "use server"
-import speechClient from "@/lib/speech-to-text"
 import fs from "fs"
 import ffmpeg from "fluent-ffmpeg"
 import path from "path"
 import { v4 as uuidv4 } from 'uuid';
+import speech from "@google-cloud/speech"
+
+const speechClient = new speech.SpeechClient();
 
 async function saveFileToDisk(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());

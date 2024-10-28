@@ -31,6 +31,6 @@ CMD ["npm", "run", "start"]
 FROM base AS dev
 ENV NODE_ENV=development
 RUN npm install 
-RUN npx prisma db push
 COPY . .
+RUN npx prisma db push
 CMD ["npm", "run", "dev"]
