@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.25.0",
     "@google-cloud/speech": "^6.7.0",
     "@google-cloud/text-to-speech": "^5.5.0",
     "@monaco-editor/react": "^4.6.0",
