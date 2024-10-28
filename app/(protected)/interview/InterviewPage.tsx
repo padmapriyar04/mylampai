@@ -35,7 +35,7 @@ const InterviewPage = () => {
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [audioURL, setAudioURL] = useState("")
   const [caption, setCaption] = useState("")
-
+  const [codingQuestion, setCodingQuestion] = useState("")
 
   const [recordedUrl, setRecordedUrl] = useState('');
   const mediaStream = useRef<MediaStream | null>(null);
@@ -106,13 +106,8 @@ const InterviewPage = () => {
             break;
 
           case "coding_question":
-            ws.send(
-              JSON.stringify({
-                type: "coding",
-                code: "This is a dummy response to the coding question.",
-                ques: data.message,
-              })
-            );
+            setCodingQuestion(data.message)
+            setShowCompiler(true)
             break;
 
           case "code_evaluation":
@@ -355,7 +350,7 @@ const InterviewPage = () => {
           <div className="flex items-center">
             <button
               className="bg-primary text-white px-4 py-3 rounded-full font-semibold ml-4"
-              onClick={() => setShowCompiler(!showCompiler)} // Toggle the compiler modal (slide)
+              onClick={() => setShowCompiler(!showCompiler)}
             >
               {showCompiler ? "Close Compiler" : "Open Online Compiler"}
             </button>
@@ -540,20 +535,8 @@ const InterviewPage = () => {
           </div>
         )}
 
-        <div
-          className={`fixed inset-y-0 right-0 w-full bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${showCompiler ? "translate-x-0" : "translate-x-full"
-            }`}
-        >
-          <div className="relative p-6">
-            <button
-              className="absolute right-4 mt-8 mr-4 py-2 px-4 text-sm md:text-base rounded-md text-white bg-destructive hover:bg-destructive-foreground focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-lg"
-              onClick={() => setShowCompiler(false)}
-            >
-              Close
-            </button>
-            <OnlineCompiler />
-          </div>
-        </div>
+        <OnlineCompiler codingQuestion={codingQuestion} showCompiler={showCompiler} setShowCompiler={setShowCompiler} />
+
       </div>
     </div>
   );

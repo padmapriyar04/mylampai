@@ -147,6 +147,7 @@ const InterviewComponent = () => {
           );
         } catch (error) {
           setIsUploading(false)
+          setResumeFile(null)
           console.log("Socket is not initialised")
         }
       } else {
@@ -159,6 +160,7 @@ const InterviewComponent = () => {
   const handleResumeUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
 
+    console.log("resume upload started")
     const file = event.target.files?.[0];
 
     if (!file || file.type !== "application/pdf") {

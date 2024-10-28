@@ -19,8 +19,9 @@ model User {
   phone            String?
   hashedPassword   String?
   role             String? @default("user")
-  posts            Modules[]
   userInfo         UserInfo?
+
+  posts            Modules[]
   accounts         Account[]
   communityIds     String[]        @db.ObjectId
   communities      Community[]     @relation(fields: [communityIds], references: [id])
@@ -31,6 +32,7 @@ model User {
   receivedMessages Directmessage[] @relation("ReceiverUser")
   otps             OTP[]
   cvs              CV[]
+  credits          Int @default(150)
 
   sessions         Session[]
 }
