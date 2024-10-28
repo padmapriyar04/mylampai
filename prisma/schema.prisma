@@ -186,18 +186,10 @@ model Blog {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String
-  authorName  Author
+  authorName  String
   position    String
   sections    Section[]
-  imageUrl       String
-  tags        String[]
-}
-
-model Author {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  position    String
-  imageUrl     String?
+  image       String
 }
 
 model Section {
@@ -214,4 +206,3 @@ model NewsletterEmails {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }
-
