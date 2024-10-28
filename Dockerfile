@@ -1,24 +1,36 @@
-# Use an official Node.js image as a base
-FROM node:18-alpine
-
-# Set the working directory
+FROM node:18-alpine AS base
+RUN apk add --no-cache g++ make py3-pip libc6-compat
 WORKDIR /app
-
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm install
-
-# Copy the rest of the application code
-COPY . .
-
-# Generate Prisma Client
-RUN npx prisma generate
-
-# Build the Next.js application
-RUN npm run build
-
-# Expose the port that the app will run on
+COPY package*.json ./
 EXPOSE 3000
 
-# Start the Next.js application
+FROM base AS builder
+WORKDIR /app
+COPY . .
+RUN npm run build
+
+
+FROM base AS production
+WORKDIR /app
+
+ENV NODE_ENV=production
+RUN npm ci
+
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+USER nextjs
+
+
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/public ./public
+
 CMD ["npm", "run", "start"]
+
+FROM base AS dev
+ENV NODE_ENV=development
+RUN npm install 
+RUN npx prisma db push
+COPY . .
+CMD ["npm", "run", "dev"]
