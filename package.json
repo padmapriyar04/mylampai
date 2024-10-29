@@ -58,7 +58,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-transition-group": "^4.4.5",
     "shadcn-ui": "^0.2.3",
-    "sharp": "^0.33.4",
+    "sharp": "^0.33.5",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "sonner": "^1.5.0",

@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState } from 'react';
 
 const url = "wss://ai-interviewer-c476.onrender.com/ws"

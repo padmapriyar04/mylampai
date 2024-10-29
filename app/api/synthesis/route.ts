@@ -13,10 +13,10 @@ export async function POST(req: NextRequest) {
       input: { text },
       voice: {
         languageCode: "en-IN",
-        ssmlGender: 'FEMALE' as "FEMALE" | "MALE" | "NEUTRAL",
+        ssmlGender: 'FEMALE' as const,
         name: "en-IN-Journey-F"
       },
-      audioConfig: { audioEncoding: 'MP3' as "MP3" }
+      audioConfig: { audioEncoding: 'MP3' as const }
     }
 
     const [response] = await textClient.synthesizeSpeech(request);

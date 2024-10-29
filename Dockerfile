@@ -1,38 +1,17 @@
-FROM node:18-alpine AS base
-RUN apk add --no-cache g++ make py3-pip libc6-compat
+# Builder Stage
+FROM node:18-alpine AS builder
+RUN apk add --no-cache g++ make py3-pip libc6-compat ffmpeg
 WORKDIR /app
 COPY package*.json ./
-EXPOSE 3000
-
-FROM base AS builder
-WORKDIR /app
+RUN npm ci  # Install dependencies
 COPY . .
-RUN npm run build
+RUN npm run build  # Build the Next.js app
 
-RUN apt-get update && \
-    apt-get install -y ffmpeg
-
-FROM base AS production
+# Production Stage
+FROM node:18-alpine AS production
 WORKDIR /app
-
 ENV NODE_ENV=production
-RUN npm ci
-
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-USER nextjs
-
-
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/public ./public
-
+COPY --from=builder /app ./
+RUN npx prisma db push  # Sync Prisma schema with MongoDB
+EXPOSE 3000
 CMD ["npm", "run", "start"]
-
-FROM base AS dev
-ENV NODE_ENV=development
-RUN npm install 
-COPY . .
-RUN npx prisma db push
-CMD ["npm", "run", "dev"]
