@@ -20,7 +20,6 @@ export const handleCreditUpdate = async (data: SessionData | UserData) => {
       }
     })
 
-    console.log("user ", user)
 
     if (!user) {
       return "failed"
@@ -52,8 +51,6 @@ export const handleVerifyRegistration = async ({ email }: { email: string }) => 
         email: email
       }
     })
-
-    console.log("user ", user)
 
     if (!user) {
       return false

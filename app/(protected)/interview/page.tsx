@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +16,8 @@ export default function Component() {
   const { userData } = useUserStore();
 
   const [loading, setLoading] = useState(true)
-  const [timeLeft, setTimeLeft] = useState("")
+
+  const countdownRef = useRef<HTMLParagraphElement>(null);
   const [isRegistered, setIsRegistered] = useState(false);
 
   const handleRegister = useCallback(async () => {
@@ -62,7 +63,6 @@ export default function Component() {
     const verifyRegistration = async () => {
       try {
         if (session) {
-          console.log("first")
           const email = session.user.email
           if (!email) {
             toast.error("Failed to Register")
@@ -101,24 +101,30 @@ export default function Component() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const now = new Date()
-      const releaseDate = new Date("2024-11-01T00:00:00")
-      const difference = releaseDate.getTime() - now.getTime()
+      const now = new Date();
+      const releaseDate = new Date("2024-11-01T19:00:00"); // November 1, 2024, at 7 PM
+      const difference = releaseDate.getTime() - now.getTime();
 
       if (difference > 0) {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000)
-        setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`)
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        if (countdownRef.current) {
+          countdownRef.current.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
       } else {
-        setTimeLeft("Registration Closed")
-        clearInterval(timer)
+        if (countdownRef.current) {
+          countdownRef.current.innerHTML = "Registration Closed";
+        }
+        clearInterval(timer);
       }
-    }, 1000)
+    }, 1000);
 
-    return () => clearInterval(timer)
-  }, [])
+    return () => clearInterval(timer);
+  }, []);
+
+  console.log("hel")
 
   return (
     <div className="h-custom w-full grid place-items-center">
@@ -149,7 +155,7 @@ export default function Component() {
               </div>
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">Time until release:</p>
-                <p className="text-lg font-bold" aria-live="polite">{timeLeft}</p>
+                <p className="text-lg font-bold" aria-live="polite" ref={countdownRef}></p>
               </div>
             </CardContent>
             <CardFooter>
@@ -196,7 +202,7 @@ export default function Component() {
               </div>
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">Time until release:</p>
-                <p className="text-lg font-bold" aria-live="polite">{timeLeft}</p>
+                <p className="text-lg font-bold" aria-live="polite" ref={countdownRef}></p>
               </div>
             </CardContent>
           </Card>
