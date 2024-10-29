@@ -31,7 +31,8 @@ model User {
   receivedMessages Directmessage[] @relation("ReceiverUser")
   otps             OTP[]
   cvs              CV[]
-  credits          Int             @default(250)
+  credits          Int             @default(0)
+  isRegistered     Boolean        @default(false)
   interviews       Interview[]
   sessions         Session[]
 }

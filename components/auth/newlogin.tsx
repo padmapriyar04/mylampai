@@ -12,6 +12,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { setCookie } from "@/utils/cookieUtils";
 import { useUserStore } from "@/utils/userStore";
+import { handleGoogleLogin } from "@/actions/authActions";
 
 const AuthForm: React.FC = () => {
   const { data: session } = useSession();
@@ -185,12 +186,12 @@ const AuthForm: React.FC = () => {
 
       if (res.ok) {
         const userData = await res.json();
-        setCookie("token", userData.token, 7); // Set cookie for 7 days
-        setCookie("user", JSON.stringify(userData.user), 7); // Set cookie for 7 days
+        setCookie("token", userData.token, 7);
+        setCookie("user", JSON.stringify(userData.user), 7);
         toast.success("Registration successful!");
         setUserData(userData.user, userData.token);
         setIsSigningUp(false);
-        router.push("/questions");
+        router.push("/interview");
       } else {
         const errorData = await res.json();
         toast.error(errorData.error || "Registration failed");
@@ -236,7 +237,7 @@ const AuthForm: React.FC = () => {
 
         setUserData(data.user, data.token);
 
-        router.push("/profile");
+        router.push("/interview");
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Login failed. Please try again.");
@@ -249,12 +250,7 @@ const AuthForm: React.FC = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signIn("google");
-      if (result?.ok) router.push("/achieve");
-      if (result?.error) {
-        console.error("Google sign-in error:", result.error);
-        toast.error("Google sign-in failed. Please try again.");
-      }
+      await signIn("google");
     } catch (error) {
       console.error("Error during Google sign-in:", error);
       toast.error("An error occurred during Google sign-in");
@@ -262,12 +258,34 @@ const AuthForm: React.FC = () => {
   };
 
   useEffect(() => {
-    if (session?.user || userData) {
-      router.push("/achieve");
+    const funcSignUp = async (email: string) => {
+      const res = await handleGoogleLogin({ email })
+
+      if (res.message === "success") {
+
+        if (!res.response) {
+          toast.error("Login Failed")
+          return;
+        }
+
+        setCookie("token", res.response.token, 70);
+        setCookie("user", JSON.stringify(res.response.user), 70);
+        setUserData(res.response.user, res.response?.token)
+
+        router.push("/interview")
+      } else {
+        toast.error("login failed")
+      }
+
+    }
+    
+    if (session?.user.email) {
+      const email = session.user.email;
+      funcSignUp(email)
     } else {
       clearUser();
     }
-  }, [session]);
+  }, [session, router, clearUser, setUserData]);
 
   const sendOTPforlogin = async () => {
     try {
@@ -353,13 +371,13 @@ const AuthForm: React.FC = () => {
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0 h-screen">
       <div className="absolute top-2 left-0 max-w-[220px]">
         <Link href="/">
-        <Image
-          src={"/home/logo.svg"}
-          width={180}
-          height={100}
-          alt="logo"
-          className="w-full h-auto drop-shadow-md"
-        />
+          <Image
+            src={"/home/logo.svg"}
+            width={180}
+            height={100}
+            alt="logo"
+            className="w-full h-auto drop-shadow-md"
+          />
         </Link>
       </div>
       <div className="bg-[#fcfcfc] rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
@@ -634,14 +652,14 @@ const AuthForm: React.FC = () => {
                       value={credentials.password}
                       onChange={handleCredentialsChange}
                     />
-                      <div
-                        onClick={handleForgotPassword}
-                        className="font-semibold text-primary text-left px-4 "
-                      >
+                    <div
+                      onClick={handleForgotPassword}
+                      className="font-semibold text-primary text-left px-4 "
+                    >
 
-                        Forgot Password
-                      </div>
+                      Forgot Password
                     </div>
+                  </div>
                 )}
                 <div className="flex justify-between items-center mt-12 mb-4">
                   <div className="text-gray-500 font-semibold">

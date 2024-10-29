@@ -1,7 +1,6 @@
-"use client"
 import { useEffect, useState } from 'react';
 
-const url = "wss://ai-interviewer-c476.onrender.com/ws"
+const url = "wss://127.0.0.1:8000//ws"
 
 const useWebSocket = () => {
     const [ws, setWs] = useState<WebSocket | null>(null);
