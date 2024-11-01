@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const url = "wss://ai-interviewer-c476.onrender.com/ws"
+const url = "wss://ai-interviewer-dse5fjdwcsbuaret.centralindia-01.azurewebsites.net/ws"
 
 const useWebSocket = () => {
     const [ws, setWs] = useState<WebSocket | null>(null);

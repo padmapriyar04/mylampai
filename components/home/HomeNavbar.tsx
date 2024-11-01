@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useUserStore } from "@/utils/userStore";
 
@@ -10,12 +10,11 @@ import {
   ResourcesComponent,
   CompanyComponent,
 } from "./HomeNavbarComponents";
-// import { useRouter } from "next/navigation";
 
 const HomeNavbar = () => {
   const { data: session } = useSession();
   const [scroll, setScroll] = useState(false);
-  const { userData, token, setUserData } = useUserStore();
+  const { userData } = useUserStore();
   const [initials, setInitials] = useState("Profile");
 
   const handleScroll = () => {
@@ -25,31 +24,6 @@ const HomeNavbar = () => {
       setScroll(false);
     }
   };
-
-  const getToken = useCallback(async () => {
-    try {
-      const res = await fetch("/api/auth/getToken", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: session?.user.email }),
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setUserData(data.user, data.token);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (session && !token) {
-      getToken();
-    }
-  }, [session]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);

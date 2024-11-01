@@ -39,31 +39,6 @@ const Navbar = () => {
     }
   };
 
-  const getToken = useCallback(async () => {
-    try {
-      const res = await fetch("/api/auth/getToken", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: session?.user.email }),
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setUserData(data.user, data.token);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (session && !token) {
-      getToken();
-    }
-  }, [session]);
-
   const handleToast = (message: string) => {
     toast.success(message);
   };
