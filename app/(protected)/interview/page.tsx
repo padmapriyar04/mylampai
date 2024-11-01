@@ -220,7 +220,7 @@ const InterviewComponent = () => {
         JSON.stringify({ type: "analyze_jd", job_description: extractedText })
       );
     } else {
-      console.error("websocket is not initialised or no extracted text");
+      console.error("Websocket is not initialised or no extracted text");
     }
   };
 
