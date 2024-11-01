@@ -15,7 +15,7 @@ export default function Component() {
   const { data: session } = useSession();
   const { userData } = useUserStore();
 
-  const [loading, setLoading] = useState(true)
+  const [showAnnouncement, setShowAnnouncement] = useState(true);
 
   const countdownRef = useRef<HTMLParagraphElement>(null);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -102,7 +102,7 @@ export default function Component() {
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
-      const releaseDate = new Date("2024-11-01T19:00:00"); // November 1, 2024, at 7 PM
+      const releaseDate = new Date("2024-11-03T19:00:00"); // November 3, 2024, at 7 PM
       const difference = releaseDate.getTime() - now.getTime();
 
       if (difference > 0) {
@@ -124,8 +124,22 @@ export default function Component() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowAnnouncement(false);
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(timer); // Cleanup the timer
+  }, []);
+
+
   return (
-    <div className="h-custom w-full grid place-items-center">
+    <div className="h-custom w-full grid place-items-center relative">
+      <div className={`w-full max-w-4xl mx-auto mb-6 p-4 border-l-4 border-primary text-primary duration-1000 ease-in-out rounded absolute top-10 ${showAnnouncement ? "opacity-100" : "opacity-0"}`}>
+        <p className="font-semibold text-center">
+          Considering that in some regions of India people are celebrating Diwali today, we&apos;ll be launching <span className="font-bold">AI Mock Interviewer</span> on <span className="font-bold">3rd November 2024, at the same time. See you then</span>!
+        </p>
+      </div>
       {
         !isRegistered ? (
           <Card className="w-full max-w-md mx-auto">
@@ -148,7 +162,7 @@ export default function Component() {
                   <span className="font-medium">Releasing on:</span>
                 </div>
                 <Badge variant="secondary" className="text-sm font-bold">
-                  1st Nov 2024, &nbsp; 7:00 PM
+                  3rd Nov 2024, &nbsp; 7:00 PM
                 </Badge>
               </div>
               <div className="text-center">
@@ -183,7 +197,7 @@ export default function Component() {
                   Thank you for joining the early access of our &apos;<span className="font-semibold text-slate-900">AI Mock Interviewer</span>&apos;! 250 wiZcoins have been credited to your account, which you can use for &apos;<span className="font-semibold text-slate-900">AI Mock Interview</span>&apos;, &apos;<span className="font-semibold text-slate-900">AI CV Review</span>&apos;, and other exciting features.
                 </p>
                 <p>
-                  Join us again on November 1st, from 7 PM onwards to start using and experiencing the &apos;<span className="font-semibold text-slate-900">AI Mock Interviewer</span>&apos;. Until then, enjoy the festive season with your family and loved ones.
+                  Join us again on November 3rd, from 7 PM onwards to start using and experiencing the &apos;<span className="font-semibold text-slate-900">AI Mock Interviewer</span>&apos;. Until then, enjoy the festive season with your family and loved ones.
                 </p>
                 <p className="font-bold">
                   Happy Diwali!
@@ -195,7 +209,7 @@ export default function Component() {
                   <span className="font-medium">Release Date:</span>
                 </div>
                 <Badge variant="secondary" className="text-sm font-bold">
-                  1st Nov 2024, &nbsp; 7:00 PM
+                  3rd Nov 2024, &nbsp; 7:00 PM
                 </Badge>
               </div>
               <div className="text-center">
@@ -207,5 +221,5 @@ export default function Component() {
         )
       }
     </div>
-  )
+  );
 }
