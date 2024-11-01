@@ -124,8 +124,6 @@ export default function Component() {
     return () => clearInterval(timer);
   }, []);
 
-  console.log("hel")
-
   return (
     <div className="h-custom w-full grid place-items-center">
       {
