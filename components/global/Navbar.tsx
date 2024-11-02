@@ -94,7 +94,7 @@ const Navbar = () => {
 
         <div className="flex items-center gap-4">
           <button
-            className="flex items-center gap-2 border-1 border-primary rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-105"
+            className="flex items-center gap-2 border-[1px] border-primary rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-105"
             onClick={() => handleToast("No notifications available")}
           >
             <svg
@@ -110,7 +110,7 @@ const Navbar = () => {
           </button>
           <Link
             href="/profile"
-            className="flex items-center gap-2 border-1 border-primary rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-105"
+            className="flex items-center gap-2 border-[1px] border-primary rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-105"
           >
             <span className="">{initials}</span>
             <svg
@@ -124,7 +124,7 @@ const Navbar = () => {
               <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
             </svg>
           </Link>
-          <button className="flex items-center gap-2 border-1 border-primary rounded-full px-4 py-2 h-[40px] duration-200 transition-transform  hover:scale-105 ">
+          <button className="flex items-center gap-2 border-[1px] border-primary rounded-full px-4 py-2 h-[40px] duration-200 transition-transform  hover:scale-105 ">
             <span className="">Menu</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -138,10 +138,9 @@ const Navbar = () => {
             </svg>
           </button>
           <button
-            className="flex items-center gap-2 border-1 border-primary rounded-full px-2 py-2 h-[40px] transition-transform transform hover:scale-105 "
+            className="flex items-center gap-2 border-[1px] border-primary rounded-full px-2 py-2 h-[40px] transition-transform transform hover:scale-105 "
             onClick={handleLogout}
           >
-            {/* <span>Logout</span> */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
