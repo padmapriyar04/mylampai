@@ -62,7 +62,7 @@ The MyLamp AI Team`,
       { status: 200 },
     );
   } catch (error) {
-    console.error("Internal Server Error:", error);
+    console.error("Error: ", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

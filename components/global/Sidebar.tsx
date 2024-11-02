@@ -19,7 +19,8 @@ export default function Flexsidebar() {
 
   const notAllowedRoutes = [
     "/interview",
-    "/cvreviewer"
+    "/cvreviewer",
+    "/my-test-interview"
   ]
 
   const isNotAllowed = notAllowedRoutes.some((route) => pathname.startsWith(route))

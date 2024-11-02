@@ -23,7 +23,6 @@ export default function Component() {
   const handleRegister = useCallback(async () => {
     try {
       if (session) {
-        console.log("first")
         const email = session.user.email
         if (!email) {
           toast.error("Failed to Register")
@@ -127,11 +126,10 @@ export default function Component() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowAnnouncement(false);
-    }, 10000); // 10 seconds
+    }, 10000);
 
-    return () => clearTimeout(timer); // Cleanup the timer
+    return () => clearTimeout(timer);
   }, []);
-
 
   return (
     <div className="h-custom w-full grid place-items-center relative">
@@ -164,7 +162,7 @@ export default function Component() {
                 <Badge variant="secondary" className="text-sm font-bold">
                   3rd Nov 2024, &nbsp; 7:00 PM
                 </Badge>
-              </div>
+              </div>Get Started
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">Time until release:</p>
                 <p className="text-lg font-bold" aria-live="polite" ref={countdownRef}></p>

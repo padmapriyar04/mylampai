@@ -32,7 +32,7 @@ model User {
   otps             OTP[]
   cvs              CV[]
   credits          Int             @default(0)
-  isRegistered     Boolean        @default(false)
+  isRegistered     Boolean         @default(false)
   interviews       Interview[]
   sessions         Session[]
 }
@@ -206,7 +206,7 @@ model NewsletterEmails {
 model Interview {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   cvText   String
-  jobDesc  String?
+  jdText   String?
   audioUrl String?
   videoUrl String?
   User     User?   @relation(fields: [userId], references: [id])

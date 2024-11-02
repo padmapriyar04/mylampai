@@ -1,0 +1,70 @@
+"use server"
+import prisma from "@/lib";
+
+export const handleCVUpload = async (formData: FormData) => {
+  try {
+    const cvText = formData.get("cvText") as string;
+    const userId = formData.get("userId") as string;
+
+    if (!userId || !cvText) {
+      return {
+        status: "failed",
+        message: "CV or User not found"
+      }
+    }
+
+    const interview = await prisma.interview.create({
+      data: {
+        cvText,
+        userId
+      }
+    })
+
+    return {
+      status: "success",
+      message: "Interview created",
+      interviewId: interview.id
+    }
+
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+
+  return {
+    status: "failed",
+    message: "Internal Server Error"
+  }
+}
+
+export const handleJDUpload = async (formData: FormData) => {
+  try {
+    const jdText = formData.get("jdText") as string;
+    const interviewId = formData.get("interviewId") as string;
+
+    if (!jdText || !interviewId) {
+      return {
+        status: "failed",
+        message: "JD or User not found"
+      }
+    }
+
+    await prisma.interview.update({
+      where: {id: interviewId},
+      data: {
+        jdText
+      }
+    })
+
+    return {
+      message: "JD Updated",
+      status: "success"
+    }
+  } catch (error) {
+    console.log("Error: ", error)
+  }
+
+  return {
+    status: "failed",
+    message: "Internal Server Error"
+  }
+}

@@ -14,8 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth focus:scroll-auto">
       <body className={`${openSans.className}`}>
-
-      <GoogleAnalytics gaId="G-3TPKSH7MPS" />
+        <GoogleAnalytics gaId="G-3TPKSH7MPS" />
         <AuthProvider>{children}</AuthProvider>
         <Toaster position="top-center" />
       </body>
