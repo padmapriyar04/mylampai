@@ -1,7 +1,7 @@
 "use client"
 import { useCallback, useEffect, useRef, useState } from "react";
-import Analysis from "./interview/analysis"
-import OnlineCompiler from "./interview/OnlineCompiler"
+import Analysis from "./analysis"
+import OnlineCompiler from "./OnlineCompiler"
 import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
 import { handleAudioTranscribe } from "@/actions/transcribeAudioAction";
@@ -12,7 +12,7 @@ import {
   RiEmotionLine,
 } from "react-icons/ri";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
-import Caption from "./interview/caption";
+import Caption from "./caption";
 
 type ChatMessage = {
   user: string;

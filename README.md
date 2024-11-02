@@ -1,3 +1,9 @@
+SYSTEM SETUP
+
+1. Intall NodeJS and TypeScript in your system.
+
+2. Install Git
+
 HOW TO GET STARTED WITH THE PROJECT
 
 1. Clone the repository using the following command in your terminal:
