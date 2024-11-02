@@ -9,13 +9,11 @@ import { IoDocumentAttach, IoCloudUploadOutline } from "react-icons/io5";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 import InterviewPage from "./InterviewPage";
-import { useRouterStore } from "@/utils/useRouteStore";
 
 pdfJSLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJSLib.version}/pdf.worker.min.js`;
 
 const InterviewComponent = () => {
   const { ws } = useWebSocketContext();
-  const { changeRoute } = useRouterStore();
   const [step, setStep] = useState(1);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [jdFile, setJDFile] = useState<File | null>(null);
@@ -286,8 +284,6 @@ const InterviewComponent = () => {
       setStep(2);
       return;
     }
-
-    changeRoute(false);
     React;
     startInterview();
   };
@@ -315,7 +311,7 @@ const InterviewComponent = () => {
 
   return (
     <>
-      <div className="h-custom bg-primary-foreground flex items-center md:justify-center justify-top w-full">
+      <div className="min-h-screen bg-primary-foreground flex items-center md:justify-center justify-top w-full">
         <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">
           <div className="max-w-[450px] w-[90vw] md:mt-[8vh] md:w-[50vw] flex flex-col items-center justify-end bg-primary shadow-lg mt-[16vh] h-[62vh] md:h-auto ml-[5vw] mr-[5vw] md:m-10 text-white rounded-3xl p-10 relative">
             <Image

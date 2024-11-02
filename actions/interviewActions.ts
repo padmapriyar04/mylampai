@@ -12,8 +12,6 @@ export const getInterviews = async (userId: string) => {
       },
     });
 
-    console.log("interviews ", interviews);
-
     return interviews;
   } catch (error) {
     console.log("Error: ", error);
