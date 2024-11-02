@@ -1,40 +1,84 @@
-"use server"
+"use server";
 import prisma from "@/lib";
+
+export const getInterviews = async (userId: string) => {
+  try {
+    if (!userId) return [];
+
+    const interviews = await prisma.interview.findMany({
+      where: { userId },
+      select: {
+        id: true,
+      },
+    });
+
+    console.log("interviews ", interviews);
+
+    return interviews;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+  return [];
+};
+
+export const createInterview = async (userId: string) => {
+  try {
+    if (!userId)
+      return {
+        status: "failed",
+      };
+
+    const interview = await prisma.interview.create({
+      data: {
+        userId
+      },
+    });
+
+    return {
+      status: "success",
+      interviewId: interview.id,
+    };
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+  return {
+    status: "failed",
+  };
+};
 
 export const handleCVUpload = async (formData: FormData) => {
   try {
     const cvText = formData.get("cvText") as string;
-    const userId = formData.get("userId") as string;
+    const interviewId = formData.get("interviewId") as string;
 
-    if (!userId || !cvText) {
+    if (!interviewId || !cvText) {
       return {
         status: "failed",
-        message: "CV or User not found"
-      }
+        message: "CV or User not found",
+      };
     }
 
-    const interview = await prisma.interview.create({
+    const interview = await prisma.interview.update({
+      where: { id: interviewId },
       data: {
         cvText,
-        userId
-      }
-    })
+      },
+    });
 
     return {
       status: "success",
-      message: "Interview created",
-      interviewId: interview.id
-    }
-
+      message: "CV Uploaded",
+      interviewId: interview.id,
+    };
   } catch (error) {
     console.log("Error: ", error);
   }
 
   return {
     status: "failed",
-    message: "Internal Server Error"
-  }
-}
+    message: "Internal Server Error",
+  };
+};
 
 export const handleJDUpload = async (formData: FormData) => {
   try {
@@ -44,27 +88,27 @@ export const handleJDUpload = async (formData: FormData) => {
     if (!jdText || !interviewId) {
       return {
         status: "failed",
-        message: "JD or User not found"
-      }
+        message: "JD or User not found",
+      };
     }
 
     await prisma.interview.update({
-      where: {id: interviewId},
+      where: { id: interviewId },
       data: {
-        jdText
-      }
-    })
+        jdText,
+      },
+    });
 
     return {
       message: "JD Updated",
-      status: "success"
-    }
+      status: "success",
+    };
   } catch (error) {
-    console.log("Error: ", error)
+    console.log("Error: ", error);
   }
 
   return {
     status: "failed",
-    message: "Internal Server Error"
-  }
-}
+    message: "Internal Server Error",
+  };
+};
