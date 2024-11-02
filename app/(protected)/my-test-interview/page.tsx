@@ -10,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 import InterviewPage from "./InterviewPage";
 import { useRouterStore } from "@/utils/useRouteStore";
-import { useRouter } from "next/navigation";
 
 pdfJSLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJSLib.version}/pdf.worker.min.js`;
 
@@ -21,8 +20,6 @@ const InterviewComponent = () => {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [jdFile, setJDFile] = useState<File | null>(null);
   const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
-
-  const router = useRouter();
 
   console.log(deviceList);
 
@@ -71,7 +68,7 @@ const InterviewComponent = () => {
         .catch((err) => {
           console.error(`${err.name}: ${err.message}`);
         });
-        
+
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === "NotAllowedError") {
@@ -349,9 +346,8 @@ const InterviewComponent = () => {
                 <div className="flex mx-auto items-center max-w-[450px] justify-center w-full">
                   <div className="relative flex-1">
                     <div
-                      className={`w-8 h-8 ${
-                        !!resumeFile ? "bg-purple-500" : "bg-gray-400"
-                      } rounded-full flex items-center justify-center`}
+                      className={`w-8 h-8 ${!!resumeFile ? "bg-purple-500" : "bg-gray-400"
+                        } rounded-full flex items-center justify-center`}
                     >
                       {!!resumeFile ? (
                         <svg
@@ -371,9 +367,8 @@ const InterviewComponent = () => {
                       )}
                     </div>
                     <div
-                      className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${
-                        resumeFile ? "bg-primary w-full" : "bg-gray-400 w-full"
-                      } z-0`}
+                      className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${resumeFile ? "bg-primary w-full" : "bg-gray-400 w-full"
+                        } z-0`}
                     ></div>
                   </div>
 
@@ -469,29 +464,27 @@ const InterviewComponent = () => {
                   )}
 
                   <button
-                    className={`flex justify-center items-center mt-2 mx-auto bg-primary text-lg md:w-full relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px]   ${
-                      !!cvText
+                    className={`flex justify-center items-center mt-2 mx-auto bg-primary text-lg md:w-full relative text-white font-bold py-3 px-3 rounded-xl lg:max-h-[40px]   ${!!cvText
                         ? "cursor-not-allowed bg-gray-400"
                         : "hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"
-                    }`}
+                      }`}
                     onClick={handleUploadClick}
                     disabled={cvText !== ""}
                   >
                     {isUploading
                       ? "Uploading..."
                       : cvText !== ""
-                      ? "Resume Uploaded"
-                      : "Upload Resume"}
+                        ? "Resume Uploaded"
+                        : "Upload Resume"}
                   </button>
                 </div>
 
                 <div className="mt-8 w-full px-4 flex flex-col items-center">
                   <button
-                    className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] lg:max-h-[70px] flex justify-center items-center h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-                      resumeFile
+                    className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] lg:max-h-[70px] flex justify-center items-center h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${resumeFile
                         ? "bg-gray-600 text-white hover:bg-gray-800"
                         : "bg-gray-300 text-gray-800 cursor-not-allowed"
-                    }`}
+                      }`}
                     disabled={cvText === ""}
                     onClick={handleNextClick}
                   >
@@ -526,9 +519,8 @@ const InterviewComponent = () => {
                   {/* Step 2 */}
                   <div className="relative flex-1">
                     <div
-                      className={`w-8 h-8 ${
-                        isNextEnabled ? "bg-primary" : "bg-gray-400"
-                      } rounded-full flex items-center justify-center`}
+                      className={`w-8 h-8 ${isNextEnabled ? "bg-primary" : "bg-gray-400"
+                        } rounded-full flex items-center justify-center`}
                     >
                       {isNextEnabled ? (
                         <svg
@@ -548,11 +540,10 @@ const InterviewComponent = () => {
                       )}
                     </div>
                     <div
-                      className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${
-                        isNextEnabled
+                      className={`absolute top-1/2 left-8 h-0.5 transition-all duration-500 ease-in-out ${isNextEnabled
                           ? "bg-primary w-full"
                           : "bg-gray-400 w-full"
-                      } z-0`}
+                        } z-0`}
                     ></div>
                   </div>
                   <div className="relative flex items-center">
@@ -659,11 +650,10 @@ const InterviewComponent = () => {
                   <button
                     onClick={handleNextClick}
                     disabled={JD === ""}
-                    className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] lg:max-h-[70px] flex justify-center items-center h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-                      JD !== ""
+                    className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] lg:max-h-[70px] flex justify-center items-center h-full text-lg font-bold py-6 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${JD !== ""
                         ? "bg-gray-600 text-white hover:bg-gray-800"
                         : "bg-gray-300 text-gray-800 cursor-not-allowed"
-                    } rounded-full px-4 py-2`}
+                      } rounded-full px-4 py-2`}
                   >
                     Next
                   </button>
