@@ -8,7 +8,7 @@ import { FiX } from "react-icons/fi";
 import { IoDocumentAttach, IoCloudUploadOutline } from "react-icons/io5";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
-import InterviewPage from "./[interviewId]/InterviewPage";
+import InterviewPage from "./InterviewPage";
 import { useRouterStore } from "@/utils/useRouteStore";
 
 pdfJSLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJSLib.version}/pdf.worker.min.js`;
@@ -72,11 +72,11 @@ const InterviewComponent = () => {
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === "NotAllowedError") {
-          toast.error("Camera and/or microphone access denied");
+          toast.error("Camera and/or microphone access denied.");
         } else if (error.name === "NotFoundError") {
           toast.error("No media devices found.");
         } else {
-          toast.error("Error accessing media devices");
+          toast.error("Error accessing media devices:");
           console.log("Error accessing media devices: ", error);
         }
       } else {
