@@ -77,12 +77,12 @@ export async function handleAudioTranscribe(formData: FormData) {
     console.log(error);
     return { status: "failed" };
   } finally {
-    // if (inputFilePath && fs.existsSync(inputFilePath)) {
-    //   fs.unlinkSync(inputFilePath);
-    // }
-    // if (monoFilePath && fs.existsSync(monoFilePath)) {
-    //   fs.unlinkSync(monoFilePath);
-    // }
+    if (inputFilePath && fs.existsSync(inputFilePath)) {
+      fs.unlinkSync(inputFilePath);
+    }
+    if (monoFilePath && fs.existsSync(monoFilePath)) {
+      fs.unlinkSync(monoFilePath);
+    }
   }
 }
 

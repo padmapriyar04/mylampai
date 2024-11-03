@@ -3,6 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Analysis from "./analysis";
 import { BlobServiceClient, BlockBlobClient } from "@azure/storage-blob";
 import OnlineCompiler from "./OnlineCompiler";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
 import {
@@ -39,13 +49,15 @@ const InterviewPage = () => {
 
   const resTranscript = useRef("");
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(true);
+
   const { ws } = useWebSocketContext();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showCompiler, setShowCompiler] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackIconClicked, setFeedbackIconClicked] = useState(false);
-  const [interviewEnded, setInterviewEnded] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [clickedIndex, setClickedIndex] = useState<number | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -147,6 +159,13 @@ const InterviewPage = () => {
               ...prevMessages,
               { user: "System", message: data.message },
             ]);
+
+            ws?.send(
+              JSON.stringify({
+                type: "get_analysis",
+              })
+            );
+
             break;
 
           case "analysis":
@@ -164,18 +183,28 @@ const InterviewPage = () => {
     }
   }, [ws, handleInterviewer]);
 
+  const stopCamera = useCallback(() => {
+    const videoElement = videoRef.current;
+    if (videoElement && videoElement.srcObject) {
+      const stream = videoElement.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach((track) => track.stop());
+      videoElement.srcObject = null; // Clear the srcObject to release the camera
+    }
+  }, []);
+
   const handleInterviewEnd = useCallback(async () => {
     // await finalizeUpload();
+    stopCamera();
 
-    setInterviewEnded(true);
     ws?.send(
       JSON.stringify({
-        type: "get_analysis",
+        type: "end_interview",
       })
     );
 
     setShowFeedback(true);
-  }, [ws]);
+  }, [ws, stopCamera]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
@@ -202,7 +231,11 @@ const InterviewPage = () => {
 
             // Send the chunk to the backend for transcription
             const formData = new FormData();
-            formData.append("audio", e.data, `${interviewId}${Date.now()}.webm`);
+            formData.append(
+              "audio",
+              e.data,
+              `${interviewId}${Date.now()}.webm`
+            );
 
             try {
               const res = await handleAudioTranscribe(formData);
@@ -235,7 +268,7 @@ const InterviewPage = () => {
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
-  }, [handleSendMessage, stopRecording]);
+  }, [handleSendMessage, interviewId, stopRecording]);
 
   const toggleVideo = () => setIsVideoOff(!isVideoOff);
 
@@ -403,6 +436,29 @@ const InterviewPage = () => {
   );
 
   useEffect(() => {
+    const fullscreenChangeHandler = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+
+      if (!!document.fullscreenElement === false) {
+        setDialogOpen(true);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", fullscreenChangeHandler);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", fullscreenChangeHandler);
+    };
+  }, []);
+
+  const enableFullscreen = () => {
+    if (!isFullscreen) {
+      document.documentElement.requestFullscreen();
+      setDialogOpen(false);
+    }
+  };
+
+  useEffect(() => {
     if (audioURL && audioRef.current) {
       audioRef.current.src = audioURL;
       audioRef.current
@@ -431,6 +487,23 @@ const InterviewPage = () => {
       className="min-h-screen flex items-center flex-col relative w-full h-full"
     >
       {loading && <FullScreenLoader />}
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Enable Fullscreen Mode</DialogTitle>
+            <DialogDescription>
+              Fullscreen mode provides an immersive interview experience. Would
+              you like to enable it?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button className="hover:text-primary" onClick={enableFullscreen}>
+              Enable Fullscreen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <nav className="sticky top-0 w-full z-10 ">
         <div className="flex items-center justify-between shadow-md px-4 h-[72px] w-full">
@@ -633,8 +706,8 @@ const InterviewPage = () => {
       )}
 
       {feedbackSubmitted && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full min-w-[600px]">
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-20">
+          <div className="bg-white w-full min-w-[600px]">
             <Analysis analysisData={analysisData} />
           </div>
         </div>

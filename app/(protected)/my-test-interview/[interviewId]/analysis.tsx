@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { RiArrowDropDownLine } from 'react-icons/ri';
-import { Oval } from 'react-loader-spinner'; // Importing the loader component
-
+import React, { useState, useEffect } from "react";
+import { Bar } from "react-chartjs-2";
+import { RiArrowDropDownLine } from "react-icons/ri";
+import FullScreenLoader from "@/components/global/FullScreenLoader";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 import {
   Chart as ChartJS,
@@ -12,13 +12,20 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from "chart.js";
 import Link from "next/link";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface LineAnalysis {
-  line: string; // Ensure this is a string
+  line: string;
   clarity: { reasoning: string; score: number };
   depth: { reasoning: string; score: number };
   professionalism: { reasoning: string; score: number };
@@ -38,8 +45,8 @@ interface AnalysisItem {
     line_analysis: LineAnalysis[];
     overall_assessment: OverallAssessment;
   };
-  answer: string; 
-  question: string; 
+  answer: string;
+  question: string;
 }
 
 interface AnalysisProps {
@@ -55,23 +62,14 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
 
   useEffect(() => {
     if (analysisData && analysisData.length > 0) {
-      console.log('Received Analysis Data: ', analysisData);
-      // Reset expanded sections when analysisData changes
+      console.log("Received Analysis Data: ", analysisData);
       setExpandedSections(analysisData.map(() => false));
       setLoading(false);
     }
   }, [analysisData]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Oval color="#00BFFF" height={80} width={80} /> {/* Loader component */}
-      </div>
-    );
-  }
-
-  if (!analysisData || analysisData.length === 0) {
-    return <p>No analysis data available.</p>;
+    return <FullScreenLoader message="Loading Analysis Data" />;
   }
 
   // Toggle visibility of analysis and overall assessment
@@ -85,10 +83,16 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
 
   const createChartData = (line: LineAnalysis) => {
     return {
-      labels: ['Clarity', 'Depth', 'Professionalism', 'Relevance', 'Technical Accuracy'],
+      labels: [
+        "Clarity",
+        "Depth",
+        "Professionalism",
+        "Relevance",
+        "Technical Accuracy",
+      ],
       datasets: [
         {
-          label: 'Scores',
+          label: "Scores",
           data: [
             line.clarity.score,
             line.depth.score,
@@ -97,11 +101,11 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
             line.technical_accuracy.score,
           ],
           backgroundColor: [
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(255, 206, 86, 0.6)',
-            'rgba(153, 102, 255, 0.6)',
+            "rgba(75, 192, 192, 0.6)",
+            "rgba(255, 99, 132, 0.6)",
+            "rgba(54, 162, 235, 0.6)",
+            "rgba(255, 206, 86, 0.6)",
+            "rgba(153, 102, 255, 0.6)",
           ],
         },
       ],
@@ -109,43 +113,43 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
   };
 
   return (
-    <div className="p-8 bg-white rounded-lg h-[100vh] w-full">
-      <div className='flex justify-center items-center mb-8'>
-      <div className="flex items-center justify-center absolute left-8">
-        <Link href="/">
-          <Image src={"/home/logo.svg"}
+    <div className="h-screen w-full relative">
+      <div className="flex justify-center items-center py-4">
+        <Link
+          href="/"
+          className="flex items-center justify-center absolute left-8 top-2"
+        >
+          <Image
+            src={"/home/logo.svg"}
             width={180}
-            height={180} alt="wiZe Logo" className="h-auto w-48 ml-2" />
+            height={180}
+            alt="wiZe Logo"
+            className="h-auto w-48 ml-2"
+          />
         </Link>
-      </div>
-      <h2 className="text-3xl font-bold  flex justify-center flex-col">Your Analysis
-      <div className='w-full h-1 bg-primary rounded-full'></div>
-      </h2>
-      
+        <div className="text-3xl font-semibold flex justify-center flex-col">
+          Your Analysis
+          <div className="w-full h-[3px] bg-primary rounded-full"></div>
+        </div>
       </div>
 
-      {/* Add a scrollable container */}
-      <div
-        style={{ maxHeight: '600px', overflowY: 'scroll' }}
-        className="scrollbar-thin scrollbar-thumb-rounded-lg scrollbar-thumb-gray-400 scrollbar-hide border-2 rounded-lg border-primary p-6"
-      >
-        {/* Loop through all analysis data */}
-        {analysisData.map((analysisItem, index) => (
+      <ScrollArea className="px-8 py-4 h-[calc(100vh-2rem)] ">
+        {analysisData?.map((analysisItem, index) => (
           <div
             key={index}
-            className="mb-8 border-2 p-10 rounded-xl border-primary-foreground shadow-lg"
+            className="mb-8 border-2 p-10 rounded-xl border-primary-foreground"
           >
             {/* Answer and Question */}
             <div className="mt-6 bg-primary rounded-lg border-4 border-primary-foreground shadow-lg p-4 text-lg text-white">
               <p>
-                <strong>Question:</strong>{' '}
-                {typeof analysisItem.question === 'string'
+                <strong>Question:</strong>{" "}
+                {typeof analysisItem.question === "string"
                   ? analysisItem.question
                   : JSON.stringify(analysisItem.question)}
               </p>
               <p>
-                <strong>Answer:</strong>{' '}
-                {typeof analysisItem.answer === 'string'
+                <strong>Answer:</strong>{" "}
+                {typeof analysisItem.answer === "string"
                   ? analysisItem.answer
                   : JSON.stringify(analysisItem.answer)}
               </p>
@@ -156,10 +160,10 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
               onClick={() => toggleSectionVisibility(index)}
               className="mt-4 mb-2 px-4 py-2 bg-primary flex justify-center items-center text-white rounded-md hover:bg-purple-600 font-semibold transition shadow-lg focus:outline-none"
             >
-              {expandedSections[index] ? 'Hide Analysis' : 'Show Analysis'}
+              {expandedSections[index] ? "Hide Analysis" : "Show Analysis"}
               <RiArrowDropDownLine
                 className={`text-3xl ml-2 transition-transform ${
-                  expandedSections[index] ? 'rotate-180' : ''
+                  expandedSections[index] ? "rotate-180" : ""
                 }`}
               />
             </button>
@@ -180,8 +184,8 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                             className="mb-4 p-4 bg-gray-100 rounded-lg"
                           >
                             <p>
-                              <strong>Line:</strong>{' '}
-                              {typeof line.line === 'string'
+                              <strong>Line:</strong>{" "}
+                              {typeof line.line === "string"
                                 ? line.line
                                 : JSON.stringify(line.line)}
                             </p>
@@ -200,8 +204,8 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                                 <strong>Clarity:</strong>
                               </p>
                               <p>
-                                Reasoning:{' '}
-                                {typeof line.clarity.reasoning === 'string'
+                                Reasoning:{" "}
+                                {typeof line.clarity.reasoning === "string"
                                   ? line.clarity.reasoning
                                   : JSON.stringify(line.clarity.reasoning)}
                               </p>
@@ -214,8 +218,8 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                                 <strong>Depth:</strong>
                               </p>
                               <p>
-                                Reasoning:{' '}
-                                {typeof line.depth.reasoning === 'string'
+                                Reasoning:{" "}
+                                {typeof line.depth.reasoning === "string"
                                   ? line.depth.reasoning
                                   : JSON.stringify(line.depth.reasoning)}
                               </p>
@@ -228,10 +232,13 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                                 <strong>Professionalism:</strong>
                               </p>
                               <p>
-                                Reasoning:{' '}
-                                {typeof line.professionalism.reasoning === 'string'
+                                Reasoning:{" "}
+                                {typeof line.professionalism.reasoning ===
+                                "string"
                                   ? line.professionalism.reasoning
-                                  : JSON.stringify(line.professionalism.reasoning)}
+                                  : JSON.stringify(
+                                      line.professionalism.reasoning
+                                    )}
                               </p>
                               <p>Score: {line.professionalism.score}</p>
                             </div>
@@ -242,8 +249,8 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                                 <strong>Relevance:</strong>
                               </p>
                               <p>
-                                Reasoning:{' '}
-                                {typeof line.relevance.reasoning === 'string'
+                                Reasoning:{" "}
+                                {typeof line.relevance.reasoning === "string"
                                   ? line.relevance.reasoning
                                   : JSON.stringify(line.relevance.reasoning)}
                               </p>
@@ -256,10 +263,13 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                                 <strong>Technical Accuracy:</strong>
                               </p>
                               <p>
-                                Reasoning:{' '}
-                                {typeof line.technical_accuracy.reasoning === 'string'
+                                Reasoning:{" "}
+                                {typeof line.technical_accuracy.reasoning ===
+                                "string"
                                   ? line.technical_accuracy.reasoning
-                                  : JSON.stringify(line.technical_accuracy.reasoning)}
+                                  : JSON.stringify(
+                                      line.technical_accuracy.reasoning
+                                    )}
                               </p>
                               <p>Score: {line.technical_accuracy.score}</p>
                             </div>
@@ -280,7 +290,7 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
 
                   {/* Overall Score */}
                   <p>
-                    <strong>Overall Score:</strong>{' '}
+                    <strong>Overall Score:</strong>{" "}
                     {analysisItem.analysis.overall_assessment.overall_score}
                   </p>
 
@@ -294,7 +304,7 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                         {analysisItem.analysis.overall_assessment.strengths.map(
                           (strength, i) => (
                             <li key={i}>
-                              {typeof strength === 'string'
+                              {typeof strength === "string"
                                 ? strength
                                 : JSON.stringify(strength)}
                             </li>
@@ -317,7 +327,7 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                         {analysisItem.analysis.overall_assessment.areas_for_improvement.map(
                           (area, i) => (
                             <li key={i}>
-                              {typeof area === 'string'
+                              {typeof area === "string"
                                 ? area
                                 : JSON.stringify(area)}
                             </li>
@@ -339,7 +349,7 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
                         {analysisItem.analysis.overall_assessment.suggestions.map(
                           (suggestion, i) => (
                             <li key={i}>
-                              {typeof suggestion === 'string'
+                              {typeof suggestion === "string"
                                 ? suggestion
                                 : JSON.stringify(suggestion)}
                             </li>
@@ -355,7 +365,7 @@ const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
             )}
           </div>
         ))}
-      </div>
+      </ScrollArea>
     </div>
   );
 };
