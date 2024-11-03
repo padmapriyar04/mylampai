@@ -525,9 +525,9 @@ const InterviewPage = () => {
           <div className="flex items-center">
             <button
               className="bg-primary font-medium text-white text-sm px-4 py-2 rounded-full"
-              onClick={() => setShowCompiler(!showCompiler)}
+              onClick={() => setShowCompiler(true)}
             >
-              {showCompiler ? "Close Compiler" : "Open Online Compiler"}
+              Open Compiler
             </button>
             <button
               className="mx-4 bg-primary p-2 rounded-full w-8 h-8 relative"
