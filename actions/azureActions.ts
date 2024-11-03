@@ -35,3 +35,29 @@ export const generateSasToken = async (blobName: string) => {
     return "";
   }
 };
+
+export const generateSasUrlForInterview = async () => {
+  const sharedKeyCredential = new StorageSharedKeyCredential(
+    accountName,
+    accountKey
+  );
+
+  const sasOptions = {
+    containerName,
+    permissions: BlobSASPermissions.parse("cw"), 
+    startsOn: new Date(new Date().valueOf() - 5 * 60 * 1000), 
+    expiresOn: new Date(new Date().valueOf() + 1 * 3600 * 1000), 
+  };
+
+  try {
+    const sasToken = generateBlobSASQueryParameters(
+      sasOptions,
+      sharedKeyCredential
+    ).toString();
+    console.log("sasToken: ", sasToken);
+    return `https://${accountName}.blob.core.windows.net/${containerName}?${sasToken}`;
+  } catch (error) {
+    console.error("Error generating SAS token:", error);
+    return "";
+  }
+};

@@ -38,6 +38,7 @@ const RealTimeVideoUploader: React.FC = () => {
     if (audioRecorderRef.current) audioRecorderRef.current.stop();
     setIsRecording(false);
   };
+  
   const uploadChunk = async (client: BlockBlobClient | null, chunk: Blob, blockIndex: number) => {
     try {
       if (client) {

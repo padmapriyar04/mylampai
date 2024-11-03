@@ -1,11 +1,16 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Analysis from "./analysis";
+import { BlobServiceClient, BlockBlobClient } from "@azure/storage-blob";
 import OnlineCompiler from "./OnlineCompiler";
 import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
 import { handleAudioTranscribe } from "@/actions/transcribeAudioAction";
-import { generateSasToken } from "@/actions/azureActions";
+import {
+  generateSasToken,
+  generateSasUrlForInterview,
+} from "@/actions/azureActions";
+import { useParams } from "next/navigation";
 import FullScreenLoader from "@/components/global/FullScreenLoader";
 import { MessageSquare } from "lucide-react";
 import { Mic, MicOff, Video, VideoOff, PhoneOff, User } from "lucide-react";
@@ -26,6 +31,9 @@ type ChatMessage = {
 };
 
 const InterviewPage = () => {
+  const params = useParams();
+  const interviewId = params.interviewId as string;
+
   const { ws } = useWebSocketContext();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -52,48 +60,15 @@ const InterviewPage = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const elementRef = useRef(null);
 
+  const videoBlobClient = useRef<BlockBlobClient | null>(null);
+  const audioBlobClient = useRef<BlockBlobClient | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioRecorderRef = useRef<MediaRecorder | null>(null);
+
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-
-  // const goFullscreen = () => {
-  //   if (elementRef.current) {
-  //     if (elementRef.current.requestFullscreen) {
-  //       elementRef.current.requestFullscreen();
-  //     } else if (elementRef.current.mozRequestFullScreen) {
-  //       // Firefox
-  //       elementRef.current.mozRequestFullScreen();
-  //     } else if (elementRef.current.webkitRequestFullscreen) {
-  //       // Chrome, Safari and Opera
-  //       elementRef.current.webkitRequestFullscreen();
-  //     } else if (elementRef.current.msRequestFullscreen) {
-  //       // IE/Edge
-  //       elementRef.current.msRequestFullscreen();
-  //     }
-  //   }
-  // };
-
-  // const exitFullscreen = () => {
-  //   if (document.exitFullscreen) {
-  //     document.exitFullscreen();
-  //   } else if (document.mozCancelFullScreen) {
-  //     // Firefox
-  //     document.mozCancelFullScreen();
-  //   } else if (document.webkitExitFullscreen) {
-  //     // Chrome, Safari and Opera
-  //     document.webkitExitFullscreen();
-  //   } else if (document.msExitFullscreen) {
-  //     // IE/Edge
-  //     document.msExitFullscreen();
-  //   }
-  // };
-
-  // const toggleFullscreen = () => {
-  //   if (!document.fullscreenElement) {
-  //     goFullscreen();
-  //   } else {
-  //     exitFullscreen();
-  //   }
-  // };
 
   const handleSendMessage = useCallback(
     (message: string) => {
@@ -184,19 +159,35 @@ const InterviewPage = () => {
     }
   }, [ws, handleInterviewer]);
 
-  const handleInterviewEnd = useCallback(() => {
+  const handleInterviewEnd = useCallback(async () => {
+    // await finalizeUpload();
+
     setInterviewEnded(true);
     ws?.send(
       JSON.stringify({
         type: "get_analysis",
       })
     );
+
     setShowFeedback(true);
   }, [ws]);
 
+  const stopRecording = useCallback(() => {
+    if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
+      mediaRecorder.current.stop();
+    }
+    if (mediaStream.current) {
+      mediaStream.current.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+  }, []);
+
   const startRecording = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
 
       if (mediaRecorder && mediaStream) {
         mediaStream.current = stream;
@@ -231,43 +222,136 @@ const InterviewPage = () => {
           }
         };
 
-        mediaRecorder.current.start();
+        mediaRecorder.current.start(3300);
       }
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
   }, [handleSendMessage]);
 
-  const toggleMute = () => setIsMuted(!isMuted);
   const toggleVideo = () => setIsVideoOff(!isVideoOff);
 
-  const stopRecording = useCallback(() => {
-    if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
-      mediaRecorder.current.stop();
+  const uploadChunk = async (
+    client: BlockBlobClient | null,
+    chunk: Blob,
+    blockIndex: number
+  ) => {
+    try {
+      if (client) {
+        const blockId = btoa(String(blockIndex).padStart(6, "0")); // Padded, consistent ID
+        await client.stageBlock(blockId, chunk, chunk.size);
+        console.log(`Uploaded block: ${blockId}`);
+      }
+    } catch (error) {
+      console.error("Error uploading chunk:", error);
     }
-    if (mediaStream.current) {
-      mediaStream.current.getTracks().forEach((track) => {
-        track.stop();
-      });
+  };
+
+  const finalizeUpload = async () => {
+    try {
+      stopVideoStream();
+
+      const videoBlockList = chunksRef.current.map((_, index) =>
+        btoa(String(index).padStart(6, "0"))
+      );
+      const audioBlockList = audioChunksRef.current.map((_, index) =>
+        btoa(String(index).padStart(6, "0"))
+      );
+
+      if (videoBlobClient.current) {
+        await videoBlobClient.current.commitBlockList(videoBlockList);
+        console.log("Video upload complete and finalized.");
+      }
+      if (audioBlobClient.current) {
+        await audioBlobClient.current.commitBlockList(audioBlockList);
+        console.log("Audio upload complete and finalized.");
+      }
+    } catch (error) {
+      console.error("Error finalizing upload:", error);
     }
+  };
+
+  const stopVideoStream = () => {
+    if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
+    if (audioRecorderRef.current) audioRecorderRef.current.stop();
+  };
+
+  const startVideoStream = useCallback(async () => {
+    // try {
+    //   const stream = await navigator.mediaDevices.getUserMedia({
+    //     video: true,
+    //     audio: true,
+    //   });
+    //   if (videoRef.current) videoRef.current.srcObject = stream;
+
+    //   const mediaRecorder = new MediaRecorder(stream, {
+    //     mimeType: "video/webm",
+    //   });
+    //   const audioStream = new MediaStream(stream.getAudioTracks());
+    //   const audioRecorder = new MediaRecorder(audioStream, {
+    //     mimeType: "audio/webm",
+    //   });
+
+    //   let videoBlockIndex = 0;
+    //   let audioBlockIndex = 0;
+
+    //   mediaRecorder.ondataavailable = async (event: BlobEvent) => {
+    //     if (event.data.size > 0) {
+    //       chunksRef.current.push(event.data);
+    //       await uploadChunk(
+    //         videoBlobClient.current,
+    //         event.data,
+    //         videoBlockIndex++
+    //       );
+    //     }
+    //   };
+
+    //   audioRecorder.ondataavailable = async (event: BlobEvent) => {
+    //     if (event.data.size > 0) {
+    //       audioChunksRef.current.push(event.data);
+    //       await uploadChunk(
+    //         audioBlobClient.current,
+    //         event.data,
+    //         audioBlockIndex++
+    //       );
+    //     }
+    //   };
+
+    //   mediaRecorder.start(3000);
+    //   audioRecorder.start(3000);
+
+    //   mediaRecorderRef.current = mediaRecorder;
+    //   audioRecorderRef.current = audioRecorder;
+    // } catch (error) {
+    //   console.error("Error starting recording:", error);
+    // }
   }, []);
 
   useEffect(() => {
-    const startVideoStream = async () => {
-      if (videoRef.current) {
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: true })
-          .then((stream) => {
-            if (videoRef.current) {
-              videoRef.current.srcObject = stream;
-            }
-          })
-          .catch((err) => console.error("Error accessing media devices:", err));
-      }
+    startVideoStream();
+  }, [startVideoStream]);
+
+  useEffect(() => {
+    const startVideoAudioRecording = async (interviewId: string) => {
+      const sasUrl = await generateSasUrlForInterview();
+
+      const blobServiceClient = new BlobServiceClient(sasUrl);
+      const containerClient =
+        blobServiceClient.getContainerClient("mylampai-av");
+
+      const timestamp = Date.now();
+
+      // Set up separate Blob Clients for video and audio
+      videoBlobClient.current = containerClient.getBlockBlobClient(
+        `${interviewId}_${timestamp}_v.webm`
+      );
+      audioBlobClient.current = containerClient.getBlockBlobClient(
+        `${interviewId}_${timestamp}_a.webm`
+      );
     };
 
-    startVideoStream();
-  }, []);
+    startVideoAudioRecording(interviewId);
+  }, [interviewId]);
 
   useEffect(() => {
     const SpeechRecognition =
@@ -346,7 +430,6 @@ const InterviewPage = () => {
     >
       {loading && <FullScreenLoader />}
 
-
       <nav className="sticky top-0 w-full z-10 ">
         <div className="flex items-center justify-between shadow-md px-4 h-[72px] w-full">
           <div className="flex gap-8">
@@ -386,7 +469,7 @@ const InterviewPage = () => {
           </div>
         </div>
       </nav>
-      
+
       <div className="flex flex-col w-full items-center justify-center min-h-[calc(100vh-72px)] relative bg-gray-100">
         <div className="relative w-screen h-[calc(100vh-72px)] overflow-hidden aspect-video rounded-xl shadow-lg">
           <video
