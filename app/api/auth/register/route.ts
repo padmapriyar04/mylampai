@@ -1,5 +1,3 @@
-// pages/api/auth/register.ts
-
 import { NextResponse } from "next/server";
 import prisma from "@/lib";
 import bcrypt from "bcrypt";
@@ -53,7 +51,6 @@ export const POST = async (req: Request) => {
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
-      // Update existing user information
       await prisma.user.update({
         where: { email },
         data: {
@@ -66,7 +63,6 @@ export const POST = async (req: Request) => {
         },
       });
 
-      // Optionally update userInfo
       let userInfo;
       if (
         country ||
@@ -200,7 +196,7 @@ export const POST = async (req: Request) => {
       );
     }
   } catch (error) {
-    console.error("Error during user registration:", error);
+    console.error("Error: ", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
