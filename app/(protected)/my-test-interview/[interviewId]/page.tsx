@@ -672,7 +672,7 @@ const InterviewComponent = () => {
                   Choose your Interview Profile
                 </h3>
                 <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[450px] lg:max-w-[450px] shadow-lg text-center flex flex-col items-center">
-                  <Tabs defaultValue="jd" className="w-[400px]">
+                  <Tabs defaultValue="profile" className="w-[400px]">
                     <TabsList className="grid w-full grid-cols-2 bg-primary-foreground py-2 h-auto">
                       <TabsTrigger value="profile">Choose Profile</TabsTrigger>
                       <TabsTrigger value="jd">Upload JD</TabsTrigger>

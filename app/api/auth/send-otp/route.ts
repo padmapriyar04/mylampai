@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     if (!email) {
       return NextResponse.json(
         { error: "Email is required." },
-        { status: 422 },
+        { status: 422 }
       );
     }
 
@@ -44,28 +44,28 @@ export async function POST(req: Request) {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "MyLamp AI - Your OTP Code",
+      subject: `wiZe - Your OTP is ${otp}`,
       text: `Hello,
 
-Your one-time password (OTP) for MyLamp AI is ${otp}. This code is valid for the next 15 minutes.
+Your one-time password (OTP) for wiZe is ${otp}. This code is valid for the next 15 minutes.
 
 If you did not request this code, please ignore this email.
 
-Thank you for choosing MyLamp AI!
+Thank you for choosing wiZe!
 
 Best regards,
-The MyLamp AI Team`,
+The wiZe(MyLamp AI) Team`,
     });
 
     return NextResponse.json(
       { message: "OTP sent successfully!", otpSent: true },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Error: ", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

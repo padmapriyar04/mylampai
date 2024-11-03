@@ -39,7 +39,7 @@ export default function CreateInterview() {
         className="hover:text-primary"
         onClick={() => handleInterview(userData?.id as string)}
       >
-        Create New Interview
+        Start New Interview
       </Button>
     </>
   );

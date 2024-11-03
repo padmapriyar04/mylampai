@@ -7,6 +7,8 @@ import Image from "next/image";
 import { handleAudioTranscribe } from "@/actions/transcribeAudioAction";
 import { generateSasToken } from "@/actions/azureActions";
 import FullScreenLoader from "@/components/global/FullScreenLoader";
+import { MessageSquare } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, PhoneOff, User } from "lucide-react";
 
 import {
   RiEmotionUnhappyLine,
@@ -16,6 +18,7 @@ import {
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 import Caption from "./caption";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 type ChatMessage = {
   user: string;
@@ -48,6 +51,9 @@ const InterviewPage = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const elementRef = useRef(null);
+
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
 
   // const goFullscreen = () => {
   //   if (elementRef.current) {
@@ -154,13 +160,6 @@ const InterviewPage = () => {
             break;
 
           case "code_evaluation":
-            setChatMessages((prevMessages) => [
-              ...prevMessages,
-              {
-                user: "System",
-                message: "Code evaluation result: " + data.result,
-              },
-            ]);
             break;
 
           case "interview_end":
@@ -239,6 +238,9 @@ const InterviewPage = () => {
     }
   }, [handleSendMessage]);
 
+  const toggleMute = () => setIsMuted(!isMuted);
+  const toggleVideo = () => setIsVideoOff(!isVideoOff);
+
   const stopRecording = useCallback(() => {
     if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
       mediaRecorder.current.stop();
@@ -252,29 +254,19 @@ const InterviewPage = () => {
 
   useEffect(() => {
     const startVideoStream = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
-        const videoElement = videoRef.current;
-        if (videoElement) {
-          videoElement.srcObject = stream;
-        }
-      } catch (error) {
-        console.error("Error accessing video stream:", error);
+      if (videoRef.current) {
+        navigator.mediaDevices
+          .getUserMedia({ video: true, audio: true })
+          .then((stream) => {
+            if (videoRef.current) {
+              videoRef.current.srcObject = stream;
+            }
+          })
+          .catch((err) => console.error("Error accessing media devices:", err));
       }
     };
 
     startVideoStream();
-
-    const videoElement = videoRef.current;
-
-    return () => {
-      if (videoElement && videoElement.srcObject) {
-        const stream = videoElement.srcObject as MediaStream;
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -312,6 +304,20 @@ const InterviewPage = () => {
     setFeedbackIconClicked(true);
   };
 
+  const handleChatSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      const answer = (
+        document.getElementById("answerInput") as HTMLInputElement
+      ).value;
+      if (answer) {
+        handleSendMessage(answer);
+        (document.getElementById("answerInput") as HTMLInputElement).value = "";
+      }
+    },
+    [handleSendMessage]
+  );
+
   useEffect(() => {
     if (audioURL && audioRef.current) {
       audioRef.current.src = audioURL;
@@ -338,40 +344,44 @@ const InterviewPage = () => {
   return (
     <div
       ref={elementRef}
-      className="min-h-screen relative w-full h-full flex flex-col bg-primary-foreground items-center md:justify-center justify-top"
+      className="min-h-screen flex items-center flex-col relative w-full h-full"
     >
       {loading && <FullScreenLoader />}
 
       {caption && <Caption text={caption} />}
 
-      <nav className="sticky top-0 w-full z-10">
-        <div className="flex items-center justify-between bg-white shadow-md p-4 w-full">
+      <nav className="sticky top-0 w-full z-10 ">
+        <div className="flex items-center justify-between shadow-md px-4 h-[72px] w-full">
           <div className="flex gap-8">
-            <Image
-              src={"/home/logo.svg"}
-              width={180}
-              height={180}
-              alt="wiZe Logo"
-              className="h-auto w-48 ml-2"
-            />
-            <div className="font-semibold text-xl flex justify-center items-center ">
-              Interview Round
-            </div>
+            <Link href={"/"} className="">
+              <Image
+                src={"/home/logo.svg"}
+                width={180}
+                height={180}
+                alt="wiZe Logo"
+                className="h-auto w-48 ml-2"
+              />
+            </Link>
           </div>
 
+          <div className="font-semibold text-lg flex justify-center items-center ">
+            Interview Round
+          </div>
           <div className="flex items-center">
             <button
-              className="bg-primary text-white px-4 py-3 rounded-full font-semibold ml-4"
+              className="bg-primary font-medium text-white text-sm px-4 py-2 rounded-full"
               onClick={() => setShowCompiler(!showCompiler)}
             >
               {showCompiler ? "Close Compiler" : "Open Online Compiler"}
             </button>
-            <span className="text-gray-600 text-sm mr-4" id="status"></span>
-            <button className="mr-6" onClick={() => setIsChatOpen(!isChatOpen)}>
-              <PiChatsThin className="w-10 h-10 text-gray-600" />
+            <button
+              className="mx-4 bg-primary p-2 rounded-full w-8 h-8 relative"
+              onClick={() => setIsChatOpen(!isChatOpen)}
+            >
+              <MessageSquare className="absolute top-1/2 right-1/2 w-5 -translate-y-1/2 translate-x-1/2 text-white" />
             </button>
             <button
-              className="bg-destructive text-white px-4 py-3 rounded-full font-semibold"
+              className="bg-destructive text-white text-sm px-4 py-2 rounded-full"
               onClick={handleInterviewEnd}
             >
               END INTERVIEW
@@ -379,17 +389,47 @@ const InterviewPage = () => {
           </div>
         </div>
       </nav>
-
-      <div
-        className={`flex flex-col justify-items-center bg-primary-foreground overflow-hidden transition-all duration-300 ${
-          isChatOpen ? "w-[80vw]" : "w-full"
-        }`}
-      >
-        <video
-          ref={videoRef}
-          className="w-full  object-cover rounded-lg shadow-lg  relative"
-          autoPlay
-        />
+      
+      <div className="flex flex-col w-full items-center justify-center min-h-[calc(100vh-72px)] relative bg-gray-100">
+        <div className="relative w-screen h-[calc(100vh-72px)] overflow-hidden aspect-video rounded-xl shadow-lg">
+          <video
+            ref={videoRef}
+            className={`w-full h-full object-cover ${
+              isVideoOff ? "hidden" : ""
+            }`}
+            autoPlay
+            muted={isMuted}
+          />
+          {isVideoOff && (
+            <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+              <User className="text-white w-24 h-24" />
+            </div>
+          )}
+        </div>
+        <div className="mt-4 flex space-x-4 absolute bottom-8 ">
+          <Button
+            variant={isMuted ? "destructive" : "secondary"}
+            size="icon"
+            onClick={stopRecording}
+          >
+            {isMuted ? (
+              <MicOff className="h-4 w-4" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant={isVideoOff ? "destructive" : "secondary"}
+            size="icon"
+            onClick={toggleVideo}
+          >
+            {isVideoOff ? (
+              <VideoOff className="h-4 w-4" />
+            ) : (
+              <Video className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {audioURL && (
@@ -398,16 +438,8 @@ const InterviewPage = () => {
         </audio>
       )}
 
-      <div>
-        <audio controls src={recordedUrl}>
-          Your browser does not support the audio element
-        </audio>
-        <button onClick={startRecording}>Start Recording</button>
-        <button onClick={stopRecording}>Stop Recording</button>
-      </div>
-
       {isChatOpen && (
-        <div className="absolute top-[5.7rem] right-6 bg-white border border-slate-500 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
+        <div className="absolute top-1/2 -translate-y-1/2 right-6 bg-white border border-slate-500 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
           <div className="flex justify-between items-center bg-primary text-white p-4 rounded-t-lg">
             <span className="font-semibold text-lg">Prompt Box</span>
             <button
@@ -429,7 +461,10 @@ const InterviewPage = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-gray-100 border-t border-b border-slate-500 rounded-lg">
+          <form
+            onSubmit={handleChatSubmit}
+            className="p-4 bg-gray-100 border-t border-b border-slate-500 rounded-lg"
+          >
             <input
               id="answerInput"
               type="text"
@@ -441,22 +476,11 @@ const InterviewPage = () => {
               <button
                 id="sendAnswerButton"
                 className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"
-                onClick={() => {
-                  const answer = (
-                    document.getElementById("answerInput") as HTMLInputElement
-                  ).value;
-                  if (answer) {
-                    handleSendMessage(answer);
-                    (
-                      document.getElementById("answerInput") as HTMLInputElement
-                    ).value = "";
-                  }
-                }}
               >
                 Send Answer
               </button>
             </div>
-          </div>
+          </form>
         </div>
       )}
 
@@ -539,7 +563,6 @@ const InterviewPage = () => {
         showCompiler={showCompiler}
         setShowCompiler={setShowCompiler}
       />
-      
     </div>
   );
 };
