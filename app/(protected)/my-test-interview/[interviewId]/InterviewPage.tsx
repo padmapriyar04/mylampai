@@ -5,7 +5,10 @@ import { BlobServiceClient, BlockBlobClient } from "@azure/storage-blob";
 import OnlineCompiler from "./OnlineCompiler";
 import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
-import { handleAudioTranscribe } from "@/actions/transcribeAudioAction";
+import {
+  handleAudioTranscribe,
+  // handleLiveAudioTranscribe,
+} from "@/actions/transcribeAudioAction";
 import {
   generateSasToken,
   generateSasUrlForInterview,
@@ -33,6 +36,8 @@ type ChatMessage = {
 const InterviewPage = () => {
   const params = useParams();
   const interviewId = params.interviewId as string;
+
+  const resTranscript = useRef("");
 
   const { ws } = useWebSocketContext();
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -185,49 +190,52 @@ const InterviewPage = () => {
 
   const startRecording = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       if (mediaRecorder && mediaStream) {
         mediaStream.current = stream;
         mediaRecorder.current = new MediaRecorder(stream);
 
-        mediaRecorder.current.ondataavailable = (e: BlobEvent) => {
+        mediaRecorder.current.ondataavailable = async (e: BlobEvent) => {
           if (e.data.size > 0) {
             chunks.current.push(e.data);
-          }
-        };
 
-        mediaRecorder.current.onstop = async () => {
-          const recordedBlob = new Blob(chunks.current, { type: "audio/webm" });
-          const url = URL.createObjectURL(recordedBlob);
-          setRecordedUrl(url);
-          chunks.current = [];
+            // Send the chunk to the backend for transcription
+            const formData = new FormData();
+            formData.append("audio", e.data, `${interviewId}${Date.now()}.webm`);
 
-          const formData = new FormData();
-
-          formData.append("audio", recordedBlob);
-
-          try {
-            const res = await handleAudioTranscribe(formData);
-
-            if (res.status === "success" && res.transcript) {
-              handleSendMessage(res.transcript);
-            } else {
-              startRecording();
+            try {
+              const res = await handleAudioTranscribe(formData);
+              if (res.status === "success" && res.transcript) {
+                resTranscript.current += res.transcript;
+                console.log(resTranscript.current);
+              } else if (resTranscript.current !== "") {
+                console.log("Stopping recording due to inactivity...");
+                stopRecording();
+              }
+            } catch (error) {
+              console.error("Error transcribing audio:", error);
             }
-          } catch (error) {
-            console.error("Error transcribing audio:", error);
           }
         };
 
-        mediaRecorder.current.start(3300);
+        mediaRecorder.current.onstop = () => {
+          console.log("Recording stopped.");
+
+          handleSendMessage(resTranscript.current);
+
+          resTranscript.current = "";
+
+          chunks.current = [];
+        };
+
+        console.log("Recording Started");
+        mediaRecorder.current.start(5000);
       }
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
-  }, [handleSendMessage]);
+  }, [handleSendMessage, stopRecording]);
 
   const toggleVideo = () => setIsVideoOff(!isVideoOff);
 
@@ -277,54 +285,48 @@ const InterviewPage = () => {
   };
 
   const startVideoStream = useCallback(async () => {
-    // try {
-    //   const stream = await navigator.mediaDevices.getUserMedia({
-    //     video: true,
-    //     audio: true,
-    //   });
-    //   if (videoRef.current) videoRef.current.srcObject = stream;
-
-    //   const mediaRecorder = new MediaRecorder(stream, {
-    //     mimeType: "video/webm",
-    //   });
-    //   const audioStream = new MediaStream(stream.getAudioTracks());
-    //   const audioRecorder = new MediaRecorder(audioStream, {
-    //     mimeType: "audio/webm",
-    //   });
-
-    //   let videoBlockIndex = 0;
-    //   let audioBlockIndex = 0;
-
-    //   mediaRecorder.ondataavailable = async (event: BlobEvent) => {
-    //     if (event.data.size > 0) {
-    //       chunksRef.current.push(event.data);
-    //       await uploadChunk(
-    //         videoBlobClient.current,
-    //         event.data,
-    //         videoBlockIndex++
-    //       );
-    //     }
-    //   };
-
-    //   audioRecorder.ondataavailable = async (event: BlobEvent) => {
-    //     if (event.data.size > 0) {
-    //       audioChunksRef.current.push(event.data);
-    //       await uploadChunk(
-    //         audioBlobClient.current,
-    //         event.data,
-    //         audioBlockIndex++
-    //       );
-    //     }
-    //   };
-
-    //   mediaRecorder.start(3000);
-    //   audioRecorder.start(3000);
-
-    //   mediaRecorderRef.current = mediaRecorder;
-    //   audioRecorderRef.current = audioRecorder;
-    // } catch (error) {
-    //   console.error("Error starting recording:", error);
-    // }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      if (videoRef.current) videoRef.current.srcObject = stream;
+      // const mediaRecorder = new MediaRecorder(stream, {
+      //   mimeType: "video/webm",
+      // });
+      // const audioStream = new MediaStream(stream.getAudioTracks());
+      // const audioRecorder = new MediaRecorder(audioStream, {
+      //   mimeType: "audio/webm",
+      // });
+      // let videoBlockIndex = 0;
+      // let audioBlockIndex = 0;
+      // mediaRecorder.ondataavailable = async (event: BlobEvent) => {
+      //   if (event.data.size > 0) {
+      //     chunksRef.current.push(event.data);
+      //     await uploadChunk(
+      //       videoBlobClient.current,
+      //       event.data,
+      //       videoBlockIndex++
+      //     );
+      //   }
+      // };
+      // audioRecorder.ondataavailable = async (event: BlobEvent) => {
+      //   if (event.data.size > 0) {
+      //     audioChunksRef.current.push(event.data);
+      //     await uploadChunk(
+      //       audioBlobClient.current,
+      //       event.data,
+      //       audioBlockIndex++
+      //     );
+      //   }
+      // };
+      // mediaRecorder.start(3000);
+      // audioRecorder.start(3000);
+      // mediaRecorderRef.current = mediaRecorder;
+      // audioRecorderRef.current = audioRecorder;
+    } catch (error) {
+      console.error("Error starting recording:", error);
+    }
   }, []);
 
   useEffect(() => {
@@ -353,33 +355,33 @@ const InterviewPage = () => {
     startVideoAudioRecording(interviewId);
   }, [interviewId]);
 
-  useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+  // useEffect(() => {
+  //   const SpeechRecognition =
+  //     window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognitionRef.current = recognition;
+  //   if (SpeechRecognition) {
+  //     const recognition = new SpeechRecognition();
+  //     recognitionRef.current = recognition;
 
-      recognition.continuous = false;
-      recognition.interimResults = false;
+  //     recognition.continuous = false;
+  //     recognition.interimResults = false;
 
-      recognition.onresult = (event) => {
-        const result = event.results[0][0].transcript;
-        setCaption(result);
-      };
+  //     recognition.onresult = (event) => {
+  //       const result = event.results[0][0].transcript;
+  //       setCaption(result);
+  //     };
 
-      recognition.onend = () => {
-        stopRecording();
-      };
+  //     recognition.onend = () => {
+  //       stopRecording();
+  //     };
 
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
-      };
-    } else {
-      console.warn("SpeechRecognition is not supported by this browser.");
-    }
-  }, [stopRecording]);
+  //     recognition.onerror = (event) => {
+  //       console.error("Speech recognition error:", event.error);
+  //     };
+  //   } else {
+  //     console.warn("SpeechRecognition is not supported by this browser.");
+  //   }
+  // }, [stopRecording]);
 
   const handleButtonClick = (index: number) => {
     setClickedIndex(index);

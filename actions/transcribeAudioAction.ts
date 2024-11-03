@@ -5,8 +5,6 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import speech from "@google-cloud/speech";
 
-const speechClient = new speech.SpeechClient();
-
 async function saveFileToDisk(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
   const filePath = path.join("./tmp", `${uuidv4()}_${file.name}`);
@@ -20,12 +18,15 @@ async function convertToMonoMP3(inputFile: string): Promise<string> {
     path.basename(inputFile, path.extname(inputFile)) + "_mono.mp3"
   );
 
+  console.log(`Converting to mono MP3: ${inputFile} -> ${outputFile}`); 
   return new Promise<string>((resolve, reject) => {
     ffmpeg(inputFile)
-      .audioChannels(1)
       .toFormat("mp3")
       .on("end", () => resolve(outputFile))
-      .on("error", reject)
+      .on("error", (err) => {
+        console.error("FFmpeg error:", err.message);
+        reject(err);
+      })
       .save(outputFile);
   });
 }
@@ -59,18 +60,15 @@ export async function handleAudioTranscribe(formData: FormData) {
 
     const request = { audio, config };
 
+    const speechClient = new speech.SpeechClient();
+
     const [response] = await speechClient.recognize(request);
     const transcription = response.results
       ?.map((result) => result.alternatives?.[0].transcript)
       .join("\n");
 
     console.log("transcription: ", transcription);
-    if (inputFilePath && fs.existsSync(inputFilePath)) {
-      fs.unlinkSync(inputFilePath);
-    }
-    if (monoFilePath && fs.existsSync(monoFilePath)) {
-      fs.unlinkSync(monoFilePath);
-    }
+
     return {
       status: "success",
       transcript: transcription,
@@ -78,65 +76,72 @@ export async function handleAudioTranscribe(formData: FormData) {
   } catch (error) {
     console.log(error);
     return { status: "failed" };
-  }
-}
-
-const transcribeAudio = async (audioFilePath: string) => {
-  const client = new speech.SpeechClient();
-
-  // Convert audio file to a format that Google Speech API accepts (e.g., WAV)
-  const convertedAudioPath = "converted_audio.wav";
-  await new Promise((resolve, reject) => {
-    ffmpeg(audioFilePath)
-      .toFormat("wav")
-      .save(convertedAudioPath)
-      .on("end", resolve)
-      .on("error", reject);
-  });
-
-  // Load the converted audio file
-  const file = fs.readFileSync(convertedAudioPath);
-  const audioBytes = file.toString("base64");
-
-  // Configure request
-  const request = {
-    audio: { content: audioBytes },
-    config: {
-      encoding: "LINEAR16" as const,
-      sampleRateHertz: 16000,
-      languageCode: "en-US",
-    },
-  };
-
-  const [response] = await client.recognize(request);
-  const transcription = response.results
-    ?.map((result) => result.alternatives?.[0].transcript)
-    .join("\n");
-
-  console.log("Transcription:", transcription);
-  return transcription;
-};
-
-export async function handleLiveAudioTranscribe(formData: FormData) {
-  let inputFilePath: string | null = null;
-
-  try {
-    const audioFile = formData.get("audio") as File;
-
-    if (!audioFile) return "";
-
-    inputFilePath = await saveFileToDisk(audioFile);
-
-    const transcription = await transcribeAudio(inputFilePath);
-
-    return transcription;
-  } catch (error) {
-    console.log(error);
   } finally {
-    if (inputFilePath && fs.existsSync(inputFilePath)) {
-      fs.unlinkSync(inputFilePath);
-    }
+    // if (inputFilePath && fs.existsSync(inputFilePath)) {
+    //   fs.unlinkSync(inputFilePath);
+    // }
+    // if (monoFilePath && fs.existsSync(monoFilePath)) {
+    //   fs.unlinkSync(monoFilePath);
+    // }
   }
-
-  return "";
 }
+
+// const transcribeAudio = async (audioFilePath: string) => {
+//   const client = new speech.SpeechClient();
+
+//   // Convert audio file to a format that Google Speech API accepts (e.g., WAV)
+//   const convertedAudioPath = "converted_audio.wav";
+//   await new Promise((resolve, reject) => {
+//     ffmpeg(audioFilePath)
+//       .toFormat("wav")
+//       .save(convertedAudioPath)
+//       .on("end", resolve)
+//       .on("error", reject);
+//   });
+
+//   // Load the converted audio file
+//   const file = fs.readFileSync(convertedAudioPath);
+//   const audioBytes = file.toString("base64");
+
+//   // Configure request
+//   const request = {
+//     audio: { content: audioBytes },
+//     config: {
+//       encoding: "LINEAR16" as const,
+//       sampleRateHertz: 44100,
+//       languageCode: "en-US",
+//     },
+//   };
+
+//   const [response] = await client.recognize(request);
+//   const transcription = response.results
+//     ?.map((result) => result.alternatives?.[0].transcript)
+//     .join("\n");
+
+//   console.log("Transcription:", transcription);
+//   return transcription;
+// };
+
+// export async function handleLiveAudioTranscribe(formData: FormData) {
+//   let inputFilePath: string | null = null;
+
+//   try {
+//     const audioFile = formData.get("audio") as File;
+
+//     if (!audioFile) return "";
+
+//     inputFilePath = await saveFileToDisk(audioFile);
+
+//     const transcription = await transcribeAudio(inputFilePath);
+//     console.log(transcription);
+//     return transcription;
+//   } catch (error) {
+//     console.log(error);
+//   } finally {
+//     if (inputFilePath && fs.existsSync(inputFilePath)) {
+//       fs.unlinkSync(inputFilePath);
+//     }
+//   }
+
+//   return "";
+// }

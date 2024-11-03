@@ -90,8 +90,6 @@ export const handleJDTextUpload = async ({
 }) => {
   try {
 
-    console.log(jdText, interviewId)
-
     if (!jdText || !interviewId) {
       return {
         status: "failed",

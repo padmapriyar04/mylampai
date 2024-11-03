@@ -10,9 +10,25 @@ import { IoDocumentAttach, IoCloudUploadOutline } from "react-icons/io5";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 import InterviewPage from "./InterviewPage";
+import { Input } from "@/components/ui/input";
 import { generateSasToken } from "@/actions/azureActions";
 import { useParams } from "next/navigation";
 import { handleCVUpload, handleJDTextUpload } from "@/actions/interviewActions";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import FullScreenLoader from "@/components/global/FullScreenLoader";
 
 pdfJSLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfJSLib.version}/pdf.worker.min.js`;
@@ -28,6 +44,12 @@ function generateFileName(
 }
 
 const InterviewComponent = () => {
+  const form = useForm<{ jobProfile: string }>({
+    defaultValues: {
+      jobProfile: "",
+    },
+  });
+
   const params = useParams();
   const interviewId = params.interviewId as string;
 
@@ -37,10 +59,9 @@ const InterviewComponent = () => {
   const [jdFile, setJDFile] = useState<File | null>(null);
   const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
 
-  console.log("deviceList ", deviceList);
+  // console.log("deviceList ", deviceList);
 
   const [selectedJobProfile, setSelectedJobProfile] = useState("");
-  const [jobProfile, setJobProfile] = useState("");
   const [cvText, setCvText] = useState("");
   const [JD, setJD] = useState("");
 
@@ -60,6 +81,7 @@ const InterviewComponent = () => {
     "Business Analyst",
     "DevOps Engineer",
     "System Administrator",
+    "Other",
   ];
 
   const updateDeviceList = useCallback(() => {
@@ -127,6 +149,10 @@ const InterviewComponent = () => {
     },
     [interviewId]
   );
+
+  const handleSubmit = form.handleSubmit((data) => {
+    handleJDSubmit(data.jobProfile);
+  });
 
   const startInterview = useCallback(
     (JD: string) => {
@@ -429,9 +455,7 @@ const InterviewComponent = () => {
     );
   };
 
-  const handleJDSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleJDSubmit = (jobProfile: string) => {
     if (!jobProfile) {
       return;
     }
@@ -679,34 +703,47 @@ const InterviewComponent = () => {
                       <TabsTrigger value="jd">Upload JD</TabsTrigger>
                     </TabsList>
                     <TabsContent value="profile">
-                      <select
-                        id="jobProfileDropdown"
-                        className="w-full transition p-4 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                      <Select
                         value={selectedJobProfile}
-                        onChange={(e) => handleProfileChange(e.target.value)}
+                        onValueChange={handleProfileChange}
                       >
-                        <option value="" disabled={!!selectedJobProfile}>
-                          Select a profile
-                        </option>
-                        {jobProfiles.map((profile) => (
-                          <option key={profile} value={profile}>
-                            {profile}
-                          </option>
-                        ))}
-                        <option value="Other">Other</option>
-                      </select>
+                        <SelectTrigger
+                          id="jobProfileDropdown"
+                          className="w-full p-4 mb-2"
+                        >
+                          <SelectValue placeholder="Select a profile" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {jobProfiles.map((profile) => (
+                            <SelectItem key={profile} value={profile}>
+                              {profile}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {selectedJobProfile === "Other" && (
-                        <form onSubmit={handleJDSubmit}>
-                          <input
-                            value={jobProfile}
-                            onChange={(e) => {
-                              setJobProfile(e.target.value);
-                            }}
-                            className="mt-4 p-4 border text-center flex items-center justify-center border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary w-full transition"
-                            placeholder="Enter profile name"
-                          />
-                          <Button type="submit">Submit</Button>
-                        </form>
+                        <Form {...form}>
+                          <form onSubmit={handleSubmit} className="space-y-4">
+                            <FormField
+                              control={form.control}
+                              name="jobProfile"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Enter profile name"
+                                      className="text-center"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                </FormItem>
+                              )}
+                            />
+                            <Button type="submit" className="w-full">
+                              Submit
+                            </Button>
+                          </form>
+                        </Form>
                       )}
                     </TabsContent>
                     <TabsContent value="jd">
