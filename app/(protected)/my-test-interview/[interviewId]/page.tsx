@@ -219,6 +219,7 @@ const InterviewComponent = () => {
             setIsUploading(false);
             setResumeFile(null);
             console.log("Socket is not initialised");
+            if (fileInputRef.current) fileInputRef.current.value = "";
           }
         } else {
           setIsUploading(false);

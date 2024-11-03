@@ -282,12 +282,10 @@ const InterviewPage = () => {
 
       recognition.onresult = (event) => {
         const result = event.results[0][0].transcript;
-        console.log("User said:", result);
         setCaption(result);
       };
 
       recognition.onend = () => {
-        console.log("Speech has ended");
         stopRecording();
       };
 
@@ -348,7 +346,6 @@ const InterviewPage = () => {
     >
       {loading && <FullScreenLoader />}
 
-      {caption && <Caption text={caption} />}
 
       <nav className="sticky top-0 w-full z-10 ">
         <div className="flex items-center justify-between shadow-md px-4 h-[72px] w-full">
