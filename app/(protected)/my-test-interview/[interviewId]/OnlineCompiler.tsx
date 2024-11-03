@@ -122,7 +122,7 @@ export default function OnlineCompiler({ codingQuestion, showCompiler, setShowCo
 
   return (
     <><div
-      className={`fixed inset-y-0 right-0 w-full bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${showCompiler ? "translate-x-0" : "translate-x-full"
+      className={`fixed z-20 inset-y-0 right-0 w-full bg-white shadow-lg transition-transform duration-500 ease-in-out transform ${showCompiler ? "translate-x-0" : "translate-x-full"
         }`}
     >
       <div className="relative p-6">

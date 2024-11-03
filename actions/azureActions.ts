@@ -10,7 +10,7 @@ const accountKey = process.env.AZURE_ACCOUNT_KEY || "";
 const containerName = process.env.AZURE_CONTAINER_NAME || "";
 
 // SAS Token Generator Function
-export const generateSasToken = (blobName: string) => {
+export const generateSasToken = async (blobName: string) => {
   const sharedKeyCredential = new StorageSharedKeyCredential(
     accountName,
     accountKey

@@ -315,14 +315,14 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               </div>
               <div
                 className={`absolute top-1/2 left-5 h-1 -translate-y-1/2 transition-all duration-500 ease-in-out ${
-                  isResumeUploaded ? "bg-primary w-full" : "bg-gray-400 w-0"
+                  isResumeUploaded ? "bg-primary w-full" : "bg-slate-500 w-0"
                 } w-full`}
               ></div>
             </div>
             <div className="relative">
               <div
                 className={`w-5 h-5 ${
-                  profile ? "bg-primary" : "bg-gray-400"
+                  profile ? "bg-primary" : "bg-slate-500"
                 } rounded-full flex items-center justify-center`}
               >
                 {profile && (
@@ -356,7 +356,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               </div>
 
               <div
-                className="border-dashed border-2 border-gray-300 rounded-xl p-2 flex flex-col items-center justify-center"
+                className="border-dashed border-2 border-slate-500 rounded-xl p-2 flex flex-col items-center justify-center"
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
               >
@@ -366,7 +366,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                   className="text-gray-500 cursor-pointer text-sm"
                 >
                   Click to{" "}
-                  <span className="font-semibold text-gray-700 ">
+                  <span className="font-semibold text-primary ">
                     Upload Resume
                   </span>
                 </label>
@@ -378,12 +378,12 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                   onChange={handleFileChange}
                 />
 
-                <div className="text-4xl mt-3 text-gray-300">
+                <div className="text-4xl mt-3 text-slate-500">
                   <IoCloudUploadOutline />
                 </div>
 
-                <p className="text-gray-400 text-sm mt-2">
-                  Supported file formats: PDF. File size limit 1MB.
+                <p className="text-slate-500 text-sm mt-2">
+                  Supported file format: PDF. File size limit 1MB.
                 </p>
               </div>
 
@@ -419,7 +419,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               <select
                 className={`w-full p-4 py-2 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${
                   profile === "other" || profile === null || profile === ""
-                    ? "border-gray-300"
+                    ? "border-slate-500"
                     : "border-primary ring-primary ring-1"
                 }  `}
                 value={manualJobDescription}
@@ -445,7 +445,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                   type="text"
                   className={`w-full p-4 py-2 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${
                     profile === "other" || profile === null
-                      ? "border-gray-300"
+                      ? "border-slate-500"
                       : "border-primary ring-primary ring-1"
                   }  `}
                   placeholder="Please specify your profile"
@@ -464,7 +464,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                 className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-4 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
                   isResumeUploaded
                     ? "bg-gray-600 hover:bg-gray-800 text-white"
-                    : "bg-gray-300 text-gray-800 cursor-not-allowed"
+                    : "bg-slate-500 text-gray-800 cursor-not-allowed"
                 }`}
                 disabled={!isResumeUploaded}
                 onClick={handleNextClick}
@@ -477,7 +477,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                   className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-4 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
                     profile
                       ? "bg-gray-600 hover:bg-gray-800 text-white"
-                      : "bg-gray-300 text-gray-800 cursor-not-allowed"
+                      : "bg-slate-500 text-gray-800 cursor-not-allowed"
                   }`}
                   disabled={!profile}
                   onClick={handleNextClick}
@@ -487,7 +487,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               </>
             )}
             <button
-              className={`absolute bottom-0 opacity-0 text-gray-700 w-full font-semibold hover:underline cursor-pointer focus:ring-4 focus:ring-gray-200 transition ${
+              className={`absolute bottom-0 opacity-0 text-primary w-full font-semibold hover:underline cursor-pointer focus:ring-4 focus:ring-gray-200 transition ${
                 step === 1 ? "opacity-0" : "opacity-100"
               }`}
               onClick={handleBackClick}

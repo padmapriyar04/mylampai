@@ -6,6 +6,7 @@ import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
 import { handleAudioTranscribe } from "@/actions/transcribeAudioAction";
 import { generateSasToken } from "@/actions/azureActions";
+import FullScreenLoader from "@/components/global/FullScreenLoader";
 
 import {
   RiEmotionUnhappyLine,
@@ -23,7 +24,6 @@ type ChatMessage = {
 
 const InterviewPage = () => {
   const { ws } = useWebSocketContext();
-  const timeRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showCompiler, setShowCompiler] = useState(false);
@@ -251,23 +251,6 @@ const InterviewPage = () => {
   }, []);
 
   useEffect(() => {
-    if (timeRef.current?.textContent === "00:00" && !interviewEnded) {
-      setInterviewEnded(true);
-      ws?.send(
-        JSON.stringify({
-          type: "get_analysis",
-        })
-      );
-      setShowFeedback(true);
-
-      if (videoRef.current) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    }
-  }, [loading, ws, interviewEnded]);
-
-  useEffect(() => {
     const startVideoStream = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -330,26 +313,6 @@ const InterviewPage = () => {
   };
 
   useEffect(() => {
-    // toggleFullscreen();
-
-    let seconds = 1200;
-
-    const intervalId = setInterval(() => {
-      seconds -= 1;
-      const minutes = Math.floor(seconds / 60)
-        .toString()
-        .padStart(2, "0");
-      const secs = (seconds % 60).toString().padStart(2, "0");
-
-      if (timeRef.current) {
-        timeRef.current.textContent = `${minutes}:${secs}`;
-      }
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  useEffect(() => {
     if (audioURL && audioRef.current) {
       audioRef.current.src = audioURL;
       audioRef.current
@@ -377,8 +340,11 @@ const InterviewPage = () => {
       ref={elementRef}
       className="min-h-screen relative w-full h-full flex flex-col bg-primary-foreground items-center md:justify-center justify-top"
     >
-      <Caption text={caption} />
-      <nav className="sticky top-0 w-full">
+      {loading && <FullScreenLoader />}
+
+      {caption && <Caption text={caption} />}
+
+      <nav className="sticky top-0 w-full z-10">
         <div className="flex items-center justify-between bg-white shadow-md p-4 w-full">
           <div className="flex gap-8">
             <Image
@@ -404,10 +370,6 @@ const InterviewPage = () => {
             <button className="mr-6" onClick={() => setIsChatOpen(!isChatOpen)}>
               <PiChatsThin className="w-10 h-10 text-gray-600" />
             </button>
-            <span className="text-gray-600 text-sm mr-4">
-              Time Remaining: <div ref={timeRef}>20:00</div>
-            </span>
-
             <button
               className="bg-destructive text-white px-4 py-3 rounded-full font-semibold"
               onClick={handleInterviewEnd}
@@ -445,7 +407,7 @@ const InterviewPage = () => {
       </div>
 
       {isChatOpen && (
-        <div className="absolute top-[5.7rem] right-6 bg-white border border-gray-300 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
+        <div className="absolute top-[5.7rem] right-6 bg-white border border-slate-500 shadow-lg rounded-xl w-[25vw] h-3/4 flex flex-col">
           <div className="flex justify-between items-center bg-primary text-white p-4 rounded-t-lg">
             <span className="font-semibold text-lg">Prompt Box</span>
             <button
@@ -467,18 +429,18 @@ const InterviewPage = () => {
             </div>
           </div>
 
-          <div className="p-4 bg-gray-100 border-t border-b border-gray-300 rounded-lg">
+          <div className="p-4 bg-gray-100 border-t border-b border-slate-500 rounded-lg">
             <input
               id="answerInput"
               type="text"
               placeholder="Type your answer here"
-              className="w-full px-4 py-4 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary focus:outline-none mb-4"
+              className="w-full px-4 py-4 border border-slate-500 rounded-full focus:ring-2 focus:ring-primary focus:outline-none mb-4"
             />
 
             <div className="flex justify-between">
               <button
                 id="sendAnswerButton"
-                className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 focus:ring-4 focus:ring-primary-foreground transition"
+                className="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-primary focus:ring-4 focus:ring-primary-foreground transition"
                 onClick={() => {
                   const answer = (
                     document.getElementById("answerInput") as HTMLInputElement
@@ -498,18 +460,12 @@ const InterviewPage = () => {
         </div>
       )}
 
-      {loading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="border-t-4 border-blue-500 border-solid w-16 h-16 rounded-full animate-spin"></div>
-        </div>
-      )}
-
       {showFeedback && !feedbackSubmitted && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-[40vw] min-w-[400px] min-h-[400px]">
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-4 inline">
-                A quick feedback and we&#39;ll guide you to your interview
+                A quick feedback and we&apos;ll guide you to your interview
               </h2>
               <h2 className="text-2xl font-bold mb-4 inline text-primary">
                 {" "}
@@ -548,14 +504,14 @@ const InterviewPage = () => {
                 Please provide your feedback about the interview experience.
               </p>
               <textarea
-                className="w-full h-32 p-2 border border-gray-300 rounded-lg resize-none mb-4"
+                className="w-full h-32 p-2 border border-slate-500 rounded-lg resize-none mb-4"
                 placeholder="Your feedback here (optional)..."
               />
               <button
                 className={`text-white px-4 py-3 rounded-lg font-semibold transition ${
                   feedbackIconClicked
-                    ? "bg-primary hover:bg-purple-600"
-                    : "bg-gray-400"
+                    ? "bg-primary hover:bg-primary"
+                    : "bg-slate-500"
                 }`}
                 disabled={!feedbackIconClicked}
                 onClick={() => {
@@ -583,6 +539,7 @@ const InterviewPage = () => {
         showCompiler={showCompiler}
         setShowCompiler={setShowCompiler}
       />
+      
     </div>
   );
 };

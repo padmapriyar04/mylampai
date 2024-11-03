@@ -28,7 +28,7 @@ export const createInterview = async (userId: string) => {
 
     const interview = await prisma.interview.create({
       data: {
-        userId
+        userId,
       },
     });
 
@@ -44,11 +44,14 @@ export const createInterview = async (userId: string) => {
   };
 };
 
-export const handleCVUpload = async (formData: FormData) => {
+export const handleCVUpload = async ({
+  cvText,
+  interviewId,
+}: {
+  cvText: string;
+  interviewId: string;
+}) => {
   try {
-    const cvText = formData.get("cvText") as string;
-    const interviewId = formData.get("interviewId") as string;
-
     if (!interviewId || !cvText) {
       return {
         status: "failed",
@@ -78,15 +81,21 @@ export const handleCVUpload = async (formData: FormData) => {
   };
 };
 
-export const handleJDUpload = async (formData: FormData) => {
+export const handleJDTextUpload = async ({
+  jdText,
+  interviewId,
+}: {
+  jdText: string;
+  interviewId: string;
+}) => {
   try {
-    const jdText = formData.get("jdText") as string;
-    const interviewId = formData.get("interviewId") as string;
+
+    console.log(jdText, interviewId)
 
     if (!jdText || !interviewId) {
       return {
         status: "failed",
-        message: "JD or User not found",
+        message: "JD or InterviewId not found",
       };
     }
 
