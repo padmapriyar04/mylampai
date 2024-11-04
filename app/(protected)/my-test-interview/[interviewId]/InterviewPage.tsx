@@ -65,7 +65,6 @@ const InterviewPage = () => {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioStream = useRef<MediaStream | null>(null);
   const audioChunks = useRef<Blob[]>([]);
-  const isRecording = useRef(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -202,15 +201,10 @@ const InterviewPage = () => {
     console.log("Sending: ", resTranscript.current);
     handleSendMessage(resTranscript.current);
     resTranscript.current = "";
-    isRecording.current = false;
   }, [handleSendMessage]);
 
   const startTranscribing = useCallback(async () => {
-    if (isRecording.current) {
-      console.log("Already recording, waiting for previous recording to complete.");
-      return;
-    }
-    
+
     if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
       mediaRecorder.current.stop();
     }
@@ -267,12 +261,9 @@ const InterviewPage = () => {
           }
         } catch (error) {
           console.error("Error transcribing audio:", error);
-        } finally {
-          isRecording.current = false;
-        }
+        } 
       };
 
-      isRecording.current = true;
       mediaRecorder.current.start();
 
       // setTimeout(() => {
