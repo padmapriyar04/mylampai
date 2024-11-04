@@ -193,10 +193,10 @@ const InterviewPage = () => {
 
   const stopAudioRecording = useCallback(() => {
     if (intervalRef.current) {
-      console.log("res: ", resTranscript.current);
-      console.log("Stopping audio recording...");
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+      console.log("Stopping audio recording...");
+      console.log("Sending: ", resTranscript.current);
       handleSendMessage(resTranscript.current);
       resTranscript.current = "";
     }
@@ -227,6 +227,8 @@ const InterviewPage = () => {
             type: "audio/webm",
           });
 
+          audioChunks.current = [];
+
           if (recordedBlob.size === 0 && resTranscript.current !== "") {
             stopAudioRecording();
             return;
@@ -239,8 +241,6 @@ const InterviewPage = () => {
 
           console.log("Transcribing audio...");
 
-          audioChunks.current = [];
-
           const formData = new FormData();
           formData.append("audio", recordedBlob);
 
@@ -249,6 +249,8 @@ const InterviewPage = () => {
 
             if (res.status === "success" && res.transcript) {
               resTranscript.current += res.transcript;
+            } else if (res.transcript === "" && resTranscript.current !== "") {
+              stopAudioRecording();
             }
           } catch (error) {
             console.error("Error transcribing audio:", error);
