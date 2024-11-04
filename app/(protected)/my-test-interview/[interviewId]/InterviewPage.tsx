@@ -32,6 +32,7 @@ import {
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { toast } from "sonner";
 
 type ChatMessage = {
   user: string;
@@ -65,6 +66,7 @@ const InterviewPage = () => {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioStream = useRef<MediaStream | null>(null);
   const audioChunks = useRef<Blob[]>([]);
+  const emptyTranscribeCnt = useRef(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -147,6 +149,8 @@ const InterviewPage = () => {
             { user: "System", message: data.message },
           ]);
 
+          setShowFeedback(true);
+
           ws?.send(
             JSON.stringify({
               type: "get_analysis",
@@ -188,22 +192,27 @@ const InterviewPage = () => {
         type: "end_interview",
       })
     );
-
-    setShowFeedback(true);
   }, [ws, stopCamera]);
 
   const stopAudioRecording = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+      mediaRecorder.current?.stop();
+      mediaRecorder.current = null;
     }
-    console.log("Stopping audio recording...");
-    console.log("Sending: ", resTranscript.current);
+    emptyTranscribeCnt.current = 0;
     handleSendMessage(resTranscript.current);
     resTranscript.current = "";
   }, [handleSendMessage]);
 
   const startTranscribing = useCallback(async () => {
+    if (emptyTranscribeCnt.current >= 6) {
+      stopAudioRecording();
+      toast.error("Enable mic to continue Interview");
+      setIsMuted(true);
+    }
+
     if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
       mediaRecorder.current.stop();
     }
@@ -235,18 +244,9 @@ const InterviewPage = () => {
 
         audioChunks.current = [];
 
-        if (recordedBlob.size === 0 && resTranscript.current !== "") {
-          console.log("No audio recorded 1");
-          stopAudioRecording();
-          return;
-        }
-
         if (recordedBlob.size === 0) {
-          console.log("No audio recorded 2");
           return;
         }
-
-        console.log("Transcribing audio...");
 
         const formData = new FormData();
         formData.append("audio", recordedBlob);
@@ -254,10 +254,12 @@ const InterviewPage = () => {
         try {
           const res = await handleAudioTranscribe(formData);
 
-          if (res.status === "success" && res.transcript) {
-            resTranscript.current += res.transcript;
-          } else if (res.transcript === "" && resTranscript.current !== "") {
-            stopAudioRecording();
+          if (res.status === "success") {
+            if (res.transcript) resTranscript.current += res.transcript;
+            else if (resTranscript.current) stopAudioRecording();
+            else emptyTranscribeCnt.current += 1;
+          } else {
+            console.log("Error transcribing audio");
           }
         } catch (error) {
           console.error("Error transcribing audio:", error);
@@ -273,12 +275,14 @@ const InterviewPage = () => {
   const startAudioRecording = useCallback(() => {
     startTranscribing();
 
+    if (isMuted) setIsMuted(false);
+
     if (!intervalRef.current) {
       intervalRef.current = setInterval(() => {
         startTranscribing();
       }, 5000);
     }
-  }, [startTranscribing]);
+  }, [startTranscribing, isMuted]);
 
   const toggleVideo = () => setIsVideoOff(!isVideoOff);
 
@@ -544,17 +548,6 @@ const InterviewPage = () => {
             variant={isMuted ? "destructive" : "secondary"}
             size="icon"
             onClick={startAudioRecording}
-          >
-            {isMuted ? (
-              <MicOff className="h-4 w-4" />
-            ) : (
-              <Mic className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant={isMuted ? "destructive" : "secondary"}
-            size="icon"
-            onClick={stopAudioRecording}
           >
             {isMuted ? (
               <MicOff className="h-4 w-4" />
