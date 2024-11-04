@@ -63,7 +63,9 @@ const InterviewPage = () => {
   const [codingQuestion, setCodingQuestion] = useState("");
 
   const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const audioStream = useRef<MediaStream | null>(null);
   const audioChunks = useRef<Blob[]>([]);
+  const isRecording = useRef(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -87,7 +89,7 @@ const InterviewPage = () => {
         ws?.send(JSON.stringify({ type: "answer", answer: message }));
       }
     },
-    [ws],
+    [ws]
   );
 
   const handleInterviewer = useCallback(async (text: string) => {
@@ -149,7 +151,7 @@ const InterviewPage = () => {
           ws?.send(
             JSON.stringify({
               type: "get_analysis",
-            }),
+            })
           );
 
           break;
@@ -185,7 +187,7 @@ const InterviewPage = () => {
     ws?.send(
       JSON.stringify({
         type: "end_interview",
-      }),
+      })
     );
 
     setShowFeedback(true);
@@ -195,80 +197,93 @@ const InterviewPage = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
-      console.log("Stopping audio recording...");
-      console.log("Sending: ", resTranscript.current);
-      handleSendMessage(resTranscript.current);
-      resTranscript.current = "";
     }
+    console.log("Stopping audio recording...");
+    console.log("Sending: ", resTranscript.current);
+    handleSendMessage(resTranscript.current);
+    resTranscript.current = "";
+    isRecording.current = false;
   }, [handleSendMessage]);
 
   const startTranscribing = useCallback(async () => {
+    if (isRecording.current) {
+      console.log("Already recording, waiting for previous recording to complete.");
+      return;
+    }
+    
+    if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
+      mediaRecorder.current.stop();
+    }
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          sampleRate: 16000,
-          channelCount: 1,
-        },
+      if (!audioStream.current) {
+        audioStream.current = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            sampleRate: 16000,
+            channelCount: 1,
+          },
+        });
+      }
+
+      mediaRecorder.current = new MediaRecorder(audioStream.current, {
+        mimeType: "audio/webm; codecs=opus",
       });
 
-      if (mediaRecorder) {
-        mediaRecorder.current = new MediaRecorder(stream, {
-          mimeType: "audio/webm; codecs=opus",
+      mediaRecorder.current.ondataavailable = (e: BlobEvent) => {
+        if (e.data.size > 0) {
+          audioChunks.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.current.onstop = async () => {
+        const recordedBlob = new Blob(audioChunks.current, {
+          type: "audio/webm",
         });
 
-        mediaRecorder.current.ondataavailable = (e: BlobEvent) => {
-          if (e.data.size > 0) {
-            audioChunks.current.push(e.data);
-          }
-        };
+        audioChunks.current = [];
 
-        mediaRecorder.current.onstop = async () => {
-          const recordedBlob = new Blob(audioChunks.current, {
-            type: "audio/webm",
-          });
+        if (recordedBlob.size === 0 && resTranscript.current !== "") {
+          stopAudioRecording();
+          return;
+        }
 
-          audioChunks.current = [];
+        if (recordedBlob.size === 0) {
+          console.log("No audio recorded");
+          return;
+        }
 
-          if (recordedBlob.size === 0 && resTranscript.current !== "") {
+        console.log("Transcribing audio...");
+
+        const formData = new FormData();
+        formData.append("audio", recordedBlob);
+
+        try {
+          const res = await handleAudioTranscribe(formData);
+
+          if (res.status === "success" && res.transcript) {
+            resTranscript.current += res.transcript;
+          } else if (res.transcript === "" && resTranscript.current !== "") {
             stopAudioRecording();
-            return;
           }
+        } catch (error) {
+          console.error("Error transcribing audio:", error);
+        } finally {
+          isRecording.current = false;
+        }
+      };
 
-          if (recordedBlob.size === 0) {
-            console.log("No audio recorded");
-            return;
-          }
+      isRecording.current = true;
+      mediaRecorder.current.start();
 
-          console.log("Transcribing audio...");
-
-          const formData = new FormData();
-          formData.append("audio", recordedBlob);
-
-          try {
-            const res = await handleAudioTranscribe(formData);
-
-            if (res.status === "success" && res.transcript) {
-              resTranscript.current += res.transcript;
-            } else if (res.transcript === "" && resTranscript.current !== "") {
-              stopAudioRecording();
-            }
-          } catch (error) {
-            console.error("Error transcribing audio:", error);
-          }
-        };
-
-        mediaRecorder.current.start();
-
-        setTimeout(() => {
-          if (
-            mediaRecorder.current &&
-            mediaRecorder.current.state === "recording"
-          ) {
-            console.log("Recording stopped after timeout");
-            mediaRecorder.current.stop();
-          }
-        }, 6000);
-      }
+      // setTimeout(() => {
+      //   if (
+      //     mediaRecorder.current &&
+      //     mediaRecorder.current.state === "recording"
+      //   ) {
+      //     console.log("Recording stopped after timeout");
+      //     mediaRecorder.current.stop();
+      //   }
+      // }, 6000);
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
@@ -289,7 +304,7 @@ const InterviewPage = () => {
   const uploadChunk = async (
     client: BlockBlobClient | null,
     chunk: Blob,
-    blockIndex: number,
+    blockIndex: number
   ) => {
     try {
       if (client) {
@@ -307,10 +322,10 @@ const InterviewPage = () => {
       stopVideoStream();
 
       const videoBlockList = chunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0")),
+        btoa(String(index).padStart(6, "0"))
       );
       const audioBlockList = audioChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0")),
+        btoa(String(index).padStart(6, "0"))
       );
 
       if (videoBlobClient.current) {
@@ -392,10 +407,10 @@ const InterviewPage = () => {
 
       // Set up separate Blob Clients for video and audio
       videoBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_v.webm`,
+        `${interviewId}_${timestamp}_v.webm`
       );
       audioBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_a.webm`,
+        `${interviewId}_${timestamp}_a.webm`
       );
     };
 
@@ -418,7 +433,7 @@ const InterviewPage = () => {
         (document.getElementById("answerInput") as HTMLInputElement).value = "";
       }
     },
-    [handleSendMessage],
+    [handleSendMessage]
   );
 
   useEffect(() => {
