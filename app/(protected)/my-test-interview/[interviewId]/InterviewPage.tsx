@@ -63,9 +63,9 @@ const InterviewPage = () => {
 
   const mediaStream = useRef<MediaStream | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
-  const chunks = useRef<Blob[]>([]);
+  const audioChunks = useRef<Blob[]>([]);
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognition>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const elementRef = useRef(null);
@@ -90,7 +90,7 @@ const InterviewPage = () => {
         ws?.send(JSON.stringify({ type: "answer", answer: message }));
       }
     },
-    [ws]
+    [ws],
   );
 
   const handleInterviewer = useCallback(async (text: string) => {
@@ -156,7 +156,7 @@ const InterviewPage = () => {
             ws?.send(
               JSON.stringify({
                 type: "get_analysis",
-              })
+              }),
             );
 
             break;
@@ -193,13 +193,13 @@ const InterviewPage = () => {
     ws?.send(
       JSON.stringify({
         type: "end_interview",
-      })
+      }),
     );
 
     setShowFeedback(true);
   }, [ws, stopCamera]);
 
-  const stopRecording = useCallback(() => {
+  const stopTranscribing = useCallback(() => {
     if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
       mediaRecorder.current.stop();
     }
@@ -210,7 +210,7 @@ const InterviewPage = () => {
     }
   }, []);
 
-  const startRecording = useCallback(async () => {
+  const startTranscribing = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -218,57 +218,48 @@ const InterviewPage = () => {
         mediaStream.current = stream;
         mediaRecorder.current = new MediaRecorder(stream);
 
-        mediaRecorder.current.ondataavailable = async (e: BlobEvent) => {
+        mediaRecorder.current.ondataavailable = (e: BlobEvent) => {
           if (e.data.size > 0) {
-            chunks.current.push(e.data);
-
-            // Send the chunk to the backend for transcription
-            const formData = new FormData();
-            formData.append(
-              "audio",
-              e.data,
-              `${interviewId}${Date.now()}.webm`
-            );
-
-            try {
-              const res = await handleAudioTranscribe(formData);
-              if (res.status === "success" && res.transcript) {
-                resTranscript.current += res.transcript;
-                console.log(resTranscript.current);
-              } else if (resTranscript.current !== "") {
-                console.log("Stopping recording due to inactivity...");
-                stopRecording();
-              }
-            } catch (error) {
-              console.error("Error transcribing audio:", error);
-            }
+            audioChunks.current.push(e.data);
           }
         };
 
-        mediaRecorder.current.onstop = () => {
-          console.log("Recording stopped.");
+        mediaRecorder.current.onstop = async () => {
+          const recordedBlob = new Blob(audioChunks.current, {
+            type: "audio/webm",
+          });
+          audioChunks.current = [];
 
-          handleSendMessage(resTranscript.current);
+          const formData = new FormData();
 
-          resTranscript.current = "";
+          formData.append("audio", recordedBlob);
 
-          chunks.current = [];
+          try {
+            const res = await handleAudioTranscribe(formData);
+
+            if (res.status === "success" && res.transcript) {
+              handleSendMessage(res.transcript);
+            } else {
+              startTranscribing();
+            }
+          } catch (error) {
+            console.error("Error transcribing audio:", error);
+          }
         };
 
-        console.log("Recording Started");
-        mediaRecorder.current.start(5000);
+        mediaRecorder.current.start();
       }
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
-  }, [handleSendMessage, interviewId, stopRecording]);
+  }, [handleSendMessage]);
 
   const toggleVideo = () => setIsVideoOff(!isVideoOff);
 
   const uploadChunk = async (
     client: BlockBlobClient | null,
     chunk: Blob,
-    blockIndex: number
+    blockIndex: number,
   ) => {
     try {
       if (client) {
@@ -286,10 +277,10 @@ const InterviewPage = () => {
       stopVideoStream();
 
       const videoBlockList = chunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0"))
+        btoa(String(index).padStart(6, "0")),
       );
       const audioBlockList = audioChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0"))
+        btoa(String(index).padStart(6, "0")),
       );
 
       if (videoBlobClient.current) {
@@ -371,10 +362,10 @@ const InterviewPage = () => {
 
       // Set up separate Blob Clients for video and audio
       videoBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_v.webm`
+        `${interviewId}_${timestamp}_v.webm`,
       );
       audioBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_a.webm`
+        `${interviewId}_${timestamp}_a.webm`,
       );
     };
 
@@ -398,7 +389,7 @@ const InterviewPage = () => {
   //     };
 
   //     recognition.onend = () => {
-  //       stopRecording();
+  //       stopTranscribing();
   //     };
 
   //     recognition.onerror = (event) => {
@@ -407,7 +398,7 @@ const InterviewPage = () => {
   //   } else {
   //     console.warn("SpeechRecognition is not supported by this browser.");
   //   }
-  // }, [stopRecording]);
+  // }, [stopTranscribing]);
 
   const handleButtonClick = (index: number) => {
     setClickedIndex(index);
@@ -425,7 +416,7 @@ const InterviewPage = () => {
         (document.getElementById("answerInput") as HTMLInputElement).value = "";
       }
     },
-    [handleSendMessage]
+    [handleSendMessage],
   );
 
   useEffect(() => {
@@ -464,15 +455,15 @@ const InterviewPage = () => {
     const audioElement = audioRef.current;
 
     if (audioElement) {
-      audioElement.addEventListener("ended", startRecording);
+      audioElement.addEventListener("ended", startTranscribing);
     }
 
     return () => {
       if (audioElement) {
-        audioElement.removeEventListener("ended", startRecording);
+        audioElement.removeEventListener("ended", startTranscribing);
       }
     };
-  }, [audioURL, startRecording]);
+  }, [audioURL, startTranscribing]);
 
   return (
     <div
@@ -558,7 +549,7 @@ const InterviewPage = () => {
           <Button
             variant={isMuted ? "destructive" : "secondary"}
             size="icon"
-            onClick={stopRecording}
+            onClick={stopTranscribing}
           >
             {isMuted ? (
               <MicOff className="h-4 w-4" />
