@@ -204,7 +204,6 @@ const InterviewPage = () => {
   }, [handleSendMessage]);
 
   const startTranscribing = useCallback(async () => {
-
     if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
       mediaRecorder.current.stop();
     }
@@ -213,7 +212,7 @@ const InterviewPage = () => {
       if (!audioStream.current) {
         audioStream.current = await navigator.mediaDevices.getUserMedia({
           audio: {
-            sampleRate: 16000,
+            sampleRate: 44100,
             channelCount: 1,
           },
         });
@@ -237,12 +236,13 @@ const InterviewPage = () => {
         audioChunks.current = [];
 
         if (recordedBlob.size === 0 && resTranscript.current !== "") {
+          console.log("No audio recorded 1");
           stopAudioRecording();
           return;
         }
 
         if (recordedBlob.size === 0) {
-          console.log("No audio recorded");
+          console.log("No audio recorded 2");
           return;
         }
 
@@ -261,20 +261,10 @@ const InterviewPage = () => {
           }
         } catch (error) {
           console.error("Error transcribing audio:", error);
-        } 
+        }
       };
 
       mediaRecorder.current.start();
-
-      // setTimeout(() => {
-      //   if (
-      //     mediaRecorder.current &&
-      //     mediaRecorder.current.state === "recording"
-      //   ) {
-      //     console.log("Recording stopped after timeout");
-      //     mediaRecorder.current.stop();
-      //   }
-      // }, 6000);
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
@@ -286,7 +276,7 @@ const InterviewPage = () => {
     if (!intervalRef.current) {
       intervalRef.current = setInterval(() => {
         startTranscribing();
-      }, 6000);
+      }, 5000);
     }
   }, [startTranscribing]);
 
@@ -396,7 +386,6 @@ const InterviewPage = () => {
 
       const timestamp = Date.now();
 
-      // Set up separate Blob Clients for video and audio
       videoBlobClient.current = containerClient.getBlockBlobClient(
         `${interviewId}_${timestamp}_v.webm`
       );

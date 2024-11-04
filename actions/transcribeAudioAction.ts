@@ -1,6 +1,5 @@
 "use server";
 import fs from "fs";
-import ffmpeg from "fluent-ffmpeg";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import speech from "@google-cloud/speech";
@@ -11,27 +10,6 @@ async function saveFileToDisk(file: File): Promise<string> {
   fs.writeFileSync(filePath, buffer);
   return filePath;
 }
-
-// async function convertToMonoMP3(inputFile: string): Promise<string> {
-//   const outputFile = path.join(
-//     "./tmp",
-//     path.basename(inputFile, path.extname(inputFile)) + "_mono.mp3",
-//   );
-
-//   console.log(`Converting to mono MP3: ${inputFile} -> ${outputFile}`);
-//   console.log("Input file size:", fs.statSync(inputFile).size);
-
-//   return new Promise<string>((resolve, reject) => {
-//     ffmpeg(inputFile)
-//       .toFormat("mp3")
-//       .on("end", () => resolve(outputFile))
-//       .on("error", (err) => {
-//         console.error("FFmpeg error:", err.message);
-//         reject(err);
-//       })
-//       .save(outputFile);
-//   });
-// }
 
 export async function handleAudioTranscribe(formData: FormData) {
   let inputFilePath: string | null = null;
@@ -48,16 +26,13 @@ export async function handleAudioTranscribe(formData: FormData) {
     }
 
     inputFilePath = await saveFileToDisk(audioFile);
-    
-    // monoFilePath = await convertToMonoMP3(inputFilePath);
 
     const audioBuffer = fs.readFileSync(inputFilePath);
 
     const audio = { content: audioBuffer.toString("base64") };
     const config = {
-      encoding: "MP3" as const,
-      sampleRateHertz: 16000,
-      languageCode: "en-US",
+      encoding: "WEBM_OPUS" as const,
+      languageCode: "en-IN",
     };
 
     const request = { audio, config };
@@ -67,9 +42,8 @@ export async function handleAudioTranscribe(formData: FormData) {
     const [response] = await speechClient.recognize(request);
     const transcription = response.results
       ?.map((result) => result.alternatives?.[0].transcript)
-      .join("\n");
-
-    console.log("transcription: ", transcription);
+      .join("\n")
+      .trim();
 
     return {
       status: "success",
