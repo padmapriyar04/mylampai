@@ -20,10 +20,11 @@ import { Plus, Minus } from "lucide-react";
 const initialCode = {
   javascript: 'console.log("hello");',
   python: 'print("hello")',
-  cpp: `#include <iostream>
+  cpp: `#include <bits/stdc++.h>
+using namespace std;
 
 int main() {
-    std::cout << "hello";
+    cout << "hello";
     return 0;
 }`,
 };

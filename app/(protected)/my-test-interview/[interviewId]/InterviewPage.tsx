@@ -43,6 +43,7 @@ const InterviewPage = () => {
   const interviewId = params.interviewId as string;
 
   const resTranscript = useRef("");
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(true);
@@ -61,14 +62,10 @@ const InterviewPage = () => {
   const [audioURL, setAudioURL] = useState("");
   const [codingQuestion, setCodingQuestion] = useState("");
 
-  const mediaStream = useRef<MediaStream | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
-  const recognitionRef = useRef<SpeechRecognition>(null);
-
   const videoRef = useRef<HTMLVideoElement>(null);
-  const elementRef = useRef(null);
 
   const videoBlobClient = useRef<BlockBlobClient | null>(null);
   const audioBlobClient = useRef<BlockBlobClient | null>(null);
@@ -118,62 +115,57 @@ const InterviewPage = () => {
   }, []);
 
   useEffect(() => {
-    if (ws) {
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
+    if (!ws) return;
 
-        switch (data.type) {
-          case "interview_question":
-            setChatMessages((prevMessages) => [
-              ...prevMessages,
-              { user: "Interviewer", message: data.question },
-            ]);
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
 
-            handleInterviewer(data.question);
+      switch (data.type) {
+        case "interview_question":
+          setChatMessages((prevMessages) => [
+            ...prevMessages,
+            { user: "Interviewer", message: data.question },
+          ]);
 
-            if (recognitionRef.current) recognitionRef.current.start();
+          handleInterviewer(data.question);
+          if (setLoading) setLoading(false);
 
-            console.log("data: ", data.question);
+          break;
 
-            if (setLoading) setLoading(false);
+        case "coding_question":
+          setCodingQuestion(data.message);
+          setShowCompiler(true);
+          break;
 
-            break;
+        case "code_evaluation":
+          break;
 
-          case "coding_question":
-            setCodingQuestion(data.message);
-            setShowCompiler(true);
-            break;
+        case "interview_end":
+          setChatMessages((prevMessages) => [
+            ...prevMessages,
+            { user: "System", message: data.message },
+          ]);
 
-          case "code_evaluation":
-            break;
+          ws?.send(
+            JSON.stringify({
+              type: "get_analysis",
+            }),
+          );
 
-          case "interview_end":
-            setChatMessages((prevMessages) => [
-              ...prevMessages,
-              { user: "System", message: data.message },
-            ]);
+          break;
 
-            ws?.send(
-              JSON.stringify({
-                type: "get_analysis",
-              }),
-            );
+        case "analysis":
+          setAnalysisData(data.result);
+          setChatMessages((prevMessages) => [
+            ...prevMessages,
+            { user: "Analysis", message: JSON.stringify(data.result) },
+          ]);
+          break;
 
-            break;
-
-          case "analysis":
-            setAnalysisData(data.result);
-            setChatMessages((prevMessages) => [
-              ...prevMessages,
-              { user: "Analysis", message: JSON.stringify(data.result) },
-            ]);
-            break;
-
-          default:
-            break;
-        }
-      };
-    }
+        default:
+          break;
+      }
+    };
   }, [ws, handleInterviewer]);
 
   const stopCamera = useCallback(() => {
@@ -199,24 +191,30 @@ const InterviewPage = () => {
     setShowFeedback(true);
   }, [ws, stopCamera]);
 
-  const stopTranscribing = useCallback(() => {
-    if (mediaRecorder.current && mediaRecorder.current.state === "recording") {
-      mediaRecorder.current.stop();
+  const stopAudioRecording = useCallback(() => {
+    if (intervalRef.current) {
+      console.log("res: ", resTranscript.current);
+      console.log("Stopping audio recording...");
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      handleSendMessage(resTranscript.current);
+      resTranscript.current = "";
     }
-    if (mediaStream.current) {
-      mediaStream.current.getTracks().forEach((track) => {
-        track.stop();
-      });
-    }
-  }, []);
+  }, [handleSendMessage]);
 
   const startTranscribing = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+        },
+      });
 
-      if (mediaRecorder && mediaStream) {
-        mediaStream.current = stream;
-        mediaRecorder.current = new MediaRecorder(stream);
+      if (mediaRecorder) {
+        mediaRecorder.current = new MediaRecorder(stream, {
+          mimeType: "audio/webm; codecs=opus",
+        });
 
         mediaRecorder.current.ondataavailable = (e: BlobEvent) => {
           if (e.data.size > 0) {
@@ -228,19 +226,29 @@ const InterviewPage = () => {
           const recordedBlob = new Blob(audioChunks.current, {
             type: "audio/webm",
           });
+
+          if (recordedBlob.size === 0 && resTranscript.current !== "") {
+            stopAudioRecording();
+            return;
+          }
+
+          if (recordedBlob.size === 0) {
+            console.log("No audio recorded");
+            return;
+          }
+
+          console.log("Transcribing audio...");
+
           audioChunks.current = [];
 
           const formData = new FormData();
-
           formData.append("audio", recordedBlob);
 
           try {
             const res = await handleAudioTranscribe(formData);
 
             if (res.status === "success" && res.transcript) {
-              handleSendMessage(res.transcript);
-            } else {
-              startTranscribing();
+              resTranscript.current += res.transcript;
             }
           } catch (error) {
             console.error("Error transcribing audio:", error);
@@ -248,11 +256,31 @@ const InterviewPage = () => {
         };
 
         mediaRecorder.current.start();
+
+        setTimeout(() => {
+          if (
+            mediaRecorder.current &&
+            mediaRecorder.current.state === "recording"
+          ) {
+            console.log("Recording stopped after timeout");
+            mediaRecorder.current.stop();
+          }
+        }, 6000);
       }
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
-  }, [handleSendMessage]);
+  }, [stopAudioRecording]);
+
+  const startAudioRecording = useCallback(() => {
+    startTranscribing();
+
+    if (!intervalRef.current) {
+      intervalRef.current = setInterval(() => {
+        startTranscribing();
+      }, 6000);
+    }
+  }, [startTranscribing]);
 
   const toggleVideo = () => setIsVideoOff(!isVideoOff);
 
@@ -372,34 +400,6 @@ const InterviewPage = () => {
     startVideoAudioRecording(interviewId);
   }, [interviewId]);
 
-  // useEffect(() => {
-  //   const SpeechRecognition =
-  //     window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  //   if (SpeechRecognition) {
-  //     const recognition = new SpeechRecognition();
-  //     recognitionRef.current = recognition;
-
-  //     recognition.continuous = false;
-  //     recognition.interimResults = false;
-
-  //     recognition.onresult = (event) => {
-  //       const result = event.results[0][0].transcript;
-  //       setCaption(result);
-  //     };
-
-  //     recognition.onend = () => {
-  //       stopTranscribing();
-  //     };
-
-  //     recognition.onerror = (event) => {
-  //       console.error("Speech recognition error:", event.error);
-  //     };
-  //   } else {
-  //     console.warn("SpeechRecognition is not supported by this browser.");
-  //   }
-  // }, [stopTranscribing]);
-
   const handleButtonClick = (index: number) => {
     setClickedIndex(index);
     setFeedbackIconClicked(true);
@@ -455,21 +455,18 @@ const InterviewPage = () => {
     const audioElement = audioRef.current;
 
     if (audioElement) {
-      audioElement.addEventListener("ended", startTranscribing);
+      audioElement.addEventListener("ended", startAudioRecording);
     }
 
     return () => {
       if (audioElement) {
-        audioElement.removeEventListener("ended", startTranscribing);
+        audioElement.removeEventListener("ended", startAudioRecording);
       }
     };
-  }, [audioURL, startTranscribing]);
+  }, [audioURL, startAudioRecording]);
 
   return (
-    <div
-      ref={elementRef}
-      className="min-h-screen flex items-center flex-col relative w-full h-full"
-    >
+    <div className="min-h-screen flex items-center flex-col relative w-full h-full">
       {loading && <FullScreenLoader />}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -537,7 +534,7 @@ const InterviewPage = () => {
               isVideoOff ? "hidden" : ""
             }`}
             autoPlay
-            muted={isMuted}
+            muted
           />
           {isVideoOff && (
             <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
@@ -549,7 +546,18 @@ const InterviewPage = () => {
           <Button
             variant={isMuted ? "destructive" : "secondary"}
             size="icon"
-            onClick={stopTranscribing}
+            onClick={startAudioRecording}
+          >
+            {isMuted ? (
+              <MicOff className="h-4 w-4" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant={isMuted ? "destructive" : "secondary"}
+            size="icon"
+            onClick={stopAudioRecording}
           >
             {isMuted ? (
               <MicOff className="h-4 w-4" />

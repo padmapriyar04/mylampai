@@ -12,24 +12,26 @@ async function saveFileToDisk(file: File): Promise<string> {
   return filePath;
 }
 
-async function convertToMonoMP3(inputFile: string): Promise<string> {
-  const outputFile = path.join(
-    "./tmp",
-    path.basename(inputFile, path.extname(inputFile)) + "_mono.mp3"
-  );
+// async function convertToMonoMP3(inputFile: string): Promise<string> {
+//   const outputFile = path.join(
+//     "./tmp",
+//     path.basename(inputFile, path.extname(inputFile)) + "_mono.mp3",
+//   );
 
-  console.log(`Converting to mono MP3: ${inputFile} -> ${outputFile}`); 
-  return new Promise<string>((resolve, reject) => {
-    ffmpeg(inputFile)
-      .toFormat("mp3")
-      .on("end", () => resolve(outputFile))
-      .on("error", (err) => {
-        console.error("FFmpeg error:", err.message);
-        reject(err);
-      })
-      .save(outputFile);
-  });
-}
+//   console.log(`Converting to mono MP3: ${inputFile} -> ${outputFile}`);
+//   console.log("Input file size:", fs.statSync(inputFile).size);
+
+//   return new Promise<string>((resolve, reject) => {
+//     ffmpeg(inputFile)
+//       .toFormat("mp3")
+//       .on("end", () => resolve(outputFile))
+//       .on("error", (err) => {
+//         console.error("FFmpeg error:", err.message);
+//         reject(err);
+//       })
+//       .save(outputFile);
+//   });
+// }
 
 export async function handleAudioTranscribe(formData: FormData) {
   let inputFilePath: string | null = null;
@@ -46,16 +48,16 @@ export async function handleAudioTranscribe(formData: FormData) {
     }
 
     inputFilePath = await saveFileToDisk(audioFile);
-    monoFilePath = await convertToMonoMP3(inputFilePath);
+    
+    // monoFilePath = await convertToMonoMP3(inputFilePath);
 
-    const audioBuffer = fs.readFileSync(monoFilePath);
-    const audioContent = audioBuffer.toString("base64");
+    const audioBuffer = fs.readFileSync(inputFilePath);
 
-    const audio = { content: audioContent };
+    const audio = { content: audioBuffer.toString("base64") };
     const config = {
       encoding: "MP3" as const,
-      sampleRateHertz: 12000,
-      languageCode: "en-IN",
+      sampleRateHertz: 16000,
+      languageCode: "en-US",
     };
 
     const request = { audio, config };
