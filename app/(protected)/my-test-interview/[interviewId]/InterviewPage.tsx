@@ -66,7 +66,7 @@ const InterviewPage = () => {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioStream = useRef<MediaStream | null>(null);
   const audioChunks = useRef<Blob[]>([]);
-  const emptyTranscribeCnt = useRef(0);
+  const emptyTranscribeCnt = useRef<number>(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
