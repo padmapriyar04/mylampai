@@ -82,7 +82,6 @@ export default function OnlineCompiler({
   const [code, setCode] = useState(initialCode.cpp);
   const [output, setOutput] = useState("");
   const [fontSize, setFontSize] = useState(14);
-  const [editorWidth, setEditorWidth] = useState(70);
 
   const editorRef = useRef(null);
   const outputRef = useRef(null);
@@ -98,11 +97,11 @@ export default function OnlineCompiler({
   const runCode = async () => {
     let version;
     if (language === "cpp") {
-      version = "10.2.0"; // GCC version for C++
+      version = "10.2.0";
     } else if (language === "python") {
-      version = "3.10.0"; // Python version
+      version = "3.10.0";
     } else if (language === "javascript") {
-      version = "18.15.0"; // Known working JavaScript version
+      version = "18.15.0";
     }
 
     try {
@@ -134,24 +133,6 @@ export default function OnlineCompiler({
         setOutput("An unknown error occurred");
       }
     }
-  };
-
-  // Function to handle resizing of editor width
-  const handleMouseMove = (e: MouseEvent) => {
-    const newWidth = (e.clientX / window.innerWidth) * 100;
-    if (newWidth > 20 && newWidth < 80) {
-      setEditorWidth(newWidth);
-    }
-  };
-
-  const handleMouseUp = () => {
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-  };
-
-  const handleMouseDown = () => {
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
   };
 
   const handleLanguageChange = (value: string) => {

@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import Analysis from "./analysis";
+import Analysis from "./Analysis";
 import { BlobServiceClient, BlockBlobClient } from "@azure/storage-blob";
 import OnlineCompiler from "./OnlineCompiler";
 
@@ -13,16 +13,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { PiChatsThin } from "react-icons/pi";
 import Image from "next/image";
 import {
   handleAudioTranscribe,
   // handleLiveAudioTranscribe,
 } from "@/actions/transcribeAudioAction";
-import {
-  generateSasToken,
-  generateSasUrlForInterview,
-} from "@/actions/azureActions";
+import { generateSasUrlForInterview } from "@/actions/azureActions";
 import { useParams } from "next/navigation";
 import FullScreenLoader from "@/components/global/FullScreenLoader";
 import { MessageSquare } from "lucide-react";
@@ -34,7 +30,6 @@ import {
   RiEmotionLine,
 } from "react-icons/ri";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
-import Caption from "./caption";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -64,10 +59,8 @@ const InterviewPage = () => {
   const [loading, setLoading] = useState(true);
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [audioURL, setAudioURL] = useState("");
-  const [caption, setCaption] = useState("");
   const [codingQuestion, setCodingQuestion] = useState("");
 
-  const [recordedUrl, setRecordedUrl] = useState("");
   const mediaStream = useRef<MediaStream | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<Blob[]>([]);
@@ -189,7 +182,7 @@ const InterviewPage = () => {
       const stream = videoElement.srcObject as MediaStream;
       const tracks = stream.getTracks();
       tracks.forEach((track) => track.stop());
-      videoElement.srcObject = null; // Clear the srcObject to release the camera
+      videoElement.srcObject = null;
     }
   }, []);
 
