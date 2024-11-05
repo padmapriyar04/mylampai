@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import { Label } from "@/components/ui/label";
+import { handleMessageUpload } from "@/actions/interviewActions";
 import { useWebSocketContext } from "@/hooks/interviewersocket/webSocketContext";
 import {
   Select,
@@ -16,6 +17,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Plus, Minus } from "lucide-react";
+import { toast } from "sonner";
 
 const initialCode = {
   javascript: 'console.log("hello");',
@@ -41,6 +43,7 @@ type Language = "javascript" | "python" | "cpp";
 type OnlineCompilerProp = {
   codingQuestion: string;
   showCompiler: boolean;
+  interviewId: string;
   setShowCompiler: (showCompiler: boolean) => void;
 };
 
@@ -77,6 +80,7 @@ export default function OnlineCompiler({
   codingQuestion,
   showCompiler,
   setShowCompiler,
+  interviewId,
 }: OnlineCompilerProp) {
   const { ws } = useWebSocketContext();
   const [language, setLanguage] = useState<Language>("cpp"); // Type the language state
@@ -143,20 +147,29 @@ export default function OnlineCompiler({
   };
 
   const handleSubmitCode = useCallback(
-    (code: string, question: string) => {
+    async (code: string, question: string) => {
       if (ws) {
         ws.send(
           JSON.stringify({
             type: "coding",
             code: code,
             ques: question,
-          })
+          }),
         );
+
+        const res = await handleMessageUpload({
+          interviewId,
+          sender: "user",
+          type: "coding",
+          code,
+          response: question,
+        });
+        if (res.status === "failed") toast.error("Failed to send code");
 
         setShowCompiler(false);
       }
     },
-    [ws, setShowCompiler]
+    [ws, setShowCompiler, interviewId],
   );
 
   return (
@@ -177,7 +190,13 @@ export default function OnlineCompiler({
                 direction="horizontal"
                 className="min-h-[calc(100vh-80px)] w-full rounded-lg border "
               >
-                <ResizablePanel defaultSize={75}>
+                <ResizablePanel defaultSize={20}>
+                  <div className="bg-white w-full h-full text-black p-4 md:p-6 rounded-lg border">
+                    Write a python, javascript or cpp code to print &quot;Hello
+                    World&quot;.
+                  </div>
+                </ResizablePanel>
+                <ResizablePanel defaultSize={60}>
                   <div
                     ref={editorRef}
                     className="bg-white h-full text-black w-full p-4 md:p-6 rounded-lg flex flex-col justify-between"
@@ -259,7 +278,7 @@ export default function OnlineCompiler({
                   </div>
                 </ResizablePanel>
                 <ResizableHandle withHandle />
-                <ResizablePanel defaultSize={25}>
+                <ResizablePanel defaultSize={20}>
                   <div
                     ref={outputRef}
                     className="bg-white w-full h-full text-black p-4 md:p-6 rounded-lg flex flex-col justify-start border"

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Analysis from "./Analysis";
 import { BlobServiceClient, BlockBlobClient } from "@azure/storage-blob";
 import OnlineCompiler from "./OnlineCompiler";
+import { handleMessageUpload } from "@/actions/interviewActions";
 
 import {
   Dialog,
@@ -14,10 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import {
-  handleAudioTranscribe,
-  // handleLiveAudioTranscribe,
-} from "@/actions/transcribeAudioAction";
+import { handleAudioTranscribe } from "@/actions/transcribeAudioAction";
 import { generateSasUrlForInterview } from "@/actions/azureActions";
 import { useParams } from "next/navigation";
 import FullScreenLoader from "@/components/global/FullScreenLoader";
@@ -87,10 +85,16 @@ const InterviewPage = () => {
           ...prevMessages,
           { user: "You", message },
         ]);
+        handleMessageUpload({
+          interviewId,
+          type: "answer",
+          sender: "user",
+          response: message,
+        });
         ws?.send(JSON.stringify({ type: "answer", answer: message }));
       }
     },
-    [ws]
+    [ws, interviewId],
   );
 
   const handleInterviewer = useCallback(async (text: string) => {
@@ -129,8 +133,8 @@ const InterviewPage = () => {
 
   useEffect(() => {
     if (!ws) return;
-
-    ws.onmessage = (event) => {
+    let res;
+    ws.onmessage = async (event) => {
       const data = JSON.parse(event.data);
 
       switch (data.type) {
@@ -139,8 +143,15 @@ const InterviewPage = () => {
             ...prevMessages,
             { user: "Interviewer", message: data.question },
           ]);
-
           handleInterviewer(data.question);
+          res = await handleMessageUpload({
+            interviewId,
+            sender: "interviewer",
+            type: "interview_question",
+            response: data.question,
+          });
+
+          if (res.status === "failed") toast.error("Message send failed");
           if (setLoading) setLoading(false);
 
           break;
@@ -148,6 +159,16 @@ const InterviewPage = () => {
         case "coding_question":
           setCodingQuestion(data.message);
           setShowCompiler(true);
+
+          res = await handleMessageUpload({
+            interviewId,
+            sender: "system",
+            type: "coding_question",
+            response: data.message,
+          });
+
+          if (res.status === "failed") toast.error("Message send failed");
+
           break;
 
         case "code_evaluation":
@@ -159,13 +180,22 @@ const InterviewPage = () => {
             { user: "System", message: data.message },
           ]);
 
+          res = await handleMessageUpload({
+            interviewId,
+            sender: "system",
+            type: "interview_end",
+            response: data.message,
+          });
+
+          if (res.status === "failed") toast.error("Message send failed");
+
           setShowFeedback(true);
           stopCamera();
 
           ws?.send(
             JSON.stringify({
               type: "get_analysis",
-            })
+            }),
           );
 
           break;
@@ -182,13 +212,13 @@ const InterviewPage = () => {
           break;
       }
     };
-  }, [ws, handleInterviewer, stopCamera]);
+  }, [ws, handleInterviewer, stopCamera, interviewId]);
 
   const handleInterviewEnd = () => {
     ws?.send(
       JSON.stringify({
         type: "end_interview",
-      })
+      }),
     );
   };
 
@@ -287,7 +317,7 @@ const InterviewPage = () => {
   const uploadChunk = async (
     client: BlockBlobClient | null,
     chunk: Blob,
-    blockIndex: number
+    blockIndex: number,
   ) => {
     try {
       if (client) {
@@ -305,10 +335,10 @@ const InterviewPage = () => {
       stopVideoStream();
 
       const videoBlockList = chunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0"))
+        btoa(String(index).padStart(6, "0")),
       );
       const audioBlockList = audioChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0"))
+        btoa(String(index).padStart(6, "0")),
       );
 
       if (videoBlobClient.current) {
@@ -389,10 +419,10 @@ const InterviewPage = () => {
       const timestamp = Date.now();
 
       videoBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_v.webm`
+        `${interviewId}_${timestamp}_v.webm`,
       );
       audioBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_a.webm`
+        `${interviewId}_${timestamp}_a.webm`,
       );
     };
 
@@ -415,7 +445,7 @@ const InterviewPage = () => {
         (document.getElementById("answerInput") as HTMLInputElement).value = "";
       }
     },
-    [handleSendMessage]
+    [handleSendMessage],
   );
 
   useEffect(() => {
@@ -695,6 +725,7 @@ const InterviewPage = () => {
       )}
 
       <OnlineCompiler
+        interviewId={interviewId}
         codingQuestion={codingQuestion}
         showCompiler={showCompiler}
         setShowCompiler={setShowCompiler}

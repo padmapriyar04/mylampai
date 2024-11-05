@@ -150,14 +150,6 @@ export const handleJDTextUpload = async ({
   };
 };
 
-type MessageData = {
-  interviewId: string;
-  type: string;
-  sender: "system" | "user" | "interviewer";
-  response: string;
-  code?: string;
-};
-
 export const updateInterviewStarted = async (interviewId: string) => {
   try {
     if (!interviewId) {
@@ -240,6 +232,14 @@ export const verifyInterview = async ({
     status: "failed",
     message: "Internal Server Error",
   };
+};
+
+type MessageData = {
+  interviewId: string;
+  type: string;
+  sender: "system" | "user" | "interviewer";
+  response: string;
+  code?: string;
 };
 
 export const handleMessageUpload = async (messageData: MessageData) => {
