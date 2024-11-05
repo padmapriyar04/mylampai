@@ -141,7 +141,7 @@ const InterviewComponent = () => {
           return;
         }
       } catch (error) {
-        toast.error("Failed to uplaod Resume");
+        toast.error("Failed to upload Resume");
         console.error("Error during PDF extraction or upload:", error);
       } finally {
         setIsUploading(false);
@@ -155,7 +155,7 @@ const InterviewComponent = () => {
   });
 
   const startInterview = useCallback(
-    (JD: string) => {
+    async (JD: string) => {
       if (!cvText || !JD) {
         toast.error("Upload CV and Job Description");
         return;
@@ -163,13 +163,25 @@ const InterviewComponent = () => {
 
       setLoading(true);
 
-      ws?.send(
-        JSON.stringify({
-          type: "start_interview",
-          pdf_text: cvText,
-          job_description: JD,
-        })
-      );
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true,
+        });
+
+        stream.getTracks().forEach((track) => track.stop());
+
+        ws?.send(
+          JSON.stringify({
+            type: "start_interview",
+            pdf_text: cvText,
+            job_description: JD,
+          })
+        );
+      } catch (err) {
+        toast.error("Failed to access microphone and camera.");
+        setLoading(false);
+      }
     },
     [ws, cvText]
   );
@@ -699,8 +711,12 @@ const InterviewComponent = () => {
                 <div className="bg-white py-4 px-8 rounded-2xl w-full md:max-w-[450px] lg:max-w-[450px] shadow-lg text-center flex flex-col items-center">
                   <Tabs defaultValue="profile" className="w-[400px]">
                     <TabsList className="grid w-full grid-cols-2 p-2 h-auto">
-                      <TabsTrigger className="p-2" value="profile">Choose Profile</TabsTrigger>
-                      <TabsTrigger className="p-2" value="jd">Upload JD</TabsTrigger>
+                      <TabsTrigger className="p-2" value="profile">
+                        Choose Profile
+                      </TabsTrigger>
+                      <TabsTrigger className="p-2" value="jd">
+                        Upload JD
+                      </TabsTrigger>
                     </TabsList>
                     <TabsContent value="profile">
                       <Select

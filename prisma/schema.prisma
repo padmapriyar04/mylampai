@@ -223,6 +223,6 @@ model InterviewMessage {
   sender      String
   response    String
   code        String?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime?  @default(now())
   interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
 }
