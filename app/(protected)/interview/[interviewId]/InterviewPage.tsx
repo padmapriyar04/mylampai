@@ -70,7 +70,7 @@ const InterviewPage = () => {
 
   const videoBlobClient = useRef<BlockBlobClient | null>(null);
   const audioBlobClient = useRef<BlockBlobClient | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const videoChunksRef = useRef<Blob[]>([]);
   const audioChunksRef = useRef<Blob[]>([]);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRecorderRef = useRef<MediaRecorder | null>(null);
@@ -334,7 +334,7 @@ const InterviewPage = () => {
     try {
       stopVideoStream();
 
-      const videoBlockList = chunksRef.current.map((_, index) =>
+      const videoBlockList = videoChunksRef.current.map((_, index) =>
         btoa(String(index).padStart(6, "0")),
       );
       const audioBlockList = audioChunksRef.current.map((_, index) =>
@@ -377,7 +377,7 @@ const InterviewPage = () => {
       // let audioBlockIndex = 0;
       // mediaRecorder.ondataavailable = async (event: BlobEvent) => {
       //   if (event.data.size > 0) {
-      //     chunksRef.current.push(event.data);
+      //     videoChunksRef.current.push(event.data);
       //     await uploadChunk(
       //       videoBlobClient.current,
       //       event.data,
