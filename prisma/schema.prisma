@@ -204,11 +204,25 @@ model NewsletterEmails {
 }
 
 model Interview {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  id       String             @id @default(auto()) @map("_id") @db.ObjectId
   cvText   String?
   jdText   String?
   audioUrl String?
   videoUrl String?
-  User     User?   @relation(fields: [userId], references: [id])
-  userId   String @db.ObjectId
+  User     User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String             @db.ObjectId
+  messages InterviewMessage[]
+
+  createdAt DateTime @default(now())
+}
+
+model InterviewMessage {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  interviewId String    @db.ObjectId
+  type        String
+  sender      String
+  response    String
+  code        String?
+  createdAt   DateTime  @default(now())
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
 }

@@ -89,7 +89,6 @@ export const handleJDTextUpload = async ({
   interviewId: string;
 }) => {
   try {
-
     if (!jdText || !interviewId) {
       return {
         status: "failed",
@@ -107,6 +106,34 @@ export const handleJDTextUpload = async ({
     return {
       message: "JD Updated",
       status: "success",
+    };
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+
+  return {
+    status: "failed",
+    message: "Internal Server Error",
+  };
+};
+
+type MessageData = {
+  interviewId: string;
+  type: string;
+  sender: "system" | "user" | "interviewer";
+  response: string;
+  code?: string;
+};
+
+export const handleMessageUpload = async (messageData: MessageData) => {
+  try {
+    await prisma.interviewMessage.create({
+      data: messageData,
+    });
+
+    return {
+      status: "success",
+      message: "Message added",
     };
   } catch (error) {
     console.log("Error: ", error);

@@ -90,7 +90,7 @@ const InterviewPage = () => {
         ws?.send(JSON.stringify({ type: "answer", answer: message }));
       }
     },
-    [ws]
+    [ws],
   );
 
   const handleInterviewer = useCallback(async (text: string) => {
@@ -114,6 +114,16 @@ const InterviewPage = () => {
       setAudioURL(audioUrl);
     } catch (error) {
       console.error("Error synthesising speech: ", error);
+    }
+  }, []);
+
+  const stopCamera = useCallback(() => {
+    const videoElement = videoRef.current;
+    if (videoElement && videoElement.srcObject) {
+      const stream = videoElement.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach((track) => track.stop());
+      videoElement.srcObject = null;
     }
   }, []);
 
@@ -150,11 +160,12 @@ const InterviewPage = () => {
           ]);
 
           setShowFeedback(true);
+          stopCamera();
 
           ws?.send(
             JSON.stringify({
               type: "get_analysis",
-            })
+            }),
           );
 
           break;
@@ -171,28 +182,15 @@ const InterviewPage = () => {
           break;
       }
     };
-  }, [ws, handleInterviewer]);
+  }, [ws, handleInterviewer, stopCamera]);
 
-  const stopCamera = useCallback(() => {
-    const videoElement = videoRef.current;
-    if (videoElement && videoElement.srcObject) {
-      const stream = videoElement.srcObject as MediaStream;
-      const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop());
-      videoElement.srcObject = null;
-    }
-  }, []);
-
-  const handleInterviewEnd = useCallback(async () => {
-    // await finalizeUpload();
-    stopCamera();
-
+  const handleInterviewEnd = () => {
     ws?.send(
       JSON.stringify({
         type: "end_interview",
-      })
+      }),
     );
-  }, [ws, stopCamera]);
+  };
 
   const stopAudioRecording = useCallback(() => {
     if (intervalRef.current) {
@@ -289,7 +287,7 @@ const InterviewPage = () => {
   const uploadChunk = async (
     client: BlockBlobClient | null,
     chunk: Blob,
-    blockIndex: number
+    blockIndex: number,
   ) => {
     try {
       if (client) {
@@ -307,10 +305,10 @@ const InterviewPage = () => {
       stopVideoStream();
 
       const videoBlockList = chunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0"))
+        btoa(String(index).padStart(6, "0")),
       );
       const audioBlockList = audioChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0"))
+        btoa(String(index).padStart(6, "0")),
       );
 
       if (videoBlobClient.current) {
@@ -391,10 +389,10 @@ const InterviewPage = () => {
       const timestamp = Date.now();
 
       videoBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_v.webm`
+        `${interviewId}_${timestamp}_v.webm`,
       );
       audioBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_a.webm`
+        `${interviewId}_${timestamp}_a.webm`,
       );
     };
 
@@ -417,7 +415,7 @@ const InterviewPage = () => {
         (document.getElementById("answerInput") as HTMLInputElement).value = "";
       }
     },
-    [handleSendMessage]
+    [handleSendMessage],
   );
 
   useEffect(() => {
