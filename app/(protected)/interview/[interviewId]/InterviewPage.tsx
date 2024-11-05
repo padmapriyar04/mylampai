@@ -3,7 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Analysis from "./Analysis";
 import { BlobServiceClient, BlockBlobClient } from "@azure/storage-blob";
 import OnlineCompiler from "./OnlineCompiler";
-import { handleMessageUpload } from "@/actions/interviewActions";
+import {
+  handleMessageUpload,
+  submitFeedback,
+} from "@/actions/interviewActions";
 
 import {
   Dialog,
@@ -41,6 +44,8 @@ const InterviewPage = () => {
   const params = useParams();
   const interviewId = params.interviewId as string;
 
+  const [feedback, setFeedback] = useState("");
+
   const resTranscript = useRef("");
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -52,9 +57,8 @@ const InterviewPage = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showCompiler, setShowCompiler] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackIconClicked, setFeedbackIconClicked] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
-  const [clickedIndex, setClickedIndex] = useState<number | null>(null);
+  const [clickedIndex, setClickedIndex] = useState<number>(0);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [analysisData, setAnalysisData] = useState<any>(null);
@@ -431,7 +435,6 @@ const InterviewPage = () => {
 
   const handleButtonClick = (index: number) => {
     setClickedIndex(index);
-    setFeedbackIconClicked(true);
   };
 
   const handleChatSubmit = useCallback(
@@ -468,6 +471,25 @@ const InterviewPage = () => {
     if (!isFullscreen) {
       document.documentElement.requestFullscreen();
       setDialogOpen(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async (rating: number, feedback: string) => {
+    if (rating === 0) toast.error("Rate the Interview");
+    else if (feedback.trim().split(" ").length < 10)
+      toast.error("Feedback should be atleast 10 words");
+
+    try {
+      const res = await submitFeedback({ interviewId, rating, feedback });
+      if (res.status === "success") {
+        toast.success("Feedback submitted successfully");
+        setShowFeedback(false);
+        setFeedbackSubmitted(true);
+      } else {
+        toast.error("Error submitting feedback");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -666,7 +688,7 @@ const InterviewPage = () => {
               <div className="flex justify-evenly p-10 text-6xl">
                 <button
                   className={`hover:scale-110 hover:translate-y-[-10px] hover:text-primary transition ${
-                    clickedIndex === 0 ? "text-primary scale-125" : ""
+                    clickedIndex === 1 ? "text-primary scale-125" : ""
                   }`}
                   onClick={() => handleButtonClick(0)}
                 >
@@ -674,7 +696,7 @@ const InterviewPage = () => {
                 </button>
                 <button
                   className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
-                    clickedIndex === 1 ? "text-primary scale-125" : ""
+                    clickedIndex === 2 ? "text-primary scale-125" : ""
                   }`}
                   onClick={() => handleButtonClick(1)}
                 >
@@ -682,7 +704,7 @@ const InterviewPage = () => {
                 </button>
                 <button
                   className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
-                    clickedIndex === 2 ? "text-primary scale-125" : ""
+                    clickedIndex === 3 ? "text-primary scale-125" : ""
                   }`}
                   onClick={() => handleButtonClick(2)}
                 >
@@ -696,18 +718,17 @@ const InterviewPage = () => {
               <textarea
                 className="w-full h-32 p-2 border border-slate-500 rounded-lg resize-none mb-4"
                 placeholder="Your feedback here (optional)..."
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
               />
               <button
                 className={`text-white px-4 py-3 rounded-lg font-semibold transition ${
-                  feedbackIconClicked
+                  clickedIndex === 0
                     ? "bg-primary hover:bg-primary"
                     : "bg-slate-500"
                 }`}
-                disabled={!feedbackIconClicked}
-                onClick={() => {
-                  setShowFeedback(false);
-                  setFeedbackSubmitted(true);
-                }}
+                disabled={clickedIndex === 0}
+                onClick={() => handleFeedbackSubmit(clickedIndex, feedback)}
               >
                 Submit Feedback
               </button>

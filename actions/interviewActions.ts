@@ -261,3 +261,42 @@ export const handleMessageUpload = async (messageData: MessageData) => {
     message: "Internal Server Error",
   };
 };
+
+export const submitFeedback = async ({
+  rating,
+  feedback,
+  interviewId,
+}: {
+  rating: number;
+  feedback: string;
+  interviewId: string;
+}) => {
+  try {
+    if (!interviewId) {
+      return {
+        status: "failed",
+        message: "Interview Id is required",
+      };
+    }
+
+    await prisma.interviewFeedback.create({
+      data: {
+        rating,
+        feedback,
+        interviewId,
+      },
+    });
+
+    return {
+      status: "success",
+      message: "Feedback submitted",
+    };
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+
+  return {
+    status: "failed",
+    message: "Internal Server Error",
+  };
+};

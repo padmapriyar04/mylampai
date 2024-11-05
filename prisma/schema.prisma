@@ -31,8 +31,8 @@ model User {
   receivedMessages Directmessage[] @relation("ReceiverUser")
   otps             OTP[]
   cvs              CV[]
-  credits          Int?             @default(0)
-  isRegistered     Boolean?         @default(false)
+  credits          Int?            @default(0)
+  isRegistered     Boolean?        @default(false)
   interviews       Interview[]
   sessions         Session[]
 }
@@ -204,16 +204,17 @@ model NewsletterEmails {
 }
 
 model Interview {
-  id        String             @id @default(auto()) @map("_id") @db.ObjectId
-  cvText    String?
-  jdText    String?
-  audioUrl  String?
-  videoUrl  String?
-  User      User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String             @db.ObjectId
-  messages  InterviewMessage[]
-  isStarted Boolean            @default(false)
-  createdAt DateTime           @default(now())
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  cvText            String?
+  jdText            String?
+  audioUrl          String?
+  videoUrl          String?
+  User              User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String              @db.ObjectId
+  messages          InterviewMessage[]
+  isStarted         Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  InterviewFeedback InterviewFeedback[]
 }
 
 model InterviewMessage {
@@ -225,4 +226,13 @@ model InterviewMessage {
   code        String?
   createdAt   DateTime  @default(now())
   interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+}
+
+model InterviewFeedback {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  feedback    String
+  rating      Int
+  interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  interviewId String    @db.ObjectId
+  createdAt   DateTime  @default(now())
 }
