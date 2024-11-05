@@ -32,7 +32,7 @@ export default function InterviewsPage() {
       else toast.error(res.message);
     } else {
       setLoading(true);
-      router.push(`/my-test-interview/${interviewId}`);
+      router.push(`/interview/${interviewId}`);
     }
   };
 

@@ -23,13 +23,13 @@ export default function CreateInterview() {
         } else if (res.status === "success") {
           toast.success("Interview created successfully");
           setLoading(true);
-          router.push(`/my-test-interview/${res.interviewId}`);
+          router.push(`/interview/${res.interviewId}`);
         }
       } catch (error) {
         console.log(error);
       }
     },
-    [router]
+    [router],
   );
 
   return (

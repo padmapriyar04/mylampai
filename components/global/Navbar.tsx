@@ -15,7 +15,7 @@ const Navbar = () => {
   const router = useRouter();
   const [initials, setInitials] = useState("Profile");
 
-  const hiddenOn = ["/my-test-interview/"];
+  const hiddenOn = ["/interview/"];
 
   const isHidden = hiddenOn.some((route) => pathname.startsWith(route));
 

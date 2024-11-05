@@ -17,13 +17,11 @@ export default function Flexsidebar() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const notAllowedRoutes = [
-    "/interview",
-    "/cvreviewer",
-    "/my-test-interview"
-  ]
+  const notAllowedRoutes = ["/interview", "/cvreviewer", "/interview"];
 
-  const isNotAllowed = notAllowedRoutes.some((route) => pathname.startsWith(route))
+  const isNotAllowed = notAllowedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
 
   const checkScreenSize = () => {
     setIsSmallScreen(window.innerWidth < 640);
