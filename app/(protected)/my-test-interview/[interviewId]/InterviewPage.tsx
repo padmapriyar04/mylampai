@@ -90,7 +90,7 @@ const InterviewPage = () => {
         ws?.send(JSON.stringify({ type: "answer", answer: message }));
       }
     },
-    [ws],
+    [ws]
   );
 
   const handleInterviewer = useCallback(async (text: string) => {
@@ -165,7 +165,7 @@ const InterviewPage = () => {
           ws?.send(
             JSON.stringify({
               type: "get_analysis",
-            }),
+            })
           );
 
           break;
@@ -188,7 +188,7 @@ const InterviewPage = () => {
     ws?.send(
       JSON.stringify({
         type: "end_interview",
-      }),
+      })
     );
   };
 
@@ -287,7 +287,7 @@ const InterviewPage = () => {
   const uploadChunk = async (
     client: BlockBlobClient | null,
     chunk: Blob,
-    blockIndex: number,
+    blockIndex: number
   ) => {
     try {
       if (client) {
@@ -305,10 +305,10 @@ const InterviewPage = () => {
       stopVideoStream();
 
       const videoBlockList = chunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0")),
+        btoa(String(index).padStart(6, "0"))
       );
       const audioBlockList = audioChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0")),
+        btoa(String(index).padStart(6, "0"))
       );
 
       if (videoBlobClient.current) {
@@ -389,10 +389,10 @@ const InterviewPage = () => {
       const timestamp = Date.now();
 
       videoBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_v.webm`,
+        `${interviewId}_${timestamp}_v.webm`
       );
       audioBlobClient.current = containerClient.getBlockBlobClient(
-        `${interviewId}_${timestamp}_a.webm`,
+        `${interviewId}_${timestamp}_a.webm`
       );
     };
 
@@ -415,7 +415,7 @@ const InterviewPage = () => {
         (document.getElementById("answerInput") as HTMLInputElement).value = "";
       }
     },
-    [handleSendMessage],
+    [handleSendMessage]
   );
 
   useEffect(() => {
@@ -546,6 +546,7 @@ const InterviewPage = () => {
             variant={isMuted ? "destructive" : "secondary"}
             size="icon"
             onClick={startAudioRecording}
+            disabled={!isMuted}
           >
             {isMuted ? (
               <MicOff className="h-4 w-4" />

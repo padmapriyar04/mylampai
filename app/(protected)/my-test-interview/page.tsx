@@ -1,16 +1,21 @@
 "use client";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import CreateInterview from "./CreateInterview";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { getInterviews } from "@/actions/interviewActions";
 import { useCallback, useEffect, useState } from "react";
 import { useUserStore } from "@/utils/userStore";
+import { verifyInterview } from "@/actions/interviewActions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { UserIcon } from "lucide-react";
 
 type Interview = {
   id: string;
 };
 
 export default function InterviewsPage() {
+  const router = useRouter();
   const { userData } = useUserStore();
   const [interviews, setInterviews] = useState<Interview[]>([]);
 
@@ -18,6 +23,17 @@ export default function InterviewsPage() {
     const res = await getInterviews(userId);
     setInterviews(res);
   }, []);
+
+  const routeInterview = async (interviewId: string, userId: string) => {
+    const res = await verifyInterview({ interviewId, userId });
+UserIcon
+    if (res.status === "failed") {
+      if (res.code === 3) toast.error("Interview not found");
+      else toast.error(res.message);
+    } else {
+      router.push(`/my-test-interview/${interviewId}`);
+    }
+  };
 
   useEffect(() => {
     const userId = userData?.id;
@@ -34,7 +50,10 @@ export default function InterviewsPage() {
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {interviews.map((interview, index) => (
-          <Link href={`/my-test-interview/${interview.id}`} key={interview.id}>
+          <Button
+            onClick={() => routeInterview(interview.id, userData?.id as string)}
+            key={interview.id}
+          >
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
@@ -42,7 +61,7 @@ export default function InterviewsPage() {
                 </CardTitle>
               </CardHeader>
             </Card>
-          </Link>
+          </Button>
         ))}
       </div>
     </div>

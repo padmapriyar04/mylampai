@@ -18,7 +18,7 @@ export default function CreateInterview() {
         const res = await createInterview(userId);
 
         if (res.status === "failed") {
-          toast.error("Failed to create Interview");
+          toast.error(res.message);
           return;
         } else if (res.status === "success") {
           toast.success("Interview created successfully");

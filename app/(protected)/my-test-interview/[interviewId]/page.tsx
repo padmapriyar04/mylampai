@@ -13,7 +13,11 @@ import InterviewPage from "./InterviewPage";
 import { Input } from "@/components/ui/input";
 import { generateSasToken } from "@/actions/azureActions";
 import { useParams } from "next/navigation";
-import { handleCVUpload, handleJDTextUpload } from "@/actions/interviewActions";
+import {
+  handleCVUpload,
+  handleJDTextUpload,
+  updateInterviewStarted,
+} from "@/actions/interviewActions";
 import {
   Form,
   FormControl,
@@ -36,7 +40,7 @@ pdfJSLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 function generateFileName(
   interviewId: string,
   originalFileName: string,
-  filetype: string
+  filetype: string,
 ) {
   const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
   const fileExtension = originalFileName.split(".").pop();
@@ -57,9 +61,6 @@ const InterviewComponent = () => {
   const [step, setStep] = useState(1);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [jdFile, setJDFile] = useState<File | null>(null);
-  const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
-
-  // console.log("deviceList ", deviceList);
 
   const [selectedJobProfile, setSelectedJobProfile] = useState("");
   const [cvText, setCvText] = useState("");
@@ -84,48 +85,6 @@ const InterviewComponent = () => {
     "Other",
   ];
 
-  const updateDeviceList = useCallback(() => {
-    try {
-      if (!navigator.mediaDevices?.enumerateDevices) {
-        console.log("enumerateDevices() not supported.");
-        return;
-      }
-
-      navigator.mediaDevices
-        .enumerateDevices()
-        .then((devices) => {
-          const audioInputDevices = devices.filter(
-            (device) => device.kind === "audioinput"
-          );
-          const videoInputDevices = devices.filter(
-            (device) => device.kind === "videoinput"
-          );
-
-          setDeviceList([...audioInputDevices, ...videoInputDevices]);
-        })
-        .catch((err) => {
-          console.error(`${err.name}: ${err.message}`);
-        });
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.name === "NotAllowedError") {
-          toast.error("Camera and/or microphone access denied.");
-        } else if (error.name === "NotFoundError") {
-          toast.error("No media devices found.");
-        } else {
-          toast.error("Error accessing media devices:");
-          console.log("Error accessing media devices: ", error);
-        }
-      } else {
-        console.error("An unknown error occurred:", error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    updateDeviceList();
-  }, [updateDeviceList]);
-
   const uploadCVText = useCallback(
     async (cvText: string) => {
       try {
@@ -147,7 +106,7 @@ const InterviewComponent = () => {
         setIsUploading(false);
       }
     },
-    [interviewId]
+    [interviewId],
   );
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -176,14 +135,14 @@ const InterviewComponent = () => {
             type: "start_interview",
             pdf_text: cvText,
             job_description: JD,
-          })
+          }),
         );
       } catch (err) {
         toast.error("Failed to access microphone and camera.");
         setLoading(false);
       }
     },
-    [ws, cvText]
+    [ws, cvText],
   );
 
   const uploadJDText = useCallback(
@@ -207,12 +166,12 @@ const InterviewComponent = () => {
         setIsUploading(false);
       }
     },
-    [interviewId, startInterview]
+    [interviewId, startInterview],
   );
 
   useEffect(() => {
     if (ws) {
-      ws.onmessage = (event) => {
+      ws.onmessage = async (event) => {
         const data = JSON.parse(event.data);
 
         switch (data.type) {
@@ -221,7 +180,13 @@ const InterviewComponent = () => {
             break;
 
           case "interview_started":
-            setIsInterviewStarted(true);
+            const res = await updateInterviewStarted(interviewId);
+
+            if (res.status === "success") setIsInterviewStarted(true);
+            else {
+              toast.error("Internal Server Error");
+            }
+
             break;
 
           case "jd_analyzed":
@@ -233,7 +198,7 @@ const InterviewComponent = () => {
         }
       };
     }
-  }, [ws, uploadCVText, uploadJDText, startInterview]);
+  }, [ws, uploadCVText, uploadJDText, startInterview, interviewId]);
 
   const handleResumeAnalysis = useCallback(
     async (file: File) => {
@@ -251,7 +216,7 @@ const InterviewComponent = () => {
               JSON.stringify({
                 type: "upload_cv",
                 cv_data: Array.from(new Uint8Array(binaryData)),
-              })
+              }),
             );
           } catch (error) {
             setIsUploading(false);
@@ -290,7 +255,7 @@ const InterviewComponent = () => {
         console.error(error);
       }
     },
-    [ws, interviewId]
+    [ws, interviewId],
   );
 
   const handleResumeUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -360,7 +325,7 @@ const InterviewComponent = () => {
           resolve(text.trim());
         } else {
           reject(
-            new Error("pdfjs-dist is not available in the server environment")
+            new Error("pdfjs-dist is not available in the server environment"),
           );
         }
       };
@@ -376,7 +341,7 @@ const InterviewComponent = () => {
 
     if (extractedText && ws) {
       ws.send(
-        JSON.stringify({ type: "analyze_jd", job_description: extractedText })
+        JSON.stringify({ type: "analyze_jd", job_description: extractedText }),
       );
     } else {
       console.error("websocket is not initialised or no extracted text");
@@ -463,7 +428,7 @@ const InterviewComponent = () => {
       JSON.stringify({
         type: "analyze_jd",
         job_description: profile,
-      })
+      }),
     );
   };
 
@@ -476,7 +441,7 @@ const InterviewComponent = () => {
       JSON.stringify({
         type: "analyze_jd",
         job_description: jobProfile,
-      })
+      }),
     );
   };
 
@@ -646,8 +611,8 @@ const InterviewComponent = () => {
                     {isUploading
                       ? "Uploading..."
                       : cvText !== ""
-                      ? "Resume Uploaded"
-                      : "Upload Resume"}
+                        ? "Resume Uploaded"
+                        : "Upload Resume"}
                   </button>
                 </div>
               </>
