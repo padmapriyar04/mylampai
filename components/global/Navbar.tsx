@@ -6,13 +6,16 @@ import { useUserStore } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSession, signOut } from "next-auth/react";
+import { Coins } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { getCreditBalance } from "@/actions/creditsAction";
 
 const Navbar = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { userData, clearUser } = useUserStore();
   const router = useRouter();
+  const [credits, setCredits] = useState(0);
   const [initials, setInitials] = useState("Profile");
 
   const hiddenOn = ["/interview/"];
@@ -46,6 +49,17 @@ const Navbar = () => {
   const handleToast = (message: string) => {
     toast.success(message);
   };
+
+  useEffect(() => {
+    const getCredits = async (userId: string) => {
+      const res = await getCreditBalance(userId);
+      if (res.status === "failed") return toast.error("Failed to get credits");
+      else if (res.credits) setCredits(res.credits);
+    };
+    if (userData?.id) {
+      getCredits(userData.id);
+    }
+  }, [userData?.id]);
 
   const getUserInitials = useCallback(() => {
     if (userData) {
@@ -98,6 +112,10 @@ const Navbar = () => {
       </Link>
 
       <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 border-[1px] border-primary rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-105">
+          <Coins className="text-primary" size={24} />
+          <span className="font-medium">{credits}</span>
+        </div>
         <button
           className="flex items-center gap-2 border-[1px] border-primary rounded-full px-4 py-2 h-[40px] transition-transform transform hover:scale-105"
           onClick={() => handleToast("No notifications available")}

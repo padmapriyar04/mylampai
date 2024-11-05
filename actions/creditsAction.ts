@@ -1,68 +1,102 @@
-"use server"
-import prisma from "@/lib"
+"use server";
+import prisma from "@/lib";
 
 type SessionData = {
-  email: string
-}
+  email: string;
+};
 
 type UserData = {
-  email: string,
-  password: string
-}
+  email: string;
+  password: string;
+};
 
+export const getCreditBalance = async (id: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        credits: true,
+        isRegistered: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        status: "failed",
+      };
+    }
+    
+    return {
+      status: "success",
+      credits: user.credits,
+      isRegistered: user.isRegistered,
+    };
+  } catch (error) {
+    console.log("error ", error);
+  }
+
+  return {
+    status: "failed",
+    message: "Error fetching credits",
+  };
+};
 
 export const handleCreditUpdate = async (data: SessionData | UserData) => {
   try {
-
     const user = await prisma.user.findUnique({
       where: {
-        email: data.email
-      }
-    })
-
+        email: data.email,
+      },
+    });
 
     if (!user) {
-      return "failed"
+      return "failed";
     }
+
+    const isRegistered = user.isRegistered;
+
+    if (isRegistered) return "failed";
 
     await prisma.user.update({
       where: {
-        email: data.email
+        email: data.email,
       },
       data: {
         credits: 250,
-        isRegistered: true
-      }
-    })
+        isRegistered: true,
+      },
+    });
 
-    return "success"
+    return "success";
   } catch (error) {
-    console.log("error ", error)
-
+    console.log("error ", error);
   }
-  return "failed"
-}
+  return "failed";
+};
 
-export const handleVerifyRegistration = async ({ email }: { email: string }) => {
+export const handleVerifyRegistration = async ({
+  email,
+}: {
+  email: string;
+}) => {
   try {
-
     const user = await prisma.user.findUnique({
       where: {
-        email: email
-      }
-    })
+        email: email,
+      },
+    });
 
     if (!user) {
-      return false
+      return false;
     }
 
-    if (user.isRegistered)
-      return true
+    if (user.isRegistered) return true;
 
-    return false
-
+    return false;
   } catch (error) {
-    console.log("error ", error)
+    console.log("error ", error);
   }
-  return false
-}
+  return false;
+};

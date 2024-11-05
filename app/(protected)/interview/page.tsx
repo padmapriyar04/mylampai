@@ -8,6 +8,7 @@ import { verifyInterview } from "@/actions/interviewActions";
 import { toast } from "sonner";
 import FullScreenLoader from "@/components/global/FullScreenLoader";
 import { useRouter } from "next/navigation";
+import { getCreditBalance, handleCreditUpdate } from "@/actions/creditsAction";
 
 type Interview = {
   id: string;
@@ -18,6 +19,7 @@ export default function InterviewsPage() {
   const { userData } = useUserStore();
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(true);
 
   const fetchInterviews = useCallback(async (userId: string) => {
     const res = await getInterviews(userId);
@@ -36,10 +38,32 @@ export default function InterviewsPage() {
     }
   };
 
+  const updateCredits = async (email: string) => {
+    if (!email) {
+      toast.error("User not found, please try again later");
+      return;
+    }
+    const res = await handleCreditUpdate({ email });
+    if (res === "success") {
+      toast.success("Got 250 free credits");
+      setIsRegistered(true);
+    }
+  };
+
   useEffect(() => {
     const userId = userData?.id;
+
+    const getCredits = async (userId: string) => {
+      const res = await getCreditBalance(userId);
+      console.log(res);
+      if (res.status === "failed") {
+        toast.error(res.message);
+      } else if (res.status === "success")
+        setIsRegistered(res.isRegistered as boolean);
+    };
     if (userId) {
       fetchInterviews(userId);
+      getCredits(userId);
     }
   }, [userData?.id, fetchInterviews]);
 
@@ -50,6 +74,14 @@ export default function InterviewsPage() {
         <h1 className="text-3xl font-bold">Past Interviews</h1>
         <CreateInterview />
       </div>
+      {!isRegistered && (
+        <Button
+          className="hover:text-primary"
+          onClick={() => updateCredits(userData?.email as string)}
+        >
+          Get Free Credits
+        </Button>
+      )}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {interviews?.map((interview, index) => (
           <Button
