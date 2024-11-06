@@ -721,7 +721,7 @@ const InterviewPage = () => {
               </p>
               <textarea
                 className="w-full h-32 p-2 border border-slate-500 rounded-lg resize-none mb-4"
-                placeholder="Your feedback here (optional)..."
+                placeholder="Your feedback here ..."
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
               />
