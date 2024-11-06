@@ -312,7 +312,7 @@ const InterviewPage = () => {
     if (!intervalRef.current) {
       intervalRef.current = setInterval(() => {
         startTranscribing();
-      }, 2400);
+      }, 4400);
     }
   }, [startTranscribing, isMuted]);
 

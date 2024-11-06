@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/card";
 import { Video, StopCircle, Upload } from "lucide-react";
 
-const containerName = "company-logos";
+const containerName = "mylampai-interview"
 const storageAccountName = "recruits0mylampai";
+
 const sasToken =
   "sp=rw&st=2024-10-27T23:50:36Z&se=2024-10-28T07:50:36Z&sv=2022-11-02&sr=c&sig=U9PRayERGT%2FWGIGxnFruX1piN2CaUDuwZHnnUuBW59g%3D";
 
@@ -21,24 +22,24 @@ const RealTimeVideoUploader: React.FC = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
-  // Type references with appropriate types
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const videoChunksRef = useRef<Blob[]>([]);
   const audioChunksRef = useRef<Blob[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const blobClient = useRef<BlockBlobClient | null>(null);
+  const videoBlobClient = useRef<BlockBlobClient | null>(null);
   const audioBlobClient = useRef<BlockBlobClient | null>(null);
-
+  
   useEffect(() => {
     const blobServiceClient = new BlobServiceClient(
       `https://${storageAccountName}.blob.core.windows.net?${sasToken}`
     );
+    
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const timestamp = Date.now();
 
     // Set up separate Blob Clients for video and audio
-    blobClient.current = containerClient.getBlockBlobClient(
+    videoBlobClient.current = containerClient.getBlockBlobClient(
       `interview-${timestamp}.webm`
     );
     audioBlobClient.current = containerClient.getBlockBlobClient(
@@ -59,7 +60,7 @@ const RealTimeVideoUploader: React.FC = () => {
   ) => {
     try {
       if (client) {
-        const blockId = btoa(String(blockIndex).padStart(6, "0")); // Padded, consistent ID
+        const blockId = btoa(String(blockIndex).padStart(6, "0"));
         await client.stageBlock(blockId, chunk, chunk.size);
         console.log(`Uploaded block: ${blockId}`);
       }
@@ -74,11 +75,13 @@ const RealTimeVideoUploader: React.FC = () => {
         video: true,
         audio: true,
       });
+      
       if (videoRef.current) videoRef.current.srcObject = stream;
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: "video/webm",
       });
+      
       const audioStream = new MediaStream(stream.getAudioTracks());
       const audioRecorder = new MediaRecorder(audioStream, {
         mimeType: "audio/webm",
@@ -89,8 +92,8 @@ const RealTimeVideoUploader: React.FC = () => {
 
       mediaRecorder.ondataavailable = async (event: BlobEvent) => {
         if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
-          await uploadChunk(blobClient.current, event.data, videoBlockIndex++);
+          videoChunksRef.current.push(event.data);
+          await uploadChunk(videoBlobClient.current, event.data, videoBlockIndex++);
         }
       };
 
@@ -118,15 +121,15 @@ const RealTimeVideoUploader: React.FC = () => {
 
   const finalizeUpload = async () => {
     try {
-      const videoBlockList = chunksRef.current.map((_, index) =>
+      const videoBlockList = videoChunksRef.current.map((_, index) =>
         btoa(String(index).padStart(6, "0"))
       );
       const audioBlockList = audioChunksRef.current.map((_, index) =>
         btoa(String(index).padStart(6, "0"))
       );
 
-      if (blobClient.current) {
-        await blobClient.current.commitBlockList(videoBlockList);
+      if (videoBlobClient.current) {
+        await videoBlobClient.current.commitBlockList(videoBlockList);
         console.log("Video upload complete and finalized.");
       }
       if (audioBlobClient.current) {
@@ -181,7 +184,7 @@ const RealTimeVideoUploader: React.FC = () => {
       <CardFooter>
         <Button
           onClick={finalizeUpload}
-          disabled={!chunksRef.current.length}
+          disabled={!videoChunksRef.current.length}
           className="w-full"
         >
           <Upload className="w-4 h-4 mr-2" />
