@@ -694,7 +694,7 @@ const InterviewPage = () => {
                   className={`hover:scale-110 hover:translate-y-[-10px] hover:text-primary transition ${
                     clickedIndex === 1 ? "text-primary scale-125" : ""
                   }`}
-                  onClick={() => handleButtonClick(0)}
+                  onClick={() => handleButtonClick(1)}
                 >
                   <RiEmotionLine />
                 </button>
@@ -702,7 +702,7 @@ const InterviewPage = () => {
                   className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
                     clickedIndex === 2 ? "text-primary scale-125" : ""
                   }`}
-                  onClick={() => handleButtonClick(1)}
+                  onClick={() => handleButtonClick(2)}
                 >
                   <RiEmotionNormalLine />
                 </button>
@@ -710,7 +710,7 @@ const InterviewPage = () => {
                   className={`hover:scale-110 hover:translate-y-[-10px] transition hover:text-primary ${
                     clickedIndex === 3 ? "text-primary scale-125" : ""
                   }`}
-                  onClick={() => handleButtonClick(2)}
+                  onClick={() => handleButtonClick(3)}
                 >
                   <RiEmotionUnhappyLine />
                 </button>
