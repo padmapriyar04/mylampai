@@ -475,9 +475,13 @@ const InterviewPage = () => {
   };
 
   const handleFeedbackSubmit = async (rating: number, feedback: string) => {
-    if (rating === 0) toast.error("Rate the Interview");
-    else if (feedback.trim().split(" ").length < 10)
+    if (rating === 0) {
+      toast.error("Rate the Interview");
+      return;
+    } else if (feedback.trim().split(" ").length < 10) {
       toast.error("Feedback should be atleast 10 words");
+      return;
+    }
 
     try {
       const res = await submitFeedback({ interviewId, rating, feedback });
@@ -723,7 +727,7 @@ const InterviewPage = () => {
               />
               <button
                 className={`text-white px-4 py-3 rounded-lg font-semibold transition ${
-                  clickedIndex === 0
+                  clickedIndex !== 0
                     ? "bg-primary hover:bg-primary"
                     : "bg-slate-500"
                 }`}
