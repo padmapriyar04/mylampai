@@ -8,14 +8,15 @@ import {
 const accountName = process.env.AZURE_ACCOUNT_NAME || "";
 const accountKey = process.env.AZURE_ACCOUNT_KEY || "";
 const containerName = process.env.AZURE_CONTAINER_NAME || "";
+const interviewContainerName = process.env.AZURE_INTERVIEW_CONTAINER_NAME || "";
+
+const sharedKeyCredential = new StorageSharedKeyCredential(
+  accountName,
+  accountKey,
+);
 
 // SAS Token Generator Function
 export const generateSasToken = async (blobName: string) => {
-  const sharedKeyCredential = new StorageSharedKeyCredential(
-    accountName,
-    accountKey
-  );
-
   const sasOptions = {
     containerName,
     blobName,
@@ -27,7 +28,7 @@ export const generateSasToken = async (blobName: string) => {
   try {
     const sasToken = generateBlobSASQueryParameters(
       sasOptions,
-      sharedKeyCredential
+      sharedKeyCredential,
     ).toString();
     return `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
   } catch (error) {
@@ -36,27 +37,26 @@ export const generateSasToken = async (blobName: string) => {
   }
 };
 
-export const generateSasUrlForInterview = async () => {
-  const sharedKeyCredential = new StorageSharedKeyCredential(
-    accountName,
-    accountKey
-  );
-
+export const generateSasUrlForInterview = async (blobName: string) => {
   const sasOptions = {
-    containerName,
-    permissions: BlobSASPermissions.parse("cw"), 
-    startsOn: new Date(new Date().valueOf() - 5 * 60 * 1000), 
-    expiresOn: new Date(new Date().valueOf() + 1 * 3600 * 1000), 
+    containerName: interviewContainerName,
+    permissions: BlobSASPermissions.parse("cw"),
+    startsOn: new Date(Date.now() - 5 * 60 * 1000),
+    expiresOn: new Date(Date.now() + 40 * 60 * 1000),
   };
 
   try {
     const sasToken = generateBlobSASQueryParameters(
       sasOptions,
-      sharedKeyCredential
+      sharedKeyCredential,
     ).toString();
-    return `https://${accountName}.blob.core.windows.net/${containerName}?${sasToken}`;
+    console.log(sasToken);
+    return {
+      sasUrl: `https://${accountName}.blob.core.windows.net/${interviewContainerName}?${sasToken}`,
+      sasToken,
+    };
   } catch (error) {
     console.error("Error generating SAS token:", error);
-    return "";
+    return null;
   }
 };
