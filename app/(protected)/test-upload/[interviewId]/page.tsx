@@ -13,7 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Video, StopCircle, Upload } from "lucide-react";
-import { StatTimer } from "pdfjs-dist/types/src/display/display_utils";
 
 const containerName = "mylampai-interview";
 
