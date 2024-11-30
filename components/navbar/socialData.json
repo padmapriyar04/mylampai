@@ -1,0 +1,7 @@
+[
+  { "icon": "/whatsapp.svg", "name": "whatsapp" },
+  { "icon": "/linkedin.svg", "name": "linkedin" },
+  { "icon": "/instagram.svg", "name": "instagram" },
+  { "icon": "/discord.svg", "name": "discord" },
+  { "icon": "/youtube.svg", "name": "youtube" }
+]

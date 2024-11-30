@@ -1,9 +1,3 @@
-
-
 export default function TermsCondition() {
-    return (
-        <div className="min-h-screen">
-            I&apos;m an Terms & Condition page
-        </div>
-    )
+  return <div className="min-h-screen">Terms & Condition page</div>;
 }
