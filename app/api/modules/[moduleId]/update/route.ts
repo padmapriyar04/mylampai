@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../../lib/index';
-import { connectToDatabase } from '@/app/helpers/server';
-import jwt from 'jsonwebtoken';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/index";
+import jwt from "jsonwebtoken";
 
 type ModuleRequest = {
   Module_Name?: string;
@@ -14,30 +13,33 @@ type ModuleRequest = {
 
 // Middleware to verify the JWT token and user role
 const verifyTokenAndAdmin = async (req: NextRequest) => {
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { error: 'Unauthorized', status: 401 };
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return { error: "Unauthorized", status: 401 };
   }
   const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
   let decodedToken: any;
   try {
-    decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'okokokok');
+    decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
   } catch (error) {
-    console.error('JWT verification error:', error);
-    return { error: 'Unauthorized', status: 401 };
+    console.error("JWT verification error:", error);
+    return { error: "Unauthorized", status: 401 };
   }
 
   const { id: authorId, role } = decodedToken;
 
-  if (role !== 'admin') {
-    return { error: 'Unauthorized', status: 403 };
+  if (role !== "admin") {
+    return { error: "Unauthorized", status: 403 };
   }
 
   return { authorId, status: 200 };
 };
 
-export const PATCH = async (req: NextRequest, { params }: { params: { moduleId: string } }) => {
+export const PATCH = async (
+  req: NextRequest,
+  { params }: { params: { moduleId: string } }
+) => {
   const { moduleId } = params;
 
   try {
@@ -49,10 +51,11 @@ export const PATCH = async (req: NextRequest, { params }: { params: { moduleId: 
     const data: ModuleRequest = await req.json();
 
     if (!Object.keys(data).length) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 422 });
+      return NextResponse.json(
+        { error: "No fields to update" },
+        { status: 422 }
+      );
     }
-
-    await connectToDatabase();
 
     // Check for unique constraint violation before updating
     if (data.Module_Name) {
@@ -61,7 +64,10 @@ export const PATCH = async (req: NextRequest, { params }: { params: { moduleId: 
       });
 
       if (moduleWithSameName && moduleWithSameName.id !== moduleId) {
-        return NextResponse.json({ error: 'Module name already exists' }, { status: 409 });
+        return NextResponse.json(
+          { error: "Module name already exists" },
+          { status: 409 }
+        );
       }
     }
 
@@ -80,24 +86,34 @@ export const PATCH = async (req: NextRequest, { params }: { params: { moduleId: 
 
     return NextResponse.json({ module: updatedModule }, { status: 200 });
   } catch (error) {
-    console.error('Error updating module:', error);
+    console.error("Error updating module:", error);
 
-    if (isPrismaError(error) && error.code === 'P2002' && error.meta?.target === 'Modules_Module_Name_key') {
-      return NextResponse.json({ error: 'Module name already exists' }, { status: 409 });
+    if (
+      isPrismaError(error) &&
+      error.code === "P2002" &&
+      error.meta?.target === "Modules_Module_Name_key"
+    ) {
+      return NextResponse.json(
+        { error: "Module name already exists" },
+        { status: 409 }
+      );
     }
 
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
-  }
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  } 
 };
 
 // Type guard to check if the error is a Prisma error
-function isPrismaError(error: unknown): error is { code: string; meta?: { target: string } } {
+function isPrismaError(
+  error: unknown
+): error is { code: string; meta?: { target: string } } {
   return (
-    typeof error === 'object' &&
+    typeof error === "object" &&
     error !== null &&
-    'code' in error &&
-    typeof (error as { code: string }).code === 'string'
+    "code" in error &&
+    typeof (error as { code: string }).code === "string"
   );
 }

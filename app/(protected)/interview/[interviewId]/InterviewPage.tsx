@@ -416,7 +416,12 @@ const InterviewPage = () => {
     const startVideoAudioRecording = async (interviewId: string) => {
       const sasUrl = await generateSasUrlForInterview();
 
-      const blobServiceClient = new BlobServiceClient(sasUrl);
+      if (!sasUrl) {
+        console.error("Error generating SAS URL");
+        return;
+      }
+
+      const blobServiceClient = new BlobServiceClient(sasUrl.sasUrl);
       const containerClient =
         blobServiceClient.getContainerClient("mylampai-av");
 

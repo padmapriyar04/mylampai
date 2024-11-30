@@ -37,7 +37,7 @@ export const generateSasToken = async (blobName: string) => {
   }
 };
 
-export const generateSasUrlForInterview = async (blobName: string) => {
+export const generateSasUrlForInterview = async () => {
   const sasOptions = {
     containerName: interviewContainerName,
     permissions: BlobSASPermissions.parse("cw"),

@@ -57,8 +57,8 @@ const RealTimeVideoUploader: React.FC = () => {
       const videoBlobName = `${interviewId}_${Date.now()}_v.webm`;
       const audioBlobName = `${interviewId}_${Date.now()}_a.webm`;
 
-      const videoResponse = await generateSasUrlForInterview(videoBlobName);
-      const audioResponse = await generateSasUrlForInterview(audioBlobName);
+      const videoResponse = await generateSasUrlForInterview();
+      const audioResponse = await generateSasUrlForInterview();
 
       return {
         videoSASUrl: videoResponse?.sasUrl,

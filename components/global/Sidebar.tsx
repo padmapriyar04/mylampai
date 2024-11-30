@@ -1,15 +1,13 @@
 "use client";
+import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import navData from "@/components/navbar/navData.json";
 import socialData from "@/components/navbar/socialData.json";
 import { NavItem } from "@/components/global/NavItems";
-import Link from "next/link";
 
-export default function Flexsidebar() {
+export default function Sidebar() {
 
-  console.log("Flexsidebar");
-  
   const pathname = usePathname();
   const notAllowedRoutes = ["/interview", "/cvreviewer"];
 

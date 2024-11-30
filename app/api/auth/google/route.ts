@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/index';
-import { connectToDatabase } from '@/app/helpers/server';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,8 +15,6 @@ export async function POST(req: NextRequest) {
         { status: 422 }
       );
     }
-
-    await connectToDatabase();
 
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });

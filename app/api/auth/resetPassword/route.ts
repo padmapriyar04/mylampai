@@ -23,7 +23,6 @@ export async function PUT(req: Request) {
     const user = await prisma.user.findUnique({ where: { id: decoded.id } });
 
     if (!user) {
-      await prisma.$disconnect(); // Disconnect before returning
       return NextResponse.json({ error: "Account does not exist." }, { status: 404 });
     }
 
@@ -39,8 +38,6 @@ export async function PUT(req: Request) {
     // Return success response
     return NextResponse.json({ email: user.email, message: "Password has been reset successfully." }, { status: 200 });
   } catch (error) {
-    // Disconnect from the database in case of error
-    // await prisma.$disconnect();
     console.error("Internal Server Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
