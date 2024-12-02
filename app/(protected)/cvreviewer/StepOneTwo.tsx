@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import * as pdfjsLib from "pdfjs-dist";
 import { useUserStore } from "@/utils/userStore";
 
-const baseUrl = "https://cv-judger.onrender.com";
+const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
 
 interface StepOneTwoProps {
   step: number;

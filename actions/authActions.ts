@@ -1,18 +1,26 @@
-"use server"
-import prisma from "@/lib"
+"use server";
+import prisma from "@/lib";
 import jwt from "jsonwebtoken";
+
+export const handleSendOTP = async (email: string) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+};
 
 export const handleGoogleLogin = async ({ email }: { email: string }) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        email: email
-      }
-    })
+        email: email,
+      },
+    });
 
     if (!user) {
       return {
-        message: "failed"
+        message: "failed",
       };
     }
 
@@ -27,8 +35,7 @@ export const handleGoogleLogin = async ({ email }: { email: string }) => {
       { expiresIn: "70d" },
     );
 
-    const response =
-    {
+    const response = {
       token,
       user: {
         id: user.id,
@@ -36,17 +43,16 @@ export const handleGoogleLogin = async ({ email }: { email: string }) => {
         name: user.name as string,
         role: user.role as string,
       },
-    }
+    };
 
     return {
       message: "success",
-      response
+      response,
     };
-
   } catch (error) {
-    console.log("error")
+    console.log("error");
   }
   return {
-    message: "failed"
+    message: "failed",
   };
-}
+};

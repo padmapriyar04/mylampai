@@ -1,17 +1,58 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import LinkedInProvider, {
+  LinkedInProfile,
+} from "next-auth/providers/linkedin";
 import prisma from "@/lib";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
-    GoogleProvider({ 
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       allowDangerousEmailAccountLinking: true,
-    })
+    }),
+    LinkedInProvider({
+      clientId: process.env.LINKEDIN_CLIENT_ID as string,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
+      allowDangerousEmailAccountLinking: true,
+      client: { token_endpoint_auth_method: "client_secret_post" },
+      issuer: "https://www.linkedin.com",
+      profile: (profile: LinkedInProfile) => ({
+        id: profile.sub,
+        name: profile.name,
+        email: profile.email,
+        role: "student",
+        image: profile.picture,
+      }),
+      wellKnown:
+        "https://www.linkedin.com/oauth/.well-known/openid-configuration",
+      authorization: {
+        params: {
+          scope: "openid profile email",
+        },
+      },
+    }),
   ],
+  callbacks: {
+    async signIn({user, account, profile}) {
+      const url = account?.url as string;
+      console.log(url)
+      const isRecruiter = url?.includes("role=recruiter");
+      user.role = isRecruiter ? "RECRUITER" : "STUDENT";
+      return true;
+    },
+    async session({ session, token }) {
+      session.user.role = token.role || "STUDENT";
+      return session;
+    },
+    async jwt({ token, account, user }) {
+      if (account && user) token.role = user.role || "STUDENT";
+      return token;
+    },
+  },
   session: {
     strategy: "jwt",
   },

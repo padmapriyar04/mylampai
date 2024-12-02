@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, DragEvent, ChangeEvent } from "react";
-import StepOneTwo from "./StepOneTwo"; // Adjust the path if necessary
+import StepOneTwo from "./StepOneTwo";
 import { useInterviewStore } from "@/utils/store";
 import PDFViewer from "./StepThree";
 import { useUserStore } from "@/utils/userStore";

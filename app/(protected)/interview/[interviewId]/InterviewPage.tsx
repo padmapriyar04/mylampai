@@ -179,11 +179,6 @@ const InterviewPage = () => {
           break;
 
         case "interview_end":
-          setChatMessages((prevMessages) => [
-            ...prevMessages,
-            { user: "System", message: data.message },
-          ]);
-
           res = await handleMessageUpload({
             interviewId,
             sender: "system",
@@ -334,34 +329,34 @@ const InterviewPage = () => {
     }
   };
 
-  const finalizeUpload = async () => {
-    try {
-      stopVideoStream();
+  // const finalizeUpload = async () => {
+  //   try {
+  //     stopVideoStream();
 
-      const videoBlockList = videoChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0")),
-      );
-      const audioBlockList = audioChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0")),
-      );
+  //     const videoBlockList = videoChunksRef.current.map((_, index) =>
+  //       btoa(String(index).padStart(6, "0")),
+  //     );
+  //     const audioBlockList = audioChunksRef.current.map((_, index) =>
+  //       btoa(String(index).padStart(6, "0")),
+  //     );
 
-      if (videoBlobClient.current) {
-        await videoBlobClient.current.commitBlockList(videoBlockList);
-        console.log("Video upload complete and finalized.");
-      }
-      if (audioBlobClient.current) {
-        await audioBlobClient.current.commitBlockList(audioBlockList);
-        console.log("Audio upload complete and finalized.");
-      }
-    } catch (error) {
-      console.error("Error finalizing upload:", error);
-    }
-  };
+  //     if (videoBlobClient.current) {
+  //       await videoBlobClient.current.commitBlockList(videoBlockList);
+  //       console.log("Video upload complete and finalized.");
+  //     }
+  //     if (audioBlobClient.current) {
+  //       await audioBlobClient.current.commitBlockList(audioBlockList);
+  //       console.log("Audio upload complete and finalized.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error finalizing upload:", error);
+  //   }
+  // };
 
-  const stopVideoStream = () => {
-    if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
-    if (audioRecorderRef.current) audioRecorderRef.current.stop();
-  };
+  // const stopVideoStream = () => {
+  //   if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
+  //   if (audioRecorderRef.current) audioRecorderRef.current.stop();
+  // };
 
   const startVideoStream = useCallback(async () => {
     try {
@@ -416,7 +411,11 @@ const InterviewPage = () => {
     const startVideoAudioRecording = async (interviewId: string) => {
       const sasUrl = await generateSasUrlForInterview();
 
-      const blobServiceClient = new BlobServiceClient(sasUrl);
+      if (!sasUrl?.sasUrl) {
+        return;
+      }
+
+      const blobServiceClient = new BlobServiceClient(sasUrl.sasUrl);
       const containerClient =
         blobServiceClient.getContainerClient("mylampai-av");
 
@@ -477,9 +476,6 @@ const InterviewPage = () => {
   const handleFeedbackSubmit = async (rating: number, feedback: string) => {
     if (rating === 0) {
       toast.error("Rate the Interview");
-      return;
-    } else if (feedback.trim().split(" ").length < 10) {
-      toast.error("Feedback should be atleast 10 words");
       return;
     }
 

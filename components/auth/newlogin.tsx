@@ -8,15 +8,13 @@ import { toast } from "sonner";
 import { signIn } from "next-auth/react";
 import Input from "./Input";
 import CountrySelector from "../misc/CountryFlag";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { setCookie } from "@/utils/cookieUtils";
 import { useUserStore } from "@/utils/userStore";
 import { handleGoogleLogin } from "@/actions/authActions";
 
 const AuthForm: React.FC = () => {
   const { data: session } = useSession();
-  const { userData, setUserData, clearUser } = useUserStore();
+  const { setUserData, clearUser } = useUserStore();
   const [isSignUp, setIsSignUp] = useState(false);
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [isOTPVerifing, setIsOTPVerifing] = useState(false);
@@ -229,7 +227,6 @@ const AuthForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
-        // Store user data and token in cookies
         setCookie("token", data.token, 7); // Set cookie for 7 days
         setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
 
@@ -259,29 +256,27 @@ const AuthForm: React.FC = () => {
 
   useEffect(() => {
     const funcSignUp = async (email: string) => {
-      const res = await handleGoogleLogin({ email })
+      const res = await handleGoogleLogin({ email });
 
       if (res.message === "success") {
-
         if (!res.response) {
-          toast.error("Login Failed")
+          toast.error("Login Failed");
           return;
         }
 
         setCookie("token", res.response.token, 70);
         setCookie("user", JSON.stringify(res.response.user), 70);
-        setUserData(res.response.user, res.response?.token)
+        setUserData(res.response.user, res.response?.token);
 
-        router.push("/interview")
+        router.push("/interview");
       } else {
-        toast.error("login failed")
+        toast.error("login failed");
       }
+    };
 
-    }
-    
     if (session?.user.email) {
       const email = session.user.email;
-      funcSignUp(email)
+      funcSignUp(email);
     } else {
       clearUser();
     }
@@ -299,9 +294,6 @@ const AuthForm: React.FC = () => {
 
       if (response.ok) {
         setOtpSent(true);
-        // Display a success message using Sonner or any other method
-      } else {
-        // Handle errors, show an error message
       }
     } catch (error) {
       console.error("Error sending OTP:", error);
@@ -351,13 +343,15 @@ const AuthForm: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: credentials.email, }),
+        body: JSON.stringify({ email: credentials.email }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Email Sent Successfully to your email for Resetting the Password.");
+        toast.success(
+          "Email Sent Successfully to your email for Resetting the Password.",
+        );
       } else {
         toast.success("Email not sent ");
       }
@@ -365,7 +359,6 @@ const AuthForm: React.FC = () => {
       console.error("Error sending password reset request:", error);
     }
   };
-
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0 h-screen">
@@ -381,36 +374,16 @@ const AuthForm: React.FC = () => {
         </Link>
       </div>
       <div className="bg-[#fcfcfc] rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
-        <div className="hidden md:block w-full md:max-w-[350px] bg-purple-500 rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
-          <Carousel
-            showThumbs={false}
-            showStatus={false}
-            infiniteLoop
-            autoPlay
-            interval={5000}
-            showArrows={false}
-            showIndicators={false}
-            className="w-full  md:h-full flex flex-col pt-4 justify-between"
-          >
-            <div className="flex justify-center p-4 items-center h-full">
-              <Image
-                src={"/images/Globe.svg"}
-                alt="Carousel Image 1"
-                className="w-4/5"
-                width={100}
-                height={100}
-              />
-            </div>
-            <div className="flex justify-center p-4 items-center h-full">
-              <Image
-                src={"/images/Globe.svg"}
-                alt="Carousel Image 1"
-                className="w-4/5"
-                width={100}
-                height={100}
-              />
-            </div>
-          </Carousel>
+        <div className="hidden md:block w-full md:max-w-[350px] bg-primary rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
+          <div className="flex justify-center p-4 items-center h-full">
+            <Image
+              src={"/images/Globe.svg"}
+              alt="Carousel Image 1"
+              className="w-4/5"
+              width={100}
+              height={100}
+            />
+          </div>
         </div>
 
         <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 flex flex-col justify-center">
@@ -449,7 +422,7 @@ const AuthForm: React.FC = () => {
 
                 <Input
                   name="email"
-                  placeholder="Email"
+                  placeholder="your-email@gmail.com"
                   type="email"
                   value={user.email}
                   onChange={handleChange}
@@ -514,14 +487,14 @@ const AuthForm: React.FC = () => {
                     you agree to our{" "}
                     <Link
                       href="/privacypolicy"
-                      className="text-purple-500 hover:text-purple-700 transition-colors duration-300"
+                      className="text-primary"
                     >
                       Privacy Policy
                     </Link>{" "}
                     and{" "}
                     <Link
                       href="/termsandconditions"
-                      className="text-purple-500 hover:text-purple-700 transition-colors duration-300"
+                      className="text-primary"
                     >
                       Terms of Use
                     </Link>
@@ -656,7 +629,6 @@ const AuthForm: React.FC = () => {
                       onClick={handleForgotPassword}
                       className="font-semibold text-primary text-left px-4 "
                     >
-
                       Forgot Password
                     </div>
                   </div>

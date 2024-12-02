@@ -5,9 +5,8 @@ import Navbar from "@/components/global/Navbar";
 import type { Metadata } from "next";
 import Flexsidebar from "@/components/global/Sidebar";
 
-
 export const metadata: Metadata = {
-  title: "MyLampAi",
+  title: "wiZe (myLampAI)",
   description: "wiZe - MyLampAi",
 };
 

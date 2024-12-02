@@ -4,8 +4,8 @@ import { Open_Sans } from "next/font/google";
 const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "MyLampAi - Login",
-  description: "MyLampAi - Login Page",
+  title: "wiZe (myLampAI) | Login",
+  description: "wiZe (myLampAI) | Sign In/Up Page",
 };
 
 export default function RootLayout({
