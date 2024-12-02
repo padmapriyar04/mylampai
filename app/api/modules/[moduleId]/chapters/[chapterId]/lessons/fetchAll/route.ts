@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib';
-import { connectToDatabase } from '@/app/helpers/server';
 
 export const GET = async (req: NextRequest, { params }: { params: { moduleId: string, chapterId: string } }) => {
     const { moduleId, chapterId } = params;
 
     try {
-        await connectToDatabase();
 
         // Fetch all lessons for the chapter
         const lessons = await prisma.lesson.findMany({
@@ -22,7 +20,5 @@ export const GET = async (req: NextRequest, { params }: { params: { moduleId: st
     } catch (error) {
         console.error('Error fetching lessons:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 };

@@ -1,5 +1,4 @@
 import prisma from "@/lib";
-import { connectToDatabase } from "@/app/helpers/server";
 import { NextResponse } from "next/server";
 import transporter from "@/lib/nodemailer";
 

@@ -1,7 +1,7 @@
 "use client";
 import { WebSocketProvider } from "@/hooks/interviewersocket/webSocketContext";
 import { verifyInterview } from "@/actions/interviewActions";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/utils/userStore";

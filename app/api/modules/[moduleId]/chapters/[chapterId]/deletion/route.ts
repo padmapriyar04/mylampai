@@ -1,7 +1,6 @@
 // API route for chapter update within a module
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib';
-import { connectToDatabase } from '@/app/helpers/server';
 import jwt from 'jsonwebtoken';
 
 type ChapterRequest = {
@@ -19,7 +18,7 @@ const verifyTokenAndAdmin = async (req: NextRequest) => {
 
     let decodedToken: any;
     try {
-        decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'okokokok');
+        decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
     } catch (error) {
         console.error('JWT verification error:', error);
         return { error: 'Unauthorized', status: 401 };
@@ -42,9 +41,6 @@ export const DELETE = async (req: NextRequest, { params }: { params: { moduleId:
         if (error) {
             return NextResponse.json({ error }, { status });
         }
-
-        await connectToDatabase();
-
         // Check if the module exists
         const existingModule = await prisma.modules.findUnique({
             where: { id: moduleId },
@@ -73,7 +69,5 @@ export const DELETE = async (req: NextRequest, { params }: { params: { moduleId:
     } catch (error) {
         console.error('Error creating chapter:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 };

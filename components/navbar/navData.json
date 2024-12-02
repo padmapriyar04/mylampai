@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Explore",
+    "icon": "/sidebar/explore.svg",
+    "link": "/explore"
+  },
+  {
+    "name": "Achieve",
+    "icon": "/sidebar/achieve.svg",
+    "link": "/achieve"
+  },
+  {
+    "name": "Career",
+    "icon": "/sidebar/career.svg",
+    "link": "/career"
+  },
+  {
+    "name": "Community",
+    "icon": "/sidebar/community.svg",
+    "link": "/community"
+  }
+]

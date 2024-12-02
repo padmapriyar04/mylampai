@@ -12,7 +12,7 @@ export const POST = async (req: NextRequest, { params }: { params: { communityId
 
     let decodedToken: any;
     try {
-      decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'okokokok');
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
     } catch (error) {
       console.error('JWT verification error:', error);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -1,7 +1,5 @@
-// pages/api/auth/verify-otp.ts
 import { NextResponse } from "next/server";
-import prisma from "../../../../lib/index";
-import { connectToDatabase } from "@/app/helpers/server";
+import prisma from "@/lib/index";
 
 export const POST = async (req: Request) => {
   try {
@@ -14,12 +12,13 @@ export const POST = async (req: Request) => {
       );
     }
 
-    await connectToDatabase();
-
-    // Find OTP in database
     const otpRecord = await prisma.oTP.findUnique({ where: { email } });
 
-    if (!otpRecord || otpRecord.otp !== otp || otpRecord.expiresAt < new Date()) {
+    if (
+      !otpRecord ||
+      otpRecord.otp !== otp ||
+      otpRecord.expiresAt < new Date()
+    ) {
       return NextResponse.json(
         { error: "Invalid or expired OTP." },
         { status: 422 }
@@ -32,7 +31,10 @@ export const POST = async (req: Request) => {
       data: { verified: true },
     });
 
-    return NextResponse.json({ message: "OTP verified successfully." }, { status: 200 });
+    return NextResponse.json(
+      { message: "OTP verified successfully." },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error during OTP verification:", error);
     return NextResponse.json(

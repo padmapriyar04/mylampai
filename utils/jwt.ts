@@ -12,7 +12,7 @@ export function decodeToken(token: string): DecodedToken | null {
   try {
     return jwt.verify(
       token,
-      process.env.JWT_SECRET || "okokokok"
+      process.env.JWT_SECRET as string
     ) as DecodedToken;
   } catch (error) {
     console.error("Failed to decode token:", error);

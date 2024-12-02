@@ -1,20 +1,14 @@
-"use client"
-import LessonsModal from '@/components/learn/lessondivdropdown';
-import App01 from '@/components/learn/text';
-import MyComponent from '@/components/learn/text02';
-// import Middle from '@/components/newmodules/middlecomponents/middlecomponents';
-import ParentMid from '@/components/newmodules/parentmid';
-// import ParentMid from '@/components/demo/parent';
+"use client";
+import ParentMid from "@/components/newmodules/parentmid";
 
 const page = () => {
   return (
     <>
-    <div>
-     <ParentMid />
-     {/* <ParentMid /> */}
-    </div>
+      <div>
+        <ParentMid />
+      </div>
     </>
-  )
-}
+  );
+};
 
 export default page;
