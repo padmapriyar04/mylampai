@@ -12,7 +12,7 @@ export function NavItem({ name, icon, link, pathname }: NavItemsProps) {
   return (
     <Link
       href={link}
-      className={`flex flex-row items-center px-5 py-2 gap-4 w-full hover:bg-[#8c52ff10] hover:grayscale-0 relative group transition duration-200 ${
+      className={`flex flex-row items-center px-5 py-2 gap-4 hover:bg-[#8c52ff10] hover:grayscale-0 relative group transition duration-200 ${
         pathname === link ? "grayscale-0 text-primary" : "grayscale"
       }`}
     >
