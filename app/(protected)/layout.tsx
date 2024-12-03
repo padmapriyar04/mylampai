@@ -1,9 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
-import Navbar from "@/components/global/Navbar";
 import type { Metadata } from "next";
-import Sidebar from "@/components/global/Sidebar";
+import { Page } from "@/components/global/Sidebar";
 
 export const metadata: Metadata = {
   title: "wiZe (myLampAI)",
@@ -30,11 +29,7 @@ export default function ProtectedLayout({
 
   return (
     <>
-      <Navbar />
-      <div className="flex w-full h-full">
-        <Sidebar />
-        {children}
-      </div>
+        <Page>{children}</Page>
     </>
   );
 }
