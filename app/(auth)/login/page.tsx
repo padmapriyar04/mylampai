@@ -14,7 +14,6 @@ import NewLogin from "@/components/auth/newlogin";
 // import {
 //   InputOTP,
 //   InputOTPGroup,
-//   InputOTPSeparator,
 //   InputOTPSlot,
 // } from "@/components/ui/input-otp";
 // import {
@@ -62,10 +61,9 @@ export default function SignupPage() {
 
   // useEffect(() => {
   //   if (data) {
-  //     // router.push("/dashboard");
-  //     console.log("Hello world")
+  //     router.push("/dashboard");
   //   }
-  // }, [data]);
+  // }, [data, router]);
 
   return (
     <NewLogin />
@@ -101,54 +99,48 @@ export default function SignupPage() {
     //             onSubmit={form.handleSubmit(onSubmit)}
     //             className="w-2/3 space-y-6"
     //           >
-    //             <div className="flex flex-col gap-1">
-    //               <FormField
-    //                 control={form.control}
-    //                 name="email"
-    //                 render={({ field }) => (
-    //                   <FormItem>
-    //                     <FormControl>
-    //                       <Input
-    //                         placeholder="your-email@gmail.com"
-    //                         {...field}
-    //                       />
-    //                     </FormControl>
-    //                     <FormMessage />
-    //                   </FormItem>
-    //                 )}
-    //               />
-    //             </div>
-    //             <div className="relative w-full flex flex-col gap-1">
-    //               <FormField
-    //                 control={form.control}
-    //                 name="pin"
-    //                 render={({ field }) => (
-    //                   <FormItem>
-    //                     <FormControl>
-    //                       <InputOTP maxLength={6} {...field}>
-    //                         <InputOTPGroup>
-    //                           <InputOTPSlot index={0} />
-    //                           <InputOTPSlot index={1} />
-    //                           <InputOTPSlot index={2} />
-    //                           <InputOTPSlot index={3} />
-    //                           <InputOTPSlot index={4} />
-    //                           <InputOTPSlot index={5} />
-    //                         </InputOTPGroup>
-    //                       </InputOTP>
-    //                     </FormControl>
-    //                     <FormMessage />
-    //                   </FormItem>
-    //                 )}
-    //               />
+    //             <FormField
+    //               control={form.control}
+    //               name="email"
+    //               render={({ field }) => (
+    //                 <FormItem>
+    //                   <FormControl>
+    //                     <Input placeholder="your-email@gmail.com" {...field} />
+    //                   </FormControl>
+    //                   <FormMessage />
+    //                 </FormItem>
+    //               )}
+    //             />
+    //             <FormField
+    //               control={form.control}
+    //               name="pin"
+    //               render={({ field }) => (
+    //                 <FormItem>
+    //                   <FormControl>
+    //                     <InputOTP maxLength={6} {...field}>
+    //                       <InputOTPGroup>
+    //                         <InputOTPSlot index={0} />
+    //                         <InputOTPSlot index={1} />
+    //                         <InputOTPSlot index={2} />
+    //                         <InputOTPSlot index={3} />
+    //                         <InputOTPSlot index={4} />
+    //                         <InputOTPSlot index={5} />
+    //                       </InputOTPGroup>
+    //                     </InputOTP>
+    //                   </FormControl>
+    //                   <FormMessage />
+    //                 </FormItem>
+    //               )}
+    //             />
 
-    //               <button
-    //                 type="button"
-    //                 onClick={sendOTPforLogin}
-    //                 className="absolute font-semibold right-2 top-[30%] transform -translate-y-1/2 bg-purple-500 text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg hover:bg-purple-600"
-    //               >
-    //                 Next
-    //               </button>
-    //             </div>
+    //             <button
+    //               type="button"
+    //               onClick={sendOTPforLogin}
+    //               className="font-semibold bg-primary text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg"
+    //             >
+    //               Next
+    //             </button>
+
     //             <div className="flex justify-between items-center mt-12 mb-4">
     //               <Button
     //                 type="submit"

@@ -7,7 +7,7 @@ import Sidebar from "@/components/global/Sidebar";
 
 export const metadata: Metadata = {
   title: "wiZe (myLampAI)",
-  description: "wiZe - MyLampAi",
+  description: "wiZe (myLampAI) - Your career builder",
 };
 
 export default function ProtectedLayout({
@@ -15,25 +15,23 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // const cookieStore = cookies();
-  // const token = cookieStore.get("token");
+  const cookieStore = cookies();
+  const token = cookieStore.get("token");
 
-  // if (!token) {
-  //   redirect("/login");
-  // }
+  if (!token) redirect("/login");
 
-  // try {
-  //   if (token.value)
-  //     jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
-  //   else redirect("/login");
-  // } catch (error) {
-  //   redirect("/login");
-  // }
+  try {
+    if (token.value)
+      jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
+    else redirect("/login");
+  } catch (error) {
+    redirect("/login");
+  }
 
   return (
     <>
-      {/* <Navbar /> */}
-      <div className="flex w-full h-full transition-all duration-300">
+      <Navbar />
+      <div className="flex w-full h-full">
         <Sidebar />
         {children}
       </div>

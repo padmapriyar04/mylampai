@@ -249,8 +249,7 @@ const AuthForm: React.FC = () => {
     try {
       await signIn("google");
     } catch (error) {
-      console.error("Error during Google sign-in:", error);
-      toast.error("An error occurred during Google sign-in");
+      toast.error("Error signing in with Google");
     }
   };
 
@@ -485,17 +484,11 @@ const AuthForm: React.FC = () => {
                     All your information is collected, stored, and processed as
                     per our data processing guidelines. By signing up on wiZe,
                     you agree to our{" "}
-                    <Link
-                      href="/privacypolicy"
-                      className="text-primary"
-                    >
+                    <Link href="/privacypolicy" className="text-primary">
                       Privacy Policy
                     </Link>{" "}
                     and{" "}
-                    <Link
-                      href="/termsandconditions"
-                      className="text-primary"
-                    >
+                    <Link href="/termsandconditions" className="text-primary">
                       Terms of Use
                     </Link>
                     .
