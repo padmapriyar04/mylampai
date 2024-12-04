@@ -12,6 +12,8 @@ import { useInterviewStore } from "@/utils/store";
 import { toast } from "sonner";
 import * as pdfjsLib from "pdfjs-dist";
 import { useUserStore } from "@/utils/userStore";
+import { BlobServiceClient, ContainerSASPermissions, generateBlobSASQueryParameters, StorageSharedKeyCredential } from "@azure/storage-blob";
+import { generateSasToken } from "@/actions/azureActions";
 
 const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
 
@@ -33,6 +35,18 @@ interface StepOneTwoProps {
   setProfile: React.Dispatch<React.SetStateAction<string | null>>; // Ensure this is correctly typed
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
 }
+
+
+function generateFileName( 
+  originalFileName: string,
+  filetype: string,
+) {
+  const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
+  const fileExtension = originalFileName.split(".").pop();
+  return `${timestamp}_${filetype}.${fileExtension}`;
+}
+
+
 
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
   step,
@@ -59,20 +73,46 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
+  
+  
 
-  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+  const handleDrop =async (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
 
     setUploading(true);
-
+     
     if (file && file.type === "application/pdf") {
       if (file.size > 1 * 1024 * 1024) {
         toast.error("File size should be less than 1MB");
         setUploading(false);
         return;
       }
+       const blobName = generateFileName( file.name, "cv");
+      const sasUrl = await generateSasToken(blobName);
+      if (!sasUrl) {
+        toast.error("Error uploading resume");
+        return;
+      }
 
+      try {
+        const uploadResponse = await fetch(sasUrl, {
+          method: "PUT",
+          headers: {
+            "x-ms-blob-type": "BlockBlob",
+          },
+          body: file,
+        });
+
+        if (!uploadResponse.ok) {
+          toast.error("Resume Upload Failed");
+        }else{
+          console.log(uploadResponse);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+            
       setResumeFile(file);
 
       const fileReader = new FileReader();
@@ -152,7 +192,32 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         setUploading(false);
         return;
       }
+      const blobName = generateFileName( file.name, "cv");
+      const sasUrl = await generateSasToken(blobName);
 
+      if (!sasUrl) {
+        toast.error("Error uploading resume");
+        return;
+      }
+
+      try {
+        const uploadResponse = await fetch(sasUrl, {
+          method: "PUT",
+          headers: {
+            "x-ms-blob-type": "BlockBlob",
+          },
+          body: file,
+        });
+
+        if (!uploadResponse.ok) {
+          toast.error("Resume Upload Failed");
+        }else{
+          console.log(uploadResponse);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      
       setResumeFile(file);
 
       const fileReader = new FileReader();
