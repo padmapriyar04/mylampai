@@ -46,55 +46,55 @@ const RealTimeVideoUploader: React.FC = () => {
     }
   }, [videoSASUrl, interviewId]);
 
-  useEffect(() => {
-    const generateSasUrl = async ({
-      interviewId,
-      timestamp,
-    }: {
-      interviewId: string;
-      timestamp: string;
-    }) => {
-      const videoBlobName = `${interviewId}_${Date.now()}_v.webm`;
-      const audioBlobName = `${interviewId}_${Date.now()}_a.webm`;
+  // useEffect(() => {
+  //   const generateSasUrl = async ({
+  //     interviewId,
+  //     timestamp,
+  //   }: {
+  //     interviewId: string;
+  //     timestamp: string;
+  //   }) => {
+  //     const videoBlobName = `${interviewId}_${Date.now()}_v.webm`;
+  //     const audioBlobName = `${interviewId}_${Date.now()}_a.webm`;
 
-      const videoResponse = await generateSasUrlForInterview();
-      const audioResponse = await generateSasUrlForInterview();
+  //     const videoResponse = await generateSasUrlForInterview(videoBlobName);
+  //     const audioResponse = await generateSasUrlForInterview(audioBlobName);
 
-      return {
-        videoSASUrl: videoResponse?.sasUrl,
-        audioSASUrl: audioResponse?.sasUrl,
-      };
-    };
+  //     return {
+  //       videoSASUrl: videoResponse?.sasUrl,
+  //       audioSASUrl: audioResponse?.sasUrl,
+  //     };
+  //   };
 
-    const generateBlobSasUrls = async () => {
-      const timestamp = Date.now().toString();
-      const { videoSASUrl, audioSASUrl } = await generateSasUrl({
-        interviewId,
-        timestamp,
-      });
+  //   const generateBlobSasUrls = async () => {
+  //     const timestamp = Date.now().toString();
+  //     const { videoSASUrl, audioSASUrl } = await generateSasUrl({
+  //       interviewId,
+  //       timestamp,
+  //     });
 
-      if (videoSASUrl && audioSASUrl) {
-        console.log("videoSASUrl", videoSASUrl);
-        console.log("audioSASUrl", audioSASUrl);
-        const blobServiceClient = new BlobServiceClient(videoSASUrl);
+  //     if (videoSASUrl && audioSASUrl) {
+  //       console.log("videoSASUrl", videoSASUrl);
+  //       console.log("audioSASUrl", audioSASUrl);
+  //       const blobServiceClient = new BlobServiceClient(videoSASUrl);
 
-        const videoContainerClient =
-          blobServiceClient.getContainerClient(containerName);
-        const audioContainerClient =
-          blobServiceClient.getContainerClient(containerName);
+  //       const videoContainerClient =
+  //         blobServiceClient.getContainerClient(containerName);
+  //       const audioContainerClient =
+  //         blobServiceClient.getContainerClient(containerName);
 
-        const videoBlobName = `${interviewId}_${timestamp}_v.webm`;
-        videoBlobClient.current =
-          videoContainerClient.getBlockBlobClient(videoBlobName);
+  //       const videoBlobName = `${interviewId}_${timestamp}_v.webm`;
+  //       videoBlobClient.current =
+  //         videoContainerClient.getBlockBlobClient(videoBlobName);
 
-        const audioBlobName = `${interviewId}_${timestamp}_a.webm`;
-        audioBlobClient.current =
-          audioContainerClient.getBlockBlobClient(audioBlobName);
-      }
-    };
+  //       const audioBlobName = `${interviewId}_${timestamp}_a.webm`;
+  //       audioBlobClient.current =
+  //         audioContainerClient.getBlockBlobClient(audioBlobName);
+  //     }
+  //   };
 
-    generateBlobSasUrls();
-  }, [interviewId]);
+  //   generateBlobSasUrls();
+  // }, [interviewId]);
 
   // const stopRecording = () => {
   //   if (mediaRecorderRef.current) mediaRecorderRef.current.stop();

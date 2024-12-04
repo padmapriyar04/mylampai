@@ -1,4 +1,3 @@
-// lib/nodemailer.ts
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -8,5 +7,24 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
+export const sendEmail = async (to: string, subject: string, html: string) => {
+  const mailOptions = {
+    from: "your-email@gmail.com",
+    to,
+    subject,
+    html,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+
+    return "success";
+  } catch (error) {
+    console.error("Error sending email:", error);
+  }
+
+  return "failed";
+};
 
 export default transporter;
