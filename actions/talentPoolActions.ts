@@ -49,7 +49,6 @@ export const getTalentPoolsData = async (targetPoolIds: string[]) => {
 };
 
 type TalentPoolType = {
-  id: string;
   userId: string;
   skills: string[];
   profiles: string[];
