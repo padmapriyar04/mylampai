@@ -78,17 +78,17 @@ model OTP {
 
 // for recruiter
 model TalentPool {
-  id                String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String        @db.ObjectId
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skillsNeeded      String[]
-  profilesTargeting String[]
-  salaryOffer       String
-  locationPref      String
-  experienceNeeded  String
-  talents           TalentMatch[]
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String        @db.ObjectId
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills           String[]
+  profiles         String[]
+  salary           String
+  locationPref     String
+  experienceNeeded String
+  talents          TalentMatch[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 }
 
 model TalentMatch {
@@ -98,7 +98,7 @@ model TalentMatch {
   talentPoolId String     @db.ObjectId
   talentPool   TalentPool @relation(fields: [talentPoolId], references: [id], onDelete: Cascade)
   isMatched    Boolean    @default(false)
-  isHired      Boolean    @default(false) 
+  isHired      Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
@@ -114,7 +114,7 @@ model TalentProfile {
   expectedSalary  String
   locationPref    String
   experienceYears String
-  userId          String   @unique @db.ObjectId
+  userId          String   @db.ObjectId
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

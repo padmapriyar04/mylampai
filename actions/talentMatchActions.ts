@@ -16,6 +16,7 @@ export const getTalentMatches = async (userId: string) => {
   }
 };
 
+
 export const acceptTalentMatch = async (matchId: string) => {
   try {
     await prisma.talentMatch.update({
@@ -59,3 +60,18 @@ export const createTalentProfile = async (profileData: ProfileData) => {
     return "failed";
   }
 };
+
+export const getTalentProfiles = async (userId: string) => {
+  try {
+    const talentProfile = await prisma.talentProfile.findMany({
+      where: {
+        userId,
+      },
+    });
+
+    return talentProfile;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
