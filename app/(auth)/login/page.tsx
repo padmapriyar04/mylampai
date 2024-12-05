@@ -1,13 +1,4 @@
 "use client";
-
-// import NewLogin from "@/components/auth/newlogin";
-
-// export default function LoginPage() {
-//   return (
-//     <NewLogin />
-//   )
-// }
-
 import Link from "next/link";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
