@@ -132,8 +132,6 @@ export const verifyOTPandLogin = async ({
       },
     });
 
-    console.log("User ", user);
-
     let accessToken;
     try {
       accessToken = jwt.sign(

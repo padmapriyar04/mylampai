@@ -1,5 +1,4 @@
 "use client";
-
 import {
   BadgeCheck,
   Bell,
@@ -23,6 +22,7 @@ import { toast } from "sonner";
 import { useUserStore } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { removeCookie } from "@/utils/cookieUtils";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -39,7 +39,10 @@ export function NavUser() {
 
   const handleLogout = async () => {
     try {
-      
+      removeCookie("accessToken");
+      clearUser();
+      toast.success("Logged out successfully");
+      router.push("/");
     } catch (error) {
       console.error("Error during logout:", error);
     }
@@ -85,7 +88,7 @@ export function NavUser() {
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={handleUpgrade}>
             <Sparkles />
-            Upgrade to Pro
+            Upgrade to Premium
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

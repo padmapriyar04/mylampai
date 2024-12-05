@@ -62,7 +62,6 @@ export default function LoginPage() {
   const router = useRouter();
   const { data } = useSession();
   const { setUserData } = useUserStore();
-  console.log("data ", data);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -99,7 +98,11 @@ export default function LoginPage() {
 
   const sendOTPforLogin = async () => {
     try {
-      const res = await handleSendOTP(form.getValues("email"), "user");
+      const queryParams = new URLSearchParams(window.location.search);
+      const role =
+        queryParams.get("role") === "recruiter" ? "recruiter" : "user";
+
+      const res = await handleSendOTP(form.getValues("email"), role);
       if (res.otpSent) {
         toast.success(res.message);
       } else {
@@ -125,7 +128,9 @@ export default function LoginPage() {
     }
 
     const email = data.user.email as string;
-    const role = "user";
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const role = queryParams.get("role") === "recruiter" ? "recruiter" : "user";
 
     const handleLogin = async () => {
       const res = await nextAuthLogin({ email, role });
@@ -139,10 +144,10 @@ export default function LoginPage() {
       } else {
         toast.error(res.message);
       }
-      
+
       await signOut();
     };
-    
+
     handleLogin();
   }, [data, router, setUserData]);
 
@@ -160,7 +165,7 @@ export default function LoginPage() {
         </Link>
       </div>
       <div className="bg-white rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
-        <div className="justify-center items-center hidden md:flex w-full md:max-w-[350px] bg-primary rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
+        <div className="justify-evenly flex-col items-center hidden md:flex w-full md:max-w-[350px] bg-primary rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
           <div className="">
             <Image
               src={"/images/Globe.svg"}
@@ -170,6 +175,16 @@ export default function LoginPage() {
               height={100}
             />
           </div>
+          <Link href={"/login?role=recruiter"}>
+            <button className="bg-white text-primary p-2 rounded-sm font-semibold">
+              Login as Recruiter
+            </button>
+          </Link>
+          <Link href={"/login"}>
+            <button className="bg-white text-primary p-2 rounded-sm font-semibold">
+              Login as User
+            </button>
+          </Link>
         </div>
 
         <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 flex flex-col justify-center">
