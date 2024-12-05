@@ -1,5 +1,3 @@
-
-
 export default function TalentPoolPage() {
   return (
     <div>
@@ -7,7 +5,6 @@ export default function TalentPoolPage() {
       <div>
         <h2>Create Talent Pool</h2>
         {/* Create Talent Pool Form */}
-        
       </div>
     </div>
   );

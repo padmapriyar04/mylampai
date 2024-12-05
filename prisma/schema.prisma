@@ -28,6 +28,8 @@ model User {
   credits        Int             @default(0)
   isRegistered   Boolean         @default(false)
   interviews     Interview[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   // posts            Modules[]
   // communityIds     String[]        @db.ObjectId
   // communities      Community[]     @relation(fields: [communityIds], references: [id])
@@ -85,6 +87,8 @@ model TalentPool {
   locationPref      String
   experienceNeeded  String
   talents           TalentMatch[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 }
 
 model TalentMatch {
@@ -93,30 +97,37 @@ model TalentMatch {
   talent       User       @relation(fields: [talentId], references: [id], onDelete: Cascade)
   talentPoolId String     @db.ObjectId
   talentPool   TalentPool @relation(fields: [talentPoolId], references: [id], onDelete: Cascade)
+  isMatched    Boolean    @default(false)
+  isHired      Boolean    @default(false) 
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
 // for user
 model TalentProfile {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  resumeId           String   @db.ObjectId
-  interviewId        String   @db.ObjectId
-  skills             String[]
-  profiles           String[]
-  certifications     String[]
-  salaryExpectations String
-  loacationPref      String
-  experienceYears    String
-  userId             String   @unique @db.ObjectId
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  resumeId        String   @db.ObjectId
+  interviewId     String   @db.ObjectId
+  skills          String[]
+  profiles        String[]
+  certifications  String[]
+  expectedSalary  String
+  locationPref    String
+  experienceYears String
+  userId          String   @unique @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model CV {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   Resume         String
   JobDescription String
-  createdAt      DateTime @default(now())
   userId         String?  @db.ObjectId
   user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Interview {
@@ -129,10 +140,11 @@ model Interview {
   userId            String              @db.ObjectId
   messages          InterviewMessage[]
   isStarted         Boolean             @default(false)
-  createdAt         DateTime            @default(now())
   InterviewFeedback InterviewFeedback[]
   isCompleted       Boolean             @default(false)
   isFeedbackGiven   Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 }
 
 model InterviewMessage {
