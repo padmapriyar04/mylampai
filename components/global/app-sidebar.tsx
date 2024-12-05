@@ -14,7 +14,7 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/home",
       icons: [Bookmark, BookmarkMinus],
       isActive: true,
       items: [
@@ -34,7 +34,7 @@ const data = {
     },
     {
       title: "CV Reviewer",
-      url: "#",
+      url: "/cvreviewer",
       icons: [Bookmark, BookmarkMinus],
       items: [
         {
@@ -53,7 +53,7 @@ const data = {
     },
     {
       title: "Interview",
-      url: "#",
+      url: "/interview",
       icons: [Bookmark, BookmarkMinus],
       items: [
         {
@@ -75,8 +75,8 @@ const data = {
       ],
     },
     {
-      title: "Analytics",
-      url: "#",
+      title: "Talent Match",
+      url: "/talentmatch",
       icons: [Bookmark, BookmarkMinus],
       items: [
         {
@@ -98,8 +98,8 @@ const data = {
       ],
     },
     {
-      title: "Communnity",
-      url: "#",
+      title: "Talent Pool",
+      url: "/talentpool",
       icons: [Bookmark, BookmarkMinus],
       items: [
         {
@@ -123,7 +123,7 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar() {
 
   return (
     <div className="flex flex-col justify-between p-2">

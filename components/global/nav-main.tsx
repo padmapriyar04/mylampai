@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import React from "react";
 import { type LucideIcon } from "lucide-react";
 import {
@@ -28,16 +29,21 @@ export function NavMain({
         <div key={index} className="group">
           <TooltipProvider delayDuration={100}>
             <Tooltip>
-              <TooltipTrigger className=" flex flex-col w-full items-center">
-                {item.icons?.[0] &&
-                  React.createElement(item.icons[0], {
-                    className: "block group-hover:hidden",
-                  })}
-                {item.icons?.[1] &&
-                  React.createElement(item.icons[1], {
-                    className: "hidden group-hover:block",
-                  })}
-                <p className="text-[0.6rem]"> {item.title} </p>
+              <TooltipTrigger className="w-full">
+                <Link
+                  href={item.url}
+                  className="flex flex-col w-full items-center"
+                >
+                  {item.icons?.[0] &&
+                    React.createElement(item.icons[0], {
+                      className: "block group-hover:hidden",
+                    })}
+                  {item.icons?.[1] &&
+                    React.createElement(item.icons[1], {
+                      className: "hidden group-hover:block",
+                    })}
+                  <p className="text-[0.6rem]"> {item.title} </p>
+                </Link>
               </TooltipTrigger>
 
               <TooltipContent side="right">

@@ -21,7 +21,7 @@ export default async function ProtectedLayout({
 
   return (
     <>
-        <Page>{children}</Page>
+      <Page>{children}</Page>
     </>
   );
 }
