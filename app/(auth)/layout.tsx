@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Open_Sans } from "next/font/google";
-
-const openSans = Open_Sans({ subsets: ["latin"], display: "swap" });
+import { auth } from "@/lib/authlib";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "wiZe (myLampAI) | Login",
@@ -13,6 +12,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = auth();
+
+  if (user) {
+    redirect("/home");
+  }
+
   return (
     <>
       <main className="h-full">{children}</main>

@@ -1,8 +1,7 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import jwt from "jsonwebtoken";
 import type { Metadata } from "next";
 import { Page } from "@/components/global/Sidebar";
+import { auth } from "@/lib/authlib";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "wiZe (myLampAI)",
@@ -14,16 +13,9 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
-  const token = cookieStore.get("token");
+  const user = auth();
 
-  if (!token) redirect("/login");
-
-  try {
-    if (token.value)
-      jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
-    else redirect("/login");
-  } catch (error) {
+  if (!user) {
     redirect("/login");
   }
 

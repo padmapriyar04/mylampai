@@ -3,7 +3,7 @@ import prisma from "@/lib";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "@/lib/nodemailer";
 
-export const handleSendOTP = async (email: string, role: string) => {
+export const handleSendOTP = async (email: string, role: "user" | "recruiter") => {
   try {
     let user = await prisma.user.findUnique({
       where: {
@@ -58,14 +58,19 @@ export const handleSendOTP = async (email: string, role: string) => {
         message: "OTP sent successfully!",
         otpSent: true,
       };
+    } else {
+      return {
+        message: "Failed to send OTP",
+        otpSent: false,
+      };
     }
   } catch (error) {
     console.log("Error", error);
+    return {
+      message: "Internal Server Error",
+      otpSent: false,
+    };
   }
-  return {
-    message: "failed",
-    otpSent: false,
-  };
 };
 
 export const verifyOTPandLogin = async ({
@@ -77,7 +82,13 @@ export const verifyOTPandLogin = async ({
 }): Promise<{
   otpVerified: boolean;
   message?: string;
-  user?: { id: string; email: string };
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: "user" | "recruiter";
+    image: string;
+  };
   accessToken?: string;
 }> => {
   try {
@@ -121,15 +132,19 @@ export const verifyOTPandLogin = async ({
       },
     });
 
+    console.log("User ", user);
+
     let accessToken;
     try {
       accessToken = jwt.sign(
         {
           id: user.id,
+          name: user.name,
           email: user.email,
+          role: user.role,
         },
         process.env.JWT_SECRET as string,
-        { expiresIn: process.env.JWT_EXPIRATION || "70d" },
+        { expiresIn: process.env.JWT_EXPIRATION || "90d" }
       );
     } catch (err) {
       console.error("JWT generation error:", err);
@@ -143,7 +158,10 @@ export const verifyOTPandLogin = async ({
       otpVerified: true,
       user: {
         id: user.id,
-        email: user.email as string,
+        name: user.name as string,
+        email: user.email,
+        role: user.role as "user" | "recruiter",
+        image: user.image as string,
       },
       accessToken,
     };
@@ -156,12 +174,12 @@ export const verifyOTPandLogin = async ({
   }
 };
 
-export const handleNextAuthLogin = async ({
+export const nextAuthLogin = async ({
   email,
   role,
 }: {
   email: string;
-  role: string;
+  role: "user" | "recruiter";
 }) => {
   try {
     const user = await prisma.user.findUnique({
@@ -196,10 +214,10 @@ export const handleNextAuthLogin = async ({
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role,
+          role,
         },
         process.env.JWT_SECRET as string,
-        { expiresIn: process.env.JWT_EXPIRATION || "70d" },
+        { expiresIn: process.env.JWT_EXPIRATION || "90d" }
       );
     } catch (err) {
       console.error("JWT generation error:", err);
@@ -213,10 +231,10 @@ export const handleNextAuthLogin = async ({
       status: "success",
       user: {
         id: user.id,
-        name: user.name,
+        name: user.name as string,
         email: user.email,
-        role: user.role,
-        image: user.image,
+        role,
+        image: user.image as string,
       },
       accessToken,
     };
@@ -251,7 +269,7 @@ export const handleGoogleLogin = async ({ email }: { email: string }) => {
         role: user.role as string,
       },
       process.env.JWT_SECRET as string,
-      { expiresIn: "70d" },
+      { expiresIn: "70d" }
     );
 
     const response = {
