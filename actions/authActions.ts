@@ -40,7 +40,7 @@ export const handleSendOTP = async (email: string, role: "user" | "recruiter") =
 
     const sub = "Login | wiZe (myLampAI)";
     const html = `
-<h1> Hi ${user.name}, </h1>
+<h1> Hi ${user?.name}, </h1>
 <p> Your OTP is: <strong>${otp}</strong> </p>
 
 <p> This OTP is valid for 5 minutes. </p>

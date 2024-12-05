@@ -1,31 +1,13 @@
 "use client";
-
 import * as React from "react";
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
   Bookmark,
-  BookmarkMinus
+  BookmarkMinus,
 } from "lucide-react";
-import { useUserStore } from "@/utils/userStore";
 import { NavMain } from "@/components/global/nav-main";
-import { NavProjects } from "@/components/global/nav-projects";
 import { NavUser } from "@/components/global/nav-user";
-import { TeamSwitcher } from "@/components/global/team-switcher";
 import {
   Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
 } from "@/components/ui/sidebar";
 
 const data = {
@@ -142,12 +124,11 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { userData } = useUserStore();
 
   return (
     <div className="flex flex-col justify-between p-2">
       <NavMain items={data.navMain} />
-      <NavUser user={userData} />
+      <NavUser />
     </div>
   );
 }

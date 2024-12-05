@@ -8,12 +8,14 @@ export const metadata: Metadata = {
   description: "wiZe (myLampAI) - Your career builder",
 };
 
-export default function ProtectedLayout({
+export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = auth();
+  const user = await auth();
+
+  console.log("user", user);
 
   if (!user) {
     redirect("/login");

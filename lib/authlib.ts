@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
-export function auth() {
+export async function auth() {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken");
 

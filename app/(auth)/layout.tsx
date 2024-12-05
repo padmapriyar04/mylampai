@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   description: "wiZe (myLampAI) | Sign In/Up Page",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = auth();
+  const user = await auth();
 
   if (user) {
     redirect("/home");
