@@ -28,8 +28,6 @@ model User {
   credits        Int             @default(0)
   isRegistered   Boolean         @default(false)
   interviews     Interview[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
   // posts            Modules[]
   // communityIds     String[]        @db.ObjectId
   // communities      Community[]     @relation(fields: [communityIds], references: [id])
@@ -65,6 +63,13 @@ model Session {
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+// model VerificationToken {
+//   identifier String   @id @default(auto()) @map("_id") @db.ObjectId
+//   token      String   @unique
+//   expires    DateTime
+//   @@unique([identifier, token])
+// }
 
 model OTP {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -114,6 +119,7 @@ model TalentProfile {
   expectedSalary  String
   locationPref    String
   experienceYears String
+  availability    String
   userId          String   @db.ObjectId
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt       DateTime @default(now())
@@ -129,6 +135,7 @@ model CV {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
 
 model Interview {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
@@ -166,6 +173,7 @@ model InterviewFeedback {
   interviewId String    @db.ObjectId
   createdAt   DateTime  @default(now())
 }
+
 
 model NewsletterEmails {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId

@@ -6,7 +6,7 @@ import PDFViewer from "./StepThree";
 import { useUserStore } from "@/utils/userStore";
 import { toast } from "sonner";
 
-const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
+const baseUrl = "https://cv-judger.onrender.com";
 
 const Page: React.FC = () => {
   const {

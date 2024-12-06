@@ -3,7 +3,10 @@ import prisma from "@/lib";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "@/lib/nodemailer";
 
-export const handleSendOTP = async (email: string, role: "user" | "recruiter") => {
+export const handleSendOTP = async (
+  email: string,
+  role: "user" | "recruiter"
+) => {
   try {
     let user = await prisma.user.findUnique({
       where: {
@@ -40,7 +43,7 @@ export const handleSendOTP = async (email: string, role: "user" | "recruiter") =
 
     const sub = "Login | wiZe (myLampAI)";
     const html = `
-<h1> Hi ${user?.name}, </h1>
+<h1> Hi ${role === "recruiter" ? "recruiter" : "user"}, </h1>
 <p> Your OTP is: <strong>${otp}</strong> </p>
 
 <p> This OTP is valid for 5 minutes. </p>
@@ -180,7 +183,7 @@ export const nextAuthLogin = async ({
   role: "user" | "recruiter";
 }) => {
   try {
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: {
         email,
       },
@@ -194,7 +197,7 @@ export const nextAuthLogin = async ({
     }
 
     if (user?.emailVerified === null) {
-      await prisma.user.update({
+      user = await prisma.user.update({
         where: {
           email,
         },
@@ -212,7 +215,7 @@ export const nextAuthLogin = async ({
           id: user.id,
           name: user.name,
           email: user.email,
-          role,
+          role: user.role,
         },
         process.env.JWT_SECRET as string,
         { expiresIn: process.env.JWT_EXPIRATION || "90d" }
@@ -231,7 +234,7 @@ export const nextAuthLogin = async ({
         id: user.id,
         name: user.name as string,
         email: user.email,
-        role,
+        role: user.role as "user" | "recruiter",
         image: user.image as string,
       },
       accessToken,
