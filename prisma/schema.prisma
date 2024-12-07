@@ -214,6 +214,7 @@ model Interview {
   isStarted         Boolean             @default(false)
   createdAt         DateTime            @default(now())
   InterviewFeedback InterviewFeedback[]
+  Analysis           Analysis[]
 }
 
 model InterviewMessage {
@@ -235,3 +236,16 @@ model InterviewFeedback {
   interviewId String    @db.ObjectId
   createdAt   DateTime  @default(now())
 }
+model Analysis{
+  id                   String      @id @default(auto()) @map("_id") @db.ObjectId
+  Introduction Json    // or whatever type it should be
+  Project      Json
+  Coding       Json
+  Technical    Json
+  Outro        Json
+  createdAt    DateTime @default(now())
+  interview            Interview   @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  interviewId          String      @db.ObjectId
+  updatedAt            DateTime    @updatedAt
+}
+

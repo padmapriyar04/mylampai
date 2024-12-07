@@ -1,8 +1,10 @@
+"use client"
 import React, { useState, useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import FullScreenLoader from "@/components/global/FullScreenLoader";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import axios from "axios"
 import Image from "next/image";
 import {
   Chart as ChartJS,
@@ -14,6 +16,7 @@ import {
   Legend,
 } from "chart.js";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 ChartJS.register(
   CategoryScale,
@@ -23,6 +26,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
 
 interface LineAnalysis {
   line: string;
@@ -53,20 +57,107 @@ interface AnalysisProps {
   analysisData: AnalysisItem[];
 }
 
-const Analysis: React.FC<AnalysisProps> = ({ analysisData }) => {
+
+
+const Analysis: React.FC<AnalysisProps> =({ analysisData }) => {
   const [expandedSections, setExpandedSections] = useState<boolean[]>(
     analysisData ? analysisData.map(() => false) : []
-  );
+  );  
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (analysisData && analysisData.length > 0) {
       console.log("Received Analysis Data: ", analysisData);
+    
+     
       setExpandedSections(analysisData.map(() => false));
       setLoading(false);
     }
   }, [analysisData]);
+
+     const { interviewId } = useParams<{ interviewId: string }>();  
+     useEffect(() => {
+      if (analysisData && analysisData.length > 0) {
+        console.log('Received Analysis Data: ', analysisData);
+        setExpandedSections(analysisData.map(() => false)); // Initial state for expanded sections
+        setLoading(false); // Set loading to false once data is loaded
+      }
+    }, [analysisData]);
+  
+    const submitAnalysis = async () => {
+      if (!analysisData || !Array.isArray(analysisData)) {
+        console.error("Invalid analysis data:", analysisData);
+        return;
+      }
+    // const introductiondata=analysisData[0]?.analysis
+    // const secondintro=analysisData[1]?.analysis
+    // const thirdintro=analysisData[2]?.analysis;
+    // const fourthintro=analysisData[3]?.analysis
+    // const  fiveintro=analysisData[4]?.analysis
+    // const first=analysisData[0]?.answer
+    // const second=analysisData[1]?.analysis
+    // const third=analysisData[2]?.analysis
+    // const fourth=analysisData[3]?.analysis
+    // const five=analysisData[4]?.analysis
+    //   const body = {
+    //     interviewId,
+    //     Introduction:{
+    //       first,
+    //       ...introductiondata.line_analysis,
+    //        ...introductiondata.overall_assessment
+    //     },
+    //     Project:{
+    //       second,
+    //       ...secondintro.line_analysis,
+    //        ...secondintro.overall_assessment
+    //     },
+    //     Coding:{
+    //       third,
+    //       ...thirdintro.line_analysis,
+    //        ...thirdintro.overall_assessment
+    //     },
+    //     Technical:{
+    //       fourth,
+    //       ...fourthintro.line_analysis,
+    //        ...fourthintro.overall_assessment
+    //     },
+    //     Outro:{
+    //       five,
+    //       ...fiveintro.line_analysis,
+    //        ...fiveintro.overall_assessment
+    //     }
+    //   };
+    const body = {
+      interviewId,
+      ...['Introduction', 'Project', 'Coding', 'Technical', 'Outro'].reduce((acc:any, section, index) => {
+        const data = analysisData[index]?.analysis || {};
+        acc[section] = {
+          answer: analysisData[index]?.answer || '',
+          ...data.line_analysis,
+          ...data.overall_assessment,
+        };
+        return acc;
+      }, {}),
+    };
+      console.log("Final Body:", body);
+    
+      try {
+        const response = await axios.post("/api/interviewer/post_review", body);
+        console.log("Analysis submitted successfully:", response.data);
+      } catch (error) {
+        console.error("Error submitting analysis:", error);
+      }
+    };
+  
+    // Trigger submission on load or when `analysisData` or `interviewId` changes
+    useEffect(() => {
+      if (analysisData && Array.isArray(analysisData) && interviewId) {
+        submitAnalysis(); // Automatically submit when the data is available
+      }
+    }, [analysisData, interviewId]);
+  
+  
 
   if (loading) {
     return <FullScreenLoader message="Loading Analysis Data" />;
