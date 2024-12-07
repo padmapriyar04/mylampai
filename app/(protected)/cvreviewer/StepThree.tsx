@@ -24,7 +24,7 @@ import {
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const baseUrl = "https://ai-cv-review-b6ddhshaecbkcfau.centralindia-01.azurewebsites.net";
+const baseUrl = "https://cv-judger.onrender.com";
 
 interface PDFViewerProps {
   profile: string | null;

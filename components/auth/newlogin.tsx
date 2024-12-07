@@ -167,6 +167,7 @@ const AuthForm: React.FC = () => {
     }
 
     setIsSigningUp(true);
+    
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -178,7 +179,6 @@ const AuthForm: React.FC = () => {
           name: `${user.firstName} ${user.lastName}`,
           phone: user.phone,
           password: user.password,
-          role: "user",
         }),
       });
 
@@ -227,8 +227,8 @@ const AuthForm: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
 
-        setCookie("token", data.token, 7); // Set cookie for 7 days
-        setCookie("user", JSON.stringify(data.user), 7); // Set cookie for 7 days
+        setCookie("token", data.token, 7);
+        setCookie("user", JSON.stringify(data.user), 7);
 
         toast.success("Login successful!");
 

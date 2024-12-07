@@ -1,40 +1,27 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import jwt from "jsonwebtoken";
-import Navbar from "@/components/global/Navbar";
 import type { Metadata } from "next";
-import Sidebar from "@/components/global/Sidebar";
+import { Page } from "@/components/global/Sidebar";
+import { auth } from "@/lib/authlib";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "wiZe (myLampAI)",
   description: "wiZe (myLampAI) - Your career builder",
 };
 
-export default function ProtectedLayout({
+export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
-  const token = cookieStore.get("token");
+  const user = await auth();
 
-  if (!token) redirect("/login");
-
-  try {
-    if (token.value)
-      jwt.verify(token?.value as string, process.env.JWT_SECRET as string);
-    else redirect("/login");
-  } catch (error) {
+  if (!user) {
     redirect("/login");
   }
 
   return (
     <>
-      <Navbar />
-      <div className="flex w-full h-full">
-        <Sidebar />
-        {children}
-      </div>
+      <Page>{children}</Page>
     </>
   );
 }

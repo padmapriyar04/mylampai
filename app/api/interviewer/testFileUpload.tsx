@@ -18,9 +18,9 @@ const CreateCV = () => {
 
       reader.onload = () => {
         if (name === "cv") {
-          setResume(reader.result); // Assign the base64 string to the resume
+          setResume(reader.result);
         } else {
-          setJobDescription(reader.result); // Assign the base64 string to the job description
+          setJobDescription(reader.result); 
         }
       };
 
@@ -33,7 +33,7 @@ const CreateCV = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token"); // Assuming JWT is stored in localStorage
+    const token = localStorage.getItem("token");
     if (!token) {
       setMessage("Unauthorized: Please log in.");
       return;
@@ -47,7 +47,7 @@ const CreateCV = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          Resume: resume, // Send the base64 string
+          Resume: resume, 
           JobDescription: jobDescription,
         }),
       });

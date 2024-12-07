@@ -8,52 +8,34 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  email            String?         @unique
-  name             String?
-  emailVerified    DateTime?
-  image            String?
-  first_name       String?
-  last_name        String?
-  phone            String?
-  hashedPassword   String?
-  role             String?         @default("user")
-  userInfo         UserInfo?
-  posts            Modules[]
-  accounts         Account[]
-  communityIds     String[]        @db.ObjectId
-  communities      Community[]     @relation(fields: [communityIds], references: [id])
-  seenMessageIds   String[]        @db.ObjectId
-  seenMessages     Message[]       @relation("Seen", fields: [seenMessageIds], references: [id])
-  messages         Message[]
-  sentmessages     Directmessage[] @relation("SenderUser")
-  receivedMessages Directmessage[] @relation("ReceiverUser")
-  otps             OTP[]
-  cvs              CV[]
-  credits          Int?            @default(0)
-  isRegistered     Boolean?        @default(false)
-  interviews       Interview[]
-  sessions         Session[]
-}
-
-model OTP {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  otp       String   @unique
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-  verified  Boolean  @default(false)
-  userId    String?  @db.ObjectId
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model CV {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  Resume         String
-  JobDescription String
-  createdAt      DateTime @default(now())
-  userId         String?  @db.ObjectId
-  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  email          String          @unique
+  name           String?
+  emailVerified  DateTime?
+  image          String?
+  first_name     String?
+  last_name      String?
+  phone          String?
+  hashedPassword String?
+  role           String          @default("user")
+  talentPool     TalentPool[]
+  talentProfile  TalentProfile[]
+  TalentMatch    TalentMatch[]
+  accounts       Account[]
+  sessions       Session[]
+  otps           OTP[]
+  cvs            CV[]
+  credits        Int             @default(0)
+  isRegistered   Boolean         @default(false)
+  interviews     Interview[]
+  // posts            Modules[]
+  // communityIds     String[]        @db.ObjectId
+  // communities      Community[]     @relation(fields: [communityIds], references: [id])
+  // seenMessageIds   String[]        @db.ObjectId
+  // seenMessages     Message[]       @relation("Seen", fields: [seenMessageIds], references: [id])
+  // messages         Message[]
+  // sentmessages     Directmessage[] @relation("SenderUser")
+  // receivedMessages Directmessage[] @relation("ReceiverUser")
 }
 
 model Account {
@@ -82,125 +64,78 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model VerificationToken {
-  identifier String   @id @default(auto()) @map("_id") @db.ObjectId
-  token      String   @unique
-  expires    DateTime
+// model VerificationToken {
+//   identifier String   @id @default(auto()) @map("_id") @db.ObjectId
+//   token      String   @unique
+//   expires    DateTime
+//   @@unique([identifier, token])
+// }
 
-  @@unique([identifier, token])
-}
-
-model UserInfo {
-  id                     String  @id @default(auto()) @map("_id") @db.ObjectId
-  country                String?
-  college                String?
-  degree                 String?
-  branch                 String?
-  areaOfStudy            String?
-  expectedGraduationDate String?
-  goal                   String?
-  skills                 String?
-  headline               String?
-  userId                 String  @unique @db.ObjectId
-  user                   User    @relation(fields: [userId], references: [id])
-}
-
-model Modules {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  Module_Name    String     @unique
-  No_of_Chapters String
-  No_of_Lessons  String
-  No_of_Weeks    String
-  No_of_Credits  String
-  Projects       String
-  author         User       @relation(fields: [authorId], references: [id])
-  authorId       String     @db.ObjectId
-  chapters       Chapters[]
-}
-
-model Chapters {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  Chapter_Name String
-  Lessons      String
-  chapter      Modules  @relation(fields: [chapterId], references: [id])
-  chapterId    String   @db.ObjectId
-  lessons      Lesson[]
-}
-
-model Lesson {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  Lesson_Name   String
-  lab           String?
-  content_url   String
-  video_url     String
-  Assesment_url String
-  chapter       Chapters @relation(fields: [chapterId], references: [id])
-  chapterId     String   @db.ObjectId
-}
-
-model Community {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt     DateTime  @default(now())
-  lastmessageAt DateTime  @default(now())
-  name          String    @unique
-  description   String?
-  isCommunity   Boolean?
-  comm_type     String
-  messagesIds   String?   @db.ObjectId
-  messages      Message[]
-  userIds       String[]  @db.ObjectId
-  users         User[]    @relation(fields: [userIds], references: [id])
-}
-
-model Message {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  content     String
-  type        String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  seenIds     String[]  @db.ObjectId
-  seen        User[]    @relation("Seen", fields: [seenIds], references: [id])
-  communityId String    @db.ObjectId
-  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  senderId    String    @db.ObjectId
-  sender      User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
-}
-
-model Directmessage {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  content    String
-  createdAt  DateTime @default(now())
-  seen       Boolean?
-  receiverId String   @db.ObjectId
-  receiver   User     @relation("ReceiverUser", fields: [receiverId], references: [id], onDelete: Cascade)
-  senderId   String   @db.ObjectId
-  sender     User     @relation("SenderUser", fields: [senderId], references: [id], onDelete: Cascade)
-}
-
-model Blog {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String
-  authorName  String
-  position    String
-  sections    Section[]
-  image       String
-}
-
-model Section {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  blogId     String @db.ObjectId
-  subheading String
-  content    String
-  blog       Blog   @relation(fields: [blogId], references: [id])
-}
-
-model NewsletterEmails {
+model OTP {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String
+  email     String   @unique
+  otp       String   @unique
+  expiresAt DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+// for recruiter
+model TalentPool {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String        @db.ObjectId
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills           String[]
+  profiles         String[]
+  salary           String
+  locationPref     String
+  experienceNeeded String
+  talents          TalentMatch[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model TalentMatch {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  talentId     String     @db.ObjectId
+  talent       User       @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  talentPoolId String     @db.ObjectId
+  talentPool   TalentPool @relation(fields: [talentPoolId], references: [id], onDelete: Cascade)
+  isMatched    Boolean    @default(false)
+  isHired      Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+// for user
+model TalentProfile {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  resumeId        String   @db.ObjectId
+  interviewId     String   @db.ObjectId
+  skills          String[]
+  profiles        String[]
+  certifications  String[]
+  expectedSalary  String
+  locationPref    String
+  experienceYears String
+  availability    String
+  userId          String   @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CV {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  Resume         String
+  JobDescription String
+  userId         String?  @db.ObjectId
+  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 
 model Interview {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
@@ -212,9 +147,14 @@ model Interview {
   userId            String              @db.ObjectId
   messages          InterviewMessage[]
   isStarted         Boolean             @default(false)
-  createdAt         DateTime            @default(now())
-  InterviewFeedback InterviewFeedback[]
+  InterviewFeedback InterviewFeedback
+  
   Analysis           Analysis[]
+
+  isCompleted       Boolean             @default(false)
+  isFeedbackGiven   Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 }
 
 model InterviewMessage {
@@ -236,6 +176,7 @@ model InterviewFeedback {
   interviewId String    @db.ObjectId
   createdAt   DateTime  @default(now())
 }
+
 model Analysis{
   id                   String      @id @default(auto()) @map("_id") @db.ObjectId
   Introduction Json    // or whatever type it should be
@@ -248,4 +189,101 @@ model Analysis{
   interviewId          String      @db.ObjectId
   updatedAt            DateTime    @updatedAt
 }
+
+model NewsletterEmails {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// model Modules {
+//   id             String     @id @default(auto()) @map("_id") @db.ObjectId
+//   Module_Name    String     @unique
+//   No_of_Chapters String
+//   No_of_Lessons  String
+//   No_of_Weeks    String
+//   No_of_Credits  String
+//   Projects       String
+//   author         User       @relation(fields: [authorId], references: [id])
+//   authorId       String     @db.ObjectId
+//   chapters       Chapters[]
+// }
+
+// model Chapters {
+//   id           String   @id @default(auto()) @map("_id") @db.ObjectId
+//   Chapter_Name String
+//   Lessons      String
+//   chapter      Modules  @relation(fields: [chapterId], references: [id])
+//   chapterId    String   @db.ObjectId
+//   lessons      Lesson[]
+// }
+
+// model Lesson {
+//   id            String   @id @default(auto()) @map("_id") @db.ObjectId
+//   Lesson_Name   String
+//   lab           String?
+//   content_url   String
+//   video_url     String
+//   Assesment_url String
+//   chapter       Chapters @relation(fields: [chapterId], references: [id])
+//   chapterId     String   @db.ObjectId
+// }
+
+// model Community {
+//   id            String    @id @default(auto()) @map("_id") @db.ObjectId
+//   createdAt     DateTime  @default(now())
+//   lastmessageAt DateTime  @default(now())
+//   name          String    @unique
+//   description   String?
+//   isCommunity   Boolean?
+//   comm_type     String
+//   messagesIds   String?   @db.ObjectId
+//   messages      Message[]
+//   userIds       String[]  @db.ObjectId
+//   users         User[]    @relation(fields: [userIds], references: [id])
+// }
+
+// model Message {
+//   id          String    @id @default(auto()) @map("_id") @db.ObjectId
+//   content     String
+//   type        String
+//   createdAt   DateTime  @default(now())
+//   updatedAt   DateTime  @updatedAt
+//   seenIds     String[]  @db.ObjectId
+//   seen        User[]    @relation("Seen", fields: [seenIds], references: [id])
+//   communityId String    @db.ObjectId
+//   community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+//   senderId    String    @db.ObjectId
+//   sender      User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+// }
+
+// model Directmessage {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   content    String
+//   createdAt  DateTime @default(now())
+//   seen       Boolean?
+//   receiverId String   @db.ObjectId
+//   receiver   User     @relation("ReceiverUser", fields: [receiverId], references: [id], onDelete: Cascade)
+//   senderId   String   @db.ObjectId
+//   sender     User     @relation("SenderUser", fields: [senderId], references: [id], onDelete: Cascade)
+// }
+
+// model Blog {
+//   id          String    @id @default(auto()) @map("_id") @db.ObjectId
+//   title       String
+//   description String
+//   authorName  String
+//   position    String
+//   sections    Section[]
+//   image       String
+// }
+
+// model Section {
+//   id         String @id @default(auto()) @map("_id") @db.ObjectId
+//   blogId     String @db.ObjectId
+//   subheading String
+//   content    String
+//   blog       Blog   @relation(fields: [blogId], references: [id])
+// }
 

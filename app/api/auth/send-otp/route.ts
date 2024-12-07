@@ -13,9 +13,6 @@ export async function POST(req: Request) {
       );
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
@@ -25,6 +22,9 @@ export async function POST(req: Request) {
         },
       });
     }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
     await prisma.oTP.upsert({
       where: { email },

@@ -1,5 +1,5 @@
 import { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import GoogleProvider, { GoogleProfile } from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import LinkedInProvider, {
   LinkedInProfile,
@@ -37,21 +37,21 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({user, account, profile}) {
-      const url = account?.url as string;
-      console.log(url)
-      const isRecruiter = url?.includes("role=recruiter");
-      user.role = isRecruiter ? "RECRUITER" : "STUDENT";
+    async signIn({ user, account, profile }) {
+      // const url = account?.url as string;
+      // console.log(url)
+      // const isRecruiter = url?.includes("role=recruiter");
+      // user.role = isRecruiter ? "RECRUITER" : "STUDENT";
       return true;
     },
-    async session({ session, token }) {
-      session.user.role = token.role || "STUDENT";
-      return session;
-    },
-    async jwt({ token, account, user }) {
-      if (account && user) token.role = user.role || "STUDENT";
-      return token;
-    },
+    // async session({ session, token }) {
+    //   session.user.role = token.role || "STUDENT";
+    //   return session;
+    // },
+    // async jwt({ token, account, user }) {
+    //   if (account && user) token.role = user.role || "STUDENT";
+    //   return token;
+    // },
   },
   session: {
     strategy: "jwt",
