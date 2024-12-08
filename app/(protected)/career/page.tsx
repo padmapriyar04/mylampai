@@ -12,7 +12,7 @@ import {
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { getJobs } from "@/actions/careerActions";
-import { Job } from "./job";
+import { Job } from "./jobCard";
 
 type Job = {
   id: string;

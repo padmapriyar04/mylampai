@@ -191,21 +191,21 @@ enum JobStatus {
 
 model QualifiedRounds {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  score          Int
-  JobCandidate   JobCandidate? @relation(fields: [jobCandidateId], references: [id], onDelete: Cascade)
+  score          Int?
   jobCandidateId String?       @db.ObjectId
-  JobRound       JobRound?     @relation(fields: [jobRoundId], references: [id], onDelete: Cascade)
+  JobCandidate   JobCandidate? @relation(fields: [jobCandidateId], references: [id], onDelete: Cascade)
   jobRoundId     String?       @db.ObjectId
+  JobRound       JobRound?     @relation(fields: [jobRoundId], references: [id], onDelete: Cascade)
 }
 
 model CV {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
   Resume         String
   JobDescription String
-  userId         String?  @db.ObjectId
-  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  userId         String?      @db.ObjectId
+  user           User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 model Interview {

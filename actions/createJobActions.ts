@@ -1,5 +1,6 @@
 "use server";
 import prisma from "@/lib/index";
+import { auth } from "@/lib/authlib";
 
 type JobDataType = {
   jobTitle: string;
@@ -32,16 +33,16 @@ export const createJob = async (jobData: JobDataType, userId: string) => {
   }
 };
 
-type RoundType = {
+type RoundsType = {
   roundName: string;
   roundNumber: number;
   details: string;
   roundType: string;
   roundDate: Date;
   jobProfileId: string;
-};
+}[];
 
-export const addRounds = async (rounds: RoundType[]) => {
+export const addRounds = async (rounds: RoundsType) => {
   try {
     await prisma.jobRound.createMany({
       data: rounds,
@@ -54,22 +55,37 @@ export const addRounds = async (rounds: RoundType[]) => {
   }
 };
 
-type CandidateDataType = {
-  candidateId: string;
-  score: number;
+type CandidateType = {
+  jobCandidateId: string;
+  jobRoundId: string;
 };
 
-export const updateCandidates = async (
-  candidates: CandidateDataType[],
-  jobRoundId: string,
-  jobProfileId: string
+export const shortCandidates = async (candidates: CandidateType[]) => {
+  try {
+    await prisma.qualifiedRounds.createMany({
+      data: candidates,
+    });
+    return "success";
+  } catch (error) {
+    console.error(error);
+    return "failed";
+  }
+};
+
+export const updateJobStatus = async (
+  candidatesId: string[],
+  status: "REJECTED" | "SELECTED"
 ) => {
   try {
-    const candidateData = candidates.map((candidate) => {
-      return {
-        ...candidate,
-        jobRoundId,
-      };
+    await prisma.jobCandidate.updateMany({
+      where: {
+        id: {
+          in: candidatesId,
+        },
+      },
+      data: {
+        status,
+      },
     });
 
     return "success";
@@ -79,15 +95,34 @@ export const updateCandidates = async (
   }
 };
 
-export const updateJobStatus = async (
-  jobProfileId: string,
-  status: string,
-  candidates: CandidateDataType[]
-) => {
+export const getRecruiterJobs = async () => {
   try {
-    return "success";
+    const user = await auth();
+
+    if (!user) {
+      return { status: "failed", message: "User not found" };
+    }
+
+    const jobs = await prisma.jobProfile.findMany({
+      where: {
+        userId: user.id,
+      },
+      select: {
+        id: true,
+        jobTitle: true,
+        jobRole: true,
+        company: true,
+        startDate: true,
+        skills: true,
+        salary: true,
+        location: true,
+        availability: true,
+      },
+    });
+
+    return { status: "success", data: jobs };
   } catch (error) {
-    console.error(error);
-    return "failed";
+    console.log(error);
+    return { status: "failed", message: "Internal Server Error" };
   }
 };

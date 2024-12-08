@@ -1,31 +1,60 @@
 "use server";
 import prisma from "@/lib/index";
+import { auth } from "@/lib/authlib";
 
-type CandidateDataType = {
-  candidateId: string;
-  score: number;
-  jobProfileId: string;
-};
-
-export const applyJob = async (candidateData: CandidateDataType) => {
+export const applyJob = async (jobProfileId: string) => {
   try {
+    const user = await auth();
+
+    if (!user) {
+      return {
+        status: "failed",
+        message: "User not found",
+      };
+    }
+
     await prisma.jobCandidate.create({
       data: {
-        ...candidateData,
+        jobProfileId,
+        candidateId: user.id,
       },
     });
 
-    return "success";
+    return {
+      status: "success",
+      message: "Applied successfully",
+    };
   } catch (error) {
     console.error(error);
-    return "failed";
+    return {
+      status: "failed",
+      message: "Internal server error",
+    };
+  }
+};
+
+export const getJob = async (jodId: string) => {
+  try {
+    const job = await prisma.jobProfile.findFirst({
+      where: {
+        id: jodId,
+      },
+      include: {
+        rounds: true,
+      },
+    });
+
+    return job;
+  } catch (error) {
+    console.log(error);
+    return null;
   }
 };
 
 export const getJobs = async (page: number) => {
   try {
     const jobs = await prisma.jobProfile.findMany({
-      skip: (page - 1) * 10,
+      skip: (page - 1) * 20,
       take: 10,
       orderBy: {
         createdAt: "desc",
@@ -42,7 +71,7 @@ export const getJobs = async (page: number) => {
         skills: true,
         availability: true,
         salary: true,
-      }
+      },
     });
 
     return jobs;

@@ -68,7 +68,6 @@ const formSchema = z.object({
 });
 
 export default function JobForm() {
-    console.log("Hello world")
   const { userData } = useUserStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -92,6 +91,7 @@ export default function JobForm() {
       if (!userData) return;
 
       const res = await createJob(values, userData.id);
+      
       if (res === "success") {
         form.reset();
         toast.success("Job created successfully");

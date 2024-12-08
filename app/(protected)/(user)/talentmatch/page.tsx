@@ -33,6 +33,7 @@ import {
   profileDataSchema,
 } from "@/schemas/talentMatchSchema";
 import { ArrayInput } from "@/components/misc/ArrayInput";
+import { TalentProfileCard } from "./TalentProfileCard";
 
 type TalentMatchType = {
   id: string;
@@ -53,6 +54,7 @@ type TalentProfileType = {
   expectedSalary: string;
   locationPref: string;
   experienceYears: string;
+  availability: string
 };
 
 export default function TalentMatchPage() {
@@ -119,10 +121,12 @@ export default function TalentMatchPage() {
 
     const fetchTalentProfile = async (userId: string) => {
       try {
+        console.log("fetching talent profiles");
         const profiles = await getTalentProfiles(userId);
 
         if (profiles) {
           setTalentProfiles(profiles);
+          console.log(profiles);
         }
       } catch (error) {
         console.error(error);
@@ -138,6 +142,12 @@ export default function TalentMatchPage() {
       <h1>Talent Match</h1>
       <div>
         <h2>Matches</h2>
+      </div>
+      <div>
+        Talent Profile
+        {talentProfiles.map((profile) => (
+          <TalentProfileCard key={profile.id} profile={profile} />
+        ))}
       </div>
       <div>
         <h2>Create Talent Profile</h2>
