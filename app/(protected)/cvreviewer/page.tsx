@@ -86,6 +86,7 @@ const Page: React.FC = () => {
       const response = await fetch(`${baseUrl}/extract_text_from_file`, {
         method: "POST",
         body: formData,
+  
       });
       const result = await response.json();
       return result.text || ""; // Adjust this depending on your API response structure

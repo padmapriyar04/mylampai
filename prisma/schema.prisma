@@ -147,7 +147,10 @@ model Interview {
   userId            String              @db.ObjectId
   messages          InterviewMessage[]
   isStarted         Boolean             @default(false)
-  InterviewFeedback InterviewFeedback[]
+  InterviewFeedback InterviewFeedback
+  
+  Analysis           Analysis[]
+
   isCompleted       Boolean             @default(false)
   isFeedbackGiven   Boolean             @default(false)
   createdAt         DateTime            @default(now())
@@ -174,6 +177,18 @@ model InterviewFeedback {
   createdAt   DateTime  @default(now())
 }
 
+model Analysis{
+  id                   String      @id @default(auto()) @map("_id") @db.ObjectId
+  Introduction Json    // or whatever type it should be
+  Project      Json
+  Coding       Json
+  Technical    Json
+  Outro        Json
+  createdAt    DateTime @default(now())
+  interview            Interview   @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  interviewId          String      @db.ObjectId
+  updatedAt            DateTime    @updatedAt
+}
 
 model NewsletterEmails {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -271,3 +286,4 @@ model NewsletterEmails {
 //   content    String
 //   blog       Blog   @relation(fields: [blogId], references: [id])
 // }
+

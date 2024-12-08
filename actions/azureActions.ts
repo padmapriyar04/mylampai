@@ -3,6 +3,7 @@ import {
   StorageSharedKeyCredential,
   generateBlobSASQueryParameters,
   BlobSASPermissions,
+  BlobServiceClient,
 } from "@azure/storage-blob";
 
 const accountName = process.env.AZURE_ACCOUNT_NAME || "";
@@ -30,6 +31,7 @@ export const generateSasToken = async (blobName: string) => {
       sasOptions,
       sharedKeyCredential,
     ).toString();
+    
     return `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
   } catch (error) {
     console.error("Error generating SAS token:", error);
@@ -60,3 +62,15 @@ export const generateSasUrlForInterview = async () => {
     return null;
   }
 };
+export const uploadLargeFile=async(file:File)=>{
+  const blobServiceClient = BlobServiceClient.fromConnectionString("<your-connection-string>");
+  const containerClient = blobServiceClient.getContainerClient("<your-container>");
+  const blobClient = containerClient.getBlockBlobClient(file.name);
+
+  await blobClient.uploadBrowserData(file, {
+      maxSingleShotSize: 4 * 1024 * 1024, // Set max chunk size (4 MB here)
+      concurrency: 5, // Set parallel uploads
+  });
+
+  console.log("Upload successful!");
+}

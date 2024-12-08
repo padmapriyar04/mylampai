@@ -1,5 +1,6 @@
 "use server";
 import prisma from "@/lib";
+import { NextRequest, NextResponse } from "next/server";
 
 export const getInterviews = async (userId: string) => {
   try {
@@ -299,4 +300,56 @@ export const submitFeedback = async ({
     status: "failed",
     message: "Internal Server Error",
   };
+};
+export const submitanalysis = async (req: NextRequest) => {
+  try {
+    const body = await req.json();
+
+    const {
+      Introduction = [],
+      Project = [],
+      Coding = [],
+      Technical = [],
+      Outro = [],
+      interviewId,
+    } = body;
+    if (!interviewId) {
+      return NextResponse.json(
+        { error: "Missing required field: interviewId" },
+        { status: 400 }
+      );
+    }
+    const response = await prisma.analysis.create({
+      data: {
+        Introduction,
+        Project,
+        Coding,
+        Technical,
+        Outro,
+        interviewId,
+      },
+    });
+    return NextResponse.json({ success: true, data: response }, { status: 200 });
+  } catch (error) {
+    console.error("Error in submitAnalysis:", error);
+    return NextResponse.json(
+      { success: false|| "Internal server error" },
+      { status: 500 }
+    );
+  }
+};
+
+export const getanalysis = async (interviewId: string) => {
+  try {
+    if (!interviewId) return [];
+
+    const interviews = await prisma.analysis.findMany({
+      where: { interviewId },
+    });
+
+    return interviews;
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+  return [];
 };
