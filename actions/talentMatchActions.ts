@@ -16,7 +16,6 @@ export const getTalentMatches = async (userId: string) => {
   }
 };
 
-
 export const acceptTalentMatch = async (matchId: string) => {
   try {
     await prisma.talentMatch.update({
@@ -74,4 +73,4 @@ export const getTalentProfiles = async (userId: string) => {
     console.error(error);
     return [];
   }
-}
+};

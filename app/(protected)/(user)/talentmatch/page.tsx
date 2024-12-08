@@ -41,7 +41,6 @@ type TalentMatchType = {
   profiles: string[];
   salary: string;
   locationPref: string;
-  experienceNeeded: string;
 };
 
 type TalentProfileType = {

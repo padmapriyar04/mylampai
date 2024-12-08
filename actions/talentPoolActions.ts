@@ -1,12 +1,37 @@
 "use server";
 import prisma from "@/lib";
+import { auth } from "@/lib/authlib";
 
 type UserMatchIdsType = {
   talentPoolId: string;
   talentIds: string[];
 };
 
-export const getTalentPoolData = async (talentPoolId: string, userId: string) => {
+export const getRecruiterTalentPool = async () => {
+  try {
+    const user = await auth();
+
+    if (!user) {
+      return [];
+    }
+
+    const talentPools = await prisma.talentPool.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    return talentPools;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+export const getTalentPoolData = async (
+  talentPoolId: string,
+  userId: string
+) => {
   try {
     const talentPoolData = await prisma.talentPool.findFirst({
       where: {
@@ -19,9 +44,8 @@ export const getTalentPoolData = async (talentPoolId: string, userId: string) =>
         profiles: true,
         salary: true,
         locationPref: true,
-        experienceNeeded: true,
         talents: true,
-      }
+      },
     });
 
     return talentPoolData;
@@ -48,13 +72,41 @@ export const getTalentPoolsData = async (targetPoolIds: string[]) => {
   }
 };
 
+type TalentPoolDataType = {
+  skills: string[];
+  profiles: string[];
+  salary: string;
+  locationPref: string;
+};
+
+export const matchTalentProfile = async (
+  talentPoolData: TalentPoolDataType
+) => {
+  try {
+    const matches = await prisma.talentProfile.findMany({
+      where: {
+        AND: [
+          { skills: { hasSome: talentPoolData.skills } },
+          { profiles: { hasSome: talentPoolData.profiles } },
+          { expectedSalary: { lte: talentPoolData.salary } },
+          { locationPref: { equals: talentPoolData.locationPref } },
+        ],
+      },
+    });
+
+    return matches;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
 type TalentPoolType = {
   userId: string;
   skills: string[];
   profiles: string[];
   salary: string;
   locationPref: string;
-  experienceNeeded: string;
 };
 
 export const createTalentPool = async (talentPool: TalentPoolType) => {
