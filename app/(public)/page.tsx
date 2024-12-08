@@ -22,8 +22,8 @@ interface SectionWrapperProps {
 const SectionWrapper = ({ children }: SectionWrapperProps) => {
   const controls = useAnimation();
   const { ref, inView } = useInView({
-    triggerOnce: false, // This makes the animation trigger every time
-    threshold: 0.1, // Adjust this to control when the animation triggers
+    triggerOnce: false,
+    threshold: 0.1,
   });
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const SectionWrapper = ({ children }: SectionWrapperProps) => {
       animate={controls}
       variants={{
         hidden: { opacity: 0, y: 50 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
       }}
     >
       {children}
@@ -61,7 +61,7 @@ export default function Page() {
         <SectionWrapper><HeroSection /></SectionWrapper>
         <SectionWrapper><AboutWize /></SectionWrapper>
         <SectionWrapper><WizeCamp /></SectionWrapper>
-        <SectionWrapper><HomeSlider /></SectionWrapper>
+        {/* <SectionWrapper><HomeSlider /></SectionWrapper> */}
         <WhyWize />
         <SectionWrapper><BackedByBest /></SectionWrapper>
         <SectionWrapper><PowerOfWize /></SectionWrapper>

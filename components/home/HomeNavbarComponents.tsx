@@ -6,8 +6,8 @@ import Image from "next/image";
 
 export function CommunityComponent() {
   return (
-    <div className="hover:bg-primary-foreground focus:bg-primary-foreground group relative transition-all py-2 px-4 rounded-full duration-300 ">
-      Community
+    <div className="hover:bg-primary-foreground focus:bg-primary-foreground group relative transition-all py-2 px-4 rounded-lg duration-300 ">
+      Talent
       <div className="max-h-0 flex flex-col items-center overflow-hidden opacity-0 scale-75 transition-all duration-500 group-hover:max-h-screen group-focus:max-h-screen group-hover:opacity-100 group-hover:scale-100 group-focus:flex group-focus:opacity-100 group-focus:scale-100 absolute top-[110%] left-0 bg-[#f9f9f9] w-[180px] rounded-xl shadow-[0px_0px_1px_rgba(0,0,0,0.3)] px-2">
         <Link
           href={"/community"}
@@ -143,14 +143,14 @@ export function ResourcesComponent() {
         setEmail("");
       }
     } catch (err) {
-      toast.error("Failed")
+      toast.error("Failed");
       console.log(err);
     }
   };
 
   return (
-    <div className="hover:bg-primary-foreground group relative focus:bg-primary-foreground transition-all py-2 px-4 rounded-full duration-300 hover:transform ">
-      Resources
+    <div className="hover:bg-primary-foreground group relative focus:bg-primary-foreground transition-all py-2 px-4 rounded-lg duration-300 hover:transform ">
+      Recruiter
       <div className="max-h-0 group-hover:max-h-screen group-focus:max-h-screen flex flex-col items-center overflow-hidden opacity-0 scale-75 transition-all duration-500 group-hover:height-auto group-hover:opacity-100 group-hover:scale-100 group-focus:flex group-focus:opacity-100 group-focus:scale-100 absolute top-[110%] left-0 bg-[#f9f9f9] w-[180px] rounded-xl shadow-[0px_0px_1px_rgba(0,0,0,0.3)] font-normal px-2">
         <form
           onSubmit={handleSubmit}
@@ -187,9 +187,9 @@ export function ResourcesComponent() {
 
 export function CompanyComponent() {
   return (
-    <div className="hover:bg-primary-foreground focus:bg-primary-foreground relative group transition-all py-2 px-4 rounded-full duration-300 hover:transform ">
-      Company
-      <div className="max-h-0 group-hover:max-h-screen group-focus:max-h-screen flex flex-col items-center overflow-hidden opacity-0 scale-75 transition-all duration-500 group-hover:height-auto group-hover:opacity-100 group-hover:scale-100 group-focus:flex group-focus:opacity-100 group-focus:scale-100 absolute top-[110%] left-0 bg-[#f9f9f9] w-[180px] rounded-xl shadow-[0px_0px_1px_rgba(0,0,0,0.3)] font-normal px-2">
+    <div className="hover:bg-primary-foreground focus:bg-primary-foreground group transition-all py-2 px-4 rounded-lg duration-300 hover:transform ">
+      About
+      <div className="max-h-0 max-w-full group-hover:max-h-screen group-focus:max-h-screen flex flex-col items-center overflow-hidden opacity-0 scale-75 transition-all duration-500 group-hover:height-auto group-hover:opacity-100 group-hover:scale-100 group-focus:flex group-focus:opacity-100 group-focus:scale-100 absolute top-[110%] left-0 bg-[#f9f9f9] rounded-xl shadow-[0px_0px_1px_rgba(0,0,0,0.3)] font-normal px-2">
         <Link
           href={"/aboutus"}
           className="hover:bg-primary-foreground w-full p-2 rounded-lg duration-400 text-center mt-2"

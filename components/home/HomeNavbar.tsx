@@ -2,7 +2,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import { useUserStore } from "@/utils/userStore";
 
 import {
@@ -12,87 +11,49 @@ import {
 } from "./HomeNavbarComponents";
 
 const HomeNavbar = () => {
-  const { data: session } = useSession();
-  const [scroll, setScroll] = useState(false);
   const { userData } = useUserStore();
   const [initials, setInitials] = useState("Profile");
 
-  const handleScroll = () => {
-    if (window.scrollY > 80) {
-      setScroll(true);
-    } else {
-      setScroll(false);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   useEffect(() => {
     const getUserInitials = () => {
-      if (userData) {
-        let name = userData.name;
-        if (!name) {
-          return "Profile";
-        }
-        let arr = name?.trim().split(" ");
+      if (!userData?.name) return "Profile";
 
-        let initials = "";
+      let name = userData.name;
 
-        for (let i = 0; i < arr.length; i++) {
-          if (arr[i].length > 0) initials += arr[i][0].toUpperCase();
-        }
+      let arr = name?.trim().split(" ");
 
-        return initials;
-      } else if (session) {
-        let name = session.user.name;
+      let initials = "";
 
-        if (!name) {
-          return "Profile";
-        }
-        let arr = name.trim().split(" ");
-
-        let initials = "";
-
-        for (let i = 0; i < arr.length; i++) {
-          if (arr[i].length > 0) initials += arr[i][0].toUpperCase();
-        }
-
-        return initials;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].length > 0) initials += arr[i][0].toUpperCase();
       }
-      return "";
+
+      return initials;
     };
 
     setInitials(getUserInitials);
-  }, [userData, session]);
+  }, [userData]);
 
   return (
     <div
-      className={`flex justify-between items-center gap-4 ${
-        !scroll ? "bg-primary-foreground" : "bg-[#ffffff20]"
-      } backdrop-blur-sm transition pr-8 sticky top-0 w-full z-50 min-h-[64px]`}
+      className={`flex justify-between items-center gap-4 bg-[#ffffff20] backdrop-blur-sm transition px-8 fixed top-0 w-full z-50 min-h-[64px]`}
     >
       <Link
         href={"/"}
-        className="grid place-items-center max-w-[220px] w-full"
+        className="flex items-center h-11 overflow-hidden max-w-[150px] w-full"
       >
         <Image
-          src={"/home/logo.svg"}
+          src={"/home/navbar/wizelogo.svg"}
           height={100}
           width={180}
           alt="logo"
-          className="w-full h-auto drop-shadow-md"
+          className="w-auto h-full drop-shadow-md"
         />
       </Link>
-      <div className="md:flex hidden justify-between bg-[#ffffff90] items-center w-full max-w-[600px] gap-1 pr-2 my-2 pl-4 py-2 min-h-[40px] backdrop-blur-md font-medium rounded-full shadow-sm">
+      <div className="md:flex relative text-sm hidden justify-between border items-center w-full max-w-[600px] gap-1 px-[5px] my-2 min-h-[45px] backdrop-blur-md font-medium rounded-lg shadow-sm">
         <Link
           href={"/"}
-          className="transition-all py-2 px-4 rounded-full duration-300 hover:bg-primary-foreground "
+          className="transition-all py-2 px-4 rounded-lg duration-300 hover:bg-primary-foreground "
         >
           Home
         </Link>
@@ -103,21 +64,20 @@ const HomeNavbar = () => {
 
         <CompanyComponent />
 
-        {userData || session ? (
+        {userData ? (
           <Link
             href={"/profile"}
-            className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
+            className="flex items-center bg-primary h-[35px] text-white pl-4 pr-2 gap-2 rounded-lg "
           >
             {initials}
-            <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
+            <Image src={"/home/userNavbar.svg"} alt="" height={20} width={20} />
           </Link>
         ) : (
           <Link
             href={"/login"}
-            className="flex items-center bg-primary text-white pl-4 pr-2 py-2 gap-2 rounded-full md:shadow transition-all duration-300 hover:shadow-lg hover:transform hover:scale-105"
+            className="flex items-center bg-primary h-[35px] text-white px-4  gap-2 rounded-lg"
           >
-            Sign In
-            <Image src={"/home/userNavbar.svg"} alt="" height={25} width={25} />
+            Login / Sign Up
           </Link>
         )}
       </div>
