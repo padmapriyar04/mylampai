@@ -78,16 +78,16 @@ model OTP {
 
 // recruiter
 model TalentPool {
-  id               String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId           String        @db.ObjectId
-  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skills           String[]
-  profiles         String[]
-  salary           String
-  locationPref     String
-  talents          TalentMatch[]
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String        @db.ObjectId
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills       String[]
+  profiles     String[]
+  salary       String
+  locationPref String
+  talents      TalentMatch[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model TalentMatch {
@@ -211,6 +211,7 @@ model Interview {
   messages          InterviewMessage[]
   isStarted         Boolean             @default(false)
   InterviewFeedback InterviewFeedback[]
+  Analysis          Analysis[]
   isCompleted       Boolean             @default(false)
   isFeedbackGiven   Boolean             @default(false)
   createdAt         DateTime            @default(now())
@@ -235,6 +236,19 @@ model InterviewFeedback {
   interview   Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
   interviewId String    @db.ObjectId
   createdAt   DateTime  @default(now())
+}
+
+model Analysis {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  Introduction Json // or whatever type it should be
+  Project      Json
+  Coding       Json
+  Technical    Json
+  Outro        Json
+  createdAt    DateTime  @default(now())
+  interview    Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  interviewId  String    @db.ObjectId
+  updatedAt    DateTime  @updatedAt
 }
 
 model NewsletterEmails {
