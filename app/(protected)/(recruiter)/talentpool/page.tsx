@@ -8,7 +8,6 @@ import {
   talentPoolSchema,
   TalentPoolFormData,
 } from "@/schemas/talentPoolSchema";
-import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,58 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useUserStore } from "@/utils/userStore";
-
-interface ArrayInputProps {
-  value: string[];
-  onChange: (value: string[]) => void;
-}
-
-function ArrayInput({ value, onChange }: ArrayInputProps) {
-  const [inputValue, setInputValue] = useState("");
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && inputValue.trim()) {
-      e.preventDefault();
-      onChange([...value, inputValue.trim()]);
-      setInputValue("");
-    }
-  };
-
-  const remove = (index: number) => {
-    onChange(value.filter((_, i) => i !== index));
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        {value.map((skill, index) => (
-          <div
-            key={index}
-            className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md flex items-center"
-          >
-            {skill}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="ml-1 h-auto p-0"
-              onClick={() => remove(index)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
-      </div>
-      <Input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Type a skill and press Enter"
-      />
-    </div>
-  );
-}
+import { ArrayInput } from "@/components/misc/ArrayInput";
 
 export default function TalentPoolPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -130,7 +78,11 @@ export default function TalentPoolPage() {
                 <FormItem>
                   <FormLabel>Skills</FormLabel>
                   <FormControl>
-                    <ArrayInput value={field.value} onChange={field.onChange} />
+                    <ArrayInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Enter skills required"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -144,7 +96,11 @@ export default function TalentPoolPage() {
                 <FormItem>
                   <FormLabel>Profiles</FormLabel>
                   <FormControl>
-                    <ArrayInput value={field.value} onChange={field.onChange} />
+                    <ArrayInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Enter targeting profiles"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

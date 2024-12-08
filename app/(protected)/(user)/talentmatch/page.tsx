@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getTalentMatches,
   createTalentProfile,
@@ -28,11 +28,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
 import {
   ProfileDataType,
   profileDataSchema,
 } from "@/schemas/talentMatchSchema";
+import { ArrayInput } from "@/components/misc/ArrayInput";
 
 type TalentMatchType = {
   id: string;
@@ -319,59 +319,6 @@ export default function TalentMatchPage() {
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-interface ArrayInputProps {
-  value: string[];
-  onChange: (value: string[]) => void;
-  placeholder: string;
-}
-
-function ArrayInput({ value, onChange, placeholder }: ArrayInputProps) {
-  const [inputValue, setInputValue] = useState("");
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && inputValue.trim()) {
-      e.preventDefault();
-      onChange([...value, inputValue.trim()]);
-      setInputValue("");
-    }
-  };
-
-  const removeItem = (index: number) => {
-    onChange(value.filter((_, i) => i !== index));
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        {value.map((item, index) => (
-          <div
-            key={index}
-            className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md flex items-center"
-          >
-            {item}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="ml-1 h-auto p-0"
-              onClick={() => removeItem(index)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
-      </div>
-      <Input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-      />
     </div>
   );
 }
