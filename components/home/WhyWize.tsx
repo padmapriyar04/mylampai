@@ -52,9 +52,9 @@ export default function WhyWize() {
             );
             if (index !== -1) {
               controls[index].start({
-                opacity: 0.5,
-                y: 50,
-                transition: { duration: 0.6 },
+                opacity: 0,
+                y: 40,
+                transition: { duration: 0.33 },
               });
             }
           }
@@ -62,24 +62,22 @@ export default function WhyWize() {
       },
       {
         root: null, // viewport
-        rootMargin: "0px", // no margin
-        threshold: 0.5, // trigger when 50% of the section is visible
+        rootMargin: "0px",
+        threshold: 0.33, // trigger when 33% of the section is visible
       }
     );
 
-    // Observe each section
     sectionsRef.current.forEach((section) => {
       if (section) observer.observe(section);
     });
 
-    // Cleanup observer on component unmount
     return () => {
       const currentSections = sectionsRef.current; // Store the ref in a variable during cleanup
       currentSections.forEach((section) => {
         if (section) observer.unobserve(section);
       });
     };
-  }, [controls]); // Dependency array should include 'controls'
+  }, [controls]);
 
   return (
     <div className="flex flex-col items-center mb-4">

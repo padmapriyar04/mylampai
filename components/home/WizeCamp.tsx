@@ -1,35 +1,41 @@
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from 'react';
+// import React, { useEffect, useRef, useState } from "react";
 
 export default function WizeCamp() {
+  // const [isFormOpen, setIsFormOpen] = useState(true);
+  // const toggleForm = () => {
+  //   setIsFormOpen(!isFormOpen);
+  // };
 
-  const [isFormOpen, setIsFormOpen] = useState(true);
-    const toggleForm = () => {
-      setIsFormOpen(!isFormOpen);
-  };
-  
-  useEffect(() => {
-    if (!isFormOpen) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-  }, [!isFormOpen]);
+  // useEffect(() => {
+  //   if (!isFormOpen) {
+  //     document.body.classList.add("overflow-hidden");
+  //   } else {
+  //     document.body.classList.remove("overflow-hidden");
+  //   }
+  // }, [!isFormOpen]);
 
   return (
-    
     <>
-    <div className={`fixed top-[94vh] left-0 right-0 flex justify-center transition-transform duration-500 z-10 ${isFormOpen ? "translate-y-[-300vh]" : "-translate-y-full"}`}>
-                <div className="bg-white w-[85vw] h-[80vh] flex flex-col items-center justify-center shadow-lg rounded-lg">
-                <h1> I am a Reg. Form</h1>
-                    <button onClick={toggleForm} className="relative text-white font-bold top-[30vh] p-4 border-x-primary-foreground border-4 rounded-xl bg-primary">
-                        CLOSE FORM
-                    </button>
-                    
-                </div>
-            </div>
-      <div className={`element xl:max-w-[1220px] max-w-[650px] m-3 sm:m-auto bg-primary-foreground flex flex-col xl:flex-row justify-around items-center rounded-2xl p-4 sm:p-8 gap-4 my-4 transition ${!isFormOpen ? "blur-sm" : "blur-none"}`}>
+      {/* <div
+        className={`fixed top-[94vh] left-0 right-0 flex justify-center transition-transform duration-500 z-10 ${
+          isFormOpen ? "translate-y-[-300vh]" : "-translate-y-full"
+        }`}
+      >
+        <div className="bg-white w-[85vw] h-[80vh] flex flex-col items-center justify-center shadow-lg rounded-lg">
+          <h1> I am a Reg. Form</h1>
+          <button
+            onClick={toggleForm}
+            className="relative text-white font-bold top-[30vh] p-4 border-x-primary-foreground border-4 rounded-xl bg-primary"
+          >
+            CLOSE FORM
+          </button>
+        </div>
+      </div> */}
+      <div
+        className={`element xl:max-w-[1220px] max-w-[650px] m-3 sm:m-auto bg-primary-foreground flex flex-col xl:flex-row justify-around items-center rounded-2xl p-4 sm:p-8 gap-4 my-4 transition-all duration-500`}
+      >
         <div className="bg-[#8C52FF] w-full h-full max-w-[600px] min-h-[500px] flex flex-col items-center justify-evenly rounded-2xl p-4">
           <Image
             src="/home/logoCombined.svg"
@@ -78,17 +84,20 @@ export default function WizeCamp() {
             </div>
           </div>
           <div className="w-full flex justify-between  text-white max-w-[400px] mx-auto gap-8">
-            <Link href="/wizecamp" className="bg-[#ffffff72] rounded-lg py-2 px-4 w-full text-lg font-semibold flex justify-center items-center">
+            <Link
+              href="/wizecamp"
+              className="bg-[#ffffff72] rounded-lg py-2 px-4 w-full text-lg font-semibold flex justify-center items-center"
+            >
               More Info.
             </Link>
-            <button onClick={toggleForm} className="border-2 rounded-lg py-3 px-4 w-full text-lg font-semibold">
+            <button className="border-2 rounded-lg py-3 px-4 w-full text-lg font-semibold">
               Register Now
             </button>
           </div>
         </div>
         <div className="hidden sm:flex w-full flex-wrap items-center justify-center gap-4 min-h-[500px] max-w-[516px] relative ">
           <div className="absolute top-1/2 right-1/2 w-[82px] h-[82px] bg-white translate-x-1/2 -translate-y-1/2 rounded-full">
-          <Image
+            <Image
               src="./home/wizecamp/avatar.svg"
               width={100}
               height={100}
@@ -130,7 +139,7 @@ export default function WizeCamp() {
               height={100}
               alt="wizecamp"
               className="w-full h-auto"
-            ></Image> 
+            ></Image>
           </div>
         </div>
       </div>

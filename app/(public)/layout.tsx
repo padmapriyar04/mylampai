@@ -1,5 +1,6 @@
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/home/Footer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function RootLayout({
   children,
@@ -9,10 +10,10 @@ export default function RootLayout({
   return (
     <>
       <HomeNavbar />
-      <div className="flex flex-col min-h-screen bg-cover transition-all duration-300">
+      <ScrollArea className="h-screen w-full flex flex-1 flex-col">
         {children}
         <Footer />
-      </div>
+      </ScrollArea>
     </>
   );
 }

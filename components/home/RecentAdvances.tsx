@@ -65,9 +65,7 @@ export default function RecentAdvances() {
     <>
       <div className="max-w-[1300px] mx-auto mt-12 px-5">
         <div className="flex justify-between flex-col sm:flex-row items-center mx-2">
-          <h2 className="text-2xl sm:text-3xl font-semibold">
-            Recent Blogs
-          </h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold">Recent Blogs</h2>
           <button className="flex items-center gap-2 border-2 border-black font-semibold mt-4 sm:mt-0 rounded-full px-4 py-1 sm:py-2 hover:scale-[1.02] hover:bg-[fafafa] transition-all duration-200">
             Read More
             <Image
@@ -78,13 +76,12 @@ export default function RecentAdvances() {
             />
           </button>
         </div>
-        
+
         <div className="flex flex-col md:flex-row justify-center sm:justify-evenly lg:justify-between gap-4 my-8 sm:my-[50px]">
           {data.map((item, index) => (
             <RecentAdvancesCard key={index} {...item} />
           ))}
         </div>
-        
       </div>
     </>
   );

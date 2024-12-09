@@ -7,8 +7,8 @@ import { MoveRight } from "lucide-react";
 export default function HeroSection() {
   return (
     <>
-      <div className="flex flex-col max-w-screen overflow-hidden ">
-        <div className="flex relative justify-evenly items-center min-h-[555px] md:min-h-screen bg-[url('/home/herosection-background.svg')] pt-4 px-8 gap-8 w-full m-auto">
+      <div className="flex flex-col bg-[url('/home/herosection-background.svg')] max-w-screen overflow-hidden ">
+        <div className="flex relative justify-evenly items-center min-h-[555px] md:min-h-screen pt-4 px-8 gap-8 w-full m-auto">
           <div className="absolute bg-[url('/home/herosection/herosection-earth.svg')] scale-x-125 scale-y-[0.8] bg-no-repeat bg-center bg-cover h-[336px] -bottom-[5%] left-[10%] w-[600px]"></div>
 
           <div className="flex flex-col justify-center min-h-[600px] w-full">
@@ -29,7 +29,7 @@ export default function HeroSection() {
                 <MoveRight size={24} />
               </Link>
               <Link
-                href={"/login"}
+                href={"/login?role=recruiter"}
                 className="flex gap-4 items-center w-[195px] h-[45px] justify-center  rounded-lg duration-150 hover:scale-[1.02] border-2 text-xl md:text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 max-w-[232px] md:max-w-[300px] mb-12 lg:ml-14"
               >
                 Recruiter
