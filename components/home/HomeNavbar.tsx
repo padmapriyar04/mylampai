@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "@/utils/userStore";
 
 import {
-  CommunityComponent,
-  ResourcesComponent,
-  CompanyComponent,
+  TalentComponent,
+  RecruiterComponent,
+  AboutComponent,
 } from "./HomeNavbarComponents";
 
 const HomeNavbar = () => {
@@ -58,11 +58,11 @@ const HomeNavbar = () => {
           Home
         </Link>
 
-        <CommunityComponent />
+        <TalentComponent />
 
-        <ResourcesComponent />
+        <RecruiterComponent />
 
-        <CompanyComponent />
+        <AboutComponent />
 
         {userData ? (
           <Link

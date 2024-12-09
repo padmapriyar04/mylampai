@@ -15,9 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  useSidebar,
-} from "@/components/ui/sidebar";
 import { toast } from "sonner";
 import { useUserStore } from "@/utils/userStore";
 import { useRouter } from "next/navigation";
@@ -25,7 +22,6 @@ import Link from "next/link";
 import { removeCookie } from "@/utils/cookieUtils";
 
 export function NavUser() {
-  const { isMobile } = useSidebar();
   const { userData, clearUser } = useUserStore();
   const router = useRouter();
 
@@ -63,7 +59,7 @@ export function NavUser() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-        side={isMobile ? "bottom" : "right"}
+        side={"right"}
         align="end"
         sideOffset={4}
       >

@@ -19,7 +19,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useUserStore } from "@/utils/userStore";
 import { ArrayInput } from "@/components/misc/ArrayInput";
 
@@ -34,7 +33,6 @@ export default function TalentPoolForm() {
       profiles: [],
       salary: "",
       locationPref: "",
-      experienceNeeded: "",
     },
   });
 
@@ -130,26 +128,6 @@ export default function TalentPoolForm() {
               </FormControl>
               <FormDescription>
                 Specify the preferred location for the talent pool.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="experienceNeeded"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Experience Needed</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Describe the experience needed"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                Describe the experience required for the talent pool.
               </FormDescription>
               <FormMessage />
             </FormItem>

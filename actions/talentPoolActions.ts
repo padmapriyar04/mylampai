@@ -28,15 +28,18 @@ export const getRecruiterTalentPool = async () => {
   }
 };
 
-export const getTalentPoolData = async (
-  talentPoolId: string,
-  userId: string
-) => {
+export const getTalentPoolData = async (talentPoolId: string) => {
   try {
+    const user = await auth();
+
+    if (!user) {
+      return null;
+    }
+
     const talentPoolData = await prisma.talentPool.findFirst({
       where: {
         id: talentPoolId,
-        userId,
+        userId: user.id,
       },
       select: {
         id: true,
@@ -85,12 +88,14 @@ export const matchTalentProfile = async (
   try {
     const matches = await prisma.talentProfile.findMany({
       where: {
-        AND: [
+        OR: [
           { skills: { hasSome: talentPoolData.skills } },
           { profiles: { hasSome: talentPoolData.profiles } },
-          { expectedSalary: { lte: talentPoolData.salary } },
-          { locationPref: { equals: talentPoolData.locationPref } },
         ],
+      },
+      take: 50,
+      orderBy: {
+        createdAt: "desc",
       },
     });
 

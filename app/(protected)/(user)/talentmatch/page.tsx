@@ -4,6 +4,8 @@ import {
   getTalentMatches,
   createTalentProfile,
   getTalentProfiles,
+  acceptTalentMatch,
+  getResumeAndInterviewIds,
 } from "@/actions/talentMatchActions";
 import { getTalentPoolsData } from "@/actions/talentPoolActions";
 import { useUserStore } from "@/utils/userStore";
@@ -34,6 +36,9 @@ import {
 } from "@/schemas/talentMatchSchema";
 import { ArrayInput } from "@/components/misc/ArrayInput";
 import { TalentProfileCard } from "./TalentProfileCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { MapPinIcon, IndianRupee } from "lucide-react";
 
 type TalentMatchType = {
   id: string;
@@ -41,6 +46,8 @@ type TalentMatchType = {
   profiles: string[];
   salary: string;
   locationPref: string;
+  isMatched: boolean;
+  matchId: string;
 };
 
 type TalentProfileType = {
@@ -53,16 +60,19 @@ type TalentProfileType = {
   expectedSalary: string;
   locationPref: string;
   experienceYears: string;
-  availability: string
+  availability: string;
+};
+
+type IdsType = {
+  id: string;
 };
 
 export default function TalentMatchPage() {
   const { userData } = useUserStore();
   const [talentMatches, setTalentMatches] = useState<TalentMatchType[]>([]);
   const [talentProfiles, setTalentProfiles] = useState<TalentProfileType[]>([]);
-
-  const [submittedProfile, setSubmittedProfile] =
-    useState<ProfileDataType | null>(null);
+  const [resumeIds, setResumeIds] = useState<IdsType[]>([]);
+  const [interviewIds, setInterviewIds] = useState<IdsType[]>([]);
 
   const form = useForm<ProfileDataType>({
     resolver: zodResolver(profileDataSchema),
@@ -83,9 +93,16 @@ export default function TalentMatchPage() {
     try {
       if (!userData) return;
 
-      const res = await createTalentProfile({ ...values, userId: userData.id });
+      const userName = userData.name || "No Name";
+
+      const res = await createTalentProfile({
+        ...values,
+        userId: userData.id,
+        userName,
+      });
 
       if (res === "success") {
+        form.reset();
         toast.success("Talent Profile created Successfully");
       } else {
         toast.error("Failed to create talent profile");
@@ -96,54 +113,126 @@ export default function TalentMatchPage() {
     }
   }
 
+  const handleConfirmMatch = async (matchId: string) => {
+    try {
+      const res = await acceptTalentMatch(matchId);
+
+      if (res === "success") {
+        toast.success("Match confirmed successfully");
+      } else {
+        toast.error("Failed to confirm match");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to confirm match");
+    }
+  };
+
   useEffect(() => {
     if (!userData || !userData.id) return;
 
-    const handleGetTalentMatches = async (userId: string) => {
+    const fetchIds = async () => {
       try {
-        const matches = await getTalentMatches(userId);
+        const ids = await getResumeAndInterviewIds(userData?.id);
 
-        if (matches && matches.length) {
-          const talentPoolIds = matches.map((match) => match.talentPoolId);
-
-          const fetchTalentPoolData = async (talentPoolIds: string[]) => {
-            const talentPoolsData = await getTalentPoolsData(talentPoolIds);
-            setTalentMatches(talentPoolsData);
-          };
-
-          fetchTalentPoolData(talentPoolIds);
+        if (ids.status === "success") {
+          setResumeIds(ids.cvIds);
+          setInterviewIds(ids.interviewIds);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching resume id:", error);
       }
     };
 
-    const fetchTalentProfile = async (userId: string) => {
+    fetchIds();
+  }, [userData]);
+
+  useEffect(() => {
+    if (!userData || !userData.id) return;
+
+    const fetchData = async (userId: string) => {
       try {
-        console.log("fetching talent profiles");
-        const profiles = await getTalentProfiles(userId);
+        const [matches, profiles] = await Promise.all([
+          getTalentMatches(userId),
+          getTalentProfiles(userId),
+        ]);
 
         if (profiles) {
           setTalentProfiles(profiles);
-          console.log(profiles);
+        }
+
+        if (matches && matches.length) {
+          const talentPoolIds = matches.map((match) => match.talentPoolId);
+          const talentPoolsData = await getTalentPoolsData(talentPoolIds);
+
+          const mergedData = matches.map((match, index) => ({
+            matchId: match.id,
+            isMatched: match.isMatched,
+            ...(talentPoolsData[index] || {}),
+          }));
+
+          setTalentMatches(mergedData);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchTalentProfile(userData.id);
-    handleGetTalentMatches(userData.id);
+    fetchData(userData.id);
   }, [userData]);
 
   return (
     <div>
       <h1>Talent Match</h1>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {talentMatches.map((match, index) => (
+          <Card key={index} className="overflow-hidden">
+            <CardHeader>
+              <CardTitle className="text-lg">Talent Match</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold">Skills</h3>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {match.skills.map((skill) => (
+                      <Badge key={skill} variant="secondary">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Profiles</h3>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {match.profiles.map((profile) => (
+                      <Badge key={profile} variant="outline">
+                        {profile}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <IndianRupee className="w-4 h-4 mr-2 text-muted-foreground" />
+                  <span>Salary: ₹{match.salary}</span>
+                </div>
+                <div className="flex items-center">
+                  <MapPinIcon className="w-4 h-4 mr-2 text-muted-foreground" />
+                  <span>Location Preference: {match.locationPref}</span>
+                </div>
+              </div>
+              <Button onClick={() => handleConfirmMatch(match.matchId)}>
+                Confirm Match
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
       <div>
         <h2>Matches</h2>
       </div>
-      <div>
-        Talent Profile
+      <h2>Talent Profile</h2>
+      <div className="flex items-center">
         {talentProfiles.map((profile) => (
           <TalentProfileCard key={profile.id} profile={profile} />
         ))}
@@ -159,10 +248,23 @@ export default function TalentMatchPage() {
               name="resumeId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Resume ID</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter Resume ID" {...field} />
-                  </FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select resume preference" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {resumeIds.map((id, index) => (
+                        <SelectItem key={index} value={id.id}>
+                          {id.id}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -172,10 +274,23 @@ export default function TalentMatchPage() {
               name="interviewId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Interview ID</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter Interview ID" {...field} />
-                  </FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select interview preference" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {interviewIds.map((id, index) => (
+                        <SelectItem key={index} value={id.id}>
+                          {id.id}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -318,15 +433,6 @@ export default function TalentMatchPage() {
             <Button type="submit">Submit</Button>
           </form>
         </Form>
-
-        {submittedProfile && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Submitted Profile:</h2>
-            <pre className="bg-gray-100 p-4 rounded-md overflow-auto">
-              {JSON.stringify(submittedProfile, null, 2)}
-            </pre>
-          </div>
-        )}
       </div>
     </div>
   );

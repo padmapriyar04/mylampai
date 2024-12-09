@@ -17,8 +17,9 @@ export const getTalentMatches = async (userId: string) => {
 };
 
 export const acceptTalentMatch = async (matchId: string) => {
+  console.log(matchId);
   try {
-    await prisma.talentMatch.update({
+    const res = await prisma.talentMatch.update({
       where: {
         id: matchId,
       },
@@ -45,6 +46,7 @@ type ProfileData = {
   availability: "full-time" | "part-time";
   experienceYears: string;
   userId: string;
+  userName: string;
 };
 
 export const createTalentProfile = async (profileData: ProfileData) => {
@@ -72,5 +74,40 @@ export const getTalentProfiles = async (userId: string) => {
   } catch (error) {
     console.error(error);
     return [];
+  }
+};
+
+export const getResumeAndInterviewIds = async (userId: string) => {
+  try {
+    const cvIds = await prisma.cV.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const interviewIds = await prisma.interview.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return {
+      status: "success",
+      cvIds,
+      interviewIds,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "failed",
+      cvIds: [],
+      interviewIds: [],
+    };
   }
 };

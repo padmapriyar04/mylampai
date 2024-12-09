@@ -333,7 +333,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   }, []);
 
   return (
-    <div className="md:h-[calc(100vh-4rem)] h-[140vh] bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
+    <div className="md:h-screen bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
       <div className="max-w-[1350px] h-full max-h-[570px]  w-full flex flex-col items-stretch md:flex-row justify-evenly">
         <div className="max-w-[450px] w-[90vw] md:w-[50vw] flex flex-col items-center justify-evenly bg-primary shadow-lg text-white rounded-3xl p-8 gap-8 relative">
           <Image

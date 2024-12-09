@@ -40,7 +40,7 @@ const TagList = ({ title, items }: { title: string; items: string[] }) => (
 
 export function TalentProfileCard({ profile }: TalentProfileCardProps) {
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="mx-auto">
       <CardHeader>
         <CardTitle>User Profile</CardTitle>
       </CardHeader>
