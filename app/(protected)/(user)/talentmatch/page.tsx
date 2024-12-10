@@ -221,9 +221,13 @@ export default function TalentMatchPage() {
                   <span>Location Preference: {match.locationPref}</span>
                 </div>
               </div>
-              <Button onClick={() => handleConfirmMatch(match.matchId)}>
-                Confirm Match
-              </Button>
+              {!match.isMatched ? (
+                <Button onClick={() => handleConfirmMatch(match.matchId)}>
+                  Confirm Match
+                </Button>
+              ) : (
+                <Badge variant="outline">Match Confirmed</Badge>
+              )}
             </CardContent>
           </Card>
         ))}

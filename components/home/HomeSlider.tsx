@@ -1,7 +1,6 @@
 "use client";
 import SliderCard from "./SliderCard";
 import sliderData from "@/data/home/SliderData.json";
-
 import {
   Carousel,
   CarouselContent,

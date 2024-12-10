@@ -7,7 +7,7 @@ import BackedByBest from "@/components/home/BackedByBest";
 import PowerOfWize from "@/components/home/PowerOfWize";
 import RecentAdvances from "@/components/home/RecentAdvances";
 import CommunitySection from "@/components/home/Community";
-// import HomeSlider from "@/components/home/HomeSlider";
+import HomeSlider from "@/components/home/HomeSlider";
 import "./home.css";
 
 // // Define the type for the children prop
@@ -65,8 +65,8 @@ export default function Page() {
         <WizeCamp />
         {/* </SectionWrapper> */}
         {/* <SectionWrapper>
-          <HomeSlider />
         </SectionWrapper> */}
+        <HomeSlider />
         <WhyWize />
         {/* <SectionWrapper> */}
         <BackedByBest />

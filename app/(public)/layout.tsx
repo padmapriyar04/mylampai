@@ -10,10 +10,10 @@ export default function RootLayout({
   return (
     <>
       <HomeNavbar />
-      <ScrollArea className="h-screen w-full flex flex-1 flex-col">
+      <div className="min-h-screen w-full flex flex-1 flex-col">
         {children}
         <Footer />
-      </ScrollArea>
+      </div>
     </>
   );
 }

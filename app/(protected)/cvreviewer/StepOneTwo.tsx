@@ -15,7 +15,7 @@ import { useUserStore } from "@/utils/userStore";
 import { BlobServiceClient, ContainerSASPermissions, generateBlobSASQueryParameters, StorageSharedKeyCredential } from "@azure/storage-blob";
 import { generateSasToken } from "@/actions/azureActions";
 
-const baseUrl = "https://cv-judger.onrender.com";
+const baseUrl = "https://optim-cv-judge.onrender.com";
 
 interface StepOneTwoProps {
   step: number;
