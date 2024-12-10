@@ -145,28 +145,25 @@ export default function LoginPage() {
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0 h-screen">
-      <div className="absolute top-2 left-0 max-w-[220px]">
-        <Link href="/">
-          <Image
-            src={"/home/logo.svg"}
-            width={180}
-            height={100}
-            alt="logo"
-            className="w-full h-auto drop-shadow-md"
-          />
-        </Link>
-      </div>
-      <div className="bg-white rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
+      <Link href="/" className="absolute top-2 left-4 max-w-[110px]">
+        <Image
+          src={"/home/navbar/wizelogo.svg"}
+          width={180}
+          height={100}
+          alt="logo"
+          className="w-full h-auto drop-shadow-md"
+        />
+      </Link>
+      <div className="bg-white rounded-lg md:rounded-tr-[5.5rem] md:rounded-bl-[5.5rem] p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
         <div className="justify-evenly flex-col items-center hidden md:flex w-full md:max-w-[350px] bg-primary rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
-          <div className="">
+     
             <Image
               src={"/images/Globe.svg"}
-              alt="Carousel Image 1"
+              alt="globe"
               className="w-full"
               width={100}
               height={100}
             />
-          </div>
           <Link href={"/login?role=recruiter"}>
             <button className="bg-white text-primary p-2 rounded-sm font-semibold">
               Login as Recruiter

@@ -19,7 +19,7 @@ export const getTalentMatches = async (userId: string) => {
 export const acceptTalentMatch = async (matchId: string) => {
   console.log(matchId);
   try {
-    const res = await prisma.talentMatch.update({
+    await prisma.talentMatch.update({
       where: {
         id: matchId,
       },
