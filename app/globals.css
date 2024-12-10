@@ -128,32 +128,11 @@ body::--webkit-scrollbar {
   }
 }
 
-/* typed js library cursor color */
 .typed-cursor {
   color: #8c52ff;
 }
-.embla__slide {
-  flex: 0 0 70%;
-}
-.carousel-root {
-  height: 100%;
-}
 
-.carousel.carousel-slider {
-  height: 100%;
-}
-
-.carousel .control-dots {
-  bottom: 16px !important;
-  margin: 0 !important;
-}
-
-.carousel .control-dots .dot {
-  box-shadow: none !important;
-  background: #ffffff !important;
-  opacity: 0.5;
-}
-
-.carousel .control-dots .dot.selected {
-  opacity: 1;
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }

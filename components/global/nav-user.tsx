@@ -1,10 +1,5 @@
 "use client";
-import {
-  BadgeCheck,
-  Bell,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
+import { BadgeCheck, Bell, LogOut, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -46,16 +41,18 @@ export function NavUser() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="m-4" asChild>
-          <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage src={userData?.image} alt={userData?.name} />
-            <AvatarFallback className="rounded-lg cursor-default">
-              {userData?.name ? userData?.name
-                .split(/\s+/)
-                .map((word) => word[0].toUpperCase())
-                .join("") : "UR"}
-            </AvatarFallback>
-          </Avatar>
+      <DropdownMenuTrigger className="" asChild>
+        <Avatar className="h-10 w-10 rounded-lg">
+          <AvatarImage src={userData?.image} alt={userData?.name} />
+          <AvatarFallback className="rounded-lg cursor-default">
+            {userData?.name
+              ? userData?.name
+                  .split(/\s+/)
+                  .map((word) => word[0].toUpperCase())
+                  .join("")
+              : "UR"}
+          </AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
@@ -68,10 +65,12 @@ export function NavUser() {
             <Avatar className="h-8 w-8 rounded-lg">
               <AvatarImage src={userData?.image} alt={userData?.name} />
               <AvatarFallback className="rounded-lg">
-              {userData?.name ? userData?.name
-                .split(/\s+/)
-                .map((word) => word[0].toUpperCase())
-                .join("") : "US"}
+                {userData?.name
+                  ? userData?.name
+                      .split(/\s+/)
+                      .map((word) => word[0].toUpperCase())
+                      .join("")
+                  : "US"}
               </AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">

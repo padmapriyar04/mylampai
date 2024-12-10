@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { auth } from "@/lib/authlib";
 import { redirect } from "next/navigation";
-import { AppSidebar } from "@/components/global/Sidebarx";
+import { AppSidebar } from "@/components/global/Sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const metadata: Metadata = {

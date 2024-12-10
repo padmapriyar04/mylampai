@@ -39,6 +39,15 @@ import { TalentProfileCard } from "./TalentProfileCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPinIcon, IndianRupee } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 type TalentMatchType = {
   id: string;
@@ -182,262 +191,274 @@ export default function TalentMatchPage() {
   }, [userData]);
 
   return (
-    <div>
-      <h1>Talent Match</h1>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {talentMatches.map((match, index) => (
-          <Card key={index} className="overflow-hidden">
-            <CardHeader>
-              <CardTitle className="text-lg">Talent Match</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold">Skills</h3>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {match.skills.map((skill) => (
-                      <Badge key={skill} variant="secondary">
-                        {skill}
-                      </Badge>
-                    ))}
+    <div className="flex  ">
+      <ScrollArea className="h-screen w-[42.5%]">
+        <div>
+          <h1>Talent Match</h1>
+          <div className="">
+            {talentMatches.map((match, index) => (
+              <Card key={index} className="">
+                <CardHeader>
+                  <CardTitle className="text-lg">Talent Match</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold">Skills</h3>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {match.skills.map((skill) => (
+                          <Badge key={skill} variant="secondary">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Profiles</h3>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {match.profiles.map((profile) => (
+                          <Badge key={profile} variant="outline">
+                            {profile}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <IndianRupee className="w-4 h-4 mr-2 text-muted-foreground" />
+                      <span>Salary: ₹{match.salary}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPinIcon className="w-4 h-4 mr-2 text-muted-foreground" />
+                      <span>Location Preference: {match.locationPref}</span>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold">Profiles</h3>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {match.profiles.map((profile) => (
-                      <Badge key={profile} variant="outline">
-                        {profile}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <IndianRupee className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span>Salary: ₹{match.salary}</span>
-                </div>
-                <div className="flex items-center">
-                  <MapPinIcon className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span>Location Preference: {match.locationPref}</span>
-                </div>
-              </div>
-              {!match.isMatched ? (
-                <Button onClick={() => handleConfirmMatch(match.matchId)}>
-                  Confirm Match
-                </Button>
-              ) : (
-                <Badge variant="outline">Match Confirmed</Badge>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <div>
-        <h2>Matches</h2>
-      </div>
-      <h2>Talent Profile</h2>
-      <div className="flex items-center">
-        {talentProfiles.map((profile) => (
-          <TalentProfileCard key={profile.id} profile={profile} />
-        ))}
-      </div>
-      <div>
+                  {!match.isMatched ? (
+                    <Button onClick={() => handleConfirmMatch(match.matchId)}>
+                      Confirm Match
+                    </Button>
+                  ) : (
+                    <Badge variant="outline">Match Confirmed</Badge>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+        <Dialog>
+          <DialogTrigger>Open</DialogTrigger>
+          <DialogContent className="scrollbar-hide overflow-y-scroll h-[90vh]">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                <FormField
+                  control={form.control}
+                  name="resumeId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select resume preference" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {resumeIds.map((id, index) => (
+                            <SelectItem key={index} value={id.id}>
+                              {id.id}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="interviewId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select interview preference" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {interviewIds.map((id, index) => (
+                            <SelectItem key={index} value={id.id}>
+                              {id.id}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="skills"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Skills</FormLabel>
+                      <FormControl>
+                        <ArrayInput
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Enter a skill and press Enter"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter your skills and press Enter to add them.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="profiles"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profiles</FormLabel>
+                      <FormControl>
+                        <ArrayInput
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Enter a profile and press Enter"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter your profiles and press Enter to add them.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="certifications"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Certifications</FormLabel>
+                      <FormControl>
+                        <ArrayInput
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Enter a certification and press Enter"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter your certifications and press Enter to add them.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="expectedSalary"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expected Salary</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter expected salary" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="locationPref"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location Preference</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select location preference" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="onsite">Onsite</SelectItem>
+                          <SelectItem value="remote">Remote</SelectItem>
+                          <SelectItem value="hybrid">Hybrid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="availability"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Availability</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select availability" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="full-time">Full-time</SelectItem>
+                          <SelectItem value="part-time">Part-time</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="experienceYears"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Years of Experience</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter years of experience"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit">Submit</Button>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </ScrollArea>
+      <ScrollArea className="h-screen w-[57.5%] ">
         <h2>Create Talent Profile</h2>
-      </div>
-      <div className="w-full max-w-2xl mx-auto space-y-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="resumeId"
-              render={({ field }) => (
-                <FormItem>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select resume preference" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {resumeIds.map((id, index) => (
-                        <SelectItem key={index} value={id.id}>
-                          {id.id}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="interviewId"
-              render={({ field }) => (
-                <FormItem>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select interview preference" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {interviewIds.map((id, index) => (
-                        <SelectItem key={index} value={id.id}>
-                          {id.id}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="skills"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Skills</FormLabel>
-                  <FormControl>
-                    <ArrayInput
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="Enter a skill and press Enter"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Enter your skills and press Enter to add them.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="profiles"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Profiles</FormLabel>
-                  <FormControl>
-                    <ArrayInput
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="Enter a profile and press Enter"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Enter your profiles and press Enter to add them.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="certifications"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Certifications</FormLabel>
-                  <FormControl>
-                    <ArrayInput
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="Enter a certification and press Enter"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Enter your certifications and press Enter to add them.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="expectedSalary"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Expected Salary</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter expected salary" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="locationPref"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location Preference</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select location preference" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="onsite">Onsite</SelectItem>
-                      <SelectItem value="remote">Remote</SelectItem>
-                      <SelectItem value="hybrid">Hybrid</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="availability"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Availability</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select availability" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="full-time">Full-time</SelectItem>
-                      <SelectItem value="part-time">Part-time</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="experienceYears"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Years of Experience</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter years of experience" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Submit</Button>
-          </form>
-        </Form>
-      </div>
+        <div>
+          <h2>Talent Profile</h2>
+          <div className="flex items-center">
+            {talentProfiles.map((profile) => (
+              <TalentProfileCard key={profile.id} profile={profile} />
+            ))}
+          </div>
+        </div>
+      </ScrollArea>
     </div>
   );
 }

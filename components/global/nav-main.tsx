@@ -1,13 +1,9 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { type LucideIcon } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Bootstrap } from "react-bootstrap-icons";
+
+type typeBootstrap = typeof Bootstrap;
 
 export function NavMain({
   items,
@@ -15,7 +11,8 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icons: LucideIcon[];
+    view: string;
+    icons: typeBootstrap[];
     isActive?: boolean;
     items?: {
       title: string;
@@ -24,35 +21,33 @@ export function NavMain({
   }[];
 }) {
   return (
-    <div className="flex flex-col gap-6">
-      {items.map((item, index) => (
-        <div key={index} className="group">
-          <TooltipProvider delayDuration={100}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <Link
-                  href={item.url}
-                  className="flex flex-col w-full items-center"
-                >
+    <div className="flex flex-col gap-3">
+      {items.map((item, index) => {
+        if (item.view === "user") {
+          return (
+            <div key={index} className="group">
+              <Link
+                href={item.url}
+                className="flex flex-col gap-1 w-full items-center"
+              >
+                <div className="p-[7px] border border-white group-hover:border-slate-200 rounded-lg">
                   {item.icons?.[0] &&
                     React.createElement(item.icons[0], {
-                      className: "block group-hover:hidden",
+                      className:
+                        "block w-full w-6 h-6 text-[#697386] group-focus:text-primary group-hover:text-primary group-hover:hidden",
                     })}
                   {item.icons?.[1] &&
                     React.createElement(item.icons[1], {
-                      className: "hidden group-hover:block",
+                      className:
+                        "hidden w-full w-6 h-6 text-[#697386] group-focus:text-primary group-hover:text-primary group-hover:block",
                     })}
-                  <p className="text-[0.6rem]"> {item.title} </p>
-                </Link>
-              </TooltipTrigger>
-
-              <TooltipContent side="right">
-                <p>{item.title}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      ))}
+                </div>
+                <p className="text-[0.6rem]"> {item.title} </p>
+              </Link>
+            </div>
+          );
+        }
+      })}
     </div>
   );
 }
