@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/global/app-sidebar";
+import { AppSidebar } from "@/components/global/Sidebarx";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function Page({ children }: { children: React.ReactNode }) {

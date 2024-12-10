@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Page } from "@/components/global/Sidebar";
 import { auth } from "@/lib/authlib";
 import { redirect } from "next/navigation";
+import { AppSidebar } from "@/components/global/Sidebarx";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const metadata: Metadata = {
   title: "wiZe (myLampAI)",
@@ -21,7 +22,12 @@ export default async function ProtectedLayout({
 
   return (
     <>
-      <Page>{children}</Page>
+      <div className="flex">
+        <AppSidebar />
+        <ScrollArea className="h-screen w-full flex flex-1 flex-col">
+          {children}
+        </ScrollArea>
+      </div>
     </>
   );
 }
