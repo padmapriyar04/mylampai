@@ -93,7 +93,7 @@ const HomeNavbar = () => {
 
         {userData ? (
           <Link
-            href={"/profile"}
+            href={"/home"}
             className="flex items-center bg-primary h-[35px] text-white pl-4 pr-2 gap-2 rounded-lg "
           >
             {initials}

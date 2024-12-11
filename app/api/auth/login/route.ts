@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
       { expiresIn: "7d" },
     );
 
-    // Set token in cookie
     const response = NextResponse.json(
       {
         token,
