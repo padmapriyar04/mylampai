@@ -1,55 +1,87 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, MapPinIcon, ClockIcon, DollarSignIcon, BriefcaseIcon, AwardIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  MapPinIcon,
+  ClockIcon,
+  DollarSignIcon,
+  BriefcaseIcon,
+  AwardIcon,
+} from "lucide-react";
+import { useUserStore } from "@/utils/userStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface TalentProfile {
-  id: string
-  resumeId: string
-  interviewId: string
-  skills: string[]
-  profiles: string[]
-  certifications: string[]
-  expectedSalary: string
-  locationPref: string
-  experienceYears: string
-  availability: string
+  id: string;
+  resumeId: string | null;
+  interviewId: string | null;
+  skills: string[];
+  profiles: string[];
+  certifications: string[];
+  expectedSalary: string | null;
+  locationPref: string | null;
+  availability: string | null;
+  experienceYears: string | null;
 }
 
 interface TalentProfileCardProps {
-  profile: TalentProfile
+  profile: TalentProfile;
 }
 
-const ProfileDetail = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+const ProfileDetail = ({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | null;
+}) => (
   <div className="flex items-center space-x-2 text-sm">
     {icon}
     <span className="font-medium">{label}:</span>
     <span>{value}</span>
   </div>
-)
+);
 
 const TagList = ({ title, items }: { title: string; items: string[] }) => (
   <div className="mt-4">
     <h3 className="font-semibold mb-2">{title}</h3>
     <div className="flex flex-wrap gap-2">
       {items.map((item, index) => (
-        <Badge key={index} variant="secondary">{item}</Badge>
+        <Badge key={index} variant="secondary">
+          {item}
+        </Badge>
       ))}
     </div>
   </div>
-)
+);
 
 export function TalentProfileCard({ profile }: TalentProfileCardProps) {
+  const { userData } = useUserStore();
+
+  if (!userData) return null;
+
   return (
-    <Card className="mx-auto">
-      <CardHeader>
-        <CardTitle>User Profile</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 ">
-        <ProfileDetail
-          icon={<BriefcaseIcon className="h-4 w-4" />}
-          label="Experience"
-          value={`${profile.experienceYears} ${parseInt(profile.experienceYears) === 1 ? 'year' : 'years'}`}
-        />
+    <div className="mx-auto">
+      <div className="flex items-center gap-4">
+        <Avatar className="h-24 w-24 rounded-lg">
+          <AvatarImage src={userData?.image} alt={userData?.name} />
+          <AvatarFallback className="rounded-lg cursor-default">
+            {userData?.name ? userData?.name : "User"}
+          </AvatarFallback>
+        </Avatar>
+        <div className="text-2xl font-semibold">{userData?.name}</div>
+      </div>
+      <div className="space-y-4 ">
+        {profile.experienceYears && (
+          <ProfileDetail
+            icon={<BriefcaseIcon className="h-4 w-4" />}
+            label="Experience"
+            value={`${profile.experienceYears} ${
+              parseInt(profile.experienceYears) === 1 ? "year" : "years"
+            }`}
+          />
+        )}
         <ProfileDetail
           icon={<MapPinIcon className="h-4 w-4" />}
           label="Location Preference"
@@ -87,8 +119,7 @@ export function TalentProfileCard({ profile }: TalentProfileCardProps) {
           <p>Resume ID: {profile.resumeId}</p>
           <p>Interview ID: {profile.interviewId}</p>
         </div>
-      </CardContent>
-    </Card>
-  )
+      </div>
+    </div>
+  );
 }
-

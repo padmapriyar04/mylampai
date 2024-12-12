@@ -10,11 +10,6 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
 import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import {
   Form,
   FormControl,
   FormField,
@@ -158,7 +153,6 @@ export default function LoginPage() {
       </Link>
       <div className="bg-white rounded-lg md:rounded-tr-[5.5rem] md:rounded-bl-[5.5rem] p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
         <div className="justify-evenly flex-col items-center hidden md:flex w-full md:max-w-[350px] bg-primary-foreground rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
-
           <Image
             src={"/images/Globe.svg"}
             alt="globe"
@@ -167,21 +161,35 @@ export default function LoginPage() {
             height={100}
           />
           <div className="flex flex-col gap-2 justify-center items-center p-2">
-            <h2 className="font-bold text-gray-500 text-center">Take the WiZe AI Mock Interview</h2>
+            <h2 className="font-bold text-gray-500 text-center">
+              Take the WiZe AI Mock Interview
+            </h2>
             <div>
-              <p className="text-gray-400 font-semibold text-xs">You&apos;ll be taking a 20-minute interview to have your skills evaluated. Just relax and take the interview.</p>
-              <p className="text-gray-600 font-semibold text-xs">All the Best!</p>
+              <p className="text-gray-400 font-semibold text-xs">
+                You&apos;ll be taking a 20-minute interview to have your skills
+                evaluated. Just relax and take the interview.
+              </p>
+              <p className="text-gray-600 font-semibold text-xs">
+                All the Best!
+              </p>
             </div>
             <div className="flex gap-1 items-center mt-4">
-              <p className="text-gray-400 text-xs font-semibold">Want to hire talent?</p>
-              <Link href={'/login?role=recruiter'} className="text-primary font-bold text-sm">Continue Here</Link>
+              <p className="text-gray-400 text-xs font-semibold">
+                Want to hire talent?
+              </p>
+              <Link
+                href={"/login?role=recruiter"}
+                className="text-primary font-bold text-sm"
+              >
+                Continue Here
+              </Link>
             </div>
           </div>
         </div>
 
         <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 flex flex-col justify-center my-auto">
           <div className="flex flex-col h-full sm:p-1 gap-4">
-            <p className="bg-primary mx-auto w-6 h-6 sm:w-8 sm:h-8 rounded text-primary">.</p>
+            <p className="bg-primary mx-auto w-6 h-6 sm:w-8 sm:h-8 rounded"></p>
             <div className="flex justify-center items-center">
               <h1 className="font-bold sm:text-xl mr-2">SignUp or Login to</h1>
               <h1 className="font-bold text-primary sm:text-xl"> wiZ</h1>
@@ -193,16 +201,22 @@ export default function LoginPage() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className=" p-0 sm:p-4 w-full"
                 >
-                  {!showOTP && (
+                  {!showOTP ? (
                     <div className="flex flex-col gap-4 items-center justify-center p-2 ">
                       <FormField
                         control={form.control}
                         name="email"
                         render={({ field }) => (
                           <FormItem className="w-full">
-                            <FormLabel className="font-bold">Email Id</FormLabel>
-                            <FormControl >
-                              <Input placeholder="Email" {...field} className="flex items-center text-xs md:text-sm justify-center bg-white font-semibold text-slate-500 shadow p-3 border-slate-300 rounded-md space-x-2  transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02]" />
+                            <FormLabel className="font-bold">
+                              Email Id
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Email"
+                                {...field}
+                                className="flex items-center text-xs md:text-sm justify-center bg-white font-semibold text-slate-500 shadow p-3 border-slate-300 rounded-md space-x-2  transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02]"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -216,8 +230,7 @@ export default function LoginPage() {
                         Continue
                       </button>
                     </div>
-                  )}
-                  {showOTP && (
+                  ) : (
                     <div className="flex flex-col gap-4 items-center justify-center p-0 sm:p-2 ">
                       <FormField
                         control={form.control}
@@ -226,7 +239,11 @@ export default function LoginPage() {
                           <FormItem className="w-full">
                             <FormLabel className="font-bold">OTP</FormLabel>
                             <FormControl>
-                              <Input placeholder="OTP" {...field} className="flex items-center text-xs md:text-sm justify-center bg-white font-semibold text-slate-500 shadow p-3 border-slate-300 rounded-md space-x-2  transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02]" />
+                              <Input
+                                placeholder="OTP"
+                                {...field}
+                                className="flex items-center text-xs md:text-sm justify-center bg-white font-semibold text-slate-500 shadow p-3 border-slate-300 rounded-md space-x-2  transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02]"
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -234,7 +251,8 @@ export default function LoginPage() {
                       />
                       <Button
                         type="submit"
-                        className="bg-primary text-slate-50 w-full text-sm sm:font-bold px-2 sm:px-4 py-2 rounded-md shadow hover:bg-primary-dark transition-all duration-300 hover:shadow-lg hover:scale-105">
+                        className="bg-primary text-slate-50 w-full text-sm sm:font-bold px-2 sm:px-4 py-2 rounded-md shadow hover:bg-primary-dark transition-all duration-300 hover:shadow-lg hover:scale-105"
+                      >
                         Let&apos;s Go
                       </Button>
                     </div>
@@ -243,7 +261,9 @@ export default function LoginPage() {
               </Form>
               <div className="flex items-center justify-center gap-2 w-full p-0 sm:p-6">
                 <div className="flex-grow border-t border-gray-400"></div>
-                <p className="text-gray-400 sm:text-sm font-bold">Or Continue with</p>
+                <p className="text-gray-400 sm:text-sm font-bold">
+                  Or Continue with
+                </p>
                 <div className="flex-grow border-t border-gray-400"></div>
               </div>
 
@@ -271,7 +291,13 @@ export default function LoginPage() {
                   onClick={() => handleNextAuthLogin("linkedin")}
                 >
                   {/* <Linkedin /> */}
-                  <Image src={"/images/linkedin-icon.png"} alt="linkedin login" width={100} height={100} className="w-6 h-6" />
+                  <Image
+                    src={"/images/linkedin-icon.png"}
+                    alt="linkedin login"
+                    width={100}
+                    height={100}
+                    className="w-6 h-6"
+                  />
                   <span className="text-slate-500 font-bold sm:text-sm">
                     LinkedIn
                   </span>

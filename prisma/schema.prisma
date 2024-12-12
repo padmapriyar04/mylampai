@@ -37,6 +37,7 @@ model User {
   // sentmessages     Directmessage[] @relation("SenderUser")
   // receivedMessages Directmessage[] @relation("ReceiverUser")
   JobCandidate   JobCandidate[]
+  Resume         Resume[]
 }
 
 model Account {
@@ -75,6 +76,15 @@ model OTP {
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Resume {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  resumeUrl String
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // recruiter
 model TalentPool {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -105,22 +115,33 @@ model TalentMatch {
 
 // user
 model TalentProfile {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  resumeId        String        @db.ObjectId
-  interviewId     String        @db.ObjectId
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  resumeId        String?         @db.ObjectId
+  interviewId     String?         @db.ObjectId
   skills          String[]
   profiles        String[]
   certifications  String[]
-  expectedSalary  String
-  locationPref    String
-  experienceYears String
-  availability    String
+  expectedSalary  String?
+  locationPref    String?
+  experienceYears String?
+  availability    Availability?
+  structuredData  StructuredData?
   talentMatch     TalentMatch[]
   userName        String
-  userId          String        @db.ObjectId
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  userId          String          @db.ObjectId
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+type StructuredData {
+  personalInfo   Json
+  description    String[]
+  education      Json[]
+  sections       String[]
+  interests      String[]
+  projects       Json[]
+  workExperience Json[]
 }
 
 model JobProfile {
@@ -243,7 +264,7 @@ model InterviewFeedback {
 
 model Analysis {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  Introduction Json // or whatever type it should be
+  Introduction Json
   Project      Json
   Coding       Json
   Technical    Json

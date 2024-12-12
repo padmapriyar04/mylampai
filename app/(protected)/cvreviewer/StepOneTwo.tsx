@@ -55,7 +55,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   handleBackClick,
   setProfile,
   profile,
-  isManualEntry,
   manualJobDescription,
   setManualJobDescription,
 }) => {
@@ -73,7 +72,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
-  
   
 
   const handleDrop =async (event: DragEvent<HTMLDivElement>) => {
@@ -119,7 +117,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       let extractedText = "";
 
       fileReader.onload = async function () {
-        const typedArray: ArrayBuffer = new Uint8Array(
+        const typedArray = new Uint8Array(
           this.result as ArrayBuffer
         );
 
@@ -224,7 +222,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       let extractedText = "";
 
       fileReader.onload = async function () {
-        const typedArray: ArrayBuffer = new Uint8Array(
+        const typedArray = new Uint8Array(
           this.result as ArrayBuffer
         );
 

@@ -13,11 +13,10 @@ const HomeNavbar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   const { userData } = useUserStore();
-  const [initials, setInitials] = useState("Profile");
+  const [initials, setInitials] = useState("Home");
 
   useEffect(() => {
     const handleScroll = () => {
-      console.log("Hello");
       const triggerPoint = 1000;
       if (window.scrollY > triggerPoint) {
         setScrolled(true);
@@ -35,7 +34,7 @@ const HomeNavbar = () => {
 
   useEffect(() => {
     const getUserInitials = () => {
-      if (!userData?.name) return "Profile";
+      if (!userData?.name) return "Home";
 
       let name = userData.name;
 
@@ -55,7 +54,7 @@ const HomeNavbar = () => {
 
   return (
     <div
-      className={`flex justify-end items-center gap-4 bg-[#ffffff20] backdrop-blur-sm transition px-8 fixed top-0 w-full z-50 min-h-[64px]`}
+      className={`flex justify-end items-center gap-4 bg-transparent transition px-8 fixed top-0 w-full z-50 min-h-[64px]`}
     >
       <Link
         href={"/"}

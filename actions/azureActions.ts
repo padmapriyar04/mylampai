@@ -16,14 +16,13 @@ const sharedKeyCredential = new StorageSharedKeyCredential(
   accountKey,
 );
 
-// SAS Token Generator Function
 export const generateSasToken = async (blobName: string) => {
   const sasOptions = {
     containerName,
     blobName,
     permissions: BlobSASPermissions.parse("c"),
     startsOn: new Date(new Date().valueOf() - 1 * 60 * 1000),
-    expiresOn: new Date(new Date().valueOf() + 4 * 60 * 1000),
+    expiresOn: new Date(new Date().valueOf() + 5 * 60 * 1000),
   };
 
   try {
