@@ -123,22 +123,22 @@ export default function TalentMatchPage() {
 
   async function onSubmit(values: ProfileDataType) {
     try {
-      if (!userData) return;
+      // if (!userData) return;
 
-      const userName = userData.name || "No Name";
+      // const userName = userData.name || "No Name";
 
-      const res = await createTalentProfile({
-        ...values,
-        userId: userData.id,
-        userName,
-      });
+      // const res = await createTalentProfile({
+      //   ...values,
+      //   userId: userData.id,
+      //   userName,
+      // });
 
-      if (res === "success") {
-        form.reset();
-        toast.success("Talent Profile created Successfully");
-      } else {
-        toast.error("Failed to create talent profile");
-      }
+      // if (res === "success") {
+      //   form.reset();
+      //   toast.success("Talent Profile created Successfully");
+      // } else {
+      //   toast.error("Failed to create talent profile");
+      // }
     } catch (error) {
       console.error(error);
       toast.error("Failed to create talent profile");

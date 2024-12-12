@@ -37,6 +37,55 @@ export const acceptTalentMatch = async (matchId: string) => {
   }
 };
 
+type StructuredData = {
+  personalInfo: {
+    [key: string]: string;
+  };
+  description: string[];
+  education: {
+    [key: string]: string;
+  }[];
+  sections: string[];
+  interests: string[];
+  projects: {
+    [key: string]: string | string[];
+  }[];
+  workExperience: {
+    [key: string]: string | string[];
+  }[];
+};
+
+export const createTalentProfile = async (structuredData: StructuredData) => {
+  try {
+    const user = await auth();
+
+    if (!user) {
+      return {
+        status: "failed",
+        message: "User not authenticated",
+      };
+    }
+
+    await prisma.talentProfile.create({
+      data: {
+        structuredData,
+        userId: user.id,
+      },
+    });
+
+    return {
+      status: "success",
+      message: "Profile created successfully",
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      status: "failed",
+      message: "Error creating profile",
+    };
+  }
+};
+
 type ProfileData = {
   resumeId: string;
   interviewId: string;
@@ -51,10 +100,16 @@ type ProfileData = {
   userName: string;
 };
 
-export const createTalentProfile = async (profileData: ProfileData) => {
+export const updateTalentProfile = async (
+  profileData: ProfileData,
+  profileId: string
+) => {
   try {
-    await prisma.talentProfile.create({
-      data: { ...profileData },
+    await prisma.talentProfile.update({
+      where: {
+        id: profileId,
+      },
+      data: profileData,
     });
 
     return "success";
@@ -136,23 +191,6 @@ type ExtractedData = {
   }[];
 };
 
-// export const updateTalentProfile = async (extractedData: ExtractedData) => {
-//   try {
-//     await prisma.talentProfile.create({
-//       data: extractedData,
-//     });
-
-//     return "success";
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-// const generateFileName = (fileName: string, type: string) => {
-//   const date = new Date().toISOString();
-//   return `${type}-${date}-${fileName}`;
-// };
-
 export const uploadResumeToAzure = async (formData: FormData) => {
   try {
     const user = await auth();
@@ -164,9 +202,10 @@ export const uploadResumeToAzure = async (formData: FormData) => {
       };
     }
 
-    const file = formData.get("file") as File;
+    const date = new Date().toISOString();
+    const fileName = `cv-${date}-${user.id}.pdf`;
 
-    const sasUrl = await generateSasToken(file.name);
+    const sasUrl = await generateSasToken(fileName);
 
     if (!sasUrl) {
       return {
@@ -175,6 +214,7 @@ export const uploadResumeToAzure = async (formData: FormData) => {
       };
     }
 
+    const file = formData.get("file") as File;
     const response = await fetch(sasUrl, {
       method: "PUT",
       headers: {

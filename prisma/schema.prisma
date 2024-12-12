@@ -125,9 +125,9 @@ model TalentProfile {
   locationPref    String?
   experienceYears String?
   availability    Availability?
-  structuredData  StructuredData?
+  structuredData  StructuredData
   talentMatch     TalentMatch[]
-  userName        String
+  userName        String?
   userId          String          @db.ObjectId
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt       DateTime        @default(now())
