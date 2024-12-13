@@ -26,15 +26,15 @@ type TalentPoolData = {
 
 interface DeveloperProfile {
   id: string;
-  resumeId: string;
-  interviewId: string;
+  resumeId: string | null;
+  interviewId: string | null;
   skills: string[];
   profiles: string[];
   certifications: string[];
-  expectedSalary: string;
-  locationPref: string;
-  experienceYears: string;
-  availability: string;
+  expectedSalary: string | null;
+  locationPref: string | null;
+  experienceYears: string | null;
+  availability: string | null;
   userId: string;
   createdAt: Date;
   updatedAt: Date;

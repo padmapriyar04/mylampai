@@ -7,6 +7,7 @@ import {
   acceptTalentMatch,
   getResumeAndInterviewIds,
   uploadResumeToAzure,
+  updateTalentProfile,
 } from "@/actions/talentMatchActions";
 import { getTalentPoolsData } from "@/actions/talentPoolActions";
 import { useUserStore } from "@/utils/userStore";
@@ -106,6 +107,8 @@ export default function TalentMatchPage() {
   const [interviewIds, setInterviewIds] = useState<IdsType[]>([]);
   const structuredData = useRef<StructuredData | null>(null);
 
+  const [profileId, setProfileId] = useState<string | null>(null);
+
   const form = useForm<ProfileDataType>({
     resolver: zodResolver(profileDataSchema),
     defaultValues: {
@@ -123,22 +126,24 @@ export default function TalentMatchPage() {
 
   async function onSubmit(values: ProfileDataType) {
     try {
-      // if (!userData) return;
+      if (!userData || !profileId) return;
 
-      // const userName = userData.name || "No Name";
+      const userName = userData.name || "No Name";
 
-      // const res = await createTalentProfile({
-      //   ...values,
-      //   userId: userData.id,
-      //   userName,
-      // });
+      const res = await updateTalentProfile(
+        {
+          ...values,
+          userName,
+        },
+        profileId
+      );
 
-      // if (res === "success") {
-      //   form.reset();
-      //   toast.success("Talent Profile created Successfully");
-      // } else {
-      //   toast.error("Failed to create talent profile");
-      // }
+      if (res === "success") {
+        form.reset();
+        toast.success("Talent Profile created Successfully");
+      } else {
+        toast.error("Failed to create talent profile");
+      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to create talent profile");
@@ -225,6 +230,8 @@ export default function TalentMatchPage() {
       }
 
       structuredData.current = structuredDataResult;
+
+      console.log(structuredDataResult);
     };
 
     fileReader.readAsArrayBuffer(file);

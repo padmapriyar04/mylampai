@@ -6,6 +6,7 @@ import {
   CarouselContent,
 } from "@/components/ui/carousel";
 
+import AutoPlay from "embla-carousel-autoplay";
 interface CounsellorCardProps {
   name: string;
   image: string;
@@ -21,7 +22,19 @@ const carouselData = [
     ranking: "Lead Counsellor",
   },
   {
-    name: "Fiona Claudia",
+    name: "Claudia",
+    image: "/home/profile.jpg",
+    experience: "22k+ students counselled",
+    ranking: "Lead Counsellor",
+  },
+  {
+    name: "Fdia",
+    image: "/home/profile.jpg",
+    experience: "22k+ students counselled",
+    ranking: "Lead Counsellor",
+  },
+  {
+    name: "nadia",
     image: "/home/profile.jpg",
     experience: "22k+ students counselled",
     ranking: "Lead Counsellor",
@@ -68,7 +81,7 @@ interface BulletCardProps {
 
 const BulletCard: React.FC<BulletCardProps> = ({ title, description }) => {
   return (
-    <div className="w-full max-w-[380px] flex p-4 gap-4 items-center bg-white rounded-xl overflow-hidden shadow-lg">
+    <div className="w-full max-w-[360px] flex p-4 gap-4 items-center bg-white rounded-xl overflow-hidden shadow-lg">
       <div className="bg-[#2E66D3] w-6 h-6 rounded-full backdrop-blur-sm"></div>
       <div>
         <div className="text-xl font-semibold">{title}</div>
@@ -83,41 +96,50 @@ const BulletCard: React.FC<BulletCardProps> = ({ title, description }) => {
 const ExperiencedCounsellors: React.FC = () => {
   return (
     <>
-        <h4 className="pt-4 font-semibold text-primary px-6">
-          EXPERTS INSIGHTS
-          <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
-        </h4>
-        <div className="text-3xl font-medium mt-8 mb-4 px-6">
-          Expertise of 1,000+ industry professionals and experts at your reach
+      <h4 className="pt-4 font-semibold text-primary px-6">
+        EXPERTS INSIGHTS
+        <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
+      </h4>
+      <div className="text-3xl font-medium mt-8 mb-4 px-6">
+        Expertise of 1,000+ industry professionals and experts at your reach
+      </div>
+      <p className="text-[#000000BB] font-medium my-4 px-6">
+        For every phase of your college and career journey, we&apos;ve got you
+        covered. Our models are trained on extensive quality data and curated
+        insights from experienced industry and subject matter experts, guiding
+        you to your dream path.
+      </p>
+      <div className="w-full my-8 rounded-2xl">
+        <Carousel
+          plugins={[
+            AutoPlay({
+              delay: 2000,
+              stopOnFocusIn: true,
+              stopOnMouseEnter: true,
+              stopOnInteraction: false,
+            }),
+          ]}
+        >
+          <CarouselContent className="px-4 pb-8">
+            {carouselData.map((item, index) => (
+              <CarouselItem key={index} className="basis-1/2 xl:basis-1/3">
+                <CounsellorCard
+                  name={item.name}
+                  image={item.image}
+                  experience={item.experience}
+                  ranking={item.ranking}
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+        <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground py-8 px-4 mx-6 rounded-lg shadow-lg">
+          <BulletCard title="10k+" description="Successful Premium Admits" />
+          <BulletCard title="10k+" description="Successful Premium Admits" />
+          <BulletCard title="10k+" description="Successful Premium Admits" />
+          <BulletCard title="10k+" description="Successful Premium Admits" />
         </div>
-        <p className="text-[#000000BB] font-medium my-4 px-6">
-          For every phase of your college and career journey, we&apos;ve got you
-          covered. Our models are trained on extensive quality data and curated
-          insights from experienced industry and subject matter experts, guiding
-          you to your dream path.
-        </p>
-        <div className="w-full my-8 rounded-2xl">
-          <Carousel> 
-            <CarouselContent className="px-4 pb-8">
-              {carouselData.map((item, index) => (
-                <CarouselItem key={index} className="basis-1/2 xl:basis-1/3">
-                  <CounsellorCard
-                    name={item.name}
-                    image={item.image}
-                    experience={item.experience}
-                    ranking={item.ranking}
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </Carousel>
-          <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground py-8 px-4 mx-6 rounded-lg shadow-lg">
-            <BulletCard title="10k+" description="Successful Premium Admits" />
-            <BulletCard title="10k+" description="Successful Premium Admits" />
-            <BulletCard title="10k+" description="Successful Premium Admits" />
-            <BulletCard title="10k+" description="Successful Premium Admits" />
-          </div>
-        </div>
+      </div>
     </>
   );
 };

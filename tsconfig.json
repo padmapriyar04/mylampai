@@ -29,6 +29,6 @@
     "components/home/Typing.jsx",
     "app/(protected)/cvreviewer/Highlighter.jsx",
     "types/pdfjs-dist.d.ts"
-  ],
+, "components/ui/globe.jsx"  ],
   "exclude": ["node_modules"]
 }

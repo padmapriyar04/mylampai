@@ -26,6 +26,9 @@ import {
   verifyOTPandLogin,
   nextAuthLogin,
 } from "@/actions/authActions";
+import Globe from "@/components/ui/globe";
+import { useSearchParams } from "next/navigation";
+import { Linkedin } from "react-bootstrap-icons";
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -49,6 +52,10 @@ export default function LoginPage() {
   const { data } = useSession();
   const { setUserData } = useUserStore();
   const [showOTP, setshowOTP] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const searchParams = useSearchParams();
+  const role = searchParams.get("role") === "recruiter" ? "recruiter" : "user";
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -85,11 +92,8 @@ export default function LoginPage() {
   }
 
   const sendOTPforLogin = async () => {
+    setSending(true);
     try {
-      const queryParams = new URLSearchParams(window.location.search);
-      const role =
-        queryParams.get("role") === "recruiter" ? "recruiter" : "user";
-
       const res = await handleSendOTP(form.getValues("email"), role);
       if (res.otpSent) {
         setshowOTP(true);
@@ -100,6 +104,8 @@ export default function LoginPage() {
     } catch (error) {
       console.log(error);
       toast.error("Failed to send OTP");
+    } finally {
+      setSending(false);
     }
   };
 
@@ -118,14 +124,11 @@ export default function LoginPage() {
 
     const email = data.user.email as string;
 
-    const queryParams = new URLSearchParams(window.location.search);
-    const role = queryParams.get("role") === "recruiter" ? "recruiter" : "user";
-
     const handleLogin = async () => {
       const res = await nextAuthLogin({ email, role });
 
       if (res.status === "success") {
-        toast.success(res.message);
+        toast.success("Login successful");
         if (res.user && res.accessToken) {
           setUserData(res.user, res.accessToken);
           setCookie("accessToken", res.accessToken);
@@ -138,7 +141,7 @@ export default function LoginPage() {
     };
 
     handleLogin();
-  }, [data, router, setUserData]);
+  }, [data, router, role, setUserData]);
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0 h-screen">
@@ -151,35 +154,35 @@ export default function LoginPage() {
           className="w-full h-auto drop-shadow-md"
         />
       </Link>
-      <div className="bg-white rounded-lg md:rounded-tr-[5.5rem] md:rounded-bl-[5.5rem] p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
-        <div className="justify-evenly flex-col items-center hidden md:flex w-full md:max-w-[350px] bg-primary-foreground rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
-          <Image
+      <div className="bg-white rounded-lg md:rounded-tr-[5.5rem] md:rounded-bl-[5.5rem] p-[10px] gap-2 w-full max-w-[750px] flex flex-col sm:flex-row shadow-md items-center ">
+        <div className="justify-evenly flex-col items-center hidden md:flex w-full md:max-w-[300px] bg-primary-foreground rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 h-full">
+          {/* <Image
             src={"/images/Globe.svg"}
             alt="globe"
-            className="w-full filter"
+            className="w-full h-auto hue-rotate-180"
             width={100}
             height={100}
-          />
-          <div className="flex flex-col gap-2 justify-center items-center p-2">
-            <h2 className="font-bold text-gray-500 text-center">
-              Take the WiZe AI Mock Interview
+          /> */}
+          <Globe />
+          <div className="flex flex-col gap-2 text-gray-500 justify-center items-center p-2">
+            <h2 className="font-medium w-full">
+              Take the wiZe AI Mock Interview
             </h2>
             <div>
-              <p className="text-gray-400 font-semibold text-xs">
+              <p className="text-xs">
                 You&apos;ll be taking a 20-minute interview to have your skills
-                evaluated. Just relax and take the interview.
-              </p>
-              <p className="text-gray-600 font-semibold text-xs">
-                All the Best!
+                evaluated. Just relax and take the interview. All the Best!
               </p>
             </div>
-            <div className="flex gap-1 items-center mt-4">
-              <p className="text-gray-400 text-xs font-semibold">
-                Want to hire talent?
+            <div className="flex gap-2 text-slate-600 font-medium items-center mt-4">
+              <p className="text-xs ">
+                {role === "recruiter"
+                  ? "Login as student?"
+                  : "Want to hire talent?"}
               </p>
               <Link
-                href={"/login?role=recruiter"}
-                className="text-primary font-bold text-sm"
+                href={role === "recruiter" ? "/login" : "/login?role=recruiter"}
+                className="text-xs font-bold text-primary"
               >
                 Continue Here
               </Link>
@@ -187,90 +190,95 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 flex flex-col justify-center my-auto">
-          <div className="flex flex-col h-full sm:p-1 gap-4">
-            <p className="bg-primary mx-auto w-6 h-6 sm:w-8 sm:h-8 rounded"></p>
-            <div className="flex justify-center items-center">
-              <h1 className="font-bold sm:text-xl mr-2">SignUp or Login to</h1>
-              <h1 className="font-bold text-primary sm:text-xl"> wiZ</h1>
-              <h1 className="font-bold sm:text-xl">e in seconds</h1>
+        <div className="w-full md:h-full md:min-h-[426px] p-4 flex flex-col justify-center my-auto">
+          <div className="flex flex-col mt-6 h-full gap-2">
+            <div className="flex items-center justify-center">
+              <Image
+                src={"/sidebar/wize_logo_whitebg.svg"}
+                alt="wiZe logo"
+                width={40}
+                height={40}
+              />
             </div>
-            <div className="flex flex-col justify-center items-cente p-0 sm:p-8">
+            <div className="flex font-medium justify-center items-center">
+              <h1>Signup or Login to &nbsp;</h1>
+              <h1 className="text-primary"> wiZ</h1>
+              <h1>e in seconds</h1>
+            </div>
+            <div className="flex flex-col justify-center items-center px-8 mt-8">
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className=" p-0 sm:p-4 w-full"
-                >
-                  {!showOTP ? (
-                    <div className="flex flex-col gap-4 items-center justify-center p-2 ">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+                  <div className="flex flex-col gap-4 items-center justify-center">
+                    <div className={`w-full ${showOTP ? "hidden" : ""}`}>
                       <FormField
                         control={form.control}
                         name="email"
                         render={({ field }) => (
                           <FormItem className="w-full">
-                            <FormLabel className="font-bold">
-                              Email Id
-                            </FormLabel>
+                            <FormLabel>Email ID</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="Email"
                                 {...field}
-                                className="flex items-center text-xs md:text-sm justify-center bg-white font-semibold text-slate-500 shadow p-3 border-slate-300 rounded-md space-x-2  transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02]"
+                                className="shadow-none text-gray-900 py-4 px-2 border rounded-lg space-x-2"
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      <button
-                        type="button"
-                        onClick={sendOTPforLogin}
-                        className="bg-primary text-slate-50 w-full text-sm sm:font-bold px-2 sm:px-4 py-2 rounded-md shadow hover:bg-primary-dark transition-all duration-300 hover:shadow-lg hover:scale-105"
-                      >
-                        Continue
-                      </button>
                     </div>
-                  ) : (
-                    <div className="flex flex-col gap-4 items-center justify-center p-0 sm:p-2 ">
+                    <div className={`w-full ${!showOTP ? "hidden" : ""}`}>
                       <FormField
                         control={form.control}
                         name="pin"
                         render={({ field }) => (
                           <FormItem className="w-full">
-                            <FormLabel className="font-bold">OTP</FormLabel>
+                            <FormLabel>OTP</FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="OTP"
+                                placeholder="Enter OTP"
                                 {...field}
-                                className="flex items-center text-xs md:text-sm justify-center bg-white font-semibold text-slate-500 shadow p-3 border-slate-300 rounded-md space-x-2  transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02]"
+                                className="shadow-none text-gray-900 py-4 px-2 border rounded-lg space-x-2"
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
+                    </div>
+
+                    {!showOTP ? (
+                      <Button
+                        type="button"
+                        disabled={sending}
+                        onClick={sendOTPforLogin}
+                        className="bg-primary text-slate-50 w-full text-sm sm:font-bold px-2 sm:px-4 py-2 rounded-lg shadow hover:bg-primary"
+                      >
+                        Continue
+                      </Button>
+                    ) : (
                       <Button
                         type="submit"
-                        className="bg-primary text-slate-50 w-full text-sm sm:font-bold px-2 sm:px-4 py-2 rounded-md shadow hover:bg-primary-dark transition-all duration-300 hover:shadow-lg hover:scale-105"
+                        disabled={form.formState.isSubmitting}
+                        className="bg-primary text-slate-50 w-full text-sm sm:font-bold px-2 sm:px-4 py-2 rounded-lg shadow hover:bg-primary"
                       >
                         Let&apos;s Go
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </form>
               </Form>
-              <div className="flex items-center justify-center gap-2 w-full p-0 sm:p-6">
-                <div className="flex-grow border-t border-gray-400"></div>
-                <p className="text-gray-400 sm:text-sm font-bold">
-                  Or Continue with
-                </p>
-                <div className="flex-grow border-t border-gray-400"></div>
+              <div className="flex items-center justify-center gap-2 my-[25px] w-full">
+                <div className="flex-grow border-t"></div>
+                <p className="text-gray-400 text-xs px-2">Or continue with</p>
+                <div className="flex-grow border-t"></div>
               </div>
 
-              <div className="flex gap-2 sm:gap-8 justify-center items-center w-full p-0 sm:p-4">
+              <div className="flex gap-2 sm:gap-8 justify-center items-center w-full">
                 <button
                   type="button"
-                  className="flex items-center justify-center w-full bg-white text-gray-500 shadow p-3 border-gray-600 rounded-md space-x-2  font-semibold transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02]"
+                  className="flex items-center justify-center w-full border h-10 rounded-lg space-x-2 "
                   onClick={() => handleNextAuthLogin("google")}
                 >
                   <Image
@@ -287,17 +295,10 @@ export default function LoginPage() {
 
                 <button
                   type="button"
-                  className="flex items-center justify-center w-full bg-white text-slate-500 shadow p-3 border-gray-600 rounded-md space-x-2 transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02]"
+                  className="flex items-center justify-center w-full border h-10 rounded-lg space-x-2 "
                   onClick={() => handleNextAuthLogin("linkedin")}
                 >
-                  {/* <Linkedin /> */}
-                  <Image
-                    src={"/images/linkedin-icon.png"}
-                    alt="linkedin login"
-                    width={100}
-                    height={100}
-                    className="w-6 h-6"
-                  />
+                  <Linkedin className="text-[#0A66C2]" />
                   <span className="text-slate-500 font-bold sm:text-sm">
                     LinkedIn
                   </span>

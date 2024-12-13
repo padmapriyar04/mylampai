@@ -8,16 +8,29 @@ import {
   RecruiterComponent,
   AboutComponent,
 } from "./HomeNavbarComponents";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import LoginComponent from "../global/Login";
+import { useSession } from "next-auth/react";
+import { nextAuthLogin } from "@/actions/authActions";
+import { signOut } from "next-auth/react";
+import { setCookie } from "@/utils/cookieUtils";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useRoleStore } from "@/utils/loginStore";
 
 const HomeNavbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const router = useRouter();
+  const { data } = useSession();
 
-  const { userData } = useUserStore();
+  const { role, setRole } = useRoleStore();
+
+  const { userData, setUserData } = useUserStore();
   const [initials, setInitials] = useState("Home");
 
   useEffect(() => {
     const handleScroll = () => {
-      const triggerPoint = 1000;
+      const triggerPoint = 100;
       if (window.scrollY > triggerPoint) {
         setScrolled(true);
       } else {
@@ -31,6 +44,31 @@ const HomeNavbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const handleLogin = async (email: string, role: "user" | "recruiter") => {
+    const res = await nextAuthLogin({ email, role });
+
+    if (res.status === "success" && res.user && res.accessToken) {
+      setUserData(res.user, res.accessToken);
+      setCookie("accessToken", res.accessToken);
+    } else {
+      toast.error(res.message);
+    }
+
+    await signOut();
+  };
+
+  useEffect(() => {
+    if (role === null) return;
+
+    if (!data || !data.user) {
+      return;
+    }
+
+    const email = data.user.email as string;
+
+    handleLogin(email, role);
+  }, [data, router, role, setUserData]);
 
   useEffect(() => {
     const getUserInitials = () => {
@@ -99,12 +137,19 @@ const HomeNavbar = () => {
             <Image src={"/home/userNavbar.svg"} alt="" height={20} width={20} />
           </Link>
         ) : (
-          <Link
-            href={"/login"}
-            className="flex items-center bg-primary h-[35px] text-white px-4  gap-2 rounded-lg"
-          >
-            Login / Sign Up
-          </Link>
+          <Dialog>
+            <DialogTrigger>
+              <div
+                onClick={() => setRole("user")}
+                className="flex items-center bg-primary h-[35px] text-white px-4  gap-2 rounded-lg"
+              >
+                Login / Sign Up
+              </div>
+            </DialogTrigger>
+            <DialogContent className="bg-transparent border-none max-w-3xl">
+              <LoginComponent />
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </div>

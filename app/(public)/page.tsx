@@ -59,14 +59,14 @@ export default function Page() {
         <HeroSection />
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
-        <AboutWize />
+        {/* <AboutWize /> */}
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
-        <WizeCamp />
+        {/* <WizeCamp /> */}
         {/* </SectionWrapper> */}
         {/* <SectionWrapper>
         </SectionWrapper> */}
-        <HomeSlider />
+        {/* <HomeSlider /> */}
         <WhyWize />
         {/* <SectionWrapper> */}
         <BackedByBest />
@@ -75,7 +75,7 @@ export default function Page() {
         <PowerOfWize />
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
-        <RecentAdvances />
+        {/* <RecentAdvances /> */}
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
         <CommunitySection />

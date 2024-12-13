@@ -4,6 +4,7 @@ import { Bookmark, BookmarkMinus } from "lucide-react";
 import { NavMain } from "@/components/global/nav-main";
 import { NavUser } from "@/components/global/nav-user";
 import Image from "next/image";
+import Link from "next/link";
 import { House, HouseFill, FileEarmarkText, FileEarmarkTextFill, CameraVideo, CameraVideoFill, Briefcase, BriefcaseFill, PersonCheck, PersonFillCheck } from "react-bootstrap-icons";
 
 const data = {
@@ -176,14 +177,14 @@ export function AppSidebar() {
   return (
     <div className="flex flex-col items-center justify-between py-4 max-w-20 w-full">
       <div className="flex items-center flex-col gap-4">
-        <div className="shadow-lg">
+        <Link href={"/home"} className="shadow-lg">
           <Image
             src={"/sidebar/wize_logo_whitebg.svg"}
             alt="wiZe logo"
             width={50}
             height={50}
           />
-        </div>
+        </Link>
         <NavMain items={data.navMain} />
       </div>
       <NavUser />

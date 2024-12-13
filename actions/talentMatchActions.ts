@@ -19,7 +19,6 @@ export const getTalentMatches = async (userId: string) => {
 };
 
 export const acceptTalentMatch = async (matchId: string) => {
-  console.log(matchId);
   try {
     await prisma.talentMatch.update({
       where: {
@@ -96,7 +95,6 @@ type ProfileData = {
   locationPref: "onsite" | "remote" | "hybrid";
   availability: "FULL_TIME" | "PART_TIME" | "INTERN" | "CONTRACT";
   experienceYears: string;
-  userId: string;
   userName: string;
 };
 
@@ -105,6 +103,12 @@ export const updateTalentProfile = async (
   profileId: string
 ) => {
   try {
+    const user = await auth();
+
+    if (!user) {
+      return "failed";
+    }
+
     await prisma.talentProfile.update({
       where: {
         id: profileId,
@@ -167,28 +171,6 @@ export const getResumeAndInterviewIds = async (userId: string) => {
       interviewIds: [],
     };
   }
-};
-
-type ExtractedData = {
-  personalInfo: {
-    [key: string]: string;
-  };
-  description: string[];
-  skills: {
-    hard: string[];
-    soft: string[];
-  };
-  education: {
-    [key: string]: string;
-  }[];
-  sections: string[];
-  interests: string[];
-  projects: {
-    [key: string]: string | string[];
-  }[];
-  workExperience: {
-    [key: string]: string | string[];
-  }[];
 };
 
 export const uploadResumeToAzure = async (formData: FormData) => {
