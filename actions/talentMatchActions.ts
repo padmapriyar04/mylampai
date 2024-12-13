@@ -37,24 +37,13 @@ export const acceptTalentMatch = async (matchId: string) => {
 };
 
 type StructuredData = {
-  personalInfo: {
-    [key: string]: string;
-  };
-  description: string[];
-  education: {
-    [key: string]: string;
-  }[];
-  sections: string[];
-  interests: string[];
-  projects: {
-    [key: string]: string | string[];
-  }[];
-  workExperience: {
-    [key: string]: string | string[];
-  }[];
+  title: string;
+  description: string;
+  skills: string[];
+  rate: string;
 };
 
-export const createTalentProfile = async (structuredData: StructuredData) => {
+export const createTalentProfile = async (data: StructuredData) => {
   try {
     const user = await auth();
 
@@ -67,7 +56,7 @@ export const createTalentProfile = async (structuredData: StructuredData) => {
 
     await prisma.talentProfile.create({
       data: {
-        structuredData,
+        ...data,
         userId: user.id,
       },
     });

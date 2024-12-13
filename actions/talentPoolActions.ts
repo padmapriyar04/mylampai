@@ -90,7 +90,6 @@ export const matchTalentProfile = async (
       where: {
         OR: [
           { skills: { hasSome: talentPoolData.skills } },
-          { profiles: { hasSome: talentPoolData.profiles } },
         ],
       },
       take: 50,

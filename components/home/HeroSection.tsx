@@ -94,7 +94,7 @@ export default function HeroSection() {
                     className=" flex gap-4 items-center w-[225px] h-[45px] justify-center bg-primary rounded-lg text-white text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 md:max-w-[300px] hover:bg-primary-dark lg:ml-14"
                   >
                     Access Opportunities
-                    <MoveRight size={24} />
+                    <ArrowRight size={24} />
                   </div>
                 </DialogTrigger>
                 <DialogContent className="bg-transparent border-none max-w-3xl shadow-none">

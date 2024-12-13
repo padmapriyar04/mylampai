@@ -281,22 +281,22 @@ export default function TalentMatchPage() {
           getTalentProfiles(userId),
         ]);
 
-        if (profiles) {
-          setTalentProfiles(profiles);
-        }
+        // if (profiles) {
+        //   setTalentProfiles(profiles);
+        // }
 
-        if (matches && matches.length) {
-          const talentPoolIds = matches.map((match) => match.talentPoolId);
-          const talentPoolsData = await getTalentPoolsData(talentPoolIds);
+        // if (matches && matches.length) {
+        //   const talentPoolIds = matches.map((match) => match.talentPoolId);
+        //   const talentPoolsData = await getTalentPoolsData(talentPoolIds);
 
-          const mergedData = matches.map((match, index) => ({
-            matchId: match.id,
-            isMatched: match.isMatched,
-            ...(talentPoolsData[index] || {}),
-          }));
+        //   const mergedData = matches.map((match, index) => ({
+        //     matchId: match.id,
+        //     isMatched: match.isMatched,
+        //     ...(talentPoolsData[index] || {}),
+        //   }));
 
-          setTalentMatches(mergedData);
-        }
+        //   setTalentMatches(mergedData);
+        // }
       } catch (error) {
         console.error("Error fetching data:", error);
       }

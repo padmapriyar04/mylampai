@@ -67,7 +67,7 @@ export default function ProfileMatches({
   const handleGetProfiles = useCallback(async () => {
     try {
       const res = await matchTalentProfile(poolData);
-      if (res) setProfiles(res);
+      // if (res) setProfiles(res);
     } catch (error) {
       console.error(error);
     }
