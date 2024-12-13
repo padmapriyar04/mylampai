@@ -17,7 +17,11 @@ model User {
   last_name      String?
   phone          String?
   hashedPassword String?
+  gender         String? 
+  location       String?
   role           String          @default("user")
+  languages      String[]
+  education      Education[]
   talentPool     TalentPool[]
   jobProfile     JobProfile[]
   talentProfile  TalentProfile[]
@@ -64,6 +68,22 @@ model Session {
   userId       String   @db.ObjectId
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Education {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  school      String
+  degree      String?
+  field       String?
+  percentage  String?
+  cgpa        String?
+  startDate   DateTime?
+  endDate     DateTime?
+  description String?
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model OTP {
@@ -115,33 +135,45 @@ model TalentMatch {
 
 // user
 model TalentProfile {
-  id              String          @id @default(auto()) @map("_id") @db.ObjectId
-  resumeId        String?         @db.ObjectId
-  interviewId     String?         @db.ObjectId
-  skills          String[]
-  profiles        String[]
-  certifications  String[]
-  expectedSalary  String?
-  locationPref    String?
-  experienceYears String?
-  availability    Availability?
-  structuredData  StructuredData
-  talentMatch     TalentMatch[]
-  userName        String?
-  userId          String          @db.ObjectId
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  rate        String
+  skills      String[]
+  hours       String        @default("None")
+  talentMatch TalentMatch[]
+  portfolio   Portfolio[]
+  employment  Employment[]
+  userId      String        @db.ObjectId
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
-type StructuredData {
-  personalInfo   Json
-  description    String[]
-  education      Json[]
-  sections       String[]
-  interests      String[]
-  projects       Json[]
-  workExperience Json[]
+model Portfolio {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  description     String
+  role            String?
+  url             String?
+  skills          String[]
+  talentProfileId String        @db.ObjectId
+  talentProfile   TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Employment {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  company         String
+  position        String
+  startDate       DateTime
+  endDate         DateTime?
+  description     String?
+  talentProfileId String        @db.ObjectId
+  talentProfile   TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model JobProfile {

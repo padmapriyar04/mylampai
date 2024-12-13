@@ -3,7 +3,7 @@ import Image from "next/image";
 import Typing from "./Typing";
 import { useEffect } from "react";
 import InfiniteLogoSlide from "./InfiniteLogoSlide";
-import { MoveRight } from "lucide-react";
+import { ArrowRight, MoveRight } from "lucide-react";
 import Globe from "@/components/ui/globe";
 import { useSession } from "next-auth/react";
 import { nextAuthLogin } from "@/actions/authActions";
@@ -55,8 +55,8 @@ export default function HeroSection() {
           {/* <div className="absolute bg-[url('/home/herosection/herosection-earth.svg')] scale-x-125 scale-y-[0.8] bg-no-repeat bg-center bg-cover h-[336px] -bottom-[5%] left-[10%] w-[600px]"></div> */}
 
           <div className="flex flex-col justify-center min-h-[600px] w-full z-10">
-            <div className="text-4xl relative md:text-5xl xl:text-6xl font-bold lg:ml-14 mb-6">
-              <div className="flex items-center justify-evenly text-sm font-light absolute top-0 -translate-y-[140%] rounded-lg px-4 py-1 gap-2 bg-[#fafafa] border max-w-[300px]">
+            <div className=" relative font-bold lg:ml-14 mb-6">
+              <div className="flex items-center justify-evenly text-sm font-light absolute top-0 -translate-y-[150%] rounded-lg px-4 py-1 gap-2 bg-[#fafafa] border max-w-[300px]">
                 Backed by{" "}
                 <Image
                   src={"/home/herosection/nsrcel_logo.svg"}
@@ -67,14 +67,22 @@ export default function HeroSection() {
                 />{" "}
                 IIM Banglore
               </div>
-              <Typing /> <br />{" "}
-              <span className="font-semibold">Your Dream Career</span>
+              {/* <Typing /> <br />{" "} */}
+              <span className="font-semibold text-[40px] leading-10">
+                We nurture, assess & match
+                <div className="mt-2">
+                  {" "}
+                  <span className="text-primary">Talent</span> with premium
+                  Opportunities
+                </div>
+              </span>
             </div>
-            <div className=" lg:text-2xl font-medium lg:ml-16 mb-9 max-w-[640px]">
-              Get AI - Powered personalised career guidance based on Your
-              interests, aptitude, and goals
+            <div className="text-gray-500 lg:ml-14 mb-9 max-w-[640px]">
+              Join the exclusive talent pool with just one application and
+              assessment, unlocking access to thousands of premium opportunities
+              worldwide.
             </div>
-            <div className="flex gap-4 relative">
+            <div className="flex relative">
               <div className="absolute bottom-0 z-0 translate-y-full left-1/2 -translate-x-1/2 scale-125 w-[600px] h-[600px] overflow-hidden">
                 <Globe />
               </div>
@@ -82,13 +90,14 @@ export default function HeroSection() {
                 <DialogTrigger className="z-10">
                   <div
                     onClick={() => setRole("user")}
-                    className="flex gap-4 items-center w-[195px] h-[45px] justify-center bg-primary rounded-lg duration-150 hover:scale-[1.02] text-white text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 md:max-w-[300px]  lg:ml-14"
+                    id="button-dark"
+                    className=" flex gap-4 items-center w-[225px] h-[45px] justify-center bg-primary rounded-lg text-white text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 md:max-w-[300px] hover:bg-primary-dark lg:ml-14"
                   >
-                    Get Started
+                    Access Opportunities
                     <MoveRight size={24} />
                   </div>
                 </DialogTrigger>
-                <DialogContent className="bg-transparent border-none max-w-3xl">
+                <DialogContent className="bg-transparent border-none max-w-3xl shadow-none">
                   <LoginComponent />
                 </DialogContent>
               </Dialog>
@@ -101,14 +110,14 @@ export default function HeroSection() {
                 <DialogTrigger className="z-10">
                   <div
                     onClick={() => setRole("recruiter")}
-                    className="flex gap-4 z-10 items-center w-[195px] h-[45px] justify-center  rounded-lg duration-150 hover:scale-[1.02] border-2 text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 md:max-w-[300px] lg:ml-14"
+                    className="flex gap-4 z-10 items-center w-[225px] h-[45px] justify-center rounded-lg border-2 text-sm font-semibold py-2 md:py-3 pl-4  px-2 md:px-3 md:max-w-[300px] lg:ml-5 hover:bg-gray-50"
                   >
                     {" "}
-                    Recruiter
-                    <MoveRight size={24} />
+                    Recruit in no time
+                    <ArrowRight size={24} />
                   </div>
                 </DialogTrigger>
-                <DialogContent className="bg-transparent border-none max-w-3xl">
+                <DialogContent className="bg-transparent border-none max-w-3xl shadow-none">
                   <LoginComponent />
                 </DialogContent>
               </Dialog>

@@ -31,7 +31,7 @@ class Typing extends React.Component {
                     ref={(el) => {
                         this.el = el;
                     }}
-                    className='text-[#8C52FF]'
+                    className='text-primary text-6xl'
                 />
             </>
         );
