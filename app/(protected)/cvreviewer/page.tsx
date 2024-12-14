@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, ChangeEvent } from "react";
-import StepOneTwo from "./StepOneTwo";
+import { useState, ChangeEvent } from "react";
 import { useInterviewStore } from "@/utils/store";
-import PDFViewer from "./StepThree";
 import { useUserStore } from "@/utils/userStore";
+import StepOneTwo from "./StepOneTwo";
+import PDFViewer from "./StepThree";
 import { toast } from "sonner";
 
 const baseUrl = "https://optim-cv-judge.onrender.com";

@@ -256,7 +256,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               ).flatMap((item: any) => item.correction);
 
               if (sentencesToHighlight.length > 0) {
-                
                 setSentencesToHighlight(sentencesToHighlight);
                 highlightSentences(sentencesToHighlight, "highlighted", false);
               }
@@ -523,48 +522,48 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   }, []);
 
   const renderPDF = useCallback(async () => {
-    if (resumeFile && canvasRef.current) {
-      try {
-        const pdfData = base64ToUint8Array(resumeFile);
-        const loadingTask = pdfjsLib.getDocument({ data: pdfData });
-        const pdf = await loadingTask.promise;
-        const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1 });
-
-        const canvas = canvasRef.current;
-        const context = canvas.getContext("2d");
-
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        const renderContext = {
-          canvasContext: context,
-          viewport,
-        };
-
-        await page.render(renderContext).promise;
-
-        if (textLayerRef.current) {
-          textLayerRef.current.innerHTML = "";
-
-          const textContent = await page.getTextContent();
-          textLayerRef.current.style.width = `${canvas.offsetWidth}px`;
-          textLayerRef.current.style.height = `${canvas.offsetHeight}px`;
-
-          await pdfjsLib.renderTextLayer({
-            textContent: textContent,
-            container: textLayerRef.current,
-            viewport: viewport,
-            textDivs: [],
-          }).promise;
-
-          setIsTextLayerReady(true);
-        }
-      } catch (error) {
-        console.error("Error rendering PDF:", error);
-      }
-    } else {
+    if (!resumeFile || !canvasRef.current) {
       console.error("Canvas reference is null or resumeFile is not set.");
+      return;
+    }
+    try {
+      const pdfData = base64ToUint8Array(resumeFile);
+      const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+      const pdf = await loadingTask.promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1 });
+
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      const renderContext = {
+        canvasContext: context,
+        viewport,
+      };
+
+      await page.render(renderContext).promise;
+
+      if (textLayerRef.current) {
+        textLayerRef.current.innerHTML = "";
+
+        const textContent = await page.getTextContent();
+        textLayerRef.current.style.width = `${canvas.offsetWidth}px`;
+        textLayerRef.current.style.height = `${canvas.offsetHeight}px`;
+
+        await pdfjsLib.renderTextLayer({
+          textContent: textContent,
+          container: textLayerRef.current,
+          viewport: viewport,
+          textDivs: [],
+        }).promise;
+
+        setIsTextLayerReady(true);
+      }
+    } catch (error) {
+      console.error("Error rendering PDF:", error);
     }
   }, [resumeFile, base64ToUint8Array]);
 
@@ -673,10 +672,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               >
                 {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score ??
                   "N/A"}
-                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                    {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE
-                      ?.reason ?? "No details available"}
-                  </div>
+                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                  {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE
+                    ?.reason ?? "No details available"}
+                </div>
               </span>
             </div>
             <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
@@ -688,10 +687,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               >
                 {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE?.score ??
                   "N/A"}
-                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                    {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE
-                      ?.reason ?? "No details available"}
-                  </div>
+                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                  {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE
+                    ?.reason ?? "No details available"}
+                </div>
               </span>
             </div>
             <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
@@ -703,10 +702,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               >
                 {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.score ??
                   "N/A"}
-                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                    {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE
-                      ?.reason ?? "No details available"}
-                  </div>
+                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                  {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.reason ??
+                    "No details available"}
+                </div>
               </span>
             </div>
             {!reviewedData.resume_score && (

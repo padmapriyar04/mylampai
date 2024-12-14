@@ -17,7 +17,7 @@ model User {
   last_name      String?
   phone          String?
   hashedPassword String?
-  gender         String? 
+  gender         String?
   location       String?
   role           String          @default("user")
   languages      String[]
