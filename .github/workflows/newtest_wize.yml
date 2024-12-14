@@ -1,9 +1,9 @@
-name: Build and deploy Next.js app to Azure Web App
+name: Build and deploy Next.Js app to Azure Web App
 
 on:
   push:
     branches:
-      - newtest  
+      - newtest
   workflow_dispatch:
 
 env:
