@@ -57,9 +57,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_945024F5758F44DD95BC55CC5E2DB637 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DC7DD7026573493D82D173DD352BE86A }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0D3E9758DE0F41A6B726654006B50035 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_5B7F53BBE5AA470280123FD5AB77F9A3 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_ECB62FBF58B34C9C8AFC0D654D9B9892 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0F37EF4F0B37485DBE19CEE6D856160E }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
