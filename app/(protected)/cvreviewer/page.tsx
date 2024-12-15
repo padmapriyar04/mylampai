@@ -9,11 +9,8 @@ import { toast } from "sonner";
 const baseUrl = "https://optim-cv-judge.onrender.com";
 
 const Page: React.FC = () => {
-  const {
-    setResumeFile,
-    setJobDescriptionFile,
-    resumeFile,
-  } = useInterviewStore();
+  const { setResumeFile, setJobDescriptionFile, resumeFile } =
+    useInterviewStore();
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState("");
@@ -35,13 +32,12 @@ const Page: React.FC = () => {
 
   const triggerFileInput = (inputId: string) => {
     const inputElement = document.getElementById(
-      inputId,
+      inputId
     ) as HTMLInputElement | null;
     if (inputElement) {
       inputElement.click();
     }
   };
-
 
   const handleNextClick = () => {
     setStep((prevStep) => prevStep + 1);
@@ -52,7 +48,7 @@ const Page: React.FC = () => {
   };
 
   const handleJobDescriptionUpload = async (
-    event: ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target?.files?.[0];
     if (file) {
@@ -86,7 +82,6 @@ const Page: React.FC = () => {
       const response = await fetch(`${baseUrl}/extract_text_from_file`, {
         method: "POST",
         body: formData,
-  
       });
       const result = await response.json();
       return result.text || ""; // Adjust this depending on your API response structure
@@ -116,7 +111,7 @@ const Page: React.FC = () => {
 
   const uploadCVAndJobDescription = async (
     resumeFileBinary: ArrayBuffer,
-    jobDescriptionText: string,
+    jobDescriptionText: string
   ) => {
     try {
       if (!token) {
@@ -136,8 +131,8 @@ const Page: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Resume: resumeBase64, // Sending the resume file as base64
-          JobDescription: jobDescriptionBase64, // Sending the job description text as base64
+          Resume: resumeBase64,
+          JobDescription: jobDescriptionBase64,
         }),
       });
 
@@ -169,8 +164,8 @@ const Page: React.FC = () => {
           isManualEntry={isManualEntry}
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
-          profile={profile} 
-          setProfile={setProfile} 
+          profile={profile}
+          setProfile={setProfile}
         />
       ) : (
         <PDFViewer
