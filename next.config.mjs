@@ -15,7 +15,9 @@ const nextConfig = {
     config.resolve.alias.encoding = false
     return config
   },
-  output: "standalone"
+  reactStrictMode: true,
+  distDir: 'build',
+  output: 'standalone',
 };
 
 export default nextConfig;
