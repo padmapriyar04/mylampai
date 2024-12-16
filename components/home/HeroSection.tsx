@@ -51,8 +51,7 @@ export default function HeroSection() {
   return (
     <>
       <div className="flex flex-col select-none bg-[url('/home/herosection-background.svg')] max-w-screen overflow-hidden ">
-        <div className="flex relative justify-evenly items-center min-h-[555px] md:min-h-screen px-8 gap-8 w-full m-auto">
-          {/* <div className="absolute bg-[url('/home/herosection/herosection-earth.svg')] scale-x-125 scale-y-[0.8] bg-no-repeat bg-center bg-cover h-[336px] -bottom-[5%] left-[10%] w-[600px]"></div> */}
+        <div className="flex relative justify-evenly items-center min-h-[calc(100vh-80px)] px-8 gap-8 w-full m-auto">
 
           <div className="flex flex-col justify-center min-h-[600px] w-full z-10">
             <div className=" relative font-bold lg:ml-14 mb-6">
