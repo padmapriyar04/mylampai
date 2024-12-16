@@ -8,20 +8,29 @@ import {
   RecruiterComponent,
   AboutComponent,
 } from "./HomeNavbarComponents";
-import { Flag, HelpCircle, Menu, Trash } from "lucide-react";
-import SideBar, { SideBarItem } from "@/components/home/SideBar";
-import { Home, Grid, Boxes} from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import LoginComponent from "../global/Login";
+import { useSession } from "next-auth/react";
+import { nextAuthLogin } from "@/actions/authActions";
+import { signOut } from "next-auth/react";
+import { setCookie } from "@/utils/cookieUtils";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useRoleStore } from "@/utils/loginStore";
 
 const HomeNavbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const router = useRouter();
+  const { data } = useSession();
 
-  const { userData } = useUserStore();
-  const [initials, setInitials] = useState("Profile");
+  const { role, setRole } = useRoleStore();
+
+  const { userData, setUserData } = useUserStore();
+  const [initials, setInitials] = useState("Home");
 
   useEffect(() => {
     const handleScroll = () => {
-      console.log("Hello");
-      const triggerPoint = 1000;
+      const triggerPoint = 100;
       if (window.scrollY > triggerPoint) {
         setScrolled(true);
       } else {
@@ -35,16 +44,35 @@ const HomeNavbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);  // State to handle sidebar visibility
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  const handleLogin = async (email: string, role: "user" | "recruiter") => {
+    const res = await nextAuthLogin({ email, role });
+
+    if (res.status === "success" && res.user && res.accessToken) {
+      setUserData(res.user, res.accessToken);
+      setCookie("accessToken", res.accessToken);
+    } else {
+      toast.error(res.message);
+    }
+
+    await signOut();
   };
 
-  
+  useEffect(() => {
+    if (role === null) return;
+
+    if (!data || !data.user) {
+      return;
+    }
+
+    const email = data.user.email as string;
+
+    handleLogin(email, role);
+  }, [data, router, role, setUserData]);
+
   useEffect(() => {
     const getUserInitials = () => {
-      if (!userData?.name) return "Profile";
+      if (!userData?.name) return "Home";
 
       let name = userData.name;
 
@@ -64,43 +92,22 @@ const HomeNavbar = () => {
 
   return (
     <div
-      className={`flex justify-end items-center gap-4 bg-[#ffffff20] backdrop-blur-sm transition px-8 fixed top-0 w-full z-50 min-h-[64px]`}
+      className={`flex justify-end items-center gap-4 bg-transparent transition px-8 sticky top-0 w-full z-50 min-h-[64px]`}
     >
-       <div className="flex items-center justify-between absolute top-5 left-0 right-0 z-50 px-4">
-  <button
-    onClick={toggleSidebar}
-    className={`text-2xl p-2 bg-white hover:bg-gray-50 text-black rounded-lg shadow-md 
-    ${isSidebarOpen ? 'hidden' : ''} md:hidden`}
-  >
-    <Menu />
-  </button>
-  <Link
-    href="/"
-    className={`absolute md:mt-5 left-1/2 transform -translate-x-1/2 md:left-8 md:transform-none flex items-center h-11 overflow-hidden ${
-      scrolled ? "p-1 px-2" : "p-0"
-    } max-w-[150px] transition-all duration-300`}
-  >
-    <Image
-      src="/home/navbar/wizelogo.svg"
-      height={100}
-      width={180}
-      alt="logo"
-      className="w-auto h-full drop-shadow-md"
-    />
-  </Link>
-  <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar}>
-
-    <SideBarItem icon={<Home />} text="Home" active={true} />
-    <SideBarItem icon={<Grid />} text="Brand" alert={true} />
-    <SideBarItem icon={<Boxes />} text="Apps" />
-    <SideBarItem icon={<Flag />} text="Dream Lab" />
-    <SideBarItem icon={<HelpCircle />} text="Ask wize" />
-    <SideBarItem icon={<Trash />} text="Trash" />
-  </SideBar>
-</div>
-
-
-     
+      <Link
+        href={"/"}
+        className={`flex items-center h-11 overflow-hidden ${
+          scrolled ? "p-1 px-2" : "p-0"
+        } max-w-[150px] w-full absolute left-8 z-10 transition-all duration-300`}
+      >
+        <Image
+          src={"/home/navbar/wizelogo.svg"}
+          height={100}
+          width={180}
+          alt="logo"
+          className="w-auto h-full drop-shadow-md"
+        />
+      </Link>
       <div
         className={`md:flex relative text-sm hidden justify-end border items-center w-${
           scrolled ? "full" : "[600px]"
@@ -123,19 +130,26 @@ const HomeNavbar = () => {
 
         {userData ? (
           <Link
-            href={"/profile"}
+            href={"/home"}
             className="flex items-center bg-primary h-[35px] text-white pl-4 pr-2 gap-2 rounded-lg "
           >
             {initials}
             <Image src={"/home/userNavbar.svg"} alt="" height={20} width={20} />
           </Link>
         ) : (
-          <Link
-            href={"/login"}
-            className="flex items-center bg-primary h-[35px] text-white px-4  gap-2 rounded-lg"
-          >
-            Login / Sign Up
-          </Link>
+          <Dialog>
+            <DialogTrigger>
+              <div
+                onClick={() => setRole("user")}
+                className="flex items-center bg-primary h-[35px] text-white px-4  gap-2 rounded-lg"
+              >
+                Login / Sign Up
+              </div>
+            </DialogTrigger>
+            <DialogContent className="bg-transparent border-none max-w-3xl">
+              <LoginComponent />
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </div>
