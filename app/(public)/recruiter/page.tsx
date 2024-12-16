@@ -46,7 +46,7 @@ const SectionWrapper = ({ children }: SectionWrapperProps) => {
   );
 };
 
-export default function Page() {
+export default function RecruiterPage() {
   useEffect(() => {
     document.title = "MyLampAi - Recruiter";
     window.scrollTo(0, 0);
