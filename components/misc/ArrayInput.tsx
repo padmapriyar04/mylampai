@@ -45,14 +45,14 @@ export function ArrayInput({ value, onChange, placeholder }: ArrayInputProps) {
             </Button>
           </div>
         ))}
+        <Input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+        />
       </div>
-      <Input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-      />
     </div>
   );
 }

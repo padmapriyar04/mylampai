@@ -125,7 +125,7 @@ export default function HeroSection() {
 
           <div className="lg:block bg-[#f1eaff] hidden z-10 p-6 w-full max-w-[600px] rounded-2xl">
             <Image
-              src={"/home/HeroSection.svg"}
+              src={"/home/herosection/wize_hero.svg"}
               alt="HeroSection"
               width={100}
               height={100}

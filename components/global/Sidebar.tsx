@@ -4,8 +4,20 @@ import { Bookmark, BookmarkMinus } from "lucide-react";
 import { NavMain } from "@/components/global/nav-main";
 import { NavUser } from "@/components/global/nav-user";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { House, HouseFill, FileEarmarkText, FileEarmarkTextFill, CameraVideo, CameraVideoFill, Briefcase, BriefcaseFill, PersonCheck, PersonFillCheck } from "react-bootstrap-icons";
+import {
+  House,
+  HouseFill,
+  FileEarmarkText,
+  FileEarmarkTextFill,
+  CameraVideo,
+  CameraVideoFill,
+  Briefcase,
+  BriefcaseFill,
+  PersonCheck,
+  PersonFillCheck,
+} from "react-bootstrap-icons";
 
 const data = {
   navMain: [
@@ -174,6 +186,12 @@ const data = {
 };
 
 export function AppSidebar() {
+  const pathname = usePathname();
+  const hiddenOn = ["/create-profile"];
+
+  const isHidden = hiddenOn.some((route) => pathname.startsWith(route));
+
+  if (isHidden) return null;
   return (
     <div className="flex flex-col items-center justify-between py-4 max-w-20 w-full">
       <div className="flex items-center flex-col gap-4">
