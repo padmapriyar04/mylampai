@@ -52,7 +52,7 @@ export default function ExclusivePool() {
         </div>
         <div className="sm:h-[300px] max-w-[400px] absolute top-0 -translate-y-[60%] right-24">
           <Image
-            src="/home/recruit/Recruiter.svg"
+            src="/home/recruit/talent_laptop.svg"
             height={300}
             width={500}
             alt="community"
