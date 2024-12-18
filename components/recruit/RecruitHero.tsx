@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
-// import Typing from "./Typing";
 import { useEffect } from "react";
-import InfiniteLogoSlide from "./InfiniteLogoSlide";
+import InfiniteLogoSlide from "@/components/home/InfiniteLogoSlide";
 import { ArrowRight } from "lucide-react";
 import Globe from "@/components/ui/globe";
 import { useSession } from "next-auth/react";
@@ -16,7 +15,7 @@ import { useRoleStore } from "@/utils/loginStore";
 import { useUserStore } from "@/utils/userStore";
 import LoginComponent from "../global/Login";
 
-export default function HeroSection() {
+export default function RecruitHero() {
   const router = useRouter();
   const { data } = useSession();
 
@@ -44,7 +43,6 @@ export default function HeroSection() {
 
       await signOut();
     };
-
     handleLogin(email, role);
   }, [data, router, role, setUserData]);
 
@@ -67,18 +65,13 @@ export default function HeroSection() {
               </div>
               {/* <Typing /> <br />{" "} */}
               <span className="font-semibold text-[40px] leading-10">
-                We nurture, assess & match
-                <div className="mt-2">
-                  {" "}
-                  <span className="text-primary">Talent</span> with premium
-                  Opportunities
-                </div>
+                Onboard best <br /> <span className="text-primary">talent</span>{" "}
+                &nbsp;in minutes*
               </span>
             </div>
             <div className="text-gray-500 lg:ml-10 mb-9 max-w-[640px]">
-              Join the exclusive talent pool with just one application and
-              assessment, unlocking access to thousands of premium opportunities
-              worldwide.
+              Hire top talent from our exclusive pool or <br /> evaluate
+              candidates instantly with our AI-powered solution.
             </div>
             <div className="flex relative">
               <div className="absolute bottom-0 z-0 translate-y-full left-1/2 -translate-x-1/2 scale-125 w-[600px] h-[600px] overflow-hidden">
@@ -87,10 +80,10 @@ export default function HeroSection() {
               <Dialog>
                 <DialogTrigger className="z-10">
                   <div
-                    onClick={() => setRole("user")}
+                    onClick={() => setRole("recruiter")}
                     className=" flex gap-4 items-center w-[225px] h-[45px] justify-center bg-primary rounded-lg text-white text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 md:max-w-[300px] hover:bg-primary-dark lg:ml-10"
                   >
-                    Get hired instantly
+                    Hire instantly
                     <ArrowRight size={24} />
                   </div>
                 </DialogTrigger>
@@ -106,11 +99,11 @@ export default function HeroSection() {
               <Dialog>
                 <DialogTrigger className="z-10">
                   <div
-                    onClick={() => setRole("recruiter")}
+                    onClick={() => setRole("user")}
                     className="flex gap-4 z-10 items-center w-[225px] h-[45px] justify-center rounded-lg border-2 text-sm font-semibold py-2 md:py-3 pl-4  px-2 md:px-3 md:max-w-[300px] lg:ml-5 hover:bg-gray-50"
                   >
                     {" "}
-                    Recruit in no time
+                    Get hired in no time
                     <ArrowRight size={24} />
                   </div>
                 </DialogTrigger>
