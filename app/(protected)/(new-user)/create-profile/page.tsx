@@ -1,7 +1,8 @@
 "use client";
-import { Clock9 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { createTalentProfile } from "@/actions/setupProfileActions";
+import { Clock9 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobCategoriesSelector } from "@/components/create-profile/job-specialites";
 import { ArrayInput } from "@/components/misc/ArrayInput";
@@ -25,15 +26,18 @@ import { LanguageSelector } from "@/components/create-profile/language-selector"
 import { BioDetails } from "@/components/create-profile/bio-details";
 import { HourlyRate } from "@/components/create-profile/hourly-rate";
 import { PersonalDetailsForm } from "@/components/create-profile/personal-details-form";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useUserStore } from "@/utils/userStore";
 
 const formSchema = z.object({
   skills: z.array(z.string()).min(1, "At least one skill is required"),
 });
 
 export default function CreateProfile() {
+  const { userData } = useUserStore();
   const [step, setStep] = useState(1);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,6 +45,49 @@ export default function CreateProfile() {
       skills: [],
     },
   });
+
+  const handleResumeUpload = async () => {
+    if (fileInputRef.current) {
+      console.log("uploading resume");
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error("Please upload a file less than 1MB");
+      return;
+    }
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file");
+      return;
+    }
+
+    if (!userData) {
+      toast.error("Unknown error occurred");
+      return;
+    }
+
+    const data = new FormData();
+    data.append("resume", file);
+
+    try {
+      const res = await createTalentProfile(data, userData.id);
+
+      if (res.status !== 200) {
+        toast.error(res.error);
+      } else {
+        setStep(2);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to upload resume");
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -89,22 +136,27 @@ export default function CreateProfile() {
             It&apos;s quickest to import your information — you can edit it
             before your profile goes live.
           </p>
-          <div className="flex-col flex max-w-sm gap-4">
+          <form className="flex-col flex max-w-sm gap-4">
             <Button
               type="button"
-              onClick={() => handleIncStep(2)}
               className="bg-white text-primary border border-primary hover:bg-primary hover:text-white"
             >
               Manually enter details
             </Button>
-            <Button
-              type="button"
-              onClick={() => toast.success("Feature coming soon")}
-              className="bg-white text-primary border border-primary"
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="application/pdf"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <label
+              onClick={handleResumeUpload}
+              className="bg-white text-primary rounded-lg text-center py-2 h-10 cursor-pointer hover:bg-primary hover:text-white duration-100 text-sm border border-primary"
             >
-              Import from Resume
-            </Button>
-          </div>
+              Upload your Resume
+            </label>
+          </form>
         </section>
 
         <section
@@ -140,7 +192,10 @@ export default function CreateProfile() {
           </p>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-3xl">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 max-w-3xl"
+            >
               <FormField
                 control={form.control}
                 name="skills"
@@ -162,7 +217,11 @@ export default function CreateProfile() {
                 )}
               />
 
-              <Button type="submit" className="hover:bg-primary-dark" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                className="hover:bg-primary-dark"
+                disabled={form.formState.isSubmitting}
+              >
                 Submit
               </Button>
             </form>

@@ -1,6 +1,60 @@
 "use server";
 import prisma from "@/lib/index";
 import { Education, Employment, Language } from "@prisma/client";
+import { uploadResumeToAzure } from "./resumeActions";
+
+export const createTalentProfile = async (
+  formData: FormData,
+  userId: string
+) => {
+  try {
+    const resume = formData.get("resume") as File;
+
+    if (!resume || resume.type !== "application/pdf") {
+      return {
+        error: "Invalid resume file",
+        status: 400,
+      };
+    }
+
+    const resumeUrl = await uploadResumeToAzure(
+      resume,
+      `cv_${new Date().toISOString()}_${userId}.pdf`
+    );
+
+    if (!resumeUrl) {
+      return {
+        error: "Error uploading resume",
+        status: 500,
+      };
+    }
+
+    await prisma.resume.create({
+      data: {
+        userId,
+        resumeUrl,
+      },
+    });
+
+    await prisma.talentProfile.create({
+      data: {
+        userId,
+        resumeUrl,
+      },
+    });
+
+    return {
+      status: 200,
+      message: "Talent profile created successfully",
+    };
+  } catch (error) {
+    console.error("Error creating talent profile:", error);
+    return {
+      error: "Error uploading resume",
+      status: 500,
+    };
+  }
+};
 
 export const addProfiles = async (
   profiles: string[],

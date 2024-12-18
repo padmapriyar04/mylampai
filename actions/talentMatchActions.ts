@@ -43,37 +43,6 @@ type StructuredData = {
   rate: string;
 };
 
-export const createTalentProfile = async (data: StructuredData) => {
-  try {
-    const user = await auth();
-
-    if (!user) {
-      return {
-        status: "failed",
-        message: "User not authenticated",
-      };
-    }
-
-    await prisma.talentProfile.create({
-      data: {
-        ...data,
-        userId: user.id,
-      },
-    });
-
-    return {
-      status: "success",
-      message: "Profile created successfully",
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      status: "failed",
-      message: "Error creating profile",
-    };
-  }
-};
-
 type ProfileData = {
   resumeId: string;
   interviewId: string;

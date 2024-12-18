@@ -2,7 +2,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import {
   getTalentMatches,
-  createTalentProfile,
   getTalentProfiles,
   acceptTalentMatch,
   getResumeAndInterviewIds,
@@ -37,7 +36,6 @@ import {
   ProfileDataType,
   profileDataSchema,
 } from "@/schemas/talentMatchSchema";
-import { generateSasToken } from "@/actions/azureActions";
 import * as pdfjsLib from "pdfjs-dist";
 import { ArrayInput } from "@/components/misc/ArrayInput";
 import { TalentProfileCard } from "./TalentProfileCard";

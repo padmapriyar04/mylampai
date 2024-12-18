@@ -152,9 +152,10 @@ model TalentMatch {
 // user
 model TalentProfile {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String
-  rate        String
+  resumeUrl   String
+  title       String?
+  description String?
+  rate        String?
   skills      String[]
   profiles    String[]
   hours       String        @default("None")
