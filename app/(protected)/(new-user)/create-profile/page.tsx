@@ -346,7 +346,7 @@ export default function CreateProfile() {
             once you publish your profile. You can adjust your rate every time
             you submit a proposal.
           </p>
-          <HourlyRate  setStep={setStep} />
+          <HourlyRate setStep={setStep} />
         </section>
 
         <section
@@ -364,7 +364,7 @@ export default function CreateProfile() {
             keep things safe and simple, they&apos;ll pay you through us - which
             is why we need your personal information.
           </p>
-          <PersonalDetailsForm  setStep={setStep} />
+          <PersonalDetailsForm setStep={setStep} />
         </section>
       </ScrollArea>
       <div className="relative h-24 flex items-center">

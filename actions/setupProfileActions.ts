@@ -299,9 +299,11 @@ export const uploadImage = async (formData: FormData, userId: string) => {
       throw new Error("Profile picture not found");
     }
 
-    const fileExtension = image.name.split(".").pop();
+    console.log("Image:", image.name);
 
-    const fileName = `image_${new Date().toISOString()}_${useId}.${fileExtension}`;
+    const fileExtension = image.name.split(".").pop()?.toLowerCase();
+
+    const fileName = `image_${new Date().toISOString()}_${userId}.${fileExtension}`;
 
     const imageUrl = await uploadFileToAzure(image, fileName);
 

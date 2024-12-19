@@ -51,14 +51,14 @@ const formSchema = z.object({
       "Date of birth must be between 1900 and today."
     ),
   country: z.string().min(1, "Country is required."),
-  streetAddress: z.string().min(1, "Street address is required."),
+  street: z.string().min(1, "Street address is required."),
   city: z.string().min(1, "City is required."),
-  stateProvince: z.string().min(1, "State/Province is required."),
-  zipPostalCode: z
+  state: z.string().min(1, "State/Province is required."),
+  zipCode: z
     .string()
     .min(1, "ZIP/Postal code is required.")
     .regex(/^\d{4,10}$/, "Invalid ZIP/Postal code."),
-  phoneNumber: z
+  phone: z
     .string()
     .min(1, "Phone number is required.")
     .regex(/^\+?[0-9]{7,15}$/, "Invalid phone number format."),
@@ -66,11 +66,10 @@ const formSchema = z.object({
 
 const imageSchema = z.object({
   profileImage: z
-    .array(z.instanceof(File))
-    .nonempty("Profile image is required.")
-    .refine((files) => files[0]?.size <= MAX_FILE_SIZE, `Max file size is 1MB.`)
+    .instanceof(File)
+    .refine((file) => file.size <= MAX_FILE_SIZE, `Max file size is 1MB.`)
     .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
+      (file) => ACCEPTED_IMAGE_TYPES.includes(file.type),
       "Only .jpg, .jpeg, .png, and .webp formats are supported."
     ),
 });
@@ -111,13 +110,12 @@ export function PersonalDetailsForm({
     }
   }
 
-  async function onImageSubmit(data: z.infer<typeof imageSchema>) {
+  async function onImageSubmit(image: File) {
     try {
       if (!userData || !userData.id) {
         throw new Error("User not found");
       }
 
-      const image = data.profileImage[0];
       if (!image) {
         throw new Error("Profile picture not found");
       }
@@ -145,6 +143,17 @@ export function PersonalDetailsForm({
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
+      toast.error("No file selected");
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File size should be less than 1MB");
+      return;
+    }
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      toast.error("Only .jpg, .jpeg, .png, and .webp formats are supported");
       return;
     }
 
@@ -154,62 +163,40 @@ export function PersonalDetailsForm({
     };
     reader.readAsDataURL(file);
 
-    imageForm.handleSubmit(onImageSubmit)();
+    onImageSubmit(file);
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 flex items-start gap-4 justify-between"
-      >
-        <Form {...imageForm}>
-          <form
-            onSubmit={imageForm.handleSubmit(onImageSubmit)}
-            className="flex items-start flex-col gap-4"
-          >
-            {profileImagePreview && (
-              <Image
-                width={100}
-                height={100}
-                src={profileImagePreview}
-                alt="Profile preview"
-                className="w-40 h-40 rounded-lg object-cover"
-              />
-            )}
-            <FormField
-              control={imageForm.control}
-              name="profileImage"
-              render={({ field: { onChange, value, ...rest } }) => (
-                <FormItem>
-                  <FormDescription>
-                    Upload a profile picture (max 1MB).
-                  </FormDescription>
-                  <FormControl>
-                    <div className="space-x-4">
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(event) => {
-                          onChange(event.target.files);
-                          handleImageChange(event);
-                        }}
-                        {...rest}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-
-        <div className="w-full space-y-4">
+    <div className="flex gap-4">
+      <div>
+        {profileImagePreview && (
+          <Image
+            width={100}
+            height={100}
+            src={profileImagePreview}
+            alt="Profile preview"
+            className="w-40 h-40 rounded-lg object-cover"
+          />
+        )}
+        <div className="space-x-4">
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={(event) => {
+              handleImageChange(event);
+            }}
+          />
+        </div>
+      </div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4 w-full"
+        >
           <div className="flex items-start gap-4">
             <FormField
               control={form.control}
-              name="phoneNumber"
+              name="phone"
               render={({ field }) => (
                 <FormItem className="w-[calc(33%-0.5rem)]">
                   <FormLabel>Phone Number</FormLabel>
@@ -266,7 +253,7 @@ export function PersonalDetailsForm({
           <div className="grid grid-cols-3 gap-4">
             <FormField
               control={form.control}
-              name="streetAddress"
+              name="street"
               render={({ field }) => (
                 <FormItem className="col-span-2">
                   <FormLabel>Street Address</FormLabel>
@@ -325,7 +312,7 @@ export function PersonalDetailsForm({
 
             <FormField
               control={form.control}
-              name="stateProvince"
+              name="state"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>State/Province</FormLabel>
@@ -339,7 +326,7 @@ export function PersonalDetailsForm({
 
             <FormField
               control={form.control}
-              name="zipPostalCode"
+              name="zipCode"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>ZIP/Postal Code</FormLabel>
@@ -355,8 +342,8 @@ export function PersonalDetailsForm({
             />
           </div>
           <Button type="submit">Save Personal Details</Button>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }
