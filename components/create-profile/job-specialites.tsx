@@ -4,7 +4,7 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
+import { addProfiles } from "@/actions/setupProfileActions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,6 +19,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useProfileStore } from "@/utils/profileStore";
+import { toast } from "sonner";
 
 const jobCategories = [
   {
@@ -59,7 +61,12 @@ const formSchema = z.object({
     .max(3, "You can select up to 3 specialties"),
 });
 
-export function JobCategoriesSelector() {
+export function JobCategoriesSelector({
+  setStep,
+}: {
+  setStep: (step: number) => void;
+}) {
+  const { id, setProfiles } = useProfileStore();
   const [selectedCategory, setSelectedCategory] = React.useState(
     jobCategories[0].name
   );
@@ -72,8 +79,22 @@ export function JobCategoriesSelector() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      if (!id) return;
+      const profiles = values.specialties;
+      const res = await addProfiles(profiles, id);
+
+      if (res.status === 200) {
+        setProfiles(profiles);
+        setStep(3);
+      } else {
+        console.error("Error adding profiles:", res.error);
+        toast.error("Error adding profiles");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   // Get the specialties for the selected category

@@ -1,7 +1,7 @@
 "use server";
 import prisma from "@/lib/index";
-import { Education, Employment, Language } from "@prisma/client";
-import { uploadResumeToAzure } from "./resumeActions";
+import { uploadFileToAzure } from "./uploadActions";
+import { useId } from "react";
 
 export const createTalentProfile = async (
   formData: FormData,
@@ -17,7 +17,7 @@ export const createTalentProfile = async (
       };
     }
 
-    const resumeUrl = await uploadResumeToAzure(
+    const resumeUrl = await uploadFileToAzure(
       resume,
       `cv_${new Date().toISOString()}_${userId}.pdf`
     );
@@ -36,7 +36,7 @@ export const createTalentProfile = async (
       },
     });
 
-    await prisma.talentProfile.create({
+    const profile = await prisma.talentProfile.create({
       data: {
         userId,
         resumeUrl,
@@ -45,6 +45,10 @@ export const createTalentProfile = async (
 
     return {
       status: 200,
+      data: {
+        id: profile.id,
+        resumeUrl: profile.resumeUrl,
+      },
       message: "Talent profile created successfully",
     };
   } catch (error) {
@@ -131,8 +135,16 @@ export const updateTitle = async (title: string, talentProfileId: string) => {
   }
 };
 
+type EmploymentData = {
+  company: string;
+  position: string;
+  startDate: Date;
+  endDate?: Date;
+  description?: string;
+};
+
 export const createEmployments = async (
-  employments: Employment[],
+  employments: EmploymentData[],
   talentProfileId: string
 ) => {
   try {
@@ -156,8 +168,19 @@ export const createEmployments = async (
   }
 };
 
+type EducationData = {
+  school: string;
+  degree: string;
+  field?: string;
+  percentage?: string;
+  cgpa?: string;
+  startDate?: Date;
+  endDate?: Date;
+  description?: string;
+};
+
 export const createEducation = async (
-  education: Education[],
+  education: EducationData[],
   userId: string
 ) => {
   try {
@@ -181,8 +204,13 @@ export const createEducation = async (
   }
 };
 
+type LanguageData = {
+  language: string;
+  proficiency: "Basic" | "Conversational" | "Fluent" | "Native";
+};
+
 export const createLanguages = async (
-  languages: Language[],
+  languages: LanguageData[],
   userId: string
 ) => {
   try {
@@ -260,15 +288,63 @@ export const updateHourlyRate = async (
   }
 };
 
+export const uploadImage = async (formData: FormData, userId: string) => {
+  try {
+    if (!userId) {
+      throw new Error("User not found");
+    }
+    const image = formData.get("image") as File;
+
+    if (!image) {
+      throw new Error("Profile picture not found");
+    }
+
+    const fileExtension = image.name.split(".").pop();
+
+    const fileName = `image_${new Date().toISOString()}_${useId}.${fileExtension}`;
+
+    const imageUrl = await uploadFileToAzure(image, fileName);
+
+    if (!imageUrl) {
+      return {
+        message: "Failed to upload image",
+        status: 500,
+      };
+    }
+
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        image: imageUrl,
+      },
+    });
+
+    return {
+      message: "Image uploaded successfully",
+      status: 200,
+      data: {
+        imageUrl,
+      },
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      message: "Failed to upload image",
+      status: 500,
+    };
+  }
+};
+
 type UserProfileData = {
-  image: string;
-  dateOfBirth: Date;
-  phone: string;
-  street: string;
-  country: string;
-  city: string;
-  state: string;
-  zipCode: string;
+  dateOfBirth?: Date;
+  phone?: string;
+  street?: string;
+  country?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
 };
 
 export const updateProfile = async (

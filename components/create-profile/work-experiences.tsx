@@ -35,6 +35,9 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProfileStore } from "@/utils/profileStore";
+import { createEmployments } from "@/actions/setupProfileActions";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   company: z.string().min(1, "Company name is required"),
@@ -48,8 +51,16 @@ const formSchema = z.object({
 
 type WorkExperience = z.infer<typeof formSchema>;
 
-export function WorkExperiences() {
-  const [experiences, setExperiences] = React.useState<WorkExperience[]>([]);
+export function WorkExperiences({
+  setStep,
+}: {
+  setStep: (step: number) => void;
+}) {
+  const { id, setExperiences } = useProfileStore();
+
+  const [prevExperiences, setPrevExperiences] = React.useState<
+    WorkExperience[]
+  >([]);
   const [open, setOpen] = React.useState(false);
 
   const form = useForm<WorkExperience>({
@@ -62,10 +73,28 @@ export function WorkExperiences() {
   });
 
   function onSubmit(values: WorkExperience) {
-    setExperiences([...experiences, values]);
+    setPrevExperiences([...prevExperiences, values]);
     setOpen(false);
     form.reset();
   }
+
+  const handleSubmit = async () => {
+    try {
+      if (!id) return;
+
+      const res = await createEmployments(prevExperiences, id);
+
+      if (res.status === 200) {
+        setExperiences(prevExperiences);
+        setStep(6)
+      } else {
+        toast.error("Error adding experiences");
+      }
+    } catch (error) {
+      toast.error("Error adding experiences");
+      console.error(error);
+    }
+  };
 
   return (
     <div className="">
@@ -226,7 +255,7 @@ export function WorkExperiences() {
         </Dialog>
       </div>
       <div className=" py-4 gap-4 grid grid-cols-1 sm:grid-cols-2">
-        {experiences.map((exp, index) => (
+        {prevExperiences.map((exp, index) => (
           <div key={index} className="border p-4 rounded-lg">
             <h3 className="font-semibold">
               {exp.position} at {exp.company}
@@ -239,6 +268,7 @@ export function WorkExperiences() {
           </div>
         ))}
       </div>
+      <Button onClick={handleSubmit}>Submit</Button>
     </div>
   );
 }

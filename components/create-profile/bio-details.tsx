@@ -14,12 +14,16 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "../ui/textarea";
+import { useProfileStore } from "@/utils/profileStore";
+import { updateDescription } from "@/actions/setupProfileActions";
 
 const formSchema = z.object({
   bio: z.string().min(1, "Bio is required"),
 });
 
-export function BioDetails() {
+export function BioDetails({ setStep }: { setStep: (step: number) => void }) {
+  const { id, setDescription } = useProfileStore();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -29,9 +33,20 @@ export function BioDetails() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      if (!id) {
+        throw new Error("Profile ID is missing");
+      }
+      const res = await updateDescription(values.bio, id);
+
+      if (res.status === 200) {
+        setDescription(values.bio);
+        setStep(9);
+      } else {
+        toast.error("Failed to update bio");
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create job");
+      toast.error("Failed to update bio");
     }
   }
   return (

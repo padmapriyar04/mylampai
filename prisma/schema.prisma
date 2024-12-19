@@ -158,7 +158,7 @@ model TalentProfile {
   rate        String?
   skills      String[]
   profiles    String[]
-  hours       String        @default("None")
+  hours       String?
   talentMatch TalentMatch[]
   portfolio   Portfolio[]
   employment  Employment[]

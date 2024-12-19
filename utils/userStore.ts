@@ -12,6 +12,8 @@ interface User {
 interface UserState {
   userData: User | null;
   token: string | null;
+  setUser: (userData: User | null) => void;
+  setToken: (token: string | null) => void;
   setUserData: (userData: User | null, token: string | null) => void;
   clearUser: () => void;
 }
@@ -21,13 +23,15 @@ const useUserStore = create<UserState>()(
     (set) => ({
       userData: null,
       token: null,
+      setUser: (userData) => set({ userData }),
+      setToken: (token) => set({ token }),
       setUserData: (userData, token) => set({ userData, token }),
       clearUser: () => set({ userData: null, token: null }),
     }),
     {
       name: "user-storage",
-    },
-  ),
+    }
+  )
 );
 
 export { useUserStore };

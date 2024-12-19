@@ -1,11 +1,10 @@
 "use server";
 import { generateSasToken } from "./azureActions";
 
-export const uploadResumeToAzure = async (file: File, fileName: string) => {
+export const uploadFileToAzure = async (file: File, fileName: string) => {
   try {
     const sasUrl = await generateSasToken(fileName);
 
-    console.log("Uploading resume to:", sasUrl);
     if (!sasUrl) {
       return null;
     }
@@ -18,14 +17,14 @@ export const uploadResumeToAzure = async (file: File, fileName: string) => {
       body: file,
     });
 
-    const resumeUrl = sasUrl.split("?")[0];
+    const fileUrl = sasUrl.split("?")[0];
     if (response.ok) {
-      return resumeUrl;
+      return fileUrl;
     }
 
     return null;
   } catch (error) {
-    console.error("Error uploading resume:", error);
+    console.error("Error uploading file:", error);
     return null;
   }
-};
+}

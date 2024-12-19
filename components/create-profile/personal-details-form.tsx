@@ -32,20 +32,15 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { toast } from "sonner";
+import { useUserStore } from "@/utils/userStore";
+import { updateProfile, uploadImage } from "@/actions/setupProfileActions";
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 // Schema
 const formSchema = z.object({
-  profileImage: z
-    .array(z.instanceof(File))
-    .nonempty("Profile image is required.")
-    .refine((files) => files[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
-      "Only .jpg, .jpeg, .png, and .webp formats are supported."
-    ),
   dateOfBirth: z
     .date({
       required_error: "Date of birth is required.",
@@ -69,9 +64,25 @@ const formSchema = z.object({
     .regex(/^\+?[0-9]{7,15}$/, "Invalid phone number format."),
 });
 
+const imageSchema = z.object({
+  profileImage: z
+    .array(z.instanceof(File))
+    .nonempty("Profile image is required.")
+    .refine((files) => files[0]?.size <= MAX_FILE_SIZE, `Max file size is 1MB.`)
+    .refine(
+      (files) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
+      "Only .jpg, .jpeg, .png, and .webp formats are supported."
+    ),
+});
+
 type PersonalDetailsForm = z.infer<typeof formSchema>;
 
-export function PersonalDetailsForm() {
+export function PersonalDetailsForm({
+  setStep,
+}: {
+  setStep: (step: number) => void;
+}) {
+  const { userData, setUser } = useUserStore();
   const [profileImagePreview, setProfileImagePreview] = React.useState<string>(
     "https://i.pinimg.com/originals/57/3f/22/573f22a1aa17b366f5489745dc4704e1.jpg"
   );
@@ -80,20 +91,70 @@ export function PersonalDetailsForm() {
     resolver: zodResolver(formSchema),
   });
 
-  function onSubmit(data: PersonalDetailsForm) {
-    console.log(data);
-    // Here you would typically send the data to your backend
+  const imageForm = useForm<z.infer<typeof imageSchema>>({
+    resolver: zodResolver(imageSchema),
+  });
+
+  async function onSubmit(data: PersonalDetailsForm) {
+    try {
+      if (!userData || !userData.id) {
+        throw new Error("User not found");
+      }
+
+      const res = await updateProfile(data, userData.id);
+
+      if (res.status !== 200) {
+        toast.error("Failed to update profile");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function onImageSubmit(data: z.infer<typeof imageSchema>) {
+    try {
+      if (!userData || !userData.id) {
+        throw new Error("User not found");
+      }
+
+      const image = data.profileImage[0];
+      if (!image) {
+        throw new Error("Profile picture not found");
+      }
+
+      const formData = new FormData();
+
+      formData.append("image", image);
+
+      const res = await uploadImage(formData, userData.id);
+
+      if (res.status === 200) {
+        toast.success("Profile picture uploaded successfully");
+
+        if (res.data) {
+          setUser({ ...userData, image: res.data.imageUrl });
+        }
+      } else {
+        toast.error("Failed to upload profile picture");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) {
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfileImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    imageForm.handleSubmit(onImageSubmit)();
   };
 
   return (
@@ -102,42 +163,47 @@ export function PersonalDetailsForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 flex items-start gap-4 justify-between"
       >
-        <div className="flex items-start flex-col gap-4">
-          {profileImagePreview && (
-            <Image
-              width={100}
-              height={100}
-              src={profileImagePreview}
-              alt="Profile preview"
-              className="w-40 h-40 rounded-lg object-cover"
-            />
-          )}
-          <FormField
-            control={form.control}
-            name="profileImage"
-            render={({ field: { onChange, value, ...rest } }) => (
-              <FormItem>
-                <FormDescription>
-                  Upload a profile picture (max 1MB).
-                </FormDescription>
-                <FormControl>
-                  <div className="space-x-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(event) => {
-                        onChange(event.target.files);
-                        handleImageChange(event);
-                      }}
-                      {...rest}
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+        <Form {...imageForm}>
+          <form
+            onSubmit={imageForm.handleSubmit(onImageSubmit)}
+            className="flex items-start flex-col gap-4"
+          >
+            {profileImagePreview && (
+              <Image
+                width={100}
+                height={100}
+                src={profileImagePreview}
+                alt="Profile preview"
+                className="w-40 h-40 rounded-lg object-cover"
+              />
             )}
-          />
-        </div>
+            <FormField
+              control={imageForm.control}
+              name="profileImage"
+              render={({ field: { onChange, value, ...rest } }) => (
+                <FormItem>
+                  <FormDescription>
+                    Upload a profile picture (max 1MB).
+                  </FormDescription>
+                  <FormControl>
+                    <div className="space-x-4">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => {
+                          onChange(event.target.files);
+                          handleImageChange(event);
+                        }}
+                        {...rest}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
 
         <div className="w-full space-y-4">
           <div className="flex items-start gap-4">

@@ -23,9 +23,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { X } from "lucide-react";
+import { createLanguages } from "@/actions/setupProfileActions";
+import { toast } from "sonner";
+import { useProfileStore } from "@/utils/profileStore";
+import { useUserStore } from "@/utils/userStore";
 
 const languageSchema = z.object({
-  name: z.string().min(1, "Language name is required"),
+  language: z.string().min(1, "Language name is required"),
   proficiency: z.enum(["Basic", "Conversational", "Fluent", "Native"]),
 });
 
@@ -37,11 +41,18 @@ const formSchema = z.object({
 
 type LanguageForm = z.infer<typeof formSchema>;
 
-export function LanguageSelector() {
+export function LanguageSelector({
+  setStep,
+}: {
+  setStep: (step: number) => void;
+}) {
+  const { userData } = useUserStore();
+  const { setLanguages } = useProfileStore();
+
   const form = useForm<LanguageForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      languages: [{ name: "", proficiency: "Basic" }],
+      languages: [{ language: "", proficiency: "Basic" }],
     },
   });
 
@@ -50,9 +61,23 @@ export function LanguageSelector() {
     name: "languages",
   });
 
-  function onSubmit(data: LanguageForm) {
-    console.log(data);
-    // Here you would typically send the data to your backend or perform some action
+  async function onSubmit(data: LanguageForm) {
+    try {
+      if (!userData || !userData.id) {
+        return;
+      }
+      const res = await createLanguages(data.languages, userData.id);
+
+      if (res.status === 200) {
+        setStep(8);
+        setLanguages(data.languages);
+        toast.success(res.message);
+      } else {
+        toast.error(res.error);
+      }
+    } catch (error) {
+      console.error("Error adding education:", error);
+    }
   }
 
   return (
@@ -65,7 +90,7 @@ export function LanguageSelector() {
               <div key={field.id} className="flex items-start space-x-4">
                 <FormField
                   control={form.control}
-                  name={`languages.${index}.name`}
+                  name={`languages.${index}.language`}
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Language</FormLabel>
@@ -144,7 +169,7 @@ export function LanguageSelector() {
             variant="outline"
             size="sm"
             className="mt-2"
-            onClick={() => append({ name: "", proficiency: "Basic" })}
+            onClick={() => append({ language: "", proficiency: "Basic" })}
           >
             Add Language
           </Button>

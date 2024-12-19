@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { createTalentProfile } from "@/actions/setupProfileActions";
+import { addSkills, createTalentProfile } from "@/actions/setupProfileActions";
 import { Clock9 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobCategoriesSelector } from "@/components/create-profile/job-specialites";
@@ -29,12 +29,14 @@ import { PersonalDetailsForm } from "@/components/create-profile/personal-detail
 import { useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUserStore } from "@/utils/userStore";
+import { useProfileStore } from "@/utils/profileStore";
 
 const formSchema = z.object({
   skills: z.array(z.string()).min(1, "At least one skill is required"),
 });
 
 export default function CreateProfile() {
+  const { id, setId, setResumeUrl } = useProfileStore();
   const { userData } = useUserStore();
   const [step, setStep] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,6 +83,10 @@ export default function CreateProfile() {
       if (res.status !== 200) {
         toast.error(res.error);
       } else {
+        if (res.data) {
+          setResumeUrl(res.data.resumeUrl);
+          setId(res.data.id);
+        }
         setStep(2);
       }
     } catch (error) {
@@ -91,6 +97,15 @@ export default function CreateProfile() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      if (!id) return;
+      const res = await addSkills(values.skills, id);
+
+      if (res.status === 200) {
+        setStep(4);
+      } else {
+        console.error("Error adding skills:", res.error);
+        toast.error("Error adding skills");
+      }
     } catch (error) {
       console.error(error);
       toast.error("Failed to create job");
@@ -172,7 +187,7 @@ export default function CreateProfile() {
           <p className="mb-8">
             Don&apos;t worry, you can change these choices later on.
           </p>
-          <JobCategoriesSelector />
+          <JobCategoriesSelector setStep={setStep} />
         </section>
 
         <section
@@ -242,7 +257,7 @@ export default function CreateProfile() {
             It&apos;s the very first thing clients see, so make it count. Stand
             out by describing your expertise in your own words.
           </p>
-          <ProfessionalRole />
+          <ProfessionalRole setStep={setStep} />
         </section>
 
         <section
@@ -260,7 +275,7 @@ export default function CreateProfile() {
             work. But if you&apos;re just starting out, you can still create a
             great profile. Just head on to the next page.
           </p>
-          <WorkExperiences />
+          <WorkExperiences setStep={setStep} />
         </section>
 
         <section
@@ -277,7 +292,7 @@ export default function CreateProfile() {
             You don&apos;t have to have a degree. Adding any relevant education
             helps make your profile more visible.
           </p>
-          <EducationDetails />
+          <EducationDetails setStep={setStep} />
         </section>
 
         <section
@@ -295,7 +310,7 @@ export default function CreateProfile() {
             languages you speak. English is a must, but do you speak any other
             languages?
           </p>
-          <LanguageSelector />
+          <LanguageSelector setStep={setStep} />
         </section>
 
         <section
@@ -313,7 +328,7 @@ export default function CreateProfile() {
             Tell them clearly, using paragraphs or bullet points. You can always
             edit later; just make sure you proofread now?
           </p>
-          <BioDetails />
+          <BioDetails setStep={setStep} />
         </section>
 
         <section
@@ -331,7 +346,7 @@ export default function CreateProfile() {
             once you publish your profile. You can adjust your rate every time
             you submit a proposal.
           </p>
-          <HourlyRate />
+          <HourlyRate  setStep={setStep} />
         </section>
 
         <section
@@ -349,7 +364,7 @@ export default function CreateProfile() {
             keep things safe and simple, they&apos;ll pay you through us - which
             is why we need your personal information.
           </p>
-          <PersonalDetailsForm />
+          <PersonalDetailsForm  setStep={setStep} />
         </section>
       </ScrollArea>
       <div className="relative h-24 flex items-center">

@@ -33,10 +33,13 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProfileStore } from "@/utils/profileStore";
+import { toast } from "sonner";
+import { createEducation } from "@/actions/setupProfileActions";
 
 const formSchema = z.object({
   school: z.string().min(1, "School name is required"),
-  degree: z.string().optional(),
+  degree: z.string().min(1, "Degree is required"),
   field: z.string().optional(),
   percentage: z.string().optional(),
   cgpa: z.string().optional(),
@@ -47,8 +50,15 @@ const formSchema = z.object({
 
 type Education = z.infer<typeof formSchema>;
 
-export function EducationDetails() {
-  const [educations, setEducations] = React.useState<Education[]>([]);
+export function EducationDetails({
+  setStep,
+}: {
+  setStep: (step: number) => void;
+}) {
+  const { id, setEducations } = useProfileStore();
+  const [educationDetails, setEducationDetails] = React.useState<Education[]>(
+    []
+  );
   const [open, setOpen] = React.useState(false);
 
   const form = useForm<Education>({
@@ -64,10 +74,29 @@ export function EducationDetails() {
   });
 
   function onSubmit(values: Education) {
-    setEducations([...educations, values]);
+    setEducationDetails([...educationDetails, values]);
     setOpen(false);
     form.reset();
   }
+
+  const handleSubmit = async () => {
+    try {
+      if (!id) {
+        return;
+      }
+      const res = await createEducation(educationDetails, id);
+
+      if (res.status === 200) {
+        setEducations(educationDetails);
+        setStep(7);
+        toast.success(res.message);
+      } else {
+        toast.error(res.error);
+      }
+    } catch (error) {
+      console.error("Error adding education:", error);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -275,7 +304,7 @@ export function EducationDetails() {
         </Dialog>
       </div>
       <div className="space-y-4">
-        {educations.map((edu, index) => (
+        {educationDetails.map((edu, index) => (
           <div key={index} className="border p-4 rounded-lg">
             <h3 className="font-semibold">{edu.school}</h3>
             {edu.degree && (
@@ -302,6 +331,8 @@ export function EducationDetails() {
           </div>
         ))}
       </div>
+
+      <Button onClick={handleSubmit}>Submit</Button>
     </div>
   );
 }
