@@ -17,7 +17,7 @@ import Link from "next/link";
 import { removeCookie } from "@/utils/cookieUtils";
 
 export function NavUser() {
-  const { userData, clearUser } = useUserStore();
+  const { userData, clearUser, setUser } = useUserStore();
   const router = useRouter();
 
   const handleNotifications = async () => {

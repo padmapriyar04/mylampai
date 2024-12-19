@@ -6,7 +6,7 @@ interface User {
   name?: string;
   email: string;
   image?: string;
-  role: "user" | "recruiter";
+  role: string;
 }
 
 interface UserState {

@@ -44,6 +44,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPinIcon, IndianRupee } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { TalentProfile } from "@prisma/client";
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 type TalentMatchType = {
@@ -54,19 +55,6 @@ type TalentMatchType = {
   locationPref: string;
   isMatched: boolean;
   matchId: string;
-};
-
-type TalentProfileType = {
-  id: string;
-  resumeId: string | null;
-  interviewId: string | null;
-  skills: string[];
-  profiles: string[];
-  certifications: string[];
-  expectedSalary: string | null;
-  locationPref: string | null;
-  availability: string | null;
-  experienceYears: string | null;
 };
 
 type IdsType = {
@@ -100,9 +88,9 @@ type StructuredData = {
 export default function TalentMatchPage() {
   const { userData } = useUserStore();
   const [talentMatches, setTalentMatches] = useState<TalentMatchType[]>([]);
-  const [talentProfiles, setTalentProfiles] = useState<TalentProfileType[]>([]);
-  const [resumeIds, setResumeIds] = useState<IdsType[]>([]);
-  const [interviewIds, setInterviewIds] = useState<IdsType[]>([]);
+  const [talentProfiles, setTalentProfiles] = useState<TalentProfile[]>([]);
+  // const [resumeIds, setResumeIds] = useState<IdsType[]>([]);
+  // const [interviewIds, setInterviewIds] = useState<IdsType[]>([]);
   const structuredData = useRef<StructuredData | null>(null);
 
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -255,12 +243,12 @@ export default function TalentMatchPage() {
 
     const fetchIds = async () => {
       try {
-        const ids = await getResumeAndInterviewIds(userData?.id);
+        // const ids = await getResumeAndInterviewIds(userData?.id);
 
-        if (ids.status === "success") {
-          setResumeIds(ids.cvIds);
-          setInterviewIds(ids.interviewIds);
-        }
+        // if (ids.status === "success") {
+        //   setResumeIds(ids.cvIds);
+        //   setInterviewIds(ids.interviewIds);
+        // }
       } catch (error) {
         console.error("Error fetching resume id:", error);
       }
@@ -279,22 +267,23 @@ export default function TalentMatchPage() {
           getTalentProfiles(userId),
         ]);
 
-        // if (profiles) {
-        //   setTalentProfiles(profiles);
-        // }
+        if (profiles) {
+          setTalentProfiles(profiles);
+          console.log(profiles);
+        }
 
-        // if (matches && matches.length) {
-        //   const talentPoolIds = matches.map((match) => match.talentPoolId);
-        //   const talentPoolsData = await getTalentPoolsData(talentPoolIds);
+        if (matches && matches.length) {
+          const talentPoolIds = matches.map((match) => match.talentPoolId);
+          const talentPoolsData = await getTalentPoolsData(talentPoolIds);
 
-        //   const mergedData = matches.map((match, index) => ({
-        //     matchId: match.id,
-        //     isMatched: match.isMatched,
-        //     ...(talentPoolsData[index] || {}),
-        //   }));
+          const mergedData = matches.map((match, index) => ({
+            matchId: match.id,
+            isMatched: match.isMatched,
+            ...(talentPoolsData[index] || {}),
+          }));
 
-        //   setTalentMatches(mergedData);
-        // }
+          setTalentMatches(mergedData);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -305,7 +294,7 @@ export default function TalentMatchPage() {
 
   return (
     <div className="flex  ">
-      <ScrollArea className="h-screen w-[42.5%]">
+      <ScrollArea className="h-screen w-[42.5%] border-r p-4">
         <div>
           <div className="w-full flex py-2">
             {talentMatches.map((match, index) => (
@@ -456,13 +445,7 @@ export default function TalentMatchPage() {
         <Input type="file" onChange={handleFileChange} />
       </ScrollArea>
       <ScrollArea className="h-screen w-[57.5%] ">
-        <div>
-          <div className="flex items-center">
-            {talentProfiles.map((profile) => (
-              <TalentProfileCard key={profile.id} profile={profile} />
-            ))}
-          </div>
-        </div>
+        {talentProfiles[1] && <TalentProfileCard profile={talentProfiles[1]} />}
       </ScrollArea>
     </div>
   );

@@ -191,3 +191,18 @@ export const uploadResumeToAzure = async (formData: FormData) => {
     };
   }
 };
+
+export const getProfileEmployments = async (talentProfileId: string) => {
+  try {
+    const employments = await prisma.employment.findMany({
+      where: {
+        talentProfileId,
+      },
+    });
+
+    return employments;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};

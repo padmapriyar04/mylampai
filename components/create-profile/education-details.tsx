@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { useProfileStore } from "@/utils/profileStore";
 import { toast } from "sonner";
 import { createEducation } from "@/actions/setupProfileActions";
+import { useUserStore } from "@/utils/userStore";
 
 const formSchema = z.object({
   school: z.string().min(1, "School name is required"),
@@ -55,7 +56,8 @@ export function EducationDetails({
 }: {
   setStep: (step: number) => void;
 }) {
-  const { id, setEducations } = useProfileStore();
+  const { userData } = useUserStore();
+  const { setEducations } = useProfileStore();
   const [educationDetails, setEducationDetails] = React.useState<Education[]>(
     []
   );
@@ -81,10 +83,10 @@ export function EducationDetails({
 
   const handleSubmit = async () => {
     try {
-      if (!id) {
+      if (!userData || !userData.id) {
         return;
       }
-      const res = await createEducation(educationDetails, id);
+      const res = await createEducation(educationDetails, userData.id);
 
       if (res.status === 200) {
         setEducations(educationDetails);

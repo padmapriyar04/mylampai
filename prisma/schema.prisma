@@ -188,6 +188,8 @@ model Employment {
   startDate       DateTime
   endDate         DateTime?
   description     String?
+  location        String?
+  skills          String[]
   talentProfileId String        @db.ObjectId
   talentProfile   TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
   createdAt       DateTime      @default(now())

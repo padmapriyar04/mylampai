@@ -1,25 +1,185 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { Bootstrap } from "react-bootstrap-icons";
+import { Bookmark, BookmarkMinus } from "lucide-react";
+import {
+  House,
+  HouseFill,
+  FileEarmarkText,
+  FileEarmarkTextFill,
+  CameraVideo,
+  CameraVideoFill,
+  Briefcase,
+  BriefcaseFill,
+  PersonCheck,
+  PersonFillCheck,
+} from "react-bootstrap-icons";
 
-type typeBootstrap = typeof Bootstrap;
+const items = [
+  {
+    title: "Home",
+    url: "/home",
+    view: "user",
+    icons: [House, HouseFill],
+    isActive: true,
+    items: [
+      {
+        title: "History",
+        url: "#",
+      },
+      {
+        title: "Starred",
+        url: "#",
+      },
+      {
+        title: "Settings",
+        url: "#",
+      },
+    ],
+  },
+  {
+    title: "Talent Match",
+    url: "/talentmatch",
+    view: "user",
+    icons: [PersonCheck, PersonFillCheck],
+    items: [
+      {
+        title: "General",
+        url: "#",
+      },
+      {
+        title: "Team",
+        url: "#",
+      },
+      {
+        title: "Billing",
+        url: "#",
+      },
+      {
+        title: "Limits",
+        url: "#",
+      },
+    ],
+  },
+  {
+    title: "Interview",
+    url: "/interview",
+    view: "user",
+    icons: [CameraVideo, CameraVideoFill],
+    items: [
+      {
+        title: "Introduction",
+        url: "#",
+      },
+      {
+        title: "Get Started",
+        url: "#",
+      },
+      {
+        title: "Tutorials",
+        url: "#",
+      },
+      {
+        title: "Changelog",
+        url: "#",
+      },
+    ],
+  },
+  {
+    title: "Resume",
+    url: "/cvreviewer",
+    view: "user",
+    icons: [FileEarmarkText, FileEarmarkTextFill],
+    items: [
+      {
+        title: "Genesis",
+        url: "#",
+      },
+      {
+        title: "Explorer",
+        url: "#",
+      },
+      {
+        title: "Quantum",
+        url: "#",
+      },
+    ],
+  },
+  {
+    title: "Career",
+    url: "/career",
+    view: "user",
+    icons: [Briefcase, BriefcaseFill],
+    items: [
+      {
+        title: "Introduction",
+        url: "#",
+      },
+      {
+        title: "Get Started",
+        url: "#",
+      },
+      {
+        title: "Tutorials",
+        url: "#",
+      },
+      {
+        title: "Changelog",
+        url: "#",
+      },
+    ],
+  },
+  {
+    title: "Talent Pool",
+    url: "/talentpool",
+    view: "recruiter",
+    icons: [Bookmark, BookmarkMinus],
+    items: [
+      {
+        title: "General",
+        url: "#",
+      },
+      {
+        title: "Team",
+        url: "#",
+      },
+      {
+        title: "Billing",
+        url: "#",
+      },
+      {
+        title: "Limits",
+        url: "#",
+      },
+    ],
+  },
+  {
+    title: "Create Job",
+    url: "/job",
+    view: "recruiter",
+    icons: [Bookmark, BookmarkMinus],
+    items: [
+      {
+        title: "General",
+        url: "#",
+      },
+      {
+        title: "Team",
+        url: "#",
+      },
+      {
+        title: "Billing",
+        url: "#",
+      },
+      {
+        title: "Limits",
+        url: "#",
+      },
+    ],
+  },
+];
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    view: string;
-    icons: typeBootstrap[];
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
+export default function NavMain() {
   return (
     <div className="flex flex-col gap-3">
       {items.map((item, index) => {
