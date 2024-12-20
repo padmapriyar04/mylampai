@@ -206,3 +206,69 @@ export const getProfileEmployments = async (talentProfileId: string) => {
     return [];
   }
 };
+
+type EmploymentType = {
+  company: string;
+  position: string;
+  location?: string;
+  startDate: Date;
+  endDate?: Date;
+  description?: string;
+  skills: string[];
+};
+
+export const updateEmployment = async (
+  employmentData: EmploymentType,
+  id: string
+) => {
+  try {
+    await prisma.employment.update({
+      where: {
+        id,
+      },
+      data: employmentData,
+    });
+
+    return "success";
+  } catch (error) {
+    console.error(error);
+    return "failed";
+  }
+};
+
+export const getProfileProjects = async (talentProfileId: string) => {
+  try {
+    const projects = await prisma.project.findMany({
+      where: {
+        talentProfileId,
+      },
+    });
+
+    return projects;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+type ProjectType = {
+  title: string;
+  description: string;
+  role?: string;
+  url?: string;
+  skills: string[];
+  talentProfileId: string;
+};
+
+export const createTalentProject = async (projectData: ProjectType) => {
+  try {
+    await prisma.project.create({
+      data: projectData,
+    });
+
+    return "success";
+  } catch (error) {
+    console.error(error);
+    return "failed";
+  }
+};

@@ -1,40 +1,32 @@
 "use client";
 import Image from "next/image";
 import { useRef, useEffect } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
 export default function HowWizeWork() {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const triggerRef = useRef<HTMLDivElement | null>(null);
-
-  gsap.registerPlugin(ScrollTrigger);
+  const stickyRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
-    const trigger = triggerRef.current;
+    const sticky = stickyRef.current;
 
-    const pin = gsap.fromTo(
-      container,
-      {
-        translateX: 0,
-      },
-      {
-        ease: "none",
-        duration: 1,
-        translateX: "-200vw",
-        scrollTrigger: {
-          trigger: trigger,
-          start: "top top",
-          end: "1500 top",
-          scrub: 1,
-          pin: true,
-        },
-      }
-    );
+    if (!container || !sticky) return;
+
+    const handleScroll = () => {
+      const stickyTop = sticky.parentElement?.offsetTop || 0;
+
+      let percentage = ((window.scrollY - stickyTop) / window.innerHeight) * 100;
+
+      if (percentage > 200) percentage = 200;
+      if (percentage < 0) percentage = 0;
+
+      container.style.transform = `translateX(-${percentage}vw)`;
+    };
+
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      pin.kill();
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -47,7 +39,7 @@ export default function HowWizeWork() {
         </div>
         <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] shadow md:max-w-[33%] bg-gradient-to-r from-primary to-white"></div>
       </div>
-      <div className="m-auto border p-4">
+      <div className="m-auto border">
         <div className="flex justify-between items-center">
           <div className="px-6 py-1 font-medium text-muted-foreground  rounded-full bg-primary text-white">
             Jelly
@@ -61,36 +53,41 @@ export default function HowWizeWork() {
             Jelly
           </div>
         </div>
-        <div ref={triggerRef} className="overflow-hidden mt-8">
+        <div className="h-[300vh]">
           <div
-            ref={containerRef}
-            className="w-[calc(300vw)] h-screen flex flex-row relative"
+            ref={stickyRef}
+            className="overflow-hidden sticky top-0 h-screen"
           >
-            <div className="flex flex-col items-center justify-center gap-4 h-screen w-screen m-auto border rounded-lg bg-gray-100">
-              <div className="text-3xl font-medium text-center">
-                How wiZe works
+            <div
+              ref={containerRef}
+              className="absolute top-0 will-change-transform left-0 w-[300vw] h-full flex justify-between items-center"
+            >
+              <div className="flex flex-col items-center justify-center gap-4 h-[500px] w-[400px] m-auto border rounded-lg bg-gray-100">
+                <div className="text-3xl font-medium text-center">
+                  How wiZe works
+                </div>
+                <div className="text-lg text-center text-muted-foreground">
+                  wiZe is a career guidance platform that helps you find your
+                  dream career.
+                </div>
               </div>
-              <div className="text-lg text-center text-muted-foreground">
-                wiZe is a career guidance platform that helps you find your
-                dream career.
+              <div className="flex flex-col items-center justify-center gap-4 h-[500px] w-[400px] m-auto border rounded-lg bg-gray-100">
+                <div className="text-3xl font-medium text-center">
+                  How wiZe works
+                </div>
+                <div className="text-lg text-center text-muted-foreground">
+                  wiZe is a career guidance platform that helps you find your
+                  dream career.
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col items-center justify-center gap-4 h-screen w-screen m-auto border rounded-lg bg-gray-100">
-              <div className="text-3xl font-medium text-center">
-                How wiZe works
-              </div>
-              <div className="text-lg text-center text-muted-foreground">
-                wiZe is a career guidance platform that helps you find your
-                dream career.
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-center gap-4 h-screen w-screen m-auto border rounded-lg bg-gray-100">
-              <div className="text-3xl font-medium text-center">
-                How wiZe works
-              </div>
-              <div className="text-lg text-center text-muted-foreground">
-                wiZe is a career guidance platform that helps you find your
-                dream career.
+              <div className="flex flex-col items-center justify-center gap-4 h-[500px] w-[400px] m-auto border rounded-lg bg-gray-100">
+                <div className="text-3xl font-medium text-center">
+                  How wiZe works
+                </div>
+                <div className="text-lg text-center text-muted-foreground">
+                  wiZe is a career guidance platform that helps you find your
+                  dream career.
+                </div>
               </div>
             </div>
           </div>

@@ -42,6 +42,7 @@ import { toast } from "sonner";
 const formSchema = z.object({
   company: z.string().min(1, "Company name is required"),
   position: z.string().min(1, "Position is required"),
+  location: z.string().min(1, "Location is required"),
   startDate: z.date({
     required_error: "Start date is required",
   }),
@@ -86,7 +87,7 @@ export function WorkExperiences({
 
       if (res.status === 200) {
         setExperiences(prevExperiences);
-        setStep(6)
+        setStep(6);
       } else {
         toast.error("Error adding experiences");
       }
@@ -127,19 +128,37 @@ export function WorkExperiences({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="position"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Position</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your position" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="flex w-full gap-4">
+                  <FormField
+                    control={form.control}
+                    name="position"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Position</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter your position" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />{" "}
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Location</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter location where you had worked"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <div className="flex gap-4">
                   <FormField
                     control={form.control}

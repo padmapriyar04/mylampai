@@ -138,6 +138,7 @@ export const updateTitle = async (title: string, talentProfileId: string) => {
 type EmploymentData = {
   company: string;
   position: string;
+  location?: string;
   startDate: Date;
   endDate?: Date;
   description?: string;

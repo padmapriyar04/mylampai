@@ -42,8 +42,7 @@ const formSchema = z.object({
   school: z.string().min(1, "School name is required"),
   degree: z.string().min(1, "Degree is required"),
   field: z.string().optional(),
-  percentage: z.string().optional(),
-  cgpa: z.string().optional(),
+  grade: z.string().optional(),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
   description: z.string().optional(),
@@ -69,8 +68,7 @@ export function EducationDetails({
       school: "",
       degree: "",
       field: "",
-      percentage: "",
-      cgpa: "",
+      grade: "",
       description: "",
     },
   });
@@ -163,34 +161,19 @@ export function EducationDetails({
                     </FormItem>
                   )}
                 />
-                <div className="flex space-x-4">
                   <FormField
                     control={form.control}
-                    name="percentage"
+                    name="grade"
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>Percentage (Optional)</FormLabel>
+                        <FormLabel>Grade (Optional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter percentage" {...field} />
+                          <Input placeholder="Enter grade" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="cgpa"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>CGPA (Optional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter CGPA" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
                 <div className="grid grid-cols-2">
                   <FormField
                     control={form.control}
@@ -315,11 +298,9 @@ export function EducationDetails({
                 {edu.field && ` in ${edu.field}`}
               </p>
             )}
-            {(edu.percentage || edu.cgpa) && (
+            {(edu.grade) && (
               <p className="text-sm text-gray-500">
-                {edu.percentage && `Percentage: ${edu.percentage}`}
-                {edu.percentage && edu.cgpa && " | "}
-                {edu.cgpa && `CGPA: ${edu.cgpa}`}
+                {edu.grade && `Grade: ${edu.grade}`}
               </p>
             )}
             {(edu.startDate || edu.endDate) && (

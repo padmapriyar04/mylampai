@@ -16,3 +16,33 @@ export const getUserEducations = async (userId: string) => {
     return [];
   }
 };
+
+type EducationType = {
+  school: string;
+  degree?: string;
+  field?: string;
+  grade?: string;
+  startDate?: Date;
+  endDate?: Date;
+  description?: string;
+  skills: string[];
+};
+
+export const updateUserEducation = async (
+  educationData: EducationType,
+  id: string
+) => {
+  try {
+    await prisma.education.update({
+      where: {
+        id,
+      },
+      data: educationData,
+    });
+
+    return "success";
+  } catch (error) {
+    console.error("Error updating education:", error);
+    return "failed";
+  }
+};

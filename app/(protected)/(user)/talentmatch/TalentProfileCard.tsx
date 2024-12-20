@@ -6,16 +6,50 @@ import {
   DollarSignIcon,
   BriefcaseIcon,
   AwardIcon,
+  CirclePlus,
+  Pencil,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useUserStore } from "@/utils/userStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Education, Employment, TalentProfile } from "@prisma/client";
+import { Education, Employment, Project, TalentProfile } from "@prisma/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import { getUserEducations } from "@/actions/profileActions";
-import { useProfileStore } from "@/utils/profileStore";
-import { getProfileEmployments } from "@/actions/talentMatchActions";
-import exp from "constants";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  getProfileEmployments,
+  getProfileProjects,
+} from "@/actions/talentMatchActions";
+import { UpdateEducationDetails } from "@/components/talentmatch/updateEducation";
+import { UpdateWorkExperiences } from "@/components/talentmatch/updateExperience";
+import { CreateProject } from "@/components/talentmatch/updateProjects";
+
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+});
 
 const ProfileDetail = ({
   icon,
@@ -48,18 +82,42 @@ const TagList = ({ title, items }: { title: string; items: string[] }) => (
 
 export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
   const { userData } = useUserStore();
-  const { id } = useProfileStore();
+  const id = profile.id;
+
+  const [open, setOpen] = useState(false);
   const [education, setEducation] = useState<Education[] | null>(null);
   const [experience, setExperience] = useState<Employment[] | null>(null);
+  const [project, setProject] = useState<Project[] | null>(null);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    console.log(data);
+  };
 
   const getExperiences = async () => {
+    if (experience) return;
     try {
-      if (!id) return;
       const experiences = await getProfileEmployments(id);
       setExperience(experiences);
       console.log(experiences);
     } catch (error) {
       console.error("Error getting experiences:", error);
+    }
+  };
+
+  const getProjects = async () => {
+    try {
+      const projects = await getProfileProjects(id);
+      setProject(projects);
+    } catch (error) {
+      console.error("Error getting projects:", error);
     }
   };
 
@@ -73,8 +131,6 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
       console.error("Error getting educations:", error);
     }
   };
-
-  useEffect(() => {}, []);
 
   if (!userData) return null;
 
@@ -91,10 +147,10 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
       <div className="px-8 mt-12">
         <h2 className="text-2xl font-semibold">{userData?.name}</h2>
         <p className="text-muted-foreground">{profile?.title}</p>
-        <p></p>
+        <p className="text-muted-foreground">{profile?.description}</p>
       </div>
       <Tabs defaultValue="account" className="w-full px-8 mt-8">
-        <TabsList className="w-full justify-start p-2 gap-4 h-auto">
+        <TabsList className="w-full justify-start p-2 mb-2 gap-2 h-auto">
           <TabsTrigger
             className="py-2"
             value="education"
@@ -109,10 +165,66 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
           >
             Experience
           </TabsTrigger>
+          <TabsTrigger className="py-2" value="projects" onClick={getProjects}>
+            Projects
+          </TabsTrigger>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <CirclePlus className="hover:cursor-pointer rounded-full" />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Add another section</DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Section Title</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter the title" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Describe in details"
+                            className="resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter>
+                    <Button type="submit">Save Education</Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </TabsList>
-        <TabsContent value="education" className="px-1">
+        <TabsContent value="education" className="mt-0 flex flex-col gap-2">
           {education?.map((edu, index) => (
-            <div key={index} className="mt-4">
+            <div key={index} className="relative border rounded-lg p-4">
+              <div className="absolute right-4 top-4">
+                <UpdateEducationDetails education={edu} />
+              </div>
               <h3 className="font-semibold text-lg">{edu.school}</h3>
               <p className="text-muted-foreground">
                 <span className="">{edu.degree}</span>
@@ -122,107 +234,83 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
               <p>
                 <span className="text-muted-foreground text-sm">
                   {edu?.startDate?.toLocaleDateString("en-IN", {
-                    month: "long",
+                    month: "short",
                     year: "numeric",
                   })}
                 </span>
                 &nbsp;-&nbsp;
                 <span className="text-muted-foreground text-sm">
                   {edu?.endDate?.toLocaleDateString("en-IN", {
-                    month: "long",
+                    month: "short",
                     year: "numeric",
                   })}
                 </span>
               </p>
+              <p className="text-muted-foreground">{edu?.description}</p>
+              {edu?.skills.length > 0 && (
+                <TagList title="Skills" items={edu.skills} />
+              )}
             </div>
           ))}
         </TabsContent>
-        <TabsContent value="experience">
+        <TabsContent value="experience" className="mt-0 flex flex-col gap-2">
           {experience?.map((exp, index) => (
-            <div key={index} className="mt-4">
+            <div key={index} className="relative border rounded-lg p-4">
+              <div className="absolute right-4 top-4">
+                <UpdateWorkExperiences experience={exp} />
+              </div>
               <h3 className="font-semibold text-lg">{exp.company}</h3>
               <div className="text-muted-foreground">
                 <p className="">{exp.position}</p>
 
-                <div>
-                  <span className="text-muted-foreground text-sm">
-                    &nbsp;-&nbsp;
-                    {exp?.endDate?.toLocaleDateString("en-IN", {
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
                 <p>{exp.location}</p>
               </div>
               <p>
                 <span className="text-muted-foreground text-sm">
                   {exp?.startDate?.toLocaleDateString("en-IN", {
-                    month: "long",
+                    month: "short",
                     year: "numeric",
                   })}
                 </span>
                 <span className="text-muted-foreground text-sm">
                   &nbsp;-&nbsp;
                   {exp?.endDate?.toLocaleDateString("en-IN", {
-                    month: "long",
+                    month: "short",
                     year: "numeric",
                   })}
                 </span>
               </p>
+              <p>{exp.description}</p>
+              {exp?.skills.length > 0 && (
+                <TagList title="Skills" items={exp.skills} />
+              )}
             </div>
           ))}
         </TabsContent>
+        <TabsContent value="projects" className="mt-0 flex flex-col gap-2">
+          {project ? (
+            project.map((item, index) => (
+              <div key={index} className="relative border rounded-lg p-4">
+                <div className="absolute right-4 top-4">
+                  <Pencil />
+                </div>
+                <h3 className="font-semibold text-lg">{item.title}</h3>
+                <p className="text-muted-foreground">{item?.role}</p>
+                <p className="text-muted-foreground">{item?.url}</p>
+                <p className="text-muted-foreground">{item.description}</p>
+
+                {item.skills.length > 0 && (
+                  <TagList title="Skills" items={item.skills} />
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="flex items-center justify-center ">
+              <CreateProject talentProfileId={profile.id} />
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
-
-      {/* <div className="space-y-4 ">
-        {profile.experienceYears && (
-          <ProfileDetail
-            icon={<BriefcaseIcon className="h-4 w-4" />}
-            label="Experience"
-            value={`${profile.experienceYears} ${
-              parseInt(profile.experienceYears) === 1 ? "year" : "years"
-            }`}
-          />
-        )}
-        <ProfileDetail
-          icon={<MapPinIcon className="h-4 w-4" />}
-          label="Location Preference"
-          value={profile.locationPref}
-        />
-        <ProfileDetail
-          icon={<ClockIcon className="h-4 w-4" />}
-          label="Availability"
-          value={profile.availability}
-        />
-        <ProfileDetail
-          icon={<DollarSignIcon className="h-4 w-4" />}
-          label="Expected Salary"
-          value={profile.expectedSalary}
-        />
-
-        <TagList title="Skills" items={profile.skills} />
-        <TagList title="Profiles" items={profile.profiles} />
-
-        {profile.certifications.length > 0 && (
-          <div className="mt-4">
-            <h3 className="font-semibold mb-2 flex items-center">
-              <AwardIcon className="h-4 w-4 mr-2" />
-              Certifications
-            </h3>
-            <ul className="list-disc list-inside">
-              {profile.certifications.map((cert, index) => (
-                <li key={index}>{cert}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <div className="mt-4 text-sm text-muted-foreground">
-          <p>Resume ID: {profile.resumeId}</p>
-          <p>Interview ID: {profile.interviewId}</p>
-        </div>
-      </div> */}
     </div>
   );
 }

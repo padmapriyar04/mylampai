@@ -52,6 +52,7 @@ export default function HeroSection() {
     <>
       <div className="flex flex-col select-none bg-[url('/home/herosection-background.svg')] max-w-screen overflow-hidden relative">
         <div className="absolute w-full h-[50px] bottom-0 bg-gradient-to-b from-transparent to-white z-50"></div>
+        <div className="h-[64px]"></div>
         <div className="flex relative justify-evenly items-center min-h-[calc(100vh-80px)] px-8 gap-6 w-full m-auto">
           <div className="flex flex-col justify-center min-h-[600px] w-full z-10">
             <div className=" relative font-bold lg:ml-10 mb-6">
