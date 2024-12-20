@@ -272,3 +272,30 @@ export const createTalentProject = async (projectData: ProjectType) => {
     return "failed";
   }
 };
+
+type ProjectUpdateType = {
+  title: string;
+  description: string;
+  role?: string;
+  url?: string;
+  skills: string[];
+};
+
+export const updateTalentProject = async (
+  projectData: ProjectUpdateType,
+  id: string
+) => {
+  try {
+    await prisma.project.update({
+      where: {
+        id,
+      },
+      data: projectData,
+    });
+
+    return "success";
+  } catch (error) {
+    console.error(error);
+    return "failed";
+  }
+};

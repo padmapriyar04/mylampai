@@ -87,6 +87,9 @@ type StructuredData = {
 
 export default function TalentMatchPage() {
   const { userData } = useUserStore();
+  const [selectedProfieIndex, setSelectedProfileIndex] = useState<
+    number | null
+  >(null);
   const [talentMatches, setTalentMatches] = useState<TalentMatchType[]>([]);
   const [talentProfiles, setTalentProfiles] = useState<TalentProfile[]>([]);
   // const [resumeIds, setResumeIds] = useState<IdsType[]>([]);
@@ -244,7 +247,6 @@ export default function TalentMatchPage() {
     const fetchIds = async () => {
       try {
         // const ids = await getResumeAndInterviewIds(userData?.id);
-
         // if (ids.status === "success") {
         //   setResumeIds(ids.cvIds);
         //   setInterviewIds(ids.interviewIds);
@@ -269,7 +271,6 @@ export default function TalentMatchPage() {
 
         if (profiles) {
           setTalentProfiles(profiles);
-          console.log(profiles);
         }
 
         if (matches && matches.length) {
@@ -341,111 +342,26 @@ export default function TalentMatchPage() {
                 )}
               </div>
             ))}
-            {talentMatches.map((match, index) => (
-              <div key={index} className="p-4 border-primary border rounded-lg">
-                <div className="space-y-4">
-                  <div className="flex justify-start gap-2">
-                    <h3 className="font-semibold mt-2">Skills</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.skills.map((skill) => (
-                        <Badge key={skill} variant="secondary">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex justify-start gap-2">
-                    <h3 className="font-semibold mt-2">Profiles</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.profiles.map((profile) => (
-                        <Badge key={profile} variant="outline">
-                          {profile}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <IndianRupee className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Salary: ₹{match.salary}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <MapPinIcon className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Location Preference: {match.locationPref}</span>
-                  </div>
-                </div>
-                {!match.isMatched ? (
-                  <Button onClick={() => handleConfirmMatch(match.matchId)}>
-                    Confirm Match
-                  </Button>
-                ) : (
-                  <Badge variant="outline">Match Confirmed</Badge>
-                )}
-              </div>
-            ))}
-            {talentMatches.map((match, index) => (
-              <div
-                key={index}
-                className="scale-75 border-primary border rounded-lg"
-              >
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold">Skills</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.skills.map((skill) => (
-                        <Badge key={skill} variant="secondary">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Profiles</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.profiles.map((profile) => (
-                        <Badge key={profile} variant="outline">
-                          {profile}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <IndianRupee className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Salary: ₹{match.salary}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <MapPinIcon className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Location Preference: {match.locationPref}</span>
-                  </div>
-                </div>
-                {!match.isMatched ? (
-                  <Button onClick={() => handleConfirmMatch(match.matchId)}>
-                    Confirm Match
-                  </Button>
-                ) : (
-                  <Badge variant="outline">Match Confirmed</Badge>
-                )}
-              </div>
-            ))}
           </div>
         </div>
         <div>
           {talentProfiles.map((profile, index) => (
-            <div key={index}>
-              <div>
-                {profile.profiles.map((item, ind) => (
-                  <Badge key={ind} variant="outline">
-                    {item}
-                  </Badge>
-                ))}
-              </div>
+            <div
+              key={index}
+              className={`border p-4 my-4 rounded-lg cursor-pointer hover:bg-gray-100 ${index === selectedProfieIndex ? "bg-gray-100" : ""}`}
+              onClick={() => setSelectedProfileIndex(index)}
+            >
+              {profile.id}
             </div>
           ))}
         </div>
-        <Button type="button">Create new profile</Button>
-        <Input type="file" onChange={handleFileChange} />
+        {/* <Button type="button">Create new profile</Button>
+        <Input type="file" onChange={handleFileChange} /> */}
       </ScrollArea>
       <ScrollArea className="h-screen w-[57.5%] ">
-        {talentProfiles[1] && <TalentProfileCard profile={talentProfiles[1]} />}
+        {selectedProfieIndex && (
+          <TalentProfileCard profile={talentProfiles[selectedProfieIndex]} />
+        )}
       </ScrollArea>
     </div>
   );

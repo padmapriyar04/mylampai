@@ -30,7 +30,7 @@ import { useUserStore } from "@/utils/userStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Education, Employment, Project, TalentProfile } from "@prisma/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getUserEducations } from "@/actions/profileActions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,7 +44,10 @@ import {
 } from "@/actions/talentMatchActions";
 import { UpdateEducationDetails } from "@/components/talentmatch/updateEducation";
 import { UpdateWorkExperiences } from "@/components/talentmatch/updateExperience";
-import { CreateProject } from "@/components/talentmatch/updateProjects";
+import {
+  CreateProject,
+  UpdateProject,
+} from "@/components/talentmatch/updateProjects";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -67,9 +70,9 @@ const ProfileDetail = ({
   </div>
 );
 
-const TagList = ({ title, items }: { title: string; items: string[] }) => (
-  <div className="mt-4">
-    <h3 className="font-semibold mb-2">{title}</h3>
+const TagList = ({ title, items }: { title?: string; items: string[] }) => (
+  <div className="mt-4 flex items-center gap-2">
+    {title && <h3 className="font-semibold">{title}</h3>}
     <div className="flex flex-wrap gap-2">
       {items.map((item, index) => (
         <Badge key={index} variant="secondary">
@@ -83,6 +86,8 @@ const TagList = ({ title, items }: { title: string; items: string[] }) => (
 export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
   const { userData } = useUserStore();
   const id = profile.id;
+
+  console.log(profile);
 
   const [open, setOpen] = useState(false);
   const [education, setEducation] = useState<Education[] | null>(null);
@@ -101,8 +106,7 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
     console.log(data);
   };
 
-  const getExperiences = async () => {
-    if (experience) return;
+  const getExperiences = useCallback(async () => {
     try {
       const experiences = await getProfileEmployments(id);
       setExperience(experiences);
@@ -110,19 +114,18 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
     } catch (error) {
       console.error("Error getting experiences:", error);
     }
-  };
+  }, [id]);
 
-  const getProjects = async () => {
+  const getProjects = useCallback(async () => {
     try {
       const projects = await getProfileProjects(id);
       setProject(projects);
     } catch (error) {
       console.error("Error getting projects:", error);
     }
-  };
+  }, [id]);
 
-  const getEducations = async () => {
-    if (education) return;
+  const getEducations = useCallback(async () => {
     if (!userData || !userData.id) return;
     try {
       const educations = await getUserEducations(userData.id);
@@ -130,7 +133,7 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
     } catch (error) {
       console.error("Error getting educations:", error);
     }
-  };
+  }, [userData]);
 
   if (!userData) return null;
 
@@ -148,6 +151,11 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
         <h2 className="text-2xl font-semibold">{userData?.name}</h2>
         <p className="text-muted-foreground">{profile?.title}</p>
         <p className="text-muted-foreground">{profile?.description}</p>
+      </div>
+      <div className="px-8">
+        {(profile.skills.length > 0 || profile.profiles.length > 0) && (
+          <TagList items={[...profile.skills, ...profile.profiles]} />
+        )}
       </div>
       <Tabs defaultValue="account" className="w-full px-8 mt-8">
         <TabsList className="w-full justify-start p-2 mb-2 gap-2 h-auto">
@@ -292,7 +300,7 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
             project.map((item, index) => (
               <div key={index} className="relative border rounded-lg p-4">
                 <div className="absolute right-4 top-4">
-                  <Pencil />
+                  <UpdateProject project={item} />
                 </div>
                 <h3 className="font-semibold text-lg">{item.title}</h3>
                 <p className="text-muted-foreground">{item?.role}</p>
