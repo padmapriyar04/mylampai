@@ -4,6 +4,7 @@ import HeroSection from "@/components/home/HeroSection";
 // import WizeCamp from "@/components/home/WizeCamp";
 import WhyWize from "@/components/home/WhyWize";
 import BackedByBest from "@/components/home/BackedByBest";
+import HowWizeWork from "@/components/home/HowWizeWork";
 // import PowerOfWize from "@/components/home/PowerOfWize";
 // import RecentAdvances from "@/components/home/RecentAdvances";
 import CommunitySection from "@/components/home/Community";
@@ -67,6 +68,7 @@ export default function Page() {
         {/* <SectionWrapper>
         </SectionWrapper> */}
         {/* <HomeSlider /> */}
+        <HowWizeWork />
         <WhyWize />
         {/* <SectionWrapper> */}
         <BackedByBest />
