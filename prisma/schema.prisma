@@ -113,12 +113,13 @@ model OTP {
 }
 
 model Resume {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  resumeUrl String
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  resumeUrl  String
+  resumeName String?
+  userId     String   @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 // recruiter
@@ -149,7 +150,6 @@ model TalentMatch {
   @@unique([talentId, talentPoolId])
 }
 
-// user
 model TalentProfile {
   id           String         @id @default(auto()) @map("_id") @db.ObjectId
   resumeUrl    String
@@ -159,6 +159,8 @@ model TalentProfile {
   skills       String[]
   profiles     String[]
   hours        String?
+  availability String?
+  interviews   Interview[]
   talentMatch  TalentMatch[]
   projects     Project[]
   employment   Employment[]
@@ -311,6 +313,8 @@ model Interview {
   isFeedbackGiven   Boolean             @default(false)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
+  TalentProfile     TalentProfile?      @relation(fields: [talentProfileId], references: [id])
+  talentProfileId   String?             @db.ObjectId
 }
 
 model InterviewMessage {

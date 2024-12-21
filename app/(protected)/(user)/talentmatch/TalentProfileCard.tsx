@@ -87,8 +87,6 @@ export function TalentProfileCard({ profile }: { profile: TalentProfile }) {
   const { userData } = useUserStore();
   const id = profile.id;
 
-  console.log(profile);
-
   const [open, setOpen] = useState(false);
   const [education, setEducation] = useState<Education[] | null>(null);
   const [experience, setExperience] = useState<Employment[] | null>(null);
