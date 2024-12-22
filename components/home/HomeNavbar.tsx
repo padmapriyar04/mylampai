@@ -45,19 +45,6 @@ const HomeNavbar = () => {
     };
   }, []);
 
-  const handleLogin = async (email: string, role: "user" | "recruiter") => {
-    const res = await nextAuthLogin({ email, role });
-
-    if (res.status === "success" && res.user && res.accessToken) {
-      setUserData(res.user, res.accessToken);
-      setCookie("accessToken", res.accessToken);
-    } else {
-      toast.error(res.message);
-    }
-
-    await signOut();
-  };
-
   useEffect(() => {
     if (role === null) return;
 
@@ -66,6 +53,19 @@ const HomeNavbar = () => {
     }
 
     const email = data.user.email as string;
+
+    const handleLogin = async (email: string, role: "user" | "recruiter") => {
+      const res = await nextAuthLogin({ email, role });
+
+      if (res.status === "success" && res.user && res.accessToken) {
+        setUserData(res.user, res.accessToken);
+        setCookie("accessToken", res.accessToken);
+      } else {
+        toast.error(res.message);
+      }
+
+      await signOut();
+    };
 
     handleLogin(email, role);
   }, [data, router, role, setUserData]);

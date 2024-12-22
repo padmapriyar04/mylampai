@@ -46,7 +46,7 @@ const ReviewCard = ({ img }: { img: string }) => {
 export function InfiniteLogoSlide() {
   return (
     <>
-      <div className="relative flex h-[180px] w-full max-w-[calc(100vw)] flex-col items-center z-10 justify-center overflow-hidden rounded-lg">
+      <div className="relative flex h-[200px] w-full max-w-[calc(100vw)] flex-col items-center z-10 justify-center overflow-hidden rounded-lg">
         <Marquee className="[--duration:20s]">
           {firstRow.map((review, index) => (
             <ReviewCard key={index} {...review} />

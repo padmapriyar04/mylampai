@@ -3,6 +3,36 @@ import prisma from "@/lib";
 import { generateSasToken } from "./azureActions";
 import { auth } from "@/lib/authlib";
 
+type TalentProfileType = {
+  resumeUrl: string;
+  title: string;
+  availability: string;
+  interviewDate: Date;
+  userId: string;
+  target: string;
+};
+
+export const createTalentProfile = async (
+  talentProfileData: TalentProfileType
+) => {
+  try {
+    await prisma.talentProfile.create({
+      data: talentProfileData,
+    });
+
+    return {
+      message: "Profile created successfully",
+      status: "success",
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Internal Server Error",
+      status: "failed",
+    };
+  }
+};
+
 export const getTalentMatches = async (userId: string) => {
   try {
     const talentMatches = await prisma.talentMatch.findMany({
@@ -41,37 +71,6 @@ type StructuredData = {
   description: string;
   skills: string[];
   rate: string;
-};
-
-export const createTalentProfile = async (data: StructuredData) => {
-  try {
-    const user = await auth();
-
-    if (!user) {
-      return {
-        status: "failed",
-        message: "User not authenticated",
-      };
-    }
-
-    await prisma.talentProfile.create({
-      data: {
-        ...data,
-        userId: user.id,
-      },
-    });
-
-    return {
-      status: "success",
-      message: "Profile created successfully",
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      status: "failed",
-      message: "Error creating profile",
-    };
-  }
 };
 
 type ProfileData = {
@@ -220,5 +219,113 @@ export const uploadResumeToAzure = async (formData: FormData) => {
       status: "failed",
       message: "Error uploading CV",
     };
+  }
+};
+
+export const getProfileEmployments = async (talentProfileId: string) => {
+  try {
+    const employments = await prisma.employment.findMany({
+      where: {
+        talentProfileId,
+      },
+    });
+
+    return employments;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+type EmploymentType = {
+  company: string;
+  position: string;
+  location?: string;
+  startDate: Date;
+  endDate?: Date;
+  description?: string;
+  skills: string[];
+};
+
+export const updateEmployment = async (
+  employmentData: EmploymentType,
+  id: string
+) => {
+  try {
+    await prisma.employment.update({
+      where: {
+        id,
+      },
+      data: employmentData,
+    });
+
+    return "success";
+  } catch (error) {
+    console.error(error);
+    return "failed";
+  }
+};
+
+export const getProfileProjects = async (talentProfileId: string) => {
+  try {
+    const projects = await prisma.project.findMany({
+      where: {
+        talentProfileId,
+      },
+    });
+
+    return projects;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
+type ProjectType = {
+  title: string;
+  description: string;
+  role?: string;
+  url?: string;
+  skills: string[];
+  talentProfileId: string;
+};
+
+export const createTalentProject = async (projectData: ProjectType) => {
+  try {
+    await prisma.project.create({
+      data: projectData,
+    });
+
+    return "success";
+  } catch (error) {
+    console.error(error);
+    return "failed";
+  }
+};
+
+type ProjectUpdateType = {
+  title: string;
+  description: string;
+  role?: string;
+  url?: string;
+  skills: string[];
+};
+
+export const updateTalentProject = async (
+  projectData: ProjectUpdateType,
+  id: string
+) => {
+  try {
+    await prisma.project.update({
+      where: {
+        id,
+      },
+      data: projectData,
+    });
+
+    return "success";
+  } catch (error) {
+    console.error(error);
+    return "failed";
   }
 };
