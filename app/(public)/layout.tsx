@@ -11,22 +11,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname(); // Get current route
-
-  // Check if the current route is under "recruiter"
-  const isRecruiterRoute = pathname?.startsWith("/recruiter");
-
   return (
     <>
-     {isRecruiterRoute?<RecruiterNavbar/>:<HomeNavbar/>}
-      
+   <HomeNavbar/>
+   <RecruiterNavbar/>   
 
       <div className="min-h-screen w-full flex flex-1 flex-col">
         {children}
       </div>
       <Footer />
 
-      {isRecruiterRoute && <BottomNavBar />}
+      <BottomNavBar />
     </>
   );
 }
