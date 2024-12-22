@@ -464,7 +464,7 @@ const InterviewComponent = () => {
     <>
       <div className="min-h-screen bg-primary-foreground flex items-center md:justify-center justify-top w-full relative">
         <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">
-          <div className="max-w-[400px] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-2xl p-8 gap-8 relative">
+          <div className="hidden sm:flex max-w-[400px] flex-col items-center justify-end bg-primary shadow-lg text-white rounded-2xl p-8 gap-8 relative">
             <Image
               src={"/images/Globe.svg"}
               className="w-10/12 h-auto"
