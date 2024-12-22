@@ -54,14 +54,14 @@ const CounsellorCard: React.FC<CounsellorCardProps> = ({
   ranking,
 }) => {
   return (
-    <div className="w-full max-w-[260px] flex flex-col items-center bg-white rounded-xl overflow-hidden shadow-lg">
+    <div className="w-full max-w-[260px] flex flex-col items-center bg-white rounded-lg overflow-hidden shadow-lg">
       <div className="w-full h-24 bg-primary flex items-center justify-center"></div>
       <Image
         src={image}
         alt="profile"
         width={200}
         height={200}
-        className="h-24 w-24 rounded-full object-cover -translate-y-1/2 border-2 border-primary"
+        className="h-24 w-24 rounded-lg object-cover -translate-y-1/2 border-2 border-primary"
       />
 
       <div className="text-xl font-semibold -translate-y-6">{name}</div>

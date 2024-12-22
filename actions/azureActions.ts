@@ -13,14 +13,14 @@ const interviewContainerName = process.env.AZURE_INTERVIEW_CONTAINER_NAME || "";
 
 const sharedKeyCredential = new StorageSharedKeyCredential(
   accountName,
-  accountKey,
+  accountKey
 );
 
 export const generateSasToken = async (blobName: string) => {
   const sasOptions = {
     containerName,
     blobName,
-    permissions: BlobSASPermissions.parse("c"),
+    permissions: BlobSASPermissions.parse("cw"),
     startsOn: new Date(new Date().valueOf() - 1 * 60 * 1000),
     expiresOn: new Date(new Date().valueOf() + 5 * 60 * 1000),
   };
@@ -28,9 +28,9 @@ export const generateSasToken = async (blobName: string) => {
   try {
     const sasToken = generateBlobSASQueryParameters(
       sasOptions,
-      sharedKeyCredential,
+      sharedKeyCredential
     ).toString();
-    
+
     return `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
   } catch (error) {
     console.error("Error generating SAS token:", error);
@@ -49,7 +49,7 @@ export const generateSasUrlForInterview = async () => {
   try {
     const sasToken = generateBlobSASQueryParameters(
       sasOptions,
-      sharedKeyCredential,
+      sharedKeyCredential
     ).toString();
     console.log(sasToken);
     return {
@@ -61,15 +61,19 @@ export const generateSasUrlForInterview = async () => {
     return null;
   }
 };
-export const uploadLargeFile=async(file:File)=>{
-  const blobServiceClient = BlobServiceClient.fromConnectionString("<your-connection-string>");
-  const containerClient = blobServiceClient.getContainerClient("<your-container>");
+
+export const uploadLargeFile = async (file: File) => {
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    "<your-connection-string>"
+  );
+  const containerClient =
+    blobServiceClient.getContainerClient("<your-container>");
   const blobClient = containerClient.getBlockBlobClient(file.name);
 
   await blobClient.uploadBrowserData(file, {
-      maxSingleShotSize: 4 * 1024 * 1024, // Set max chunk size (4 MB here)
-      concurrency: 5, // Set parallel uploads
+    maxSingleShotSize: 4 * 1024 * 1024, // Set max chunk size (4 MB here)
+    concurrency: 5, // Set parallel uploads
   });
 
   console.log("Upload successful!");
-}
+};

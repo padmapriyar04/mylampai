@@ -104,19 +104,20 @@ export default function Footer() {
                     />
                   </button>
                 </form>
-                <div className="w-full relative flex items-start gap-2 border rounded-lg py-2 px-4">
+                <div className="w-full relative flex items-start gap-4 border rounded-lg py-2 px-3 pr-4">
                   <Image
                     src={"/home/desktop.svg"}
                     height={45}
                     width={45}
                     alt="desktop"
+                    className="scale-125"
                   />
                   <div className="text-xs text-left w-full text-[#697386]">
                     Know everything about wiZe in just one call
                   </div>
-                  <div className="absolute flex items-center bottom-1 gap-2 right-2 text-primary text-xs px-2 py-1">
-                    Schedule Call <ArrowRight className="w-4 h-4" />
-                  </div>
+                  <a href="https://calendly.com/mylamp/wize" target="_blank" className="group absolute flex items-center bottom-0 gap-1 right-4 text-primary text-xs px-2 py-1">
+                    Schedule Call <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-all" />
+                  </a>
                 </div>
               </div>
             </div>

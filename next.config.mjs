@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "avatar.vercel.sh",
+        hostname: "**",
         port: "",
         pathname: "/**",
       },
@@ -17,7 +17,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   distDir: 'build',
-  output: "standalone"
+  output: 'standalone',
 };
 
 export default nextConfig;

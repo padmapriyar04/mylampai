@@ -143,6 +143,7 @@ export const verifyOTPandLogin = async ({
           name: user.name,
           email: user.email,
           role: user.role,
+          image: user.image as string,
         },
         process.env.JWT_SECRET as string,
         { expiresIn: process.env.JWT_EXPIRATION || "90d" }
@@ -216,6 +217,7 @@ export const nextAuthLogin = async ({
           name: user.name,
           email: user.email,
           role: user.role,
+          image: user.image,
         },
         process.env.JWT_SECRET as string,
         { expiresIn: process.env.JWT_EXPIRATION || "90d" }
@@ -246,51 +248,4 @@ export const nextAuthLogin = async ({
       message: "Internal Server Error",
     };
   }
-};
-
-export const handleGoogleLogin = async ({ email }: { email: string }) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
-
-    if (!user) {
-      return {
-        message: "failed",
-      };
-    }
-
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email as string,
-        name: user.name as string,
-        role: user.role as string,
-      },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "70d" }
-    );
-
-    const response = {
-      token,
-      user: {
-        id: user.id,
-        email: user.email as string,
-        name: user.name as string,
-        role: user.role as string,
-      },
-    };
-
-    return {
-      message: "success",
-      response,
-    };
-  } catch (error) {
-    console.log("error");
-  }
-  return {
-    message: "failed",
-  };
 };
