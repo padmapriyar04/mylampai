@@ -40,7 +40,7 @@ pdfJSLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 function generateFileName(
   interviewId: string,
   originalFileName: string,
-  filetype: string,
+  filetype: string
 ) {
   const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
   const fileExtension = originalFileName.split(".").pop();
@@ -106,7 +106,7 @@ const InterviewComponent = () => {
         setIsUploading(false);
       }
     },
-    [interviewId],
+    [interviewId]
   );
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -135,14 +135,14 @@ const InterviewComponent = () => {
             type: "start_interview",
             pdf_text: cvText,
             job_description: JD,
-          }),
+          })
         );
       } catch (err) {
         toast.error("Failed to access microphone and camera.");
         setLoading(false);
       }
     },
-    [ws, cvText],
+    [ws, cvText]
   );
 
   const uploadJDText = useCallback(
@@ -166,7 +166,7 @@ const InterviewComponent = () => {
         setIsUploading(false);
       }
     },
-    [interviewId, startInterview],
+    [interviewId, startInterview]
   );
 
   useEffect(() => {
@@ -216,7 +216,7 @@ const InterviewComponent = () => {
               JSON.stringify({
                 type: "upload_cv",
                 cv_data: Array.from(new Uint8Array(binaryData)),
-              }),
+              })
             );
           } catch (error) {
             setIsUploading(false);
@@ -255,7 +255,7 @@ const InterviewComponent = () => {
         console.error(error);
       }
     },
-    [ws, interviewId],
+    [ws, interviewId]
   );
 
   const handleResumeUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -325,7 +325,7 @@ const InterviewComponent = () => {
           resolve(text.trim());
         } else {
           reject(
-            new Error("pdfjs-dist is not available in the server environment"),
+            new Error("pdfjs-dist is not available in the server environment")
           );
         }
       };
@@ -341,7 +341,7 @@ const InterviewComponent = () => {
 
     if (extractedText && ws) {
       ws.send(
-        JSON.stringify({ type: "analyze_jd", job_description: extractedText }),
+        JSON.stringify({ type: "analyze_jd", job_description: extractedText })
       );
     } else {
       console.error("websocket is not initialised or no extracted text");
@@ -428,7 +428,7 @@ const InterviewComponent = () => {
       JSON.stringify({
         type: "analyze_jd",
         job_description: profile,
-      }),
+      })
     );
   };
 
@@ -441,7 +441,7 @@ const InterviewComponent = () => {
       JSON.stringify({
         type: "analyze_jd",
         job_description: jobProfile,
-      }),
+      })
     );
   };
 
@@ -463,17 +463,6 @@ const InterviewComponent = () => {
   return (
     <>
       <div className="min-h-screen bg-primary-foreground flex items-center md:justify-center justify-top w-full relative">
-        <div className="absolute top-2 left-0 max-w-[220px]">
-          <Link href="/">
-            <Image
-              src={"/home/logo.svg"}
-              width={180}
-              height={100}
-              alt="logo"
-              className="w-full h-auto drop-shadow-md"
-            />
-          </Link>
-        </div>
         <div className="max-w-[1200px] gap-4 w-full flex flex-col items-center md:flex-row justify-between">
           <div className="max-w-[400px] flex flex-col items-center justify-end bg-primary shadow-lg text-white rounded-2xl p-8 gap-8 relative">
             <Image
@@ -611,8 +600,8 @@ const InterviewComponent = () => {
                     {isUploading
                       ? "Uploading..."
                       : cvText !== ""
-                        ? "Resume Uploaded"
-                        : "Upload Resume"}
+                      ? "Resume Uploaded"
+                      : "Upload Resume"}
                   </button>
                 </div>
               </>

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { getJobs } from "@/actions/careerActions";
 import { Job } from "./jobCard";
+import { Album } from "lucide-react";
 
 type Job = {
   id: string;
@@ -29,35 +30,44 @@ type Job = {
 };
 
 export default function Career() {
-  const searchParams = useSearchParams();
-  const page = searchParams.get("page") || "1";
-  const [jobsData, setJobsData] = useState<Job[]>([]);
+  // const searchParams = useSearchParams();
+  // const page = searchParams.get("page") || "1";
+  // const [jobsData, setJobsData] = useState<Job[]>([]);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const jobs = await getJobs(Number(page));
-        setJobsData(jobs);
-      } catch (error) {
-        console.error(error);
-        toast.error("An error occurred while fetching jobs");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchJobs = async () => {
+  //     try {
+  //       const jobs = await getJobs(Number(page));
+  //       setJobsData(jobs);
+  //     } catch (error) {
+  //       console.error(error);
+  //       toast.error("An error occurred while fetching jobs");
+  //     }
+  //   };
 
-    fetchJobs();
-  }, [page]);
+  //   fetchJobs();
+  // }, [page]);
 
   return (
     <>
-      <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-6">Available Jobs</h1>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mx-auto p-10">
+        <h1 className="text-3xl font-bold mb-6">Opportunities</h1>
+        <div className="flex h-[400px] flex-col items-center justify-center gap-4">
+          <div className="mx-auto">
+            <Album className="w-16 h-16 text-primary" />
+          </div>
+          <div className="text-sm">
+            All invites for the job/internships opportunities and assessment
+            process will be shown here.
+          </div>
+        </div>
+        {/* <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {jobsData.map((job) => (
             <Job key={job.id} job={job} />
           ))}
-        </div>
+        </div> */}
       </div>
-      <Pagination>
+      {/* <Pagination>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious href="/career" />
@@ -74,7 +84,7 @@ export default function Career() {
             <PaginationNext href={`/career?page=${Number(page) + 1}`} />
           </PaginationItem>
         </PaginationContent>
-      </Pagination>
+      </Pagination> */}
     </>
   );
 }

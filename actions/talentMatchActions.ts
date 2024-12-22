@@ -122,7 +122,7 @@ export const getTalentProfiles = async (userId: string) => {
     return talentProfile;
   } catch (error) {
     console.error(error);
-    return [];
+    null;
   }
 };
 
