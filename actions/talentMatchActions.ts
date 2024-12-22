@@ -3,6 +3,36 @@ import prisma from "@/lib";
 import { generateSasToken } from "./azureActions";
 import { auth } from "@/lib/authlib";
 
+type TalentProfileType = {
+  resumeUrl: string;
+  title: string;
+  availability: string;
+  interviewDate: Date;
+  userId: string;
+  target: string;
+};
+
+export const createTalentProfile = async (
+  talentProfileData: TalentProfileType
+) => {
+  try {
+    await prisma.talentProfile.create({
+      data: talentProfileData,
+    });
+
+    return {
+      message: "Profile created successfully",
+      status: "success",
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Internal Server Error",
+      status: "failed",
+    };
+  }
+};
+
 export const getTalentMatches = async (userId: string) => {
   try {
     const talentMatches = await prisma.talentMatch.findMany({

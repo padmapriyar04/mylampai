@@ -152,12 +152,12 @@ export default function CreateProfile() {
             before your profile goes live.
           </p>
           <form className="flex-col flex max-w-sm gap-4">
-            <Button
+            {/* <Button
               type="button"
               className="bg-white text-primary border border-primary hover:bg-primary hover:text-white"
             >
               Manually enter details
-            </Button>
+            </Button> */}
             <input
               type="file"
               ref={fileInputRef}

@@ -1,6 +1,7 @@
 "use client";
 import { useUserStore } from "@/utils/userStore";
 import FullScreenLoader from "@/components/global/FullScreenLoader";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ProfilePage() {
   const { userData } = useUserStore();
@@ -10,17 +11,27 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex items-center justify-center w-full">
-      <div className="bg-white p-8 rounded-sm shadow-md">
-        <h1 className="text-3xl font-bold mb-4 text-primary">
+    <div className="h-screen flex items-center justify-center">
+      <div className="flex flex-col border rounded-lg p-8 gap-4 mx-auto max-w-xl">
+        <h1 className="text-3xl font-bold text-primary">
           Welcome to your profile
         </h1>
-        <p className="text-xl text-slate-500 mb-2">
-          Hello, {userData.name && userData.name}
-        </p>
-        <p className="text-md text-slate-500">
-          Email: {userData.email && userData.email}
-        </p>
+        <div className="flex items-start gap-4">
+          <Avatar className="h-24 w-24 rounded-lg shadow-lg ">
+            <AvatarImage src={userData?.image} alt={userData?.name} />
+            <AvatarFallback className="rounded-lg cursor-default">
+              {userData?.name ? userData?.name : "User"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col items-start gap-2">
+            <p className="text-xl text-muted-foreground">
+              Hello, {userData.name || "User"}
+            </p>
+            <p className="text-md text-muted-foreground">
+              Email: {userData.email && userData.email}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
