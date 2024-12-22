@@ -187,7 +187,7 @@ export default function HowWizeWork() {
         </div>
         <div className="p-4">
           <div className="border rounded-lg space-y-8 mt-8 flex flex-col min-h-[1050px] justify-between">
-            <div className="flex items-start justify-between p-4 gap-4">
+            <div className="flex items-start flex-col sm:flex-row justify-between p-4 gap-4">
               <div
                 className={`mt-12 duration-100 flex flex-col gap-4 ${
                   hovered === 1 ? "max-w-[500px]" : "max-w-[550px]"
@@ -260,7 +260,7 @@ export default function HowWizeWork() {
                 }`}
               ></div>
             </div>
-            <div className="flex items-end justify-between p-4 gap-4">
+            <div className="flex items-end flex-col-reverse sm:flex-row justify-between p-4 gap-4">
               <div
                 onMouseEnter={() => setHovered(2)}
                 onMouseLeave={() => setHovered(0)}
@@ -281,7 +281,7 @@ export default function HowWizeWork() {
                   practice, real feedback, and real results!
                 </p>
                 <div className="flex flex-col items-end gap-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center flex-col sm:flow-row gap-2">
                     <div className="flex items-center gap-2">
                       <span>Fully customizable</span>
                       <Image
@@ -301,7 +301,7 @@ export default function HowWizeWork() {
                       ></Image>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center flex-col sm:flow-row gap-2">
                     <div className="flex items-center gap-2">
                       <span>Built-in compiler</span>
                       <Image

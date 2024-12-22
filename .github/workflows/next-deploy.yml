@@ -28,16 +28,7 @@ jobs:
           npm run build
           mv ./build/static ./build/standalone/build
           mv ./public ./build/standalone
-          mv ./actions ./build/standalone
-          mv ./components ./build/standalone
-          mv ./lib ./build/standalone
-          mv ./data ./build/standalone
-          mv ./hooks ./build/standalone
-          mv ./prisma ./build/standalone
-          mv ./schemas ./build/standalone
-          mv ./types ./build/standalone
-          mv ./utils ./build/standalone
-
+          
       - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3

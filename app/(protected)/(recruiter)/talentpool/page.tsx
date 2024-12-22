@@ -4,9 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, MapPinIcon, DollarSignIcon } from "lucide-react";
 import Link from "next/link";
+import { auth } from "@/lib/authlib";
 
 export default async function TalentPoolPage() {
-  const pools = await getRecruiterTalentPool();
+  const user = await auth();
+
+  if (!user || user.role !== "recruiter") {
+    return <div>Unauthorized</div>;
+  }
+
+  const pools = await getRecruiterTalentPool(user.id);
 
   return (
     <div>

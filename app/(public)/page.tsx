@@ -69,7 +69,7 @@ export default function Page() {
         </SectionWrapper> */}
         {/* <HomeSlider /> */}
         <HowWizeWork />
-        <WhyWize />
+        {/* <WhyWize /> */}
         {/* <SectionWrapper> */}
         <BackedByBest />
         {/* </SectionWrapper> */}

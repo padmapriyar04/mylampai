@@ -12,7 +12,7 @@ export default function CommunitySection() {
     <>
       <div className="flex relative justify-between flex-col-reverse sm:flex-row items-center mx-8 text-white h-[265px] px-6 sm:px-[50px] rounded-lg bg-[#0d2126] mt-[200px]">
         <div className="flex flex-col items-start justify-center gap-4 max-w-[600px] h-full ">
-          <h2 className="text-2xl sm:text-[32px] font-bold max-w-[400px]">
+          <h2 className="text-2xl sm:text-[32px] font-bold w-full sm:max-w-[400px]">
             Onboard best <br /> <span className="text-primary">talent</span>{" "}
             &nbsp;in minutes*
           </h2>
@@ -45,7 +45,7 @@ export default function CommunitySection() {
             </Link>
           </div>
         </div>
-        <div className="sm:h-[300px] max-w-[400px] absolute top-0 -translate-y-[60%] right-24">
+        <div className="sm:h-[300px] sm:max-w-[400px] absolute top-0 -translate-y-[60%] right-24">
           <Image
             src="/home/recruit/Recruiter.svg"
             height={300}
@@ -55,7 +55,7 @@ export default function CommunitySection() {
           />
         </div>
       </div>
-      <div className="mx-8 mt-16 bg-[url('/home/howwizework/landingpagecta.svg')] bg-no-repeat shadow-[0_0px_40px_rgba(140,82,255,0.2)] bg-right flex justify-between items-center px-8 pr-16 rounded-lg h-40">
+      <div className="mx-8 mt-16 bg-[url('/home/howwizework/landingpagecta.svg')] bg-no-repeat shadow-[0_0px_40px_rgba(140,82,255,0.2)] bg-right flex flex-col sm:flex-row justify-between items-start sm:items-center px-8 py-4 pr-16 rounded-lg min-h-40">
         <div className="space-y-4">
           <h2 className="text-2xl sm:text-[32px] font-bold max-w-[700px]">
             One application, unlimited opportunities
@@ -70,7 +70,7 @@ export default function CommunitySection() {
             <DialogTrigger className="z-10">
               <div
                 onClick={() => setRole("user")}
-                className=" flex gap-4 items-center w-[225px] h-[45px] justify-center bg-primary rounded-lg text-white text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 md:max-w-[300px] hover:bg-primary-dark"
+                className=" flex gap-4  items-center w-[225px] h-[45px] justify-center bg-primary rounded-lg text-white text-sm font-semibold py-2 md:py-3 pl-4 my-2 md:pl-8 px-2 md:px-3 md:max-w-[300px] hover:bg-primary-dark"
               >
                 Get hired instantly
                 <ArrowRight size={24} />

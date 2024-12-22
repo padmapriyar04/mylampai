@@ -53,7 +53,7 @@ export default function HeroSection() {
       <div className="flex flex-col select-none bg-[url('/home/herosection-background.svg')] max-w-screen overflow-hidden relative">
         <div className="absolute w-full h-[50px] bottom-0 bg-gradient-to-b from-transparent to-white z-50"></div>
         <div className="h-[64px]"></div>
-        <div className="flex relative justify-evenly items-center min-h-[calc(100vh-80px)] px-8 gap-6 w-full m-auto">
+        <div className="flex relative justify-evenly items-center min-h-1/2 sm:min-h-[calc(100vh-80px)] px-8 gap-6 w-full m-auto">
           <div className="flex flex-col justify-center min-h-[600px] w-full z-10">
             <div className=" relative font-bold lg:ml-10 mb-6">
               <div className="flex items-center justify-evenly text-sm font-light absolute top-0 -translate-y-[150%] rounded-lg px-4 py-1 gap-2 bg-[#fafafa] border max-w-[300px]">
@@ -68,7 +68,7 @@ export default function HeroSection() {
                 IIM Banglore
               </div>
               {/* <Typing /> <br />{" "} */}
-              <span className="font-semibold text-[40px] leading-10">
+              <span className="font-semibold sm:text-xl s:text-[40px] leading-4 sm:leading-10">
                 We nurture, assess & match
                 <div className="mt-2">
                   {" "}
@@ -77,12 +77,12 @@ export default function HeroSection() {
                 </div>
               </span>
             </div>
-            <div className="text-gray-500 lg:ml-10 mb-9 max-w-[640px]">
+            <div className="text-muted-foreground text-sm sm:text-base lg:ml-10 mb-9 max-w-[640px]">
               Join the exclusive talent pool with just one application and
               assessment, unlocking access to thousands of premium opportunities
               worldwide.
             </div>
-            <div className="flex relative">
+            <div className="flex flex-col sm:flex-row gap-4 relative">
               <div className="absolute bottom-0 z-0 translate-y-full left-1/2 -translate-x-1/2 scale-125 w-[600px] h-[600px] overflow-hidden">
                 <Globe />
               </div>
