@@ -112,7 +112,7 @@ export default function WhyWize() {
               To make it happen for you
             </div>
             <p className="text-sm sm:text-base text-muted-foreground font-medium my-4">
-              Everything you need, we've got it! From accessing thousands of
+              Everything you need, we&apos;ve got it! From accessing thousands of
               opportunities with just one application and assessment to
               preparing for your next big break using our AI tools — and it all
               happens quickly and seamlessly.
