@@ -23,7 +23,7 @@ export default async function ProtectedLayout({
 
   return (
     <>
-      <div className="flex-1">
+      <div className="flex-1 flex">
         <AppSidebar user={user} />
         <ScrollArea className="h-screen w-full flex flex-1 flex-col">
           {children}

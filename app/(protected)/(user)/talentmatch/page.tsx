@@ -25,7 +25,7 @@ export default async function TalentMatchPage() {
   const talentProfiles = await getTalentProfiles(user.id);
 
   return (
-    <div className="flex sm:flex-row flex-col p-2 sm:pr-2">
+    <div className="flex sm:flex-row flex-col px-2 py-2 sm:py-0 sm:pr-2">
       <ScrollArea className="h-60 sm:h-screen w-full sm:w-5/12 sm:p-4">
         <div className="h-52 sm:h-[calc(100vh-2rem)] flex items-center border rounded-lg">
           <div
@@ -44,7 +44,7 @@ export default async function TalentMatchPage() {
       </ScrollArea>
       <div className="flex flex-col border my-4 w-full sm:w-7/12 rounded-lg h-[calc(100vh-2rem)]">
         <div className="border-b py-3 px-5 flex relative text-sm gap-4 ">
-          {talentProfiles && talentProfiles.length < 4 && (
+          {talentProfiles && talentProfiles.length < 3 && (
             <CreateTalenProfileDialog />
           )}
           <div className="font-medium cursor-pointer">Career Profile</div>

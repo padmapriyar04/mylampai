@@ -281,7 +281,7 @@ export default function HowWizeWork() {
                   practice, real feedback, and real results!
                 </p>
                 <div className="flex flex-col items-end gap-4">
-                  <div className="flex items-center flex-col sm:flow-row gap-2">
+                  <div className="flex items-center flex-col sm:flex-row gap-2">
                     <div className="flex items-center gap-2">
                       <span>Fully customizable</span>
                       <Image
@@ -301,7 +301,7 @@ export default function HowWizeWork() {
                       ></Image>
                     </div>
                   </div>
-                  <div className="flex items-center flex-col sm:flow-row gap-2">
+                  <div className="flex items-center flex-col sm:flex-row gap-2">
                     <div className="flex items-center gap-2">
                       <span>Built-in compiler</span>
                       <Image
