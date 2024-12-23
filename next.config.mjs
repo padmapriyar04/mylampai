@@ -1,4 +1,3 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -15,7 +14,6 @@ const nextConfig = {
     config.resolve.alias.encoding = false
     return config
   },
-  output: 'standalone',
 };
 
 export default nextConfig;
