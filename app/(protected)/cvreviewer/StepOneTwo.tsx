@@ -30,11 +30,14 @@ interface StepOneTwoProps {
   handleUploadJDToggle: () => void;
   handleManualJDUpload: () => void;
   isManualEntry: boolean;
-  profile: string | null;
   manualJobDescription: string;
-  setProfile: React.Dispatch<React.SetStateAction<string | null>>; // Ensure this is correctly typed
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
+  profile: string | null;
+  setProfile: React.Dispatch<React.SetStateAction<string | null>>;
+  cvId: string;
+  setCvId: React.Dispatch<React.SetStateAction<string>>; // Updated type
 }
+
 
 
 function generateFileName( 
@@ -57,6 +60,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   profile,
   manualJobDescription,
   setManualJobDescription,
+  setCvId
 }) => {
   const {
     setResumeFile,
@@ -287,7 +291,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         if (!token) {
           return;
         }
-        fetch("/api/interviewer/post_cv", {
+       const response= await fetch("/api/interviewer/post_cv", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -298,11 +302,14 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
           }),
         });
+        const result = await response.json();
+        setCvId(result.id)
+        
       } catch (error) {
         console.error("Error:", error);
       }
     },
-    []
+    [manualJobDescription,setCvId,token]
   );
 
   const extractStructuredData = useCallback(async (text: string) => {
