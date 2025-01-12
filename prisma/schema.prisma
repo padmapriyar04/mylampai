@@ -37,6 +37,7 @@ model User {
   // sentmessages     Directmessage[] @relation("SenderUser")
   // receivedMessages Directmessage[] @relation("ReceiverUser")
   JobCandidate   JobCandidate[]
+  // newsletters    Newsletter[]    @relation("NewsletterRecipients")
 }
 
 model Account {
@@ -254,11 +255,27 @@ model Analysis {
   updatedAt    DateTime  @updatedAt
 }
 
-model NewsletterEmails {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Email {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  emailAddress String
+  status       String
+  openedAt     DateTime?
+  newsletterId String     @db.ObjectId
+  newsletter   Newsletter @relation(fields: [newsletterId], references: [id])
+}
+
+
+
+model Newsletter {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject       String
+  content       String?
+  template      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  sentTimestamp DateTime
+  openCount     Int?
+  emails        Email[]
 }
 
 // model Modules {

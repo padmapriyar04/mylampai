@@ -2,6 +2,7 @@
 import prisma from "@/lib";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "@/lib/nodemailer";
+import pathname from '../utils/otptemplate';
 
 export const handleSendOTP = async (
   email: string,
@@ -40,19 +41,20 @@ export const handleSendOTP = async (
         userId: user.id,
       },
     });
+    // const html = pathname.replace("{{USER_NAME}}",user?.name  || "" ).replace("{{OTP_CODE}}",otp).replace("{{USER_EMAIL}}",user?.email || "").replace("{{SERVER_URL}}","http://localhost:8080/api/newsletteremails");
+    const html = pathname.replace("{{USER_NAME}}",user?.name  || "" ).replace("{{OTP_CODE}}",otp);
+    const sub = "Your wiZe OTP Code";
+//     const html = `
+// <h1> Hi ${role === "recruiter" ? "recruiter" : "user"}, </h1>
+// <p> Your OTP is: <strong>${otp}</strong> </p>
 
-    const sub = "Login | wiZe (myLampAI)";
-    const html = `
-<h1> Hi ${role === "recruiter" ? "recruiter" : "user"}, </h1>
-<p> Your OTP is: <strong>${otp}</strong> </p>
+// <p> This OTP is valid for 5 minutes. </p>
 
-<p> This OTP is valid for 5 minutes. </p>
+// <p> If you didn't request this, please ignore this email. </p>
 
-<p> If you didn't request this, please ignore this email. </p>
-
-<p> Thanks, </p>
-<p> wiZe Team </p>
-`;
+// <p> Thanks, </p>
+// <p> wiZe Team </p>
+// `;
 
     const res = await sendEmail(email, sub, html);
 
@@ -294,3 +296,4 @@ export const handleGoogleLogin = async ({ email }: { email: string }) => {
     message: "failed",
   };
 };
+
