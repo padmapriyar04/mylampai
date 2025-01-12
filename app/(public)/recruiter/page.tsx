@@ -60,8 +60,7 @@ export default function RecruiterPage() {
         <WhyWize />
         <SectionWrapper><BackedByBest /></SectionWrapper>
         <SectionWrapper><PowerOfWize /></SectionWrapper>
-        <SectionWrapper><CommunitySection /></SectionWrapper>
-        
+        <SectionWrapper><CommunitySection /></SectionWrapper> 
       </main>
     </>
   );
