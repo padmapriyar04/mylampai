@@ -26,15 +26,15 @@ type TalentPoolData = {
 
 interface DeveloperProfile {
   id: string;
-  resumeId: string;
-  interviewId: string;
+  resumeId: string | null;
+  interviewId: string | null;
   skills: string[];
   profiles: string[];
   certifications: string[];
-  expectedSalary: string;
-  locationPref: string;
-  experienceYears: string;
-  availability: string;
+  expectedSalary: string | null;
+  locationPref: string | null;
+  experienceYears: string | null;
+  availability: string | null;
   userId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -67,7 +67,7 @@ export default function ProfileMatches({
   const handleGetProfiles = useCallback(async () => {
     try {
       const res = await matchTalentProfile(poolData);
-      if (res) setProfiles(res);
+      // if (res) setProfiles(res);
     } catch (error) {
       console.error(error);
     }

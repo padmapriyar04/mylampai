@@ -7,17 +7,11 @@ type UserMatchIdsType = {
   talentIds: string[];
 };
 
-export const getRecruiterTalentPool = async () => {
+export const getRecruiterTalentPool = async (userId: string) => {
   try {
-    const user = await auth();
-
-    if (!user) {
-      return [];
-    }
-
     const talentPools = await prisma.talentPool.findMany({
       where: {
-        userId: user.id,
+        userId,
       },
     });
 
@@ -88,10 +82,7 @@ export const matchTalentProfile = async (
   try {
     const matches = await prisma.talentProfile.findMany({
       where: {
-        OR: [
-          { skills: { hasSome: talentPoolData.skills } },
-          { profiles: { hasSome: talentPoolData.profiles } },
-        ],
+        OR: [{ skills: { hasSome: talentPoolData.skills } }],
       },
       take: 50,
       orderBy: {

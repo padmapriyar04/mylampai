@@ -7,12 +7,12 @@ export function TalentComponent() {
       <div>Talent</div>
       <ChevronDown className="w-4 h-4 text-[#697386] group-hover:-rotate-180 group-hover:text-black transition-all duration-100" />
 
-      <div className="group-hover:w-10 group-hover:h-10 w-0 h-0 bg-slate-100 backdrop-blur-md transform rotate-45 absolute bottom-0 translate-y-full opacity-0 group-hover:opacity-100 z-0 ease-in-out rounded-sm"></div>
-      <div className="max-h-0 overflow-hidden group-hover:max-h-screen group-focus:max-h-screen absolute top-full right-0 translate-x-1/2  backdrop-blur-md w-[600px] rounded-xl">
-        <div className="flex items-stretch p-1 gap-2 bg-slate-100 font-normal">
+      <div className="group-hover:w-10 group-hover:h-10 w-0 h-0 bg-slate-100 backdrop-blur-md transform rotate-45 absolute -bottom-12 opacity-0 group-hover:opacity-100 z-0 ease-in-out rounded-sm"></div>
+      <div className="max-h-0 overflow-hidden group-hover:max-h-screen group-focus:max-h-screen absolute top-full right-0 translate-x-1/2  backdrop-blur-md w-[600px] ">
+        <div className="flex items-stretch p-1 mt-3 gap-2 bg-slate-100 rounded-lg font-normal">
           <ul className="flex place-items-center flex-col bg-white rounded-lg w-full">
             <li className="py-2 px-6 w-full flex items-center gap-4 text-center">
-              <div className="p-2 h-8 w-8 bg-green-400 rounded-lg">
+              <div className="p-2 h-8 w-8 bg-green-400 rounded-lg"> 
                 <Presentation className="w-4 h-4 text-white  " />
               </div>
               <div className="text-left">
@@ -89,9 +89,9 @@ export function RecruiterComponent() {
       <div>Recruiter</div>
       <ChevronDown className="w-4 h-4 text-[#697386] group-hover:-rotate-180 group-hover:text-black transition-all duration-100" />
 
-      <div className="group-hover:w-10 group-hover:h-10 w-0 h-0 bg-slate-100 backdrop-blur-md transform rotate-45 absolute bottom-0 translate-y-full opacity-0 group-hover:opacity-100 z-0 ease-in-out rounded-sm"></div>
-      <div className="max-h-0 overflow-hidden group-hover:max-h-screen group-focus:max-h-screen absolute top-full left-0 -translate-x-1/2 bg-slate-100 backdrop-blur-md w-[600px] rounded-xl">
-        <div className="flex items-stretch p-1 gap-2 bg-slate-100 font-normal">
+      <div className="group-hover:w-10 group-hover:h-10 w-0 h-0 bg-slate-100 backdrop-blur-md transform rotate-45 absolute -bottom-12 opacity-0 group-hover:opacity-100 z-0 ease-in-out rounded-sm"></div>
+      <div className="max-h-0 overflow-hidden group-hover:max-h-screen group-focus:max-h-screen absolute top-full left-0 -translate-x-1/2 backdrop-blur-md w-[600px] rounded-xl">
+        <div className="flex items-stretch p-1 mt-3 gap-2 rounded-lg bg-slate-100 font-normal">
           <ul className="flex place-items-center flex-col bg-white rounded-lg w-full">
             <li className="py-2 px-6 w-full flex items-center gap-4 text-center cursor-pointer">
               <div className="p-2 h-8 w-8 bg-green-400 rounded-lg">
@@ -143,9 +143,9 @@ export function AboutComponent() {
       <div>About</div>
       <ChevronDown className="w-4 h-4 text-[#697386] group-hover:-rotate-180 group-hover:text-black transition-all duration-100" />
 
-      <div className="group-hover:w-10 group-hover:h-10 w-0 h-0 bg-slate-100 backdrop-blur-md transform rotate-45 absolute bottom-0 translate-y-full opacity-0 group-hover:opacity-100 z-0 ease-in-out rounded-sm"></div>
-      <div className="max-h-0 overflow-hidden group-hover:max-h-screen group-focus:max-h-screen absolute top-full left-0 -translate-x-2/3 bg-slate-100 backdrop-blur-md w-[600px] rounded-xl">
-        <div className="flex items-stretch p-1 gap-2 bg-slate-100 font-normal">
+      <div className="group-hover:w-10 group-hover:h-10 w-0 h-0 bg-slate-100 backdrop-blur-md transform rotate-45 absolute -bottom-12 opacity-0 group-hover:opacity-100 z-0 ease-in-out rounded-sm"></div>
+      <div className="max-h-0 overflow-hidden group-hover:max-h-screen group-focus:max-h-screen absolute top-full left-0 -translate-x-2/3 backdrop-blur-md w-[600px] rounded-xl">
+        <div className="flex items-stretch p-1 mt-3 gap-2 bg-slate-100 font-normal rounded-lg">
           <ul className="flex place-items-center flex-col bg-white rounded-lg w-full">
             <li className="py-2 px-6 w-full flex items-center gap-4 text-center cursor-pointer">
               <div className="p-2 h-8 w-8 bg-green-400 rounded-lg">

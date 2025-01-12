@@ -14,15 +14,17 @@ const PracticeCards = () => {
         {/* <div className="flex justify-start flex-col sm:flex-row-reverse items-center rounded-2xl border-2 border-[#eee] overflow-hidden bg-red-50" > */}
         <div
           onMouseEnter={() => handleMouseEnter(1)}
-          className={`group w-full border-y-2 sm:border-y-0 cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${expanded === 1
-            ? "bg-[#CBDEF4] sm:max-w-[400px]"
-            : "bg-white sm:max-w-[225px]"
-            }`}
+          className={`group w-full border-y-2 sm:border-y-0 cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${
+            expanded === 1
+              ? "bg-[#CBDEF4] sm:max-w-[400px]"
+              : "bg-white sm:max-w-[225px]"
+          }`}
         >
           <h2 className="text-xl font-semibold">
             <span
-              className={`text-base p-2 rounded-full duration-400 transition-all ${expanded === 1 ? "bg-white" : "bg-[#cbdef4]"
-                }`}
+              className={`text-base p-2 rounded-full duration-400 transition-all ${
+                expanded === 1 ? "bg-white" : "bg-[#cbdef4]"
+              }`}
             >
               &lt;/&gt;
             </span>
@@ -41,15 +43,17 @@ const PracticeCards = () => {
 
         <div
           onMouseEnter={() => handleMouseEnter(2)}
-          className={`group w-full border-y-2 sm:border-y-0 sm:border-x-2 border-[#eee] cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${expanded === 2
-            ? "bg-[#C8BBFF] sm:max-w-[400px]"
-            : "bg-white sm:max-w-[225px]"
-            }`}
+          className={`group w-full border-y-2 sm:border-y-0 sm:border-x-2 border-[#eee] cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${
+            expanded === 2
+              ? "bg-[#C8BBFF] sm:max-w-[400px]"
+              : "bg-white sm:max-w-[225px]"
+          }`}
         >
           <h2 className="text-xl font-semibold">
             <span
-              className={`text-base p-2 rounded-full duration-400 transition-all ${expanded === 2 ? "bg-white" : "bg-[#c8bbff]"
-                }`}
+              className={`text-base p-2 rounded-full duration-400 transition-all ${
+                expanded === 2 ? "bg-white" : "bg-[#c8bbff]"
+              }`}
             >
               &lt;/&gt;
             </span>
@@ -68,15 +72,17 @@ const PracticeCards = () => {
 
         <div
           onMouseEnter={() => handleMouseEnter(3)}
-          className={`group w-full border-y-2 sm:border-y-0 cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${expanded === 3
-            ? "bg-[#fff1cc] sm:max-w-[400px]"
-            : "bg-white sm:max-w-[225px]"
-            }`}
+          className={`group w-full border-y-2 sm:border-y-0 cursor-pointer min-h-[350px] flex p-4 gap-4 flex-col items-start justify-between overflow-hidden transition-all duration-400 ${
+            expanded === 3
+              ? "bg-[#fff1cc] sm:max-w-[400px]"
+              : "bg-white sm:max-w-[225px]"
+          }`}
         >
           <h2 className="text-xl font-semibold">
             <span
-              className={`text-base p-2 rounded-full duration-400 transition-all ${expanded === 3 ? "bg-white" : "bg-[#fff1cc]"
-                }`}
+              className={`text-base p-2 rounded-full duration-400 transition-all ${
+                expanded === 3 ? "bg-white" : "bg-[#fff1cc]"
+              }`}
             >
               &lt;/&gt;
             </span>
@@ -105,10 +111,13 @@ const PracticeCoding = () => {
         <div className="bg-[#8C52FF] w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
       </h4>
       <div className="text-3xl font-medium mt-8 mb-4">
-        Explore, Learn and Achieve your dream Career
+        Valuable Features at Your Fingertips, Completely Free!
       </div>
-      <p className="text-[#000000BB] font-medium my-4">
-        Empowering you to explore a variety of domains, learn new skills in a personalised way, and craft a unique path to success, helping  you uncover your passions and reach your full potential, making your career aspirations a reality.
+      <p className="text-muted-foreground font-medium my-4">
+        Empowering talent like you in your career journey has never been easier.
+        With just one tap, you can access all the tools you need, and the best
+        part? It&apos;s completely free! You don&apos;t have to pay even a
+        single rupee to use Wize.
       </p>
       <PracticeCards />
     </>

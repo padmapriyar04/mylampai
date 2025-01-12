@@ -1,6 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { BlobServiceClient, BlockBlobClient } from "@azure/storage-blob";
+import {
+  BlobServiceClient,
+  BlockBlobClient,
+  ContainerClient,
+} from "@azure/storage-blob";
 import { generateSasUrlForInterview } from "@/actions/azureActions";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -14,125 +18,38 @@ import {
 } from "@/components/ui/card";
 import { Video, StopCircle, Upload } from "lucide-react";
 
-const containerName = "mylampai-interview";
+const containerName = "interviews";
+const SASUrl =
+  "https://wizecloud.blob.core.windows.net/interviews?sp=racwd&st=2024-12-16T17:40:44Z&se=2024-12-18T01:40:44Z&sv=2022-11-02&sr=c&sig=yVjNCqBBx6XMkxJM0LJe%2FlGxaVYCoJ7RGukZppNrwwQ%3D";
 
 const RealTimeVideoUploader: React.FC = () => {
   const params = useParams();
-  const interviewId = params.interviewId as string;
+  const { interviewId } = params;
 
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioRecorderRef = useRef<MediaRecorder | null>(null);
-  const videoChunksRef = useRef<Blob[]>([]);
-  const audioChunksRef = useRef<Blob[]>([]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const videoBlobClient = useRef<BlockBlobClient | null>(null);
-  const audioBlobClient = useRef<BlockBlobClient | null>(null);
+  const videoChunksRef = useRef<Blob[]>([]);
 
-  const [videoSASUrl, setVideoSASUrl] = useState<string>("");
-  const [audioSASUrl, setAudioSASUrl] = useState<string>("");
+  const containerClientRef = useRef<ContainerClient | null>(null);
 
   const videoBlockIds = useRef<string[]>([]);
-  const audioBlockIds = useRef<string[]>([]);
 
   const streamRef = useRef<MediaStream | null>(null);
 
-  useEffect(() => {}, [interviewId]);
-
-  useEffect(() => {
-    if (videoSASUrl) {
-    }
-  }, [videoSASUrl, interviewId]);
-
-  // useEffect(() => {
-  //   const generateSasUrl = async ({
-  //     interviewId,
-  //     timestamp,
-  //   }: {
-  //     interviewId: string;
-  //     timestamp: string;
-  //   }) => {
-  //     const videoBlobName = `${interviewId}_${Date.now()}_v.webm`;
-  //     const audioBlobName = `${interviewId}_${Date.now()}_a.webm`;
-
-  //     const videoResponse = await generateSasUrlForInterview(videoBlobName);
-  //     const audioResponse = await generateSasUrlForInterview(audioBlobName);
-
-  //     return {
-  //       videoSASUrl: videoResponse?.sasUrl,
-  //       audioSASUrl: audioResponse?.sasUrl,
-  //     };
-  //   };
-
-  //   const generateBlobSasUrls = async () => {
-  //     const timestamp = Date.now().toString();
-  //     const { videoSASUrl, audioSASUrl } = await generateSasUrl({
-  //       interviewId,
-  //       timestamp,
-  //     });
-
-  //     if (videoSASUrl && audioSASUrl) {
-  //       console.log("videoSASUrl", videoSASUrl);
-  //       console.log("audioSASUrl", audioSASUrl);
-  //       const blobServiceClient = new BlobServiceClient(videoSASUrl);
-
-  //       const videoContainerClient =
-  //         blobServiceClient.getContainerClient(containerName);
-  //       const audioContainerClient =
-  //         blobServiceClient.getContainerClient(containerName);
-
-  //       const videoBlobName = `${interviewId}_${timestamp}_v.webm`;
-  //       videoBlobClient.current =
-  //         videoContainerClient.getBlockBlobClient(videoBlobName);
-
-  //       const audioBlobName = `${interviewId}_${timestamp}_a.webm`;
-  //       audioBlobClient.current =
-  //         audioContainerClient.getBlockBlobClient(audioBlobName);
-  //     }
-  //   };
-
-  //   generateBlobSasUrls();
-  // }, [interviewId]);
-
-  // const stopRecording = () => {
-  //   if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
-  //   if (audioRecorderRef.current) audioRecorderRef.current.stop();
-  //   setIsRecording(false);
-  // };
-
-  const uploadChunk = async (
-    client: BlockBlobClient | null,
-    chunk: Blob,
-    blockId: string,
-  ) => {
+  const uploadChunk = async (chunk: Blob, blockId: string) => {
     try {
+      const client = containerClientRef.current?.getBlockBlobClient(blockId);
       if (client) {
-        await client.stageBlock(blockId, chunk, chunk.size);
-        console.log(`Uploaded block: ${blockId}`);
+        await client.uploadData(chunk, {
+          blobHTTPHeaders: { blobContentType: "video/webm" },
+        });
       }
     } catch (error) {
       console.error("Error uploading chunk:", error);
     }
-  };
-
-  const commitBlocks = async (client: BlockBlobClient, blockIds: string[]) => {
-    try {
-      await client.commitBlockList(blockIds);
-      console.log("Finalized blob upload.");
-    } catch (error) {
-      console.error("Error finalizing blob upload:", error);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
-    if (audioRecorderRef.current) audioRecorderRef.current.stop();
-    if (streamRef.current)
-      streamRef.current.getTracks().forEach((track) => track.stop()); // Clean up media stream
-    setIsRecording(false);
-
   };
 
   const startRecording = async () => {
@@ -142,66 +59,83 @@ const RealTimeVideoUploader: React.FC = () => {
         audio: true,
       });
 
-      if (videoRef.current) videoRef.current.srcObject = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+
       streamRef.current = stream;
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: "video/webm",
       });
-      const audioStream = new MediaStream(stream.getAudioTracks());
-      const audioRecorder = new MediaRecorder(audioStream, {
-        mimeType: "audio/webm",
-      });
 
       let videoBlockIndex = 0;
-      let audioBlockIndex = 0;
-      videoBlockIds.current = [];
-      audioBlockIds.current = [];
-
-      mediaRecorder.ondataavailable = async (event) => {
+      mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          const blockId = btoa(String(videoBlockIndex++).padStart(6, "0"));
+          const rawId = `${interviewId}_${Date.now()}_${videoBlockIndex}`;
+          const blockId = btoa(rawId).padEnd(64, "A");
+
           videoBlockIds.current.push(blockId);
-          await uploadChunk(videoBlobClient.current, event.data, blockId);
-        }
-      };
+          videoBlockIndex++;
 
-      audioRecorder.ondataavailable = async (event) => {
-        if (event.data.size > 0) {
-          const blockId = btoa(String(audioBlockIndex++).padStart(6, "0"));
-          audioBlockIds.current.push(blockId);
-          await uploadChunk(audioBlobClient.current, event.data, blockId);
+          videoChunksRef.current.push(event.data);
+          uploadChunk(event.data, blockId);
         }
       };
 
       mediaRecorder.start(3000);
-      audioRecorder.start(3000);
-
       mediaRecorderRef.current = mediaRecorder;
-      audioRecorderRef.current = audioRecorder;
 
       setIsRecording(true);
     } catch (error) {
       console.error("Error starting recording:", error);
+      setIsRecording(false);
     }
   };
 
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) mediaRecorderRef.current.stop();
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+    }
+
+    if (videoRef.current) videoRef.current.srcObject = null;
+
+    setIsRecording(false);
+  };
+
+  useEffect(() => {
+    const generateBlobSasUrls = async () => {
+      if (SASUrl) {
+        const blobServiceClient = new BlobServiceClient(SASUrl);
+
+        const containerClient =
+          blobServiceClient.getContainerClient(containerName);
+
+        containerClientRef.current = containerClient;
+      }
+    };
+
+    generateBlobSasUrls();
+  }, [interviewId]);
+
   const finalizeUpload = async () => {
     try {
-      const videoBlockList = videoChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0")),
-      );
-      const audioBlockList = audioChunksRef.current.map((_, index) =>
-        btoa(String(index).padStart(6, "0")),
-      );
+      if (videoBlockIds.current.length) {
+        videoBlockIds.current.sort();
 
-      if (videoBlobClient.current) {
-        await videoBlobClient.current.commitBlockList(videoBlockList);
-        console.log("Video upload complete and finalized.");
-      }
-      if (audioBlobClient.current) {
-        await audioBlobClient.current.commitBlockList(audioBlockList);
-        console.log("Audio upload complete and finalized.");
+        const client = containerClientRef.current?.getBlockBlobClient(
+          `${interviewId}_${Date.now()}_v.webm`
+        );
+
+        console.log(videoBlockIds.current);
+
+        if (client) {
+          await client.commitBlockList(videoBlockIds.current);
+          console.log("Finalized upload.");
+        }
       }
     } catch (error) {
       console.error("Error finalizing upload:", error);
