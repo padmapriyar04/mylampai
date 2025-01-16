@@ -26,7 +26,7 @@ const Page: React.FC = () => {
     if (file) {
       setResumeFile(file);
       setLocalResume(file);
-      const resumeFileBinary = await getBinaryData(file); // Convert resume to binary
+      const resumeFileBinary = await getBinaryData(file);
       uploadCVAndJobDescription(resumeFileBinary, manualJobDescription);
     }
   };
@@ -57,10 +57,7 @@ const Page: React.FC = () => {
       if (extractedText) {
         setJobDescriptionFile(extractedText);
 
-        // Read the resume file as binary
         const resumeFileBinary = await getBinaryData(resumeFile);
-
-        // Now upload both resume (in binary) and job description
         await uploadCVAndJobDescription(resumeFileBinary, extractedText);
       }
     }
@@ -122,7 +119,6 @@ const Page: React.FC = () => {
 
       const jobDescriptionBase64 = btoa(jobDescriptionText);
 
-      // Convert binary data to a Base64 string
       const resumeBase64 = Buffer.from(resumeFileBinary).toString("base64");
 
       const response = await fetch("/api/interviewer/post_cv", {

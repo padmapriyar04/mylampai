@@ -33,10 +33,8 @@ export default function WizeCamp() {
           </button>
         </div>
       </div> */}
-      <div
-        className={`element xl:max-w-[1220px] max-w-[650px] m-3 sm:m-auto bg-primary-foreground flex flex-col xl:flex-row justify-around items-center rounded-2xl p-4 sm:p-8 gap-4 my-4 transition-all duration-500`}
-      >
-        <div className="bg-[#8C52FF] w-full h-full max-w-[600px] min-h-[500px] flex flex-col items-center justify-evenly rounded-2xl p-4">
+      <div className="element xl:max-w-[1220px] max-w-[650px] m-3 sm:m-auto bg-primary-foreground flex flex-col xl:flex-row justify-around items-center rounded-2xl p-4 sm:p-8 gap-4 my-4 transition-all duration-500">
+        <div className="bg-primary w-full h-full max-w-[600px] min-h-[500px] flex flex-col items-center justify-evenly rounded-2xl p-4">
           <Image
             src="/home/logoCombined.svg"
             alt="logo"

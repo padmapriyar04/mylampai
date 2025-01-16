@@ -1,9 +1,9 @@
 "use client";
 import Image from "next/image";
-import Typing from "./Typing";
+// import Typing from "./Typing";
 import { useEffect } from "react";
 import InfiniteLogoSlide from "./InfiniteLogoSlide";
-import { ArrowRight, MoveRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Globe from "@/components/ui/globe";
 import { useSession } from "next-auth/react";
 import { nextAuthLogin } from "@/actions/authActions";
@@ -23,18 +23,6 @@ export default function HeroSection() {
   const { role, setRole } = useRoleStore();
 
   const { setUserData } = useUserStore();
-  const handleLogin = async (email: string, role: "user" | "recruiter") => {
-    const res = await nextAuthLogin({ email, role });
-
-    if (res.status === "success" && res.user && res.accessToken) {
-      setUserData(res.user, res.accessToken);
-      setCookie("accessToken", res.accessToken);
-    } else {
-      toast.error(res.message);
-    }
-
-    await signOut();
-  };
 
   useEffect(() => {
     if (role === null) return;
@@ -44,18 +32,30 @@ export default function HeroSection() {
     }
 
     const email = data.user.email as string;
+    const handleLogin = async (email: string, role: "user" | "recruiter") => {
+      const res = await nextAuthLogin({ email, role });
+
+      if (res.status === "success" && res.user && res.accessToken) {
+        setUserData(res.user, res.accessToken);
+        setCookie("accessToken", res.accessToken);
+      } else {
+        toast.error(res.message);
+      }
+
+      await signOut();
+    };
 
     handleLogin(email, role);
   }, [data, router, role, setUserData]);
 
   return (
     <>
-      <div className="flex flex-col select-none bg-[url('/home/herosection-background.svg')] max-w-screen overflow-hidden ">
-        <div className="flex relative justify-evenly items-center min-h-[555px] md:min-h-screen px-8 gap-8 w-full m-auto">
-          {/* <div className="absolute bg-[url('/home/herosection/herosection-earth.svg')] scale-x-125 scale-y-[0.8] bg-no-repeat bg-center bg-cover h-[336px] -bottom-[5%] left-[10%] w-[600px]"></div> */}
-
+      <div className="flex flex-col select-none bg-[url('/home/herosection-background.svg')] max-w-screen overflow-hidden relative">
+        <div className="absolute w-full h-[50px] bottom-0 bg-gradient-to-b from-transparent to-white z-50"></div>
+        <div className="h-[64px]"></div>
+        <div className="flex relative justify-evenly items-center min-h-1/2 sm:min-h-[calc(100vh-80px)] px-8 gap-6 w-full m-auto">
           <div className="flex flex-col justify-center min-h-[600px] w-full z-10">
-            <div className=" relative font-bold lg:ml-14 mb-6">
+            <div className=" relative font-bold lg:ml-10 mb-6">
               <div className="flex items-center justify-evenly text-sm font-light absolute top-0 -translate-y-[150%] rounded-lg px-4 py-1 gap-2 bg-[#fafafa] border max-w-[300px]">
                 Backed by{" "}
                 <Image
@@ -68,7 +68,7 @@ export default function HeroSection() {
                 IIM Banglore
               </div>
               {/* <Typing /> <br />{" "} */}
-              <span className="font-semibold text-[40px] leading-10">
+              <span className="font-semibold sm:text-xl sm:text-[40px] leading-4 sm:leading-10">
                 We nurture, assess & match
                 <div className="mt-2">
                   {" "}
@@ -77,12 +77,12 @@ export default function HeroSection() {
                 </div>
               </span>
             </div>
-            <div className="text-gray-500 lg:ml-14 mb-9 max-w-[640px]">
+            <div className="text-muted-foreground text-sm sm:text-base lg:ml-10 mb-9 max-w-[640px]">
               Join the exclusive talent pool with just one application and
               assessment, unlocking access to thousands of premium opportunities
               worldwide.
             </div>
-            <div className="flex relative">
+            <div className="flex flex-col sm:flex-row gap-4 relative">
               <div className="absolute bottom-0 z-0 translate-y-full left-1/2 -translate-x-1/2 scale-125 w-[600px] h-[600px] overflow-hidden">
                 <Globe />
               </div>
@@ -90,8 +90,7 @@ export default function HeroSection() {
                 <DialogTrigger className="z-10">
                   <div
                     onClick={() => setRole("user")}
-                    id="button-dark"
-                    className=" flex gap-4 items-center w-[225px] h-[45px] justify-center bg-primary rounded-lg text-white text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 md:max-w-[300px] hover:bg-primary-dark lg:ml-14"
+                    className=" flex gap-4 items-center w-[225px] h-[45px] justify-center bg-primary rounded-lg text-white text-sm font-semibold py-2 md:py-3 pl-4 md:pl-8 px-2 md:px-3 md:max-w-[300px] hover:bg-primary-dark lg:ml-10"
                   >
                     Get hired instantly
                     <ArrowRight size={24} />
@@ -126,7 +125,7 @@ export default function HeroSection() {
 
           <div className="lg:block bg-[#f1eaff] hidden z-10 p-6 w-full max-w-[600px] rounded-2xl">
             <Image
-              src={"/home/HeroSection.svg"}
+              src={"/home/herosection/wize_hero.svg"}
               alt="HeroSection"
               width={100}
               height={100}

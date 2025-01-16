@@ -6,11 +6,11 @@ import WizeCampLink from "./WizeCampLink";
 import Image from "next/image";
 
 const whyWizeLinks = [
-  { id: "allroundguidance", text: "All Round Guidance" },
+  { id: "allroundguidance", text: "A Complete Solution" },
   { id: "pathtosuccess", text: "Path To Success" },
-  { id: "smartestplatform", text: "Smartest Platform" },
-  { id: "expertsinsights", text: "Experts Insights" },
-  { id: "advancedfeatures", text: "Advanced Features" },
+  { id: "smartestplatform", text: "The Smartest Platform" },
+  { id: "expertsinsights", text: "People's Choice" },
+  // { id: "advancedfeatures", text: "Advanced Features" },
 ];
 
 export default function WhyWize() {
@@ -88,7 +88,7 @@ export default function WhyWize() {
         <div className="h-1 bg-black w-full max-w-[150px] sm:max-w-[200px] md:max-w-[33%] bg-gradient-to-r from-primary to-white"></div>
       </div>
       <div className="flex w-full max-w-[1350px] relative">
-        <div className="hidden md:flex flex-col w-full max-w-[300px] pt-[100px] sticky top-0 h-screen text-[#000000BB] px-8 text-lg font-semibold tracking-wide gap-3">
+        <div className="hidden md:flex flex-col w-full max-w-[300px] pt-[100px] sticky top-0 h-screen  px-8 text-lg font-medium tracking-wide gap-3">
           {whyWizeLinks.map((item) => (
             <WizeCampLink
               key={item.id}
@@ -102,7 +102,7 @@ export default function WhyWize() {
         <div className="md:border-l-4 md:border-[#baa1eb] lg:px-[60px] xl:px-[100px] relative">
           <div
             id="allroundguidance"
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-4"
           >
             <h4 className="pt-4 font-semibold text-primary">
               ALL ROUND GUIDANCE
@@ -111,36 +111,35 @@ export default function WhyWize() {
             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
               To make it happen for you
             </div>
-            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              Everything you need, we got it! Career Exploration - yup,
-              Personalized learning - yes, Competitions, hackathons, acads-
-              yeah, projects and practice - yus, CV building and test and
-              Interview prep - in-house AI!
+            <p className="text-sm sm:text-base text-muted-foreground font-medium my-4">
+              Everything you need, we&apos;ve got it! From accessing thousands of
+              opportunities with just one application and assessment to
+              preparing for your next big break using our AI tools — and it all
+              happens quickly and seamlessly.
             </p>
             <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
           </div>
 
-          <div id="pathtosuccess" className="pb-[100px] min-h-screen px-6">
+          <div id="pathtosuccess" className="pb-[100px] min-h-screen px-4">
             <PracticeCoding />
           </div>
 
           <div
             id="smartestplatform"
-            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-6"
+            className="pb-[50px] sm:pb-[100px] sm:min-h-[700px] px-4"
           >
             <h4 className="pt-4 font-semibold text-primary">
               SMARTEST PLATFORM
               <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%]"></div>
             </h4>
             <div className="text-2xl sm:text-3xl font-medium mt-8 mb-4">
-              100% online and designed for your comfort and engaging learning
-              experience
+              Convenient, Comfortable, and Seamless
             </div>
-            <p className="text-sm sm:text-base text-[#000000BB] font-medium my-4">
-              From starting your college journey to your placement and even
-              post-college, we provide comprehensive guidance. Just keep showing
-              up and stay engaged, and our AI-powered platform will take care of
-              you!
+            <p className="text-sm sm:text-base text-muted-foreground font-medium my-4">
+              Designed for a seamless experience, Wize lets you create your
+              profile, attempt AI-powered interviews, practice for upcoming
+              opportunities, and even get paid directly on the platform for
+              matched opportunities — all from the comfort of your home.
             </p>
             <div className="bg-[#3a3a3a] min-h-[400px] w-full my-8 rounded-2xl"></div>
           </div>
@@ -149,7 +148,7 @@ export default function WhyWize() {
             <ExperiencedCounsellors />
           </div>
 
-          <div className="sm:min-h-[700px] px-6">
+          {/* <div className="sm:min-h-[700px] px-6">
             <h4 className="pt-4 font-semibold text-primary">
               ADVANCED FEATURES
               <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
@@ -166,7 +165,7 @@ export default function WhyWize() {
               career path smooth.
             </p>
             <div className="flex flex-wrap justify-center gap-4 gap-y-5 min-h-[400px] w-full my-8 rounded-2xl">
-              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] h-[200px]">
                 <Image
                   src="./home/whywize/4.svg"
                   alt="winningrecord"
@@ -175,7 +174,7 @@ export default function WhyWize() {
                   className="w-full"
                 />
               </div>
-              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] h-[200px]">
                 <Image
                   src="./home/whywize/2.svg"
                   alt="winningrecord"
@@ -184,7 +183,7 @@ export default function WhyWize() {
                   className="w-full"
                 />
               </div>
-              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] h-[200px]">
                 <Image
                   src="./home/whywize/3.svg"
                   alt="winningrecord"
@@ -193,7 +192,7 @@ export default function WhyWize() {
                   className="w-full"
                 />
               </div>
-              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] min-h-[200px]">
+              <div className="bg-white w-full max-w-[300px] lg:max-w-[380px] overflow-hidden rounded-2xl shadow-lg shadow-[#8C52FF30] h-[200px]">
                 <Image
                   src="./home/whywize/1.svg"
                   alt="winningrecord"
@@ -203,7 +202,7 @@ export default function WhyWize() {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
