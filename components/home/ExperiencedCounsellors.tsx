@@ -18,31 +18,36 @@ const carouselData = [
   {
     name: "Fiona Claudia",
     image: "/home/profile.jpg",
-    experience: "22k+ students counselled",
+    experience:
+      "I landed my dream job as a graphic designer through this platform! The personalized job matches and seamless application process made everything effortless. Employers truly recognized my talents, and within weeks, I received multiple offers. I'm grateful for the boost in confidence and the career breakthrough!",
     ranking: "Lead Counsellor",
   },
   {
     name: "Claudia",
     image: "/home/profile.jpg",
-    experience: "22k+ students counselled",
+    experience:
+      "This platform connected me with my current employer in record time. Its talent assessment tools showcased my skills perfectly. The user-friendly interface and detailed job postings made it easy to apply. Thanks to this platform, I’m now thriving in a role that fits my passion and expertise.",
     ranking: "Lead Counsellor",
   },
   {
     name: "Fdia",
     image: "/home/profile.jpg",
-    experience: "22k+ students counselled",
+    experience:
+      "As a software developer, I struggled to find roles that suited my niche. This platform's tailored recommendations were a game-changer. I secured a position at a top company that values my skills. It’s the best resource for showcasing your talents and standing out in today’s competitive job market",
     ranking: "Lead Counsellor",
   },
   {
     name: "nadia",
     image: "/home/profile.jpg",
-    experience: "22k+ students counselled",
+    experience:
+      "I always doubted online job platforms until I tried this one. Its unique approach to highlighting my creative writing skills caught the attention of my current employer. The whole process was smooth, and now I have a fulfilling job where my talents truly shine. Highly recommended!",
     ranking: "Lead Counsellor",
   },
   {
     name: "Fiona Claudia",
     image: "/home/profile.jpg",
-    experience: "22k+ students counselled",
+    experience:
+      "Through this platform, I transformed my freelance photography passion into a full-time career. The talent profile builder was incredibly insightful, helping me land a job with a prestigious media house. I couldn’t have asked for a better platform to kickstart my professional journey!",
     ranking: "Lead Counsellor",
   },
 ];
@@ -55,21 +60,22 @@ const CounsellorCard: React.FC<CounsellorCardProps> = ({
 }) => {
   return (
     <div className="w-full max-w-[260px] flex flex-col items-center bg-white rounded-lg overflow-hidden shadow-lg">
-      <div className="w-full h-24 bg-primary flex items-center justify-center"></div>
-      <Image
-        src={image}
-        alt="profile"
-        width={200}
-        height={200}
-        className="h-24 w-24 rounded-lg object-cover -translate-y-1/2 border-2 border-primary"
-      />
-
-      <div className="text-xl font-semibold -translate-y-6">{name}</div>
-      <div className="text-[#000000BB] text-sm -translate-y-4">{ranking}</div>
-      <div className="h-[1px] w-full bg-black"></div>
-      <div className="text-[#000000BB] text-center font-medium p-4">
+      <div className="w-full h-16 bg-primary relative flex items-center justify-center">
+        <Image
+          src={image}
+          alt="profile"
+          width={200}
+          height={200}
+          className=" absolute bottom-0 translate-y-1/2 h-20 w-20 rounded-lg object-cover border-2 border-primary"
+        />
+      </div>
+      <div className="h-12"></div>
+      <div className="text-xl font-semibold">{name}</div>
+      <div className="text-xs px-4 my-2 text-justify text-muted-foreground line-clamp-4 font-medium">
         {experience}
       </div>
+      <div className="h-[1px] w-full bg-black my-2"></div>
+      <div className="mb-4 mt-2 font-medium text-muted-foreground">{ranking}</div>
     </div>
   );
 };
@@ -96,18 +102,18 @@ const BulletCard: React.FC<BulletCardProps> = ({ title, description }) => {
 const ExperiencedCounsellors: React.FC = () => {
   return (
     <>
-      <h4 className="pt-4 font-semibold text-primary px-6">
+      <h4 className="pt-4 font-semibold text-primary px-4">
         EXPERTS INSIGHTS
         <div className="bg-primary w-6 h-6 blur-sm rounded-full absolute left-0 translate-x-[-14px] translate-y-[-100%] "></div>
       </h4>
       <div className="text-3xl font-medium mt-8 mb-4 px-6">
-        Expertise of 1,000+ industry professionals and experts at your reach
+        Loved by Talents and Recruiters Alike
       </div>
-      <p className="text-[#000000BB] font-medium my-4 px-6">
-        For every phase of your college and career journey, we&apos;ve got you
-        covered. Our models are trained on extensive quality data and curated
-        insights from experienced industry and subject matter experts, guiding
-        you to your dream path.
+      <p className="text-muted-foreground font-medium my-4 px-6">
+        Thousands of talented individuals use Wize and rave about the
+        experience. At the same time, recruiters prefer our innovative platform
+        for hiring. Check out some of the inspiring success stories from our
+        community!
       </p>
       <div className="w-full my-8 rounded-2xl">
         <Carousel
@@ -133,7 +139,7 @@ const ExperiencedCounsellors: React.FC = () => {
             ))}
           </CarouselContent>
         </Carousel>
-        <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground py-8 px-4 mx-6 rounded-lg shadow-lg">
+        <div className="flex flex-wrap gap-4 justify-evenly bg-primary-foreground w-full py-8 px-4 rounded-lg shadow-lg">
           <BulletCard title="10k+" description="Successful Premium Admits" />
           <BulletCard title="10k+" description="Successful Premium Admits" />
           <BulletCard title="10k+" description="Successful Premium Admits" />

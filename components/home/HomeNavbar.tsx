@@ -102,7 +102,7 @@ const HomeNavbar = () => {
 
   return (
     <div
-      className={`flex justify-end items-center gap-4 bg-transparent transition px-8 sticky top-0 w-full z-50 min-h-[64px]`}
+      className={`flex justify-end items-center gap-4 bg-transparent transition px-8 fixed top-0 w-full z-50 min-h-[64px]`}
     >
       <Link
         href={"/"}
@@ -140,7 +140,7 @@ const HomeNavbar = () => {
 
         {userData ? (
           <Link
-            href={"/home"}
+            href={"/talentmatch"}
             className="flex items-center bg-primary h-[35px] text-white pl-4 pr-2 gap-2 rounded-lg "
           >
             {initials}

@@ -30,9 +30,9 @@ export function AppSidebar({ user }: { user: User }) {
   if (isHidden) return null;
 
   return (
-    <div className="flex flex-col items-center justify-between py-4 max-w-20 w-full">
+    <div className="hidden sm:flex flex-col items-center justify-between py-4 max-w-20 w-full">
       <div className="flex items-center flex-col gap-4">
-        <Link href={"/home"} className="shadow-lg">
+        <Link href={"/talentmatch"} className="shadow-lg">
           <Image
             src={"/sidebar/wize_logo_whitebg.svg"}
             alt="wiZe logo"

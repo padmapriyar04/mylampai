@@ -7,7 +7,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Upload } from "lucide-react";
+import { CirclePlus, Upload } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
   Form,
@@ -296,7 +296,9 @@ export default function CreateTalenProfileDialog() {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button className="m-auto">Create Talent Profile</Button>
+          <div className="m-auto right-4 top-1 absolute">
+            <CirclePlus className="w-8 h-8 text-primary" />
+          </div>
         </DialogTrigger>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>

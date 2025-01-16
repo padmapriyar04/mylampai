@@ -12,7 +12,12 @@ import { useInterviewStore } from "@/utils/store";
 import { toast } from "sonner";
 import * as pdfjsLib from "pdfjs-dist";
 import { useUserStore } from "@/utils/userStore";
-import { BlobServiceClient, ContainerSASPermissions, generateBlobSASQueryParameters, StorageSharedKeyCredential } from "@azure/storage-blob";
+import {
+  BlobServiceClient,
+  ContainerSASPermissions,
+  generateBlobSASQueryParameters,
+  StorageSharedKeyCredential,
+} from "@azure/storage-blob";
 import { generateSasToken } from "@/actions/azureActions";
 
 const baseUrl = "https://optim-cv-judge.onrender.com";
@@ -30,23 +35,19 @@ interface StepOneTwoProps {
   handleUploadJDToggle: () => void;
   handleManualJDUpload: () => void;
   isManualEntry: boolean;
-  profile: string | null;
   manualJobDescription: string;
-  setProfile: React.Dispatch<React.SetStateAction<string | null>>; // Ensure this is correctly typed
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
+  profile: string | null;
+  setProfile: React.Dispatch<React.SetStateAction<string | null>>;
+  cvId: string;
+  setCvId: React.Dispatch<React.SetStateAction<string>>; // Updated type
 }
 
-
-function generateFileName( 
-  originalFileName: string,
-  filetype: string,
-) {
+function generateFileName(originalFileName: string, filetype: string) {
   const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
   const fileExtension = originalFileName.split(".").pop();
   return `${timestamp}_${filetype}.${fileExtension}`;
 }
-
-
 
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
   step,
@@ -57,12 +58,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   profile,
   manualJobDescription,
   setManualJobDescription,
+  setCvId
 }) => {
-  const {
-    setResumeFile,
-    setExtractedText,
-    setStructuredData,
-  } = useInterviewStore();
+  const { setResumeFile, setExtractedText, setStructuredData } =
+    useInterviewStore();
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [otherProfile, setOtherProfile] = useState("");
@@ -72,21 +71,20 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
-  
 
-  const handleDrop =async (event: DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
 
     setUploading(true);
-     
+
     if (file && file.type === "application/pdf") {
       if (file.size > 1 * 1024 * 1024) {
         toast.error("File size should be less than 1MB");
         setUploading(false);
         return;
       }
-       const blobName = generateFileName( file.name, "cv");
+      const blobName = generateFileName(file.name, "cv");
       const sasUrl = await generateSasToken(blobName);
       if (!sasUrl) {
         toast.error("Error uploading resume");
@@ -104,22 +102,20 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
         if (!uploadResponse.ok) {
           toast.error("Resume Upload Failed");
-        }else{
+        } else {
           console.log(uploadResponse);
         }
       } catch (error) {
         console.error(error);
       }
-            
+
       setResumeFile(file);
 
       const fileReader = new FileReader();
       let extractedText = "";
 
       fileReader.onload = async function () {
-        const typedArray = new Uint8Array(
-          this.result as ArrayBuffer
-        );
+        const typedArray = new Uint8Array(this.result as ArrayBuffer);
 
         // Load the PDF document
         const pdf = await pdfjsLib.getDocument(typedArray).promise;
@@ -190,7 +186,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         setUploading(false);
         return;
       }
-      const blobName = generateFileName( file.name, "cv");
+      const blobName = generateFileName(file.name, "cv");
       const sasUrl = await generateSasToken(blobName);
 
       if (!sasUrl) {
@@ -209,22 +205,20 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
         if (!uploadResponse.ok) {
           toast.error("Resume Upload Failed");
-        }else{
+        } else {
           console.log(uploadResponse);
         }
       } catch (error) {
         console.error(error);
       }
-      
+
       setResumeFile(file);
 
       const fileReader = new FileReader();
       let extractedText = "";
 
       fileReader.onload = async function () {
-        const typedArray = new Uint8Array(
-          this.result as ArrayBuffer
-        );
+        const typedArray = new Uint8Array(this.result as ArrayBuffer);
 
         // Load the PDF document
         const pdf = await pdfjsLib.getDocument(typedArray).promise;
@@ -287,7 +281,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         if (!token) {
           return;
         }
-        fetch("/api/interviewer/post_cv", {
+       const response= await fetch("/api/interviewer/post_cv", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -298,11 +292,14 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
           }),
         });
+        const result = await response.json();
+        setCvId(result.id)
+        
       } catch (error) {
         console.error("Error:", error);
       }
     },
-    []
+    [manualJobDescription,setCvId,token]
   );
 
   const extractStructuredData = useCallback(async (text: string) => {
@@ -331,9 +328,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   }, []);
 
   return (
-    <div className="md:h-screen bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
+    <div className="md:h-screen bg-primary-foreground min-h-screen p-4 flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
       <div className="max-w-[1350px] h-full max-h-[570px]  w-full flex flex-col items-stretch md:flex-row justify-evenly">
-        <div className="max-w-[450px] w-[90vw] md:w-[50vw] flex flex-col items-center justify-evenly bg-primary shadow-lg text-white rounded-3xl p-8 gap-8 relative">
+        <div className="hidden max-w-[450px] w-[90vw] md:w-[50vw] sm:flex flex-col items-center justify-evenly bg-primary shadow-lg text-white rounded-3xl p-8 gap-8 relative">
           <Image
             src={"/images/Globe.svg"}
             className="w-full h-auto px-12"

@@ -47,6 +47,7 @@ model User {
   // sentmessages     Directmessage[] @relation("SenderUser")
   // receivedMessages Directmessage[] @relation("ReceiverUser")
   JobCandidate   JobCandidate[]
+  // newsletters    Newsletter[]    @relation("NewsletterRecipients")
   Resume         Resume[]
 }
 
@@ -295,10 +296,33 @@ model CV {
   JobDescription String
   userId         String?  @db.ObjectId
   user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analysis       CVanalysis
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
-
+model CVAnalysis {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  cvId                String   @db.ObjectId
+  cv                  CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  summary             String? 
+  resumeScore         Float?
+  hardSkillsScore     Float?   
+  softSkillsScore     Float?   
+  experienceScore     Float?   
+  educationScore      Float?   
+  quantificationIssues String[] 
+  bulletPointLength   Json?    
+  bulletPointImprovements Json? 
+  verbTenseIssues     Json?   
+  weakVerbUsage       Json?   
+  repetitionIssues    Json?    
+  sectionFeedback     Json?    
+  skillAnalysis       Json?   
+  spellingIssues      String[] 
+  responsibilityIssues Json?  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
 model Interview {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
   cvText            String?
@@ -352,11 +376,27 @@ model Analysis {
   updatedAt    DateTime  @updatedAt
 }
 
-model NewsletterEmails {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Email {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  emailAddress String
+  status       String
+  openedAt     DateTime?
+  newsletterId String     @db.ObjectId
+  newsletter   Newsletter @relation(fields: [newsletterId], references: [id])
+}
+
+
+
+model Newsletter {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  subject       String
+  content       String?
+  template      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  sentTimestamp DateTime
+  openCount     Int?
+  emails        Email[]
 }
 
 // model Modules {

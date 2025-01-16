@@ -16,27 +16,27 @@ import {
 } from "react-bootstrap-icons";
 
 const items = [
-  {
-    title: "Home",
-    url: "/home",
-    view: "user",
-    icons: [House, HouseFill],
-    isActive: true,
-    items: [
-      {
-        title: "History",
-        url: "#",
-      },
-      {
-        title: "Starred",
-        url: "#",
-      },
-      {
-        title: "Settings",
-        url: "#",
-      },
-    ],
-  },
+  // {
+  //   title: "Home",
+  //   url: "/home",
+  //   view: "user",
+  //   icons: [House, HouseFill],
+  //   isActive: true,
+  //   items: [
+  //     {
+  //       title: "History",
+  //       url: "#",
+  //     },
+  //     {
+  //       title: "Starred",
+  //       url: "#",
+  //     },
+  //     {
+  //       title: "Settings",
+  //       url: "#",
+  //     },
+  //   ],
+  // },
   {
     title: "Talent Match",
     url: "/talentmatch",

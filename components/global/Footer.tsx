@@ -45,7 +45,7 @@ export default function Footer() {
 
   return (
     <>
-      <div className="flex flex-col justify-around lg:flex-row gap-8 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.7)] bg-[url('/home/herosection-background.svg')] py-[10px] px-8 mt-[100px]">
+      <div className="flex flex-col justify-around lg:flex-row gap-8 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.7)] bg-[url('/home/herosection-background.svg')] py-[10px] px-8 mt-16">
         <div className="w-full max-w-[600px] rounded-lg bg-primary-foreground p-4">
           <div className="bg-white w-full rounded-lg py-2 px-8 shadow-br">
             <div className="flex items-center justify-between text-2xl font-bold text-[#00000090] border-b-[1px] pb-2">
@@ -127,7 +127,7 @@ export default function Footer() {
           <div className="w-full flex justify-evenly pt-8 mx-auto">
             <div className="flex flex-col justify-start">
               <div className="uppercase mb-4">Talent</div>
-              <ul>
+              {/* <ul>
                 <li className="text-sm hover:text-primary cursor-pointer">
                   Link 1
                 </li>
@@ -137,11 +137,11 @@ export default function Footer() {
                 <li className="text-sm hover:text-primary cursor-pointer">
                   Link 3
                 </li>
-              </ul>
+              </ul> */}
             </div>
             <div className="flex flex-col justify-start">
               <div className="uppercase mb-4">Recruit</div>
-              <ul>
+              {/* <ul>
                 <li className="text-sm hover:text-primary cursor-pointer">
                   Link 1
                 </li>
@@ -151,11 +151,11 @@ export default function Footer() {
                 <li className="text-sm hover:text-primary cursor-pointer">
                   Link 3
                 </li>
-              </ul>
+              </ul> */}
             </div>
             <div className="flex flex-col justify-start">
               <div className="uppercase mb-4">Know More</div>
-              <ul>
+              {/* <ul>
                 <li className="text-sm hover:text-primary cursor-pointer">
                   Link 1
                 </li>
@@ -165,7 +165,7 @@ export default function Footer() {
                 <li className="text-sm hover:text-primary cursor-pointer">
                   Link 3
                 </li>
-              </ul>
+              </ul> */}
             </div>
           </div>
           <div className="pt-[10px] border-t-[1px] flex justify-between items-center w-full text-xs">
