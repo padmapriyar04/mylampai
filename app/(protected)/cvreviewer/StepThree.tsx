@@ -30,9 +30,10 @@ interface PDFViewerProps {
   profile: string | null;
   structuredData: any;
   localResume: any;
+  cvId:string;
 }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
   const { userData } = useUserStore();
   const { extractedText, structuredData, resumeFile } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -464,7 +465,60 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     },
     [structuredData, extractedText, profile, reviewedData]
   );
-
+  const uploadAnalysis = async (cvId: string, analysisData: any) => {
+    try {
+      const response = await fetch("api/interviewer/post_analysis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cvId, analysisData }),
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        console.error("Failed to upload analysis:", result.error);
+        return;
+      }
+      return result.analysis;
+    } catch (error) {
+      console.error("Error uploading analysis:", error);
+    }
+  };
+  
+  useEffect(() => {
+    const runAnalysisAndUpload = async () => {
+      const analysisData = {
+        summary: reviewedData.summary,
+        resumeScore: reviewedData.resume_score?.FINAL_SCORE,
+        hardSkillsScore: reviewedData.resume_score?.DETAILS?.HARD_SKILLS_SCORE?.score,
+        softSkillsScore: reviewedData.resume_score?.DETAILS?.SOFT_SKILLS_SCORE?.score,
+        experienceScore: reviewedData.resume_score?.DETAILS?.EXPERIENCE_SCORE?.score,
+        educationScore: reviewedData.resume_score?.DETAILS?.EDUCATION_SCORE?.score,
+        quantificationIssues: reviewedData.quantification_checker?.["Not Quantify"],
+        bulletPointLength: reviewedData.bullet_point_length,
+        bulletPointImprovements: reviewedData.bullet_points_improver?.bulletPoints,
+        verbTenseIssues: reviewedData.verb_tense_checker,
+        weakVerbUsage: reviewedData.weak_verb_checker,
+        repetitionIssues: reviewedData.repetition_checker,
+        sectionFeedback: reviewedData.section_checker,
+        skillAnalysis: reviewedData.skill_checker,
+        spellingIssues: reviewedData.spelling_checker?.Result,
+        responsibilityIssues: reviewedData.responsibility_checker,
+      }; 
+      const result = await uploadAnalysis(cvId, analysisData);
+  
+      if (result) {
+        console.log("Analysis successfully linked to CV:", result);
+      }
+    };
+  
+    if (reviewedData) {
+      runAnalysisAndUpload();
+    }
+  }, [reviewedData]);
+  
   const highlightSentences = useCallback(
     (
       list_of_sentences: any,
