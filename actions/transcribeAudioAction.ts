@@ -62,62 +62,8 @@ export async function handleAudioTranscribe(formData: FormData) {
   }
 }
 
-// const transcribeAudio = async (audioFilePath: string) => {
-//   const client = new speech.SpeechClient();
+export async function handleLiveAudioTranscribe(formData: FormData) {
+  
+}
 
-//   // Convert audio file to a format that Google Speech API accepts (e.g., WAV)
-//   const convertedAudioPath = "converted_audio.wav";
-//   await new Promise((resolve, reject) => {
-//     ffmpeg(audioFilePath)
-//       .toFormat("wav")
-//       .save(convertedAudioPath)
-//       .on("end", resolve)
-//       .on("error", reject);
-//   });
 
-//   // Load the converted audio file
-//   const file = fs.readFileSync(convertedAudioPath);
-//   const audioBytes = file.toString("base64");
-
-//   // Configure request
-//   const request = {
-//     audio: { content: audioBytes },
-//     config: {
-//       encoding: "LINEAR16" as const,
-//       sampleRateHertz: 44100,
-//       languageCode: "en-US",
-//     },
-//   };
-
-//   const [response] = await client.recognize(request);
-//   const transcription = response.results
-//     ?.map((result) => result.alternatives?.[0].transcript)
-//     .join("\n");
-
-//   console.log("Transcription:", transcription);
-//   return transcription;
-// };
-
-// export async function handleLiveAudioTranscribe(formData: FormData) {
-//   let inputFilePath: string | null = null;
-
-//   try {
-//     const audioFile = formData.get("audio") as File;
-
-//     if (!audioFile) return "";
-
-//     inputFilePath = await saveFileToDisk(audioFile);
-
-//     const transcription = await transcribeAudio(inputFilePath);
-//     console.log(transcription);
-//     return transcription;
-//   } catch (error) {
-//     console.log(error);
-//   } finally {
-//     if (inputFilePath && fs.existsSync(inputFilePath)) {
-//       fs.unlinkSync(inputFilePath);
-//     }
-//   }
-
-//   return "";
-// }

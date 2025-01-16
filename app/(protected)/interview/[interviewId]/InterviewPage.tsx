@@ -329,6 +329,15 @@ const InterviewPage = () => {
     }
   };
 
+
+  //TODO
+
+  //get audio transcript here
+
+  
+
+
+
   // const finalizeUpload = async () => {
   //   try {
   //     stopVideoStream();
