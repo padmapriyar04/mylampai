@@ -68,6 +68,7 @@
     "next-auth": "^4.24.7",
     "next-connect": "^1.0.0",
     "next-themes": "^0.3.0",
+    "node-cron": "^3.0.3",
     "node-microphone": "^0.1.6",
     "node-record-lpcm16": "^1.0.1",
     "node-cron": "^3.0.3",
