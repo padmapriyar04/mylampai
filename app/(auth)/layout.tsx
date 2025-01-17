@@ -10,7 +10,7 @@ export default async function RootLayout({
   const user = await auth();
 
   if (user) {
-    redirect("/home");
+    redirect("/talentmatch");
   }
 
   return (

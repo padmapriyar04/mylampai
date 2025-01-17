@@ -65,7 +65,7 @@ export default function PowerOfWize() {
         </div>
         {/* <ImageGrid /> */}
       </div>
-      <div className="flex items-center flex-col sm:flex-row justify-between rounded-2xl shadow-md bg-primary-foreground sm:my-[40px] m-2 md:mx-auto sm:m-4 sm:py-8 p-4 sm:px-12 min-h-[100px] max-w-[1300px]">
+      {/* <div className="flex items-center flex-col sm:flex-row justify-between rounded-2xl shadow-md bg-primary-foreground sm:my-[40px] m-2 md:mx-auto sm:m-4 sm:py-8 p-4 sm:px-12 min-h-[100px] max-w-[1300px]">
         <p className="sm:text-lg font-semibold mb-2 text-center text-[#1c1c1c]">
           So, what are you waiting for? <br className="hidden sm:block" />
           Start exploring career options now!
@@ -73,7 +73,7 @@ export default function PowerOfWize() {
         <button className="bg-primary transition-all border-2 border-primary text-primary-foreground hover:bg-primary-foreground hover:text-primary font-semibold sm:text-lg rounded-lg py-2 px-4 sm:px-8 shadow-md ">
           Let&apos;s get Started
         </button>
-      </div>
+      </div> */}
     </>
   );
 }

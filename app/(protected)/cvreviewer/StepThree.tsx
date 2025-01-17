@@ -30,9 +30,10 @@ interface PDFViewerProps {
   profile: string | null;
   structuredData: any;
   localResume: any;
+  cvId:string;
 }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
   const { userData } = useUserStore();
   const { extractedText, structuredData, resumeFile } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -256,7 +257,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               ).flatMap((item: any) => item.correction);
 
               if (sentencesToHighlight.length > 0) {
-                
                 setSentencesToHighlight(sentencesToHighlight);
                 highlightSentences(sentencesToHighlight, "highlighted", false);
               }
@@ -465,7 +465,60 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     },
     [structuredData, extractedText, profile, reviewedData]
   );
-
+  const uploadAnalysis = async (cvId: string, analysisData: any) => {
+    try {
+      const response = await fetch("api/interviewer/post_analysis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ cvId, analysisData }),
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        console.error("Failed to upload analysis:", result.error);
+        return;
+      }
+      return result.analysis;
+    } catch (error) {
+      console.error("Error uploading analysis:", error);
+    }
+  };
+  
+  useEffect(() => {
+    const runAnalysisAndUpload = async () => {
+      const analysisData = {
+        summary: reviewedData.summary,
+        resumeScore: reviewedData.resume_score?.FINAL_SCORE,
+        hardSkillsScore: reviewedData.resume_score?.DETAILS?.HARD_SKILLS_SCORE?.score,
+        softSkillsScore: reviewedData.resume_score?.DETAILS?.SOFT_SKILLS_SCORE?.score,
+        experienceScore: reviewedData.resume_score?.DETAILS?.EXPERIENCE_SCORE?.score,
+        educationScore: reviewedData.resume_score?.DETAILS?.EDUCATION_SCORE?.score,
+        quantificationIssues: reviewedData.quantification_checker?.["Not Quantify"],
+        bulletPointLength: reviewedData.bullet_point_length,
+        bulletPointImprovements: reviewedData.bullet_points_improver?.bulletPoints,
+        verbTenseIssues: reviewedData.verb_tense_checker,
+        weakVerbUsage: reviewedData.weak_verb_checker,
+        repetitionIssues: reviewedData.repetition_checker,
+        sectionFeedback: reviewedData.section_checker,
+        skillAnalysis: reviewedData.skill_checker,
+        spellingIssues: reviewedData.spelling_checker?.Result,
+        responsibilityIssues: reviewedData.responsibility_checker,
+      }; 
+      const result = await uploadAnalysis(cvId, analysisData);
+  
+      if (result) {
+        console.log("Analysis successfully linked to CV:", result);
+      }
+    };
+  
+    if (reviewedData) {
+      runAnalysisAndUpload();
+    }
+  }, [reviewedData]);
+  
   const highlightSentences = useCallback(
     (
       list_of_sentences: any,
@@ -523,48 +576,48 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   }, []);
 
   const renderPDF = useCallback(async () => {
-    if (resumeFile && canvasRef.current) {
-      try {
-        const pdfData = base64ToUint8Array(resumeFile);
-        const loadingTask = pdfjsLib.getDocument({ data: pdfData });
-        const pdf = await loadingTask.promise;
-        const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1 });
-
-        const canvas = canvasRef.current;
-        const context = canvas.getContext("2d");
-
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        const renderContext = {
-          canvasContext: context,
-          viewport,
-        };
-
-        await page.render(renderContext).promise;
-
-        if (textLayerRef.current) {
-          textLayerRef.current.innerHTML = "";
-
-          const textContent = await page.getTextContent();
-          textLayerRef.current.style.width = `${canvas.offsetWidth}px`;
-          textLayerRef.current.style.height = `${canvas.offsetHeight}px`;
-
-          await pdfjsLib.renderTextLayer({
-            textContent: textContent,
-            container: textLayerRef.current,
-            viewport: viewport,
-            textDivs: [],
-          }).promise;
-
-          setIsTextLayerReady(true);
-        }
-      } catch (error) {
-        console.error("Error rendering PDF:", error);
-      }
-    } else {
+    if (!resumeFile || !canvasRef.current) {
       console.error("Canvas reference is null or resumeFile is not set.");
+      return;
+    }
+    try {
+      const pdfData = base64ToUint8Array(resumeFile);
+      const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+      const pdf = await loadingTask.promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1 });
+
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      const renderContext = {
+        canvasContext: context,
+        viewport,
+      };
+
+      await page.render(renderContext).promise;
+
+      if (textLayerRef.current) {
+        textLayerRef.current.innerHTML = "";
+
+        const textContent = await page.getTextContent();
+        textLayerRef.current.style.width = `${canvas.offsetWidth}px`;
+        textLayerRef.current.style.height = `${canvas.offsetHeight}px`;
+
+        await pdfjsLib.renderTextLayer({
+          textContent: textContent,
+          container: textLayerRef.current,
+          viewport: viewport,
+          textDivs: [],
+        }).promise;
+
+        setIsTextLayerReady(true);
+      }
+    } catch (error) {
+      console.error("Error rendering PDF:", error);
     }
   }, [resumeFile, base64ToUint8Array]);
 
@@ -673,10 +726,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               >
                 {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score ??
                   "N/A"}
-                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                    {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE
-                      ?.reason ?? "No details available"}
-                  </div>
+                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                  {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE
+                    ?.reason ?? "No details available"}
+                </div>
               </span>
             </div>
             <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
@@ -688,10 +741,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               >
                 {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE?.score ??
                   "N/A"}
-                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                    {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE
-                      ?.reason ?? "No details available"}
-                  </div>
+                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                  {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE
+                    ?.reason ?? "No details available"}
+                </div>
               </span>
             </div>
             <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
@@ -703,10 +756,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               >
                 {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.score ??
                   "N/A"}
-                  <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                    {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE
-                      ?.reason ?? "No details available"}
-                  </div>
+                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                  {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.reason ??
+                    "No details available"}
+                </div>
               </span>
             </div>
             {!reviewedData.resume_score && (

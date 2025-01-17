@@ -1,19 +1,16 @@
 "use client";
-import React, { useState, ChangeEvent } from "react";
-import StepOneTwo from "./StepOneTwo";
+import { useState, ChangeEvent } from "react";
 import { useInterviewStore } from "@/utils/store";
-import PDFViewer from "./StepThree";
 import { useUserStore } from "@/utils/userStore";
+import StepOneTwo from "./StepOneTwo";
+import PDFViewer from "./StepThree";
 import { toast } from "sonner";
 
 const baseUrl = "https://optim-cv-judge.onrender.com";
 
 const Page: React.FC = () => {
-  const {
-    setResumeFile,
-    setJobDescriptionFile,
-    resumeFile,
-  } = useInterviewStore();
+  const { setResumeFile, setJobDescriptionFile, resumeFile } =
+    useInterviewStore();
   const [step, setStep] = useState(1);
   const [isManualEntry, setIsManualEntry] = useState(false);
   const [manualJobDescription, setManualJobDescription] = useState("");
@@ -21,27 +18,27 @@ const Page: React.FC = () => {
   const { token } = useUserStore();
   const [profile, setProfile] = useState<string | null>(null);
   const [localResume, setLocalResume] = useState<File | null>(null);
-
+  const [cvId, setCvId] = useState("");
+  
   const handleResumeUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     const file = event.target?.files?.[0];
     if (file) {
       setResumeFile(file);
       setLocalResume(file);
-      const resumeFileBinary = await getBinaryData(file); // Convert resume to binary
+      const resumeFileBinary = await getBinaryData(file);
       uploadCVAndJobDescription(resumeFileBinary, manualJobDescription);
     }
   };
 
   const triggerFileInput = (inputId: string) => {
     const inputElement = document.getElementById(
-      inputId,
+      inputId
     ) as HTMLInputElement | null;
     if (inputElement) {
       inputElement.click();
     }
   };
-
 
   const handleNextClick = () => {
     setStep((prevStep) => prevStep + 1);
@@ -52,7 +49,7 @@ const Page: React.FC = () => {
   };
 
   const handleJobDescriptionUpload = async (
-    event: ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target?.files?.[0];
     if (file) {
@@ -60,10 +57,7 @@ const Page: React.FC = () => {
       if (extractedText) {
         setJobDescriptionFile(extractedText);
 
-        // Read the resume file as binary
         const resumeFileBinary = await getBinaryData(resumeFile);
-
-        // Now upload both resume (in binary) and job description
         await uploadCVAndJobDescription(resumeFileBinary, extractedText);
       }
     }
@@ -86,7 +80,6 @@ const Page: React.FC = () => {
       const response = await fetch(`${baseUrl}/extract_text_from_file`, {
         method: "POST",
         body: formData,
-  
       });
       const result = await response.json();
       return result.text || ""; // Adjust this depending on your API response structure
@@ -116,7 +109,7 @@ const Page: React.FC = () => {
 
   const uploadCVAndJobDescription = async (
     resumeFileBinary: ArrayBuffer,
-    jobDescriptionText: string,
+    jobDescriptionText: string
   ) => {
     try {
       if (!token) {
@@ -126,7 +119,6 @@ const Page: React.FC = () => {
 
       const jobDescriptionBase64 = btoa(jobDescriptionText);
 
-      // Convert binary data to a Base64 string
       const resumeBase64 = Buffer.from(resumeFileBinary).toString("base64");
 
       const response = await fetch("/api/interviewer/post_cv", {
@@ -136,12 +128,13 @@ const Page: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Resume: resumeBase64, // Sending the resume file as base64
-          JobDescription: jobDescriptionBase64, // Sending the job description text as base64
+          Resume: resumeBase64,
+          JobDescription: jobDescriptionBase64,
         }),
       });
 
       const result = await response.json();
+      setCvId(result.id);
 
       if (response.ok) {
       } else {
@@ -169,14 +162,17 @@ const Page: React.FC = () => {
           isManualEntry={isManualEntry}
           manualJobDescription={manualJobDescription}
           setManualJobDescription={setManualJobDescription}
-          profile={profile} 
-          setProfile={setProfile} 
+          profile={profile}
+          setProfile={setProfile}
+          cvId={cvId}
+          setCvId={setCvId}
         />
       ) : (
         <PDFViewer
           profile={profile}
           structuredData={structuredData}
           localResume={localResume}
+          cvId={cvId}
         />
       )}
     </div>

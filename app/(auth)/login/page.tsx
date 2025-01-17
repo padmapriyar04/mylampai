@@ -6,31 +6,29 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Linkedin, CircleArrowOutUpRight } from "lucide-react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { signIn, signOut } from "next-auth/react";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { useSession } from "next-auth/react";
 import { useUserStore } from "@/utils/userStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { setCookie } from "@/utils/cookieUtils";
 import {
   handleSendOTP,
   verifyOTPandLogin,
   nextAuthLogin,
 } from "@/actions/authActions";
+import Globe from "@/components/ui/globe";
+import { useSearchParams } from "next/navigation";
+import { Linkedin } from "react-bootstrap-icons";
 
 const FormSchema = z.object({
   email: z.string().email({
@@ -53,6 +51,11 @@ export default function LoginPage() {
   const router = useRouter();
   const { data } = useSession();
   const { setUserData } = useUserStore();
+  const [showOTP, setshowOTP] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const searchParams = useSearchParams();
+  const role = searchParams.get("role") === "recruiter" ? "recruiter" : "user";
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -75,7 +78,7 @@ export default function LoginPage() {
         if (res.user && res.accessToken) {
           setUserData(res.user, res.accessToken);
           setCookie("accessToken", res.accessToken);
-          router.push("/home");
+          router.push("/talentmatch");
         } else {
           toast.error("Failed to login");
         }
@@ -89,13 +92,11 @@ export default function LoginPage() {
   }
 
   const sendOTPforLogin = async () => {
+    setSending(true);
     try {
-      const queryParams = new URLSearchParams(window.location.search);
-      const role =
-        queryParams.get("role") === "recruiter" ? "recruiter" : "user";
-
       const res = await handleSendOTP(form.getValues("email"), role);
       if (res.otpSent) {
+        setshowOTP(true);
         toast.success(res.message);
       } else {
         toast.error(res.message);
@@ -103,6 +104,8 @@ export default function LoginPage() {
     } catch (error) {
       console.log(error);
       toast.error("Failed to send OTP");
+    } finally {
+      setSending(false);
     }
   };
 
@@ -121,14 +124,11 @@ export default function LoginPage() {
 
     const email = data.user.email as string;
 
-    const queryParams = new URLSearchParams(window.location.search);
-    const role = queryParams.get("role") === "recruiter" ? "recruiter" : "user";
-
     const handleLogin = async () => {
       const res = await nextAuthLogin({ email, role });
 
       if (res.status === "success") {
-        toast.success(res.message);
+        toast.success("Login successful");
         if (res.user && res.accessToken) {
           setUserData(res.user, res.accessToken);
           setCookie("accessToken", res.accessToken);
@@ -141,7 +141,7 @@ export default function LoginPage() {
     };
 
     handleLogin();
-  }, [data, router, setUserData]);
+  }, [data, router, role, setUserData]);
 
   return (
     <div className="bg-primary-foreground flex flex-col items-center justify-center md:h-screen relative p-4 md:p-0 h-screen">
@@ -154,117 +154,158 @@ export default function LoginPage() {
           className="w-full h-auto drop-shadow-md"
         />
       </Link>
-      <div className="bg-white rounded-lg md:rounded-tr-[5.5rem] md:rounded-bl-[5.5rem] p-3 gap-2 w-full max-w-5xl flex flex-col md:flex-row md:min-h-[50vh] 3xl:min-h-[750px] 3xl:max-w-[1300px] shadow-md items-center xl:h-[46vw] lg:h-[50vw] 2xl:h-[35vw] lg:min-h-[612px]">
-        <div className="justify-evenly flex-col items-center hidden md:flex w-full md:max-w-[350px] bg-primary rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-4 mb-4 md:mb-0 relative h-full">
-     
-            <Image
-              src={"/images/Globe.svg"}
-              alt="globe"
-              className="w-full"
-              width={100}
-              height={100}
-            />
-          <Link href={"/login?role=recruiter"}>
-            <button className="bg-white text-primary p-2 rounded-sm font-semibold">
-              Login as Recruiter
-            </button>
-          </Link>
-          <Link href={"/login"}>
-            <button className="bg-white text-primary p-2 rounded-sm font-semibold">
-              Login as User
-            </button>
-          </Link>
+      <div className="bg-white rounded-lg md:rounded-tr-[5.5rem] md:rounded-bl-[5.5rem] p-[10px] gap-2 w-full max-w-[750px] flex flex-col sm:flex-row shadow-md items-center ">
+        <div className="justify-evenly flex-col items-center hidden md:flex w-full md:max-w-[300px] bg-primary-foreground rounded-lg md:rounded-tr-5xl md:rounded-bl-5xl p-3 h-full">
+          {/* <Image
+            src={"/images/Globe.svg"}
+            alt="globe"
+            className="w-full h-auto hue-rotate-180"
+            width={100}
+            height={100}
+          /> */}
+          <Globe />
+          <div className="flex flex-col gap-2 text-gray-500 justify-center items-center p-2">
+            <h2 className="font-medium w-full">
+              Take the wiZe AI Mock Interview
+            </h2>
+            <div>
+              <p className="text-xs">
+                You&apos;ll be taking a 20-minute interview to have your skills
+                evaluated. Just relax and take the interview. All the Best!
+              </p>
+            </div>
+            <div className="flex gap-2 text-slate-600 font-medium items-center mt-4">
+              <p className="text-xs ">
+                {role === "recruiter"
+                  ? "Login as student?"
+                  : "Want to hire talent?"}
+              </p>
+              <Link
+                href={role === "recruiter" ? "/login" : "/login?role=recruiter"}
+                className="text-xs font-bold text-primary"
+              >
+                Continue Here
+              </Link>
+            </div>
+          </div>
         </div>
 
-        <div className="w-full  md:h-full md:min-h-[80vh] p-4 md:p-6 flex flex-col justify-center">
-          <>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="w-2/3 space-y-6"
-              >
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="your-email@gmail.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="pin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <InputOTP maxLength={6} {...field}>
-                          <InputOTPGroup>
-                            <InputOTPSlot index={0} />
-                            <InputOTPSlot index={1} />
-                            <InputOTPSlot index={2} />
-                            <InputOTPSlot index={3} />
-                            <InputOTPSlot index={4} />
-                            <InputOTPSlot index={5} />
-                          </InputOTPGroup>
-                        </InputOTP>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+        <div className="w-full md:h-full md:min-h-[426px] p-4 flex flex-col justify-center my-auto">
+          <div className="flex flex-col mt-6 h-full gap-2">
+            <div className="flex items-center justify-center">
+              <Image
+                src={"/sidebar/wize_logo_whitebg.svg"}
+                alt="wiZe logo"
+                width={40}
+                height={40}
+              />
+            </div>
+            <div className="flex font-medium justify-center items-center">
+              <h1>Signup or Login to &nbsp;</h1>
+              <h1 className="text-primary"> wiZ</h1>
+              <h1>e in seconds</h1>
+            </div>
+            <div className="flex flex-col justify-center items-center px-8 mt-8">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+                  <div className="flex flex-col gap-4 items-center justify-center">
+                    <div className={`w-full ${showOTP ? "hidden" : ""}`}>
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>Email ID</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Email"
+                                {...field}
+                                className="shadow-none text-gray-900 py-4 px-2 border rounded-lg space-x-2"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className={`w-full ${!showOTP ? "hidden" : ""}`}>
+                      <FormField
+                        control={form.control}
+                        name="pin"
+                        render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>OTP</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Enter OTP"
+                                {...field}
+                                className="shadow-none text-gray-900 py-4 px-2 border rounded-lg space-x-2"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {!showOTP ? (
+                      <Button
+                        type="button"
+                        disabled={sending}
+                        onClick={sendOTPforLogin}
+                        className="bg-primary text-slate-50 w-full text-sm sm:font-bold px-2 sm:px-4 py-2 rounded-lg shadow hover:bg-primary"
+                      >
+                        Continue
+                      </Button>
+                    ) : (
+                      <Button
+                        type="submit"
+                        disabled={form.formState.isSubmitting}
+                        className="bg-primary text-slate-50 w-full text-sm sm:font-bold px-2 sm:px-4 py-2 rounded-lg shadow hover:bg-primary"
+                      >
+                        Let&apos;s Go
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              </Form>
+              <div className="flex items-center justify-center gap-2 my-[25px] w-full">
+                <div className="flex-grow border-t"></div>
+                <p className="text-gray-400 text-xs px-2">Or continue with</p>
+                <div className="flex-grow border-t"></div>
+              </div>
+
+              <div className="flex gap-2 sm:gap-8 justify-center items-center w-full">
+                <button
+                  type="button"
+                  className="flex items-center justify-center w-full border h-10 rounded-lg space-x-2 "
+                  onClick={() => handleNextAuthLogin("google")}
+                >
+                  <Image
+                    src={"/images/Google_Icons-09-512.png"}
+                    alt="google login"
+                    width={100}
+                    height={100}
+                    className="w-6 h-6"
+                  />
+                  <span className="text-slate-500 font-bold sm:text-sm">
+                    Google
+                  </span>
+                </button>
 
                 <button
                   type="button"
-                  onClick={sendOTPforLogin}
-                  className="font-semibold bg-primary text-white p-2 rounded-sm text-xs transition-all duration-300 hover:shadow-lg"
+                  className="flex items-center justify-center w-full border h-10 rounded-lg space-x-2 "
+                  onClick={() => handleNextAuthLogin("linkedin")}
                 >
-                  Next
+                  <Linkedin className="text-[#0A66C2]" />
+                  <span className="text-slate-500 font-bold sm:text-sm">
+                    LinkedIn
+                  </span>
                 </button>
-
-                <div className="flex justify-between items-center mt-12 mb-4">
-                  <Button
-                    type="submit"
-                    className="bg-primary text-white px-6 py-3 rounded-full font-bold flex hover:bg-primary items-center gap-2 hover:scale-105 duration-200 md:text-xl "
-                  >
-                    Submit
-                    <CircleArrowOutUpRight />
-                  </Button>
-                </div>
-              </form>
-            </Form>
-
-            <button
-              type="button"
-              className="flex items-center justify-center w-full bg-white text-gray-500 md:shadow p-3 border-1 rounded-l space-x-2  font-semibold transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02] text-lg"
-              onClick={() => handleNextAuthLogin("google")}
-            >
-              <Image
-                src={"/images/Google_Icons-09-512.png"}
-                alt="google login"
-                width={100}
-                height={100}
-                className="w-6 h-6"
-              />
-              <span className="text-slate-600 font-medium">
-                Login using Google
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className="flex items-center justify-center w-full bg-white text-slate-500 md:shadow p-3 border-1 rounded-l space-x-2  font-semibold transition-all duration-300 hover:shadow-sm hover:transform hover:scale-[1.02] text-lg"
-              onClick={() => handleNextAuthLogin("linkedin")}
-            >
-              <Linkedin />
-              <span className="text-slate-600 font-medium">
-                Login using LinkedIn
-              </span>
-            </button>
-          </>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

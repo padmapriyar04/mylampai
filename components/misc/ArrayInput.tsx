@@ -31,7 +31,7 @@ export function ArrayInput({ value, onChange, placeholder }: ArrayInputProps) {
         {value.map((item, index) => (
           <div
             key={index}
-            className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md flex items-center"
+            className="bg-secondary text-xs text-secondary-foreground px-2 py-1 rounded-md flex items-center"
           >
             {item}
             <Button
@@ -45,14 +45,14 @@ export function ArrayInput({ value, onChange, placeholder }: ArrayInputProps) {
             </Button>
           </div>
         ))}
+        <Input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+        />
       </div>
-      <Input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-      />
     </div>
   );
 }

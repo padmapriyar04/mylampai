@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,7 +22,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -28,7 +34,11 @@
     ".next/types/**/*.ts",
     "components/home/Typing.jsx",
     "app/(protected)/cvreviewer/Highlighter.jsx",
-    "types/pdfjs-dist.d.ts"
-  ],
-  "exclude": ["node_modules"]
+    "types/pdfjs-dist.d.ts",
+    "components/ui/globe.jsx",
+    "build/types/**/*.ts"
+, "public/audioProcessor.js", "components/speech-to-text/speechRecognition.tsx"  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

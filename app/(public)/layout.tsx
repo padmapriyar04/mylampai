@@ -1,6 +1,10 @@
+"use client"; 
+
+import { usePathname } from "next/navigation"; 
 import HomeNavbar from "@/components/home/HomeNavbar";
 import Footer from "@/components/global/Footer";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import BottomNavBar from "@/components/home/BottomNavBar";
+import RecruiterNavbar from "@/components/home/RecruiterNavbar";
 
 export default function RootLayout({
   children,
@@ -9,11 +13,15 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <HomeNavbar />
+   <HomeNavbar/>
+   <RecruiterNavbar/>   
+
       <div className="min-h-screen w-full flex flex-1 flex-col">
         {children}
-        <Footer />
       </div>
+      <Footer />
+
+      <BottomNavBar />
     </>
   );
 }

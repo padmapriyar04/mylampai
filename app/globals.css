@@ -26,6 +26,7 @@
 
     --primary: 260, 100%, 66%;
     --primary-foreground: 260, 100%, 94%;
+    --primary-dark: 264, 73%, 51%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -77,6 +78,7 @@
 
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-dark: 264, 73%, 51%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -108,16 +110,6 @@ body::--webkit-scrollbar {
   width: 0.5rem;
 }
 
-@keyframes fadeOut {
-    from {opacity: 1}
-    to {opacity: 0}
-}
-
-.element {
-    animation: fadeOut 2s forwards;
-    animation-timeline: scroll();
-}
-
 @layer base {
   * {
     @apply border-border;
@@ -128,32 +120,11 @@ body::--webkit-scrollbar {
   }
 }
 
-/* typed js library cursor color */
 .typed-cursor {
   color: #8c52ff;
 }
-.embla__slide {
-  flex: 0 0 70%;
-}
-.carousel-root {
-  height: 100%;
-}
 
-.carousel.carousel-slider {
-  height: 100%;
-}
-
-.carousel .control-dots {
-  bottom: 16px !important;
-  margin: 0 !important;
-}
-
-.carousel .control-dots .dot {
-  box-shadow: none !important;
-  background: #ffffff !important;
-  opacity: 0.5;
-}
-
-.carousel .control-dots .dot.selected {
-  opacity: 1;
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }

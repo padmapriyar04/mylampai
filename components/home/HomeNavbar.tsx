@@ -8,17 +8,37 @@ import {
   RecruiterComponent,
   AboutComponent,
 } from "./HomeNavbarComponents";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import LoginComponent from "../global/Login";
+import { useSession } from "next-auth/react";
+import { nextAuthLogin } from "@/actions/authActions";
+import { signOut } from "next-auth/react";
+import { setCookie } from "@/utils/cookieUtils";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useRoleStore } from "@/utils/loginStore";
+import { usePathname } from "next/navigation";
 
 const HomeNavbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const router = useRouter();
+  const { data } = useSession();
+  const pathname = usePathname();
 
-  const { userData } = useUserStore();
-  const [initials, setInitials] = useState("Profile");
+  const { role, setRole } = useRoleStore();
+
+  const { userData, setUserData } = useUserStore();
+  const [initials, setInitials] = useState("Home");
+  const hiddenOn = ["/recruiter/"];
+
+  const isHidden = hiddenOn.some((route) =>
+    pathname.startsWith(route.replace(/\/$/, ""))
+  );
+  
 
   useEffect(() => {
     const handleScroll = () => {
-      console.log("Hello");
-      const triggerPoint = 1000;
+      const triggerPoint = 100;
       if (window.scrollY > triggerPoint) {
         setScrolled(true);
       } else {
@@ -34,8 +54,33 @@ const HomeNavbar = () => {
   }, []);
 
   useEffect(() => {
+    if (role === null) return;
+
+    if (!data || !data.user) {
+      return;
+    }
+
+    const email = data.user.email as string;
+
+    const handleLogin = async (email: string, role: "user" | "recruiter") => {
+      const res = await nextAuthLogin({ email, role });
+
+      if (res.status === "success" && res.user && res.accessToken) {
+        setUserData(res.user, res.accessToken);
+        setCookie("accessToken", res.accessToken);
+      } else {
+        toast.error(res.message);
+      }
+
+      await signOut();
+    };
+
+    handleLogin(email, role);
+  }, [data, router, role, setUserData]);
+
+  useEffect(() => {
     const getUserInitials = () => {
-      if (!userData?.name) return "Profile";
+      if (!userData?.name) return "Home";
 
       let name = userData.name;
 
@@ -52,10 +97,12 @@ const HomeNavbar = () => {
 
     setInitials(getUserInitials);
   }, [userData]);
+  
+  if (isHidden) return null;
 
   return (
     <div
-      className={`flex justify-end items-center gap-4 bg-[#ffffff20] backdrop-blur-sm transition px-8 fixed top-0 w-full z-50 min-h-[64px]`}
+      className={`flex justify-end items-center gap-4 bg-transparent transition px-8 fixed top-0 w-full z-50 min-h-[64px]`}
     >
       <Link
         href={"/"}
@@ -93,19 +140,26 @@ const HomeNavbar = () => {
 
         {userData ? (
           <Link
-            href={"/profile"}
+            href={"/talentmatch"}
             className="flex items-center bg-primary h-[35px] text-white pl-4 pr-2 gap-2 rounded-lg "
           >
             {initials}
             <Image src={"/home/userNavbar.svg"} alt="" height={20} width={20} />
           </Link>
         ) : (
-          <Link
-            href={"/login"}
-            className="flex items-center bg-primary h-[35px] text-white px-4  gap-2 rounded-lg"
-          >
-            Login / Sign Up
-          </Link>
+          <Dialog>
+            <DialogTrigger>
+              <div
+                onClick={() => setRole("user")}
+                className="flex items-center bg-primary h-[35px] text-white px-4  gap-2 rounded-lg"
+              >
+                Login / Sign Up
+              </div>
+            </DialogTrigger>
+            <DialogContent className="bg-transparent border-none max-w-3xl">
+              <LoginComponent />
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </div>
