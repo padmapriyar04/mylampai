@@ -135,7 +135,7 @@ export const POST = async (req: NextRequest) => {
         return NextResponse.json(
           {
             message: "Emails sent successfully",
-            newsletter: updatedNewsletter,
+            newsletter: updatedNewsletter
           },
           { status: 200 }
         );
