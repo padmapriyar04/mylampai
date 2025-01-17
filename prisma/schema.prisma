@@ -248,17 +248,33 @@ enum Availability {
 }
 
 model JobRound {
-  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
   roundName           String
   roundNumber         Int
   details             String
   roundType           String
   roundDate           DateTime
   candidatesQualified QualifiedRounds[]
-  jobProfileId        String            @db.ObjectId
-  jobProfile          JobProfile        @relation(fields: [jobProfileId], references: [id], onDelete: Cascade)
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  jobProfileId        String             @db.ObjectId
+  jobProfile          JobProfile         @relation(fields: [jobProfileId], references: [id], onDelete: Cascade)
+  rubrics             JobRoundRubric[]   
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+}
+
+//Evaluation Criteria for each JobRound created by recruiter
+
+model JobRoundRubric {                  
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  parameter   String
+  description String
+  weightage   Int
+  type        String
+  condition   String
+  jobRound    JobRound  @relation(fields: [jobRoundId], references: [id], onDelete: Cascade)  
+  jobRoundId  String    @db.ObjectId     
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model JobCandidate {

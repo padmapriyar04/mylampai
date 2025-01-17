@@ -17,7 +17,9 @@ export async function handleAudioTranscribe(formData: FormData) {
   
   try {
     const audioFile = formData.get("audio") as File;
-
+    const audioBlob = formData.get("audio");
+    console.log("audioBlob", audioBlob);
+    
     if (!audioFile) {
       return {
         status: "failed",
@@ -26,7 +28,7 @@ export async function handleAudioTranscribe(formData: FormData) {
     }
 
     inputFilePath = await saveFileToDisk(audioFile);
-
+    console.log("inputFilePath", inputFilePath);
     const audioBuffer = fs.readFileSync(inputFilePath);
 
     const audio = { content: audioBuffer.toString("base64") };
@@ -62,8 +64,6 @@ export async function handleAudioTranscribe(formData: FormData) {
   }
 }
 
-export async function handleLiveAudioTranscribe(formData: FormData) {
-  
-}
+
 
 

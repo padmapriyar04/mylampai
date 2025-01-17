@@ -114,6 +114,7 @@ const InterviewPage = () => {
       if (!res.ok) {
         throw new Error("Network response was not okay");
       }
+
       const { audioResponse } = await res.json();
       const audioBuffer = new Uint8Array(audioResponse.data);
       const audioBlob = new Blob([audioBuffer], { type: "audio/mp3" });
@@ -275,11 +276,13 @@ const InterviewPage = () => {
           return;
         }
 
+        console.log("Audio recorded:", recordedBlob);
+
         const formData = new FormData();
         formData.append("audio", recordedBlob);
 
         try {
-          const res = await handleAudioTranscribe(formData);
+          const res = await handleAudioTranscribe(formData); //trnascribing candidate audio
 
           if (res.status === "success") {
             if (res.transcript) resTranscript.current += res.transcript;
