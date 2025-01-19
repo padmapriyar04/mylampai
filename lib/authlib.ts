@@ -7,6 +7,7 @@ interface CustomJwtPayload extends JwtPayload {
   email: string;
   name: string;
   role: string;
+  image: string;
 }
 
 export async function auth() {

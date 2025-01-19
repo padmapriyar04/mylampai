@@ -1,6 +1,5 @@
 "use server";
 import prisma from "@/lib/index";
-import { auth } from "@/lib/authlib";
 
 type JobDataType = {
   jobTitle: string;
@@ -95,17 +94,11 @@ export const updateJobStatus = async (
   }
 };
 
-export const getRecruiterJobs = async () => {
+export const getRecruiterJobs = async (userId: string) => {
   try {
-    const user = await auth();
-
-    if (!user) {
-      return { status: "failed", message: "User not found" };
-    }
-
     const jobs = await prisma.jobProfile.findMany({
       where: {
-        userId: user.id,
+        userId,
       },
       select: {
         id: true,

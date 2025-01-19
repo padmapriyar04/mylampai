@@ -10,11 +10,10 @@ export const profileDataSchema = z.object({
   locationPref: z.enum(["onsite", "remote", "hybrid"], {
     required_error: "Location preference is required",
   }),
-  availability: z.enum(["full-time", "part-time"], {
+  availability: z.enum(["FULL_TIME", "PART_TIME", "INTERN", "CONTRACT"], {
     required_error: "Availability is required",
   }),
   experienceYears: z.string().min(1, "Years of experience is required"),
-})
-
+});
 
 export type ProfileDataType = z.infer<typeof profileDataSchema>;

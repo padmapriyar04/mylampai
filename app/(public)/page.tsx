@@ -1,13 +1,14 @@
 import { Metadata } from "next";
 import HeroSection from "@/components/home/HeroSection";
-import AboutWize from "@/components/home/AboutWize";
-import WizeCamp from "@/components/home/WizeCamp";
+// import AboutWize from "@/components/home/AboutWize";
+// import WizeCamp from "@/components/home/WizeCamp";
 import WhyWize from "@/components/home/WhyWize";
 import BackedByBest from "@/components/home/BackedByBest";
-import PowerOfWize from "@/components/home/PowerOfWize";
-import RecentAdvances from "@/components/home/RecentAdvances";
+import HowWizeWork from "@/components/home/HowWizeWork";
+// import PowerOfWize from "@/components/home/PowerOfWize";
+// import RecentAdvances from "@/components/home/RecentAdvances";
 import CommunitySection from "@/components/home/Community";
-import HomeSlider from "@/components/home/HomeSlider";
+// import HomeSlider from "@/components/home/HomeSlider";
 import "./home.css";
 
 // // Define the type for the children prop
@@ -54,28 +55,29 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <main className="home-page h-full bg-[#fff]">
+      <main className="home-page h-full">
         {/* <SectionWrapper> */}
         <HeroSection />
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
-        <AboutWize />
+        {/* <AboutWize /> */}
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
-        <WizeCamp />
+        {/* <WizeCamp /> */}
         {/* </SectionWrapper> */}
         {/* <SectionWrapper>
         </SectionWrapper> */}
-        <HomeSlider />
+        {/* <HomeSlider /> */}
+        <HowWizeWork />
         <WhyWize />
         {/* <SectionWrapper> */}
         <BackedByBest />
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
-        <PowerOfWize />
+        {/* <PowerOfWize /> */}
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
-        <RecentAdvances />
+        {/* <RecentAdvances /> */}
         {/* </SectionWrapper> */}
         {/* <SectionWrapper> */}
         <CommunitySection />

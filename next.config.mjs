@@ -1,10 +1,9 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "avatar.vercel.sh",
+        hostname: "**",
         port: "",
         pathname: "/**",
       },
@@ -14,7 +13,10 @@ const nextConfig = {
     config.resolve.alias.canvas = false
     config.resolve.alias.encoding = false
     return config
-  }
+  },
+  reactStrictMode: true,
+  distDir: 'build',
+  output: 'standalone',
 };
 
 export default nextConfig;

@@ -28,27 +28,27 @@ export const createInterview = async (userId: string) => {
         message: "User not found",
       };
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    // const user = await prisma.user.findUnique({
+    //   where: {
+    //     id: userId,
+    //   },
+    // });
 
-    if (!user) {
-      return {
-        status: "failed",
-        message: "User not found",
-      };
-    }
+    // if (!user) {
+    //   return {
+    //     status: "failed",
+    //     message: "User not found",
+    //   };
+    // }
 
-    const credits = user.credits;
+    // const credits = user.credits;
 
-    if (!credits || credits < 100) {
-      return {
-        status: "failed",
-        message: "Insufficient Credits",
-      };
-    }
+    // if (!credits || credits < 100) {
+    //   return {
+    //     status: "failed",
+    //     message: "Insufficient Credits",
+    //   };
+    // }
 
     const interview = await prisma.interview.create({
       data: {
@@ -56,14 +56,14 @@ export const createInterview = async (userId: string) => {
       },
     });
 
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        credits: credits - 100,
-      },
-    });
+    // await prisma.user.update({
+    //   where: {
+    //     id: userId,
+    //   },
+    //   data: {
+    //     credits: credits - 100,
+    //   },
+    // });
 
     return {
       status: "success",
@@ -329,11 +329,14 @@ export const submitanalysis = async (req: NextRequest) => {
         interviewId,
       },
     });
-    return NextResponse.json({ success: true, data: response }, { status: 200 });
+    return NextResponse.json(
+      { success: true, data: response },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error in submitAnalysis:", error);
     return NextResponse.json(
-      { success: false|| "Internal server error" },
+      { success: false || "Internal server error" },
       { status: 500 }
     );
   }

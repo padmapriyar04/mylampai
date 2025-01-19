@@ -7,58 +7,58 @@ export const POST = async (
   { params }: { params: { communityId: string } }
 ) => {
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const token = authHeader.substring(7);
+    // const authHeader = req.headers.get("Authorization");
+    // if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
+    // const token = authHeader.substring(7);
 
-    let decodedToken: any;
-    try {
-      decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
-    } catch (error) {
-      console.error("JWT verification error:", error);
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // let decodedToken: any;
+    // try {
+    //   decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
+    // } catch (error) {
+    //   console.error("JWT verification error:", error);
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
 
-    const {
-      id: userId,
-      email: userEmail,
-      name: userName,
-      role: userRole,
-    } = decodedToken;
+    // const {
+    //   id: userId,
+    //   email: userEmail,
+    //   name: userName,
+    //   role: userRole,
+    // } = decodedToken;
 
-    const community = await prisma.community.findUnique({
-      where: { id: params.communityId },
-    });
+    // const community = await prisma.community.findUnique({
+    //   where: { id: params.communityId },
+    // });
 
-    if (!community) {
-      return NextResponse.json(
-        { error: "Community not found" },
-        { status: 404 }
-      );
-    }
+    // if (!community) {
+    //   return NextResponse.json(
+    //     { error: "Community not found" },
+    //     { status: 404 }
+    //   );
+    // }
 
-    if (!community.userIds.includes(userId)) {
-      return NextResponse.json(
-        { error: "User has not joined the community" },
-        { status: 400 }
-      );
-    }
+    // if (!community.userIds.includes(userId)) {
+    //   return NextResponse.json(
+    //     { error: "User has not joined the community" },
+    //     { status: 400 }
+    //   );
+    // }
 
-    const chatToken = jwt.sign(
-      {
-        id: userId,
-        email: userEmail,
-        name: userName,
-        role: userRole,
-        community: community,
-      },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "24h" }
-    );
+    // const chatToken = jwt.sign(
+    //   {
+    //     id: userId,
+    //     email: userEmail,
+    //     name: userName,
+    //     role: userRole,
+    //     community: community,
+    //   },
+    //   process.env.JWT_SECRET as string,
+    //   { expiresIn: "24h" }
+    // );
 
-    return NextResponse.json({ chatToken: chatToken }, { status: 200 });
+    // return NextResponse.json({ chatToken: chatToken }, { status: 200 });
   } catch (error) {
     console.error("Error sending message to community:", error);
     return NextResponse.json(

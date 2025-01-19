@@ -145,6 +145,7 @@ export const verifyOTPandLogin = async ({
           name: user.name,
           email: user.email,
           role: user.role,
+          image: user.image as string,
         },
         process.env.JWT_SECRET as string,
         { expiresIn: process.env.JWT_EXPIRATION || "90d" }
@@ -218,6 +219,7 @@ export const nextAuthLogin = async ({
           name: user.name,
           email: user.email,
           role: user.role,
+          image: user.image,
         },
         process.env.JWT_SECRET as string,
         { expiresIn: process.env.JWT_EXPIRATION || "90d" }
@@ -296,4 +298,3 @@ export const handleGoogleLogin = async ({ email }: { email: string }) => {
     message: "failed",
   };
 };
-
