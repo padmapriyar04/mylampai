@@ -1,4 +1,5 @@
 "use client";
+// fetch nessesary details first from the apis then load to the db
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useInterviewStore } from "@/utils/store";
 import * as pdfjsLib from "pdfjs-dist/webpack";
@@ -24,31 +25,59 @@ import {
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const baseUrl = "https://optim-cv-judge.onrender.com";
+const baseUrl = process.env.NEXT_PUBLIC_RESUME_API_ENDPOINT;
 
 interface PDFViewerProps {
   profile: string | null;
   structuredData: any;
   localResume: any;
-  cvId:string;
 }
 
-const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const { userData } = useUserStore();
-  const { extractedText, structuredData, resumeFile } = useInterviewStore();
+  const { extractedText, structuredData, resumeFile, resumeId } = useInterviewStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textLayerRef = useRef<HTMLDivElement>(null);
-
-  const [reviewedData, setReviewedData] = useState<any>({});
+  const [reviewedData, setReviewedData] = useState<any>({}); //reviewedData state
   const [isRendered, setIsRendered] = useState(false); // Define isRendered state
   const [isTextLayerReady, setIsTextLayerReady] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const [sentencesToHighlight, setSentencesToHighlight] = useState<string[]>(
     []
   );
+  const { token } = useUserStore();
 
+  // fetch resume analysis data via id from db and then update the reviewedData state 
+  console.log("fetching")
+  const fetchResumeAnalysis = async (resumeId: string) => {
+    try {
+      const response = await fetch(`/api/interviewer/fetchAnalysis`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ id: resumeId }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setReviewedData((data:any)=>({...data, ...result}));
+        console.log("reviewedData", reviewedData);
+      } else {
+        console.error("Failed to fetch resume analysis:", result);
+      }
+    } catch (error) {
+      console.error("Error fetching resume analysis:", error);
+    }
+  };
+
+  // const runAnalysis = (data: string) => {
+  //   console.log(data)
+  // }
   const analyzeResume = useCallback(
     async (endpoint: string, data: any, query: string) => {
+      setLoading(true)
       try {
         const response = await fetch(`${baseUrl}${endpoint}${query}`, {
           method: "POST",
@@ -58,9 +87,16 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
           body: JSON.stringify(data),
         });
         const result = await response.json();
-        if (response.ok) return result;
+        console.log("result here", result)
+        if (response.ok){
+
+          setLoading(false)
+          return result;
+        }
+        setLoading(false)
         return null;
       } catch (error) {
+        setLoading(false)
         console.error("Error:", error);
         return null;
       }
@@ -82,52 +118,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
       }
 
       switch (analysisType) {
-        case "summary":
-          if (!reviewedData.summary) {
-            endpoint = "/summary";
-            data = {
-              cv_text: extractedText,
-            };
-            result = await analyzeResume(endpoint, data, query);
-
-            if (!reviewedData.summary) {
-              setReviewedData((prevData: any) => ({
-                ...prevData,
-                summary: result?.message,
-              }));
-            }
-          }
-          break;
-        case "quantification_checker":
-          if (!reviewedData.quantification_checker) {
-            endpoint = "/quantification";
-            data = {
-              extracted_data: structuredData,
-            };
-            result = await analyzeResume(endpoint, data, query);
-            if (result?.message?.["Not Quantify"]) {
-              setSentencesToHighlight(result.message["Not Quantify"]);
-              highlightSentences(
-                result.message["Not Quantify"],
-                "highlighted",
-                false
-              );
-            }
-
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              quantification_checker: result?.message,
-            }));
-          } else {
-            console.log(
-              "Sentences to highlight:",
-              reviewedData.quantification_checker["Not Quantify"]
-            );
-            setSentencesToHighlight(
-              reviewedData.quantification_checker["Not Quantify"]
-            );
-          }
-          break;
         case "resume_score":
           if (!reviewedData.resume_score) {
             endpoint = "/job_description_resume_score";
@@ -140,8 +130,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
               },
             };
             result = await analyzeResume(endpoint, data, query);
-            if (!reviewedData.resume_score) {
-              if (result?.message?.["Result"]) {
+            //console.log("resume score", result.message)
+            if (!reviewedData?.data?.resume_score) {
+              if (result?.message["Result"]) {
                 setSentencesToHighlight(result.message["Result"]);
                 highlightSentences(
                   result.message["Result"],
@@ -151,7 +142,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
               }
               setReviewedData((prevData: any) => ({
                 ...prevData,
-                resume_score: result?.message,
+                resume_score: result?.message?result?.message:"not available",
               }));
             }
           }
@@ -166,7 +157,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
             result = await analyzeResume(endpoint, data, query);
             setReviewedData((prevData: any) => ({
               ...prevData,
-              resume_length: result?.message,
+              resume_length: result?.message?result?.message:"not available",
+            }));
+          }
+          break;
+        case "analyze":
+          if (!reviewedData.resume_length) {
+            endpoint = "/analyze";
+            data = {
+              extracted_data: structuredData,
+              text: extractedText,
+              experience: "FRESHER",
+            };
+            result = await analyzeResume(endpoint, data, query);
+            setReviewedData((prevData: any) => ({
+              ...prevData,
+              resume_length: result?.message?result?.message:"not available",
             }));
           }
           break;
@@ -178,7 +184,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
             };
             result = await analyzeResume(endpoint, data, query);
             if (!reviewedData.resume_score) {
-              if (result?.message?.["Result"]) {
+              if (result?.message["Result"]) {
                 setSentencesToHighlight(result.message["Result"]);
                 highlightSentences(
                   result.message["Result"],
@@ -189,10 +195,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
             }
             setReviewedData((prevData: any) => ({
               ...prevData,
-              bullet_point_length: result?.message,
+              bullet_point_length: result?.message?result?.message:"not available",
             }));
           } else {
-            setSentencesToHighlight(reviewedData.bullet_point_length.Result);
+            setSentencesToHighlight(reviewedData.data.bullet_point_length.Result);
           }
           break;
         case "bullet_points_improver":
@@ -215,11 +221,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
             }
             setReviewedData((prevData: any) => ({
               ...prevData,
-              bullet_points_improver: result?.message,
+              bullet_points_improver: result?.message? result?.message:"not available",
             }));
           } else {
-            const bulletPoints =
-              reviewedData.bullet_points_improver.bulletPoints;
+            const bulletPoints = reviewedData.bullet_points_improver.bulletPoints;
             bulletPoints.forEach((bulletPoint: any) => {
               const textToHighlight = [bulletPoint.original]; // Wrap in array
               setSentencesToHighlight((prevState) => [
@@ -239,154 +244,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
             result = await analyzeResume(endpoint, data, query);
             setReviewedData((prevData: any) => ({
               ...prevData,
-              total_bullet_points: result?.message,
+              total_bullet_points: result?.message?result?.message:"not available",
             }));
-          }
-          break;
-        case "verb_tense_checker":
-          if (!reviewedData.verb_tense_checker) {
-            endpoint = "/verb_tense";
-            data = {
-              extracted_data: structuredData,
-            };
-            query = "";
-            result = await analyzeResume(endpoint, data, query);
-            if (result?.message) {
-              const sentencesToHighlight = Object.values(
-                result.message
-              ).flatMap((item: any) => item.correction);
-
-              if (sentencesToHighlight.length > 0) {
-                setSentencesToHighlight(sentencesToHighlight);
-                highlightSentences(sentencesToHighlight, "highlighted", false);
-              }
-            }
-
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              verb_tense_checker: result?.message,
-            }));
-          } else {
-            const sentencesToHighlight = Object.values(
-              reviewedData.verb_tense_checker
-            ).flatMap((item: any) => item.correction);
-
-            if (sentencesToHighlight.length > 0) {
-              setSentencesToHighlight(sentencesToHighlight);
-            }
-          }
-          break;
-        case "weak_verb_checker":
-          if (!reviewedData.weak_verb_checker) {
-            endpoint = "/weak_verb_checker";
-            data = {
-              extracted_data: structuredData,
-            };
-            result = await analyzeResume(endpoint, data, query);
-            if (result?.message) {
-              const sentencesToHighlight = Object.keys(result.message);
-              console.log("Sentences to Highlight:", sentencesToHighlight);
-
-              if (sentencesToHighlight.length > 0) {
-                setSentencesToHighlight(sentencesToHighlight);
-                highlightSentences(sentencesToHighlight, "highlighted", false);
-              } else {
-                console.error("No sentences to highlight found.");
-              }
-            }
-
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              weak_verb_checker: result?.message,
-            }));
-          } else {
-            const sentencesToHighlight = Object.keys(
-              reviewedData.weak_verb_checker
-            );
-
-            if (sentencesToHighlight.length > 0) {
-              setSentencesToHighlight(sentencesToHighlight);
-            }
-          }
-          break;
-        case "section_checker":
-          if (!reviewedData.section_checker) {
-            endpoint = "/section_checker";
-            data = {
-              extracted_data: structuredData,
-            };
-            result = await analyzeResume(endpoint, data, query);
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              section_checker: result.message,
-            }));
-          }
-          break;
-        case "skill_checker":
-          if (!reviewedData.skill_checker) {
-            endpoint = "/skill_checker";
-            data = {
-              extracted_data: structuredData,
-            };
-            query = `?profile=${profile}`;
-            result = await analyzeResume(endpoint, data, query);
-            if (result?.message?.["HARD"]) {
-              setSentencesToHighlight(result.message["HARD"]);
-              highlightSentences(result.message["HARD"], "highlighted", false);
-            }
-            if (result?.message?.["SOFT"]) {
-              setSentencesToHighlight(result.message["SOFT"]);
-              highlightSentences(result.message["SOFT"], "highlighted", false);
-            }
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              skill_checker: result?.message,
-            }));
-          } else {
-            const hardSkills = reviewedData.skill_checker.HARD;
-            const softSkills = reviewedData.skill_checker.SOFT;
-
-            if (hardSkills.length > 0) {
-              setSentencesToHighlight(hardSkills);
-              highlightSentences(hardSkills, "highlighted", false);
-            }
-            if (softSkills.length > 0) {
-              setSentencesToHighlight(softSkills);
-              highlightSentences(softSkills, "highlighted", false);
-            }
-          }
-          break;
-        case "repetition_checker":
-          if (!reviewedData.repetition_checker) {
-            endpoint = "/repetition";
-            data = {
-              extracted_data: structuredData,
-            };
-            query = "";
-            result = await analyzeResume(endpoint, data, query);
-            if (result?.message) {
-              const sentencesToHighlight = Object.values(
-                result.message
-              ).flatMap((item: any) => item.text);
-
-              if (sentencesToHighlight.length > 0) {
-                setSentencesToHighlight(sentencesToHighlight);
-                highlightSentences(sentencesToHighlight, "highlighted", false);
-              }
-            }
-
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              repetition_checker: result?.message,
-            }));
-          } else {
-            const sentencesToHighlight = Object.values(
-              reviewedData.repetition_checker
-            ).flatMap((item: any) => item.text);
-
-            if (sentencesToHighlight.length > 0) {
-              setSentencesToHighlight(sentencesToHighlight);
-            }
           }
           break;
         case "personal_info":
@@ -398,7 +257,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
             result = await analyzeResume(endpoint, data, query);
             setReviewedData((prevData: any) => ({
               ...prevData,
-              personal_info: result?.message,
+              personal_info: result?.message?result?.message:"not available",
             }));
           }
           break;
@@ -422,7 +281,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
 
             setReviewedData((prevData: any) => ({
               ...prevData,
-              responsibility_checker: result?.message,
+              responsibility_checker: result?.message?result?.message:"not available",
             }));
           } else {
             const sentencesToHighlight = Object.values(
@@ -434,91 +293,237 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
             }
           }
           break;
-        case "spelling_checker":
-          if (!reviewedData.spelling_checker) {
-            endpoint = "/spelling_checker";
-            data = {
-              extracted_data: structuredData,
-            };
-            result = await analyzeResume(endpoint, data, query);
-            if (result?.message?.["Result"]) {
-              setSentencesToHighlight(result.message["Result"]);
-              highlightSentences(
-                result.message["Result"],
-                "highlighted",
-                false
-              );
-            }
-            setReviewedData((prevData: any) => ({
-              ...prevData,
-              spelling_checker: result?.message,
-            }));
-          } else {
-            setSentencesToHighlight(reviewedData.spelling_checker.Result);
-          }
-          break;
+          
+        // case "summary":
+        //   if (!reviewedData.summary) {
+        //     endpoint = "/summary";
+        //     data = {
+        //       cv_text: extractedText,
+        //     };
+        //     result = await analyzeResume(endpoint, data, query);
+
+        //     // if (!reviewedData.summary) {
+        //     setReviewedData((prevData: any) => ({
+        //       ...prevData,
+        //       summary: result?.message,
+        //     }));
+        //     // }
+        //   }
+        //   break;
+        // case "quantification_checker":
+        //   if (!reviewedData.quantification_checker) {
+        //     endpoint = "/quantification";
+        //     data = {
+        //       extracted_data: structuredData,
+        //     };
+        //     result = await analyzeResume(endpoint, data, query);
+        //     //console.log("qualification", result.message)
+        //     if (result?.message?.["Not Quantify"]) {
+        //       setSentencesToHighlight(result.message["Not Quantify"]);
+        //       highlightSentences(
+        //         result.message["Not Quantify"],
+        //         "highlighted",
+        //         false
+        //       );
+        //     }
+
+        //     setReviewedData((prevData: any) => ({
+        //       ...prevData,
+        //       quantification_checker: result?.message,
+        //     }));
+        //   } else {
+        //     //console.log(
+        //     //   "Sentences to highlight:",
+        //     //   reviewedData.quantification_checker["Not Quantify"]
+        //     // );
+        //     setSentencesToHighlight(
+        //       reviewedData.quantification_checker["Not Quantify"]
+        //     );
+        //   }
+        //   break;
+
+        // case "verb_tense_checker":
+        //   if (!reviewedData.verb_tense_checker) {
+        //     endpoint = "/verb_tense";
+        //     data = {
+        //       extracted_data: structuredData,
+        //     };
+        //     query = "";
+        //     result = await analyzeResume(endpoint, data, query);
+        //     if (result?.message) {
+        //       const sentencesToHighlight = Object.values(
+        //         result.message
+        //       ).flatMap((item: any) => item.correction);
+
+        //       if (sentencesToHighlight.length > 0) {
+        //         setSentencesToHighlight(sentencesToHighlight);
+        //         highlightSentences(sentencesToHighlight, "highlighted", false);
+        //       }
+        //     }
+
+        //     setReviewedData((prevData: any) => ({
+        //       ...prevData,
+        //       verb_tense_checker: result?.message,
+        //     }));
+        //   } else {
+        //     const sentencesToHighlight = Object.values(
+        //       reviewedData.verb_tense_checker
+        //     ).flatMap((item: any) => item.correction);
+
+        //     if (sentencesToHighlight.length > 0) {
+        //       setSentencesToHighlight(sentencesToHighlight);
+        //     }
+        //   }
+        //   break;
+        // case "weak_verb_checker":
+        //   if (!reviewedData.weak_verb_checker) {
+        //     endpoint = "/weak_verb_checker";
+        //     data = {
+        //       extracted_data: structuredData,
+        //     };
+        //     result = await analyzeResume(endpoint, data, query);
+        //     if (result?.message) {
+        //       const sentencesToHighlight = Object.keys(result.message);
+        //       //console.log("Sentences to Highlight:", sentencesToHighlight);
+
+        //       if (sentencesToHighlight.length > 0) {
+        //         setSentencesToHighlight(sentencesToHighlight);
+        //         highlightSentences(sentencesToHighlight, "highlighted", false);
+        //       } else {
+        //         console.error("No sentences to highlight found.");
+        //       }
+        //     }
+
+        //     setReviewedData((prevData: any) => ({
+        //       ...prevData,
+        //       weak_verb_checker: result?.message,
+        //     }));
+        //   } else {
+        //     const sentencesToHighlight = Object.keys(
+        //       reviewedData.weak_verb_checker
+        //     );
+
+        //     if (sentencesToHighlight.length > 0) {
+        //       setSentencesToHighlight(sentencesToHighlight);
+        //     }
+        //   }
+        //   break;
+        // case "section_checker":
+        //   if (!reviewedData.section_checker) {
+        //     endpoint = "/section_checker";
+        //     data = {
+        //       extracted_data: structuredData,
+        //     };
+        //     result = await analyzeResume(endpoint, data, query);
+        //     setReviewedData((prevData: any) => ({
+        //       ...prevData,
+        //       section_checker: result.message,
+        //     }));
+        //   }
+        //   break;
+        // case "skill_checker":
+        //   if (!reviewedData?.data?.skillsassessment) {
+        //     endpoint = "/skill_checker";
+        //     data = {
+        //       extracted_data: structuredData,
+        //     };
+        //     query = `?profile=${profile}`;
+        //     result = await analyzeResume(endpoint, data, query);
+        //     if (result?.message?.["HARD"]) {
+        //       setSentencesToHighlight(result.message["HARD"]);
+        //       highlightSentences(result.message["HARD"], "highlighted", false);
+        //     }
+        //     if (result?.message?.["SOFT"]) {
+        //       setSentencesToHighlight(result.message["SOFT"]);
+        //       highlightSentences(result.message["SOFT"], "highlighted", false);
+        //     }
+        //     setReviewedData((prevData: any) => ({
+        //       ...prevData,
+        //       skill_checker: result?.message,
+        //     }));
+        //   } else {
+        //     const hardSkills = reviewedData?.data?.skillsassessment.HARD;
+        //     const softSkills = reviewedData?.data?.skillsassessment.SOFT;
+
+        //     if (hardSkills.length > 0) {
+        //       setSentencesToHighlight(hardSkills);
+        //       highlightSentences(hardSkills, "highlighted", false);
+        //     }
+        //     if (softSkills.length > 0) {
+        //       setSentencesToHighlight(softSkills);
+        //       highlightSentences(softSkills, "highlighted", false);
+        //     }
+        //   }
+        //   break;
+        // case "repetition_checker":
+        //   if (!reviewedData.repetition_checker) {
+        //     endpoint = "/repetition";
+        //     data = {
+        //       extracted_data: structuredData,
+        //     };
+        //     query = "";
+        //     result = await analyzeResume(endpoint, data, query);
+        //     if (result?.message) {
+        //       const sentencesToHighlight = Object.values(
+        //         result.message
+        //       ).flatMap((item: any) => item.text);
+
+        //       if (sentencesToHighlight.length > 0) {
+        //         setSentencesToHighlight(sentencesToHighlight);
+        //         highlightSentences(sentencesToHighlight, "highlighted", false);
+        //       }
+        //     }
+
+        //     setReviewedData((prevData: any) => ({
+        //       ...prevData,
+        //       repetition_checker: result?.message,
+        //     }));
+        //   } else {
+        //     const sentencesToHighlight = Object.values(
+        //       reviewedData.repetition_checker
+        //     ).flatMap((item: any) => item.text);
+
+        //     if (sentencesToHighlight.length > 0) {
+        //       setSentencesToHighlight(sentencesToHighlight);
+        //     }
+        //   }
+        //   break;
+
+        // case "spelling_checker":
+        //   if (!reviewedData.spelling_checker) {
+        //     endpoint = "/spelling_checker";
+        //     data = {
+        //       extracted_data: structuredData,
+        //     };
+        //     result = await analyzeResume(endpoint, data, query);
+        //     if (result?.message?.["Result"]) {
+        //       setSentencesToHighlight(result.message["Result"]);
+        //       highlightSentences(
+        //         result.message["Result"],
+        //         "highlighted",
+        //         false
+        //       );
+        //     }
+        //     setReviewedData((prevData: any) => ({
+        //       ...prevData,
+        //       spelling_checker: result?.message,
+        //     }));
+        //   } else {
+        //     setSentencesToHighlight(reviewedData.spelling_checker.Result);
+        //   }
+        //   break;
         default:
-          console.log("Unknown analysis type");
+          //console.log("Unknown analysis type");
           return;
+
       }
       setIsTextLayerReady(true);
+      console.log("lorem",reviewedData)
     },
     [structuredData, extractedText, profile, reviewedData]
   );
-  const uploadAnalysis = async (cvId: string, analysisData: any) => {
-    try {
-      const response = await fetch("api/interviewer/post_analysis", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cvId, analysisData }),
-      });
-  
-      const result = await response.json();
-  
-      if (!response.ok) {
-        console.error("Failed to upload analysis:", result.error);
-        return;
-      }
-      return result.analysis;
-    } catch (error) {
-      console.error("Error uploading analysis:", error);
-    }
-  };
-  
-  useEffect(() => {
-    const runAnalysisAndUpload = async () => {
-      const analysisData = {
-        summary: reviewedData.summary,
-        resumeScore: reviewedData.resume_score?.FINAL_SCORE,
-        hardSkillsScore: reviewedData.resume_score?.DETAILS?.HARD_SKILLS_SCORE?.score,
-        softSkillsScore: reviewedData.resume_score?.DETAILS?.SOFT_SKILLS_SCORE?.score,
-        experienceScore: reviewedData.resume_score?.DETAILS?.EXPERIENCE_SCORE?.score,
-        educationScore: reviewedData.resume_score?.DETAILS?.EDUCATION_SCORE?.score,
-        quantificationIssues: reviewedData.quantification_checker?.["Not Quantify"],
-        bulletPointLength: reviewedData.bullet_point_length,
-        bulletPointImprovements: reviewedData.bullet_points_improver?.bulletPoints,
-        verbTenseIssues: reviewedData.verb_tense_checker,
-        weakVerbUsage: reviewedData.weak_verb_checker,
-        repetitionIssues: reviewedData.repetition_checker,
-        sectionFeedback: reviewedData.section_checker,
-        skillAnalysis: reviewedData.skill_checker,
-        spellingIssues: reviewedData.spelling_checker?.Result,
-        responsibilityIssues: reviewedData.responsibility_checker,
-      }; 
-      const result = await uploadAnalysis(cvId, analysisData);
-  
-      if (result) {
-        console.log("Analysis successfully linked to CV:", result);
-      }
-    };
-  
-    if (reviewedData) {
-      runAnalysisAndUpload();
-    }
-  }, [reviewedData]);
-  
+
+
   const highlightSentences = useCallback(
     (
       list_of_sentences: any,
@@ -642,6 +647,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
   );
 
   useEffect(() => {
+    setLoading(true)
+    if (resumeId) {
+      (async () => {
+        await fetchResumeAnalysis(resumeId);
+        setLoading(false)
+      })()
+    }
     if (resumeFile && !isRendered) {
       const timer = setTimeout(() => {
         if (canvasRef.current) {
@@ -652,695 +664,695 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile,cvId }) => {
 
       return () => clearTimeout(timer); // Cleanup the timer
     }
-  }, [resumeFile]);
-
-  useEffect(() => {
     if (isTextLayerReady) {
       highlightSentences(sentencesToHighlight, "highlighted", false);
     }
-  }, [isTextLayerReady, sentencesToHighlight]);
+  }, [isTextLayerReady, sentencesToHighlight, resumeFile, resumeId, setLoading]);
 
-  console.log("Reviewed Data:", reviewedData);
 
-  useEffect(() => {
-    runAnalysis("resume_score");
-    runAnalysis("summary");
-  }, []);
+  //console.log("Reviewed Data:", reviewedData);
+
+  // useEffect(() => {
+  //   runAnalysis("resume_score");
+  //   runAnalysis("summary");
+  // }, []);
 
   return (
     <div className="flex h-full justify-between bg-primary-foreground items-stretch gap-2 px-2 pl-0">
-      <div
-        className="w-full bg-[#fafafa] rounded-tr-lg max-w-[220px] flex flex-col gap-2 "
-        style={{
-          boxShadow: "0px 0px 15px -5px rgba(0, 0, 0, 0.3)",
-        }}
-      >
-        <div
-          className={`w-full p-8 text-[1.6rem] font-semibold ${getColorClass(
-            reviewedData.resume_score?.FINAL_SCORE
-          )} rounded-lg`}
-        >
-          <CircularProgressbarWithChildren
-            strokeWidth={6}
-            value={
-              reviewedData.resume_score
-                ? reviewedData.resume_score.FINAL_SCORE.toFixed(1)
-                : 0
-            }
-            styles={{
-              path: {
-                stroke: getColor(reviewedData.resume_score?.FINAL_SCORE),
-                strokeLinecap: "round",
-              },
+      {loading ? (<div className="flex items-center justify-center w-full min-h-screen"><span className="w-16 h-16 border-4 border-x-gray-400 border-t-gray-400 rounded-full animate-spin"></span></div>) : (
+        <>
+          <div
+            className="w-full bg-[#fafafa] rounded-tr-lg max-w-[220px] flex flex-col gap-2 "
+            style={{
+              boxShadow: "0px 0px 15px -5px rgba(0, 0, 0, 0.3)",
             }}
           >
-            {reviewedData.resume_score &&
-              reviewedData.resume_score.FINAL_SCORE.toFixed(0)}
-          </CircularProgressbarWithChildren>
-        </div>
-        <div className="h-full p-4 rounded-lg flex-grow">
-          <h2 className="text-lg font-semibold">Resume Evaluation</h2>
-          <div className="h-[1px] bg-slate-300 w-full mb-4"></div>
-          <div className="flex flex-col w-full">
-            <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
-              <span className="font-medium">Hard Skill:</span>
-              <span
-                className={`ml-2 ${getColorClass(
-                  reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE?.score
-                )}`}
+            <div
+              className={`w-full p-8 text-[1.6rem] font-semibold ${getColorClass(
+                reviewedData?.data?.score
+              )} rounded-lg`}
+            >
+              <CircularProgressbarWithChildren
+                strokeWidth={6}
+                value={
+                  reviewedData?.data?.score
+                    ? reviewedData?.data?.score.toFixed(1)
+                    : 0
+                }
+                styles={{
+                  path: {
+                    stroke: getColor(reviewedData?.data?.score),
+                    strokeLinecap: "round",
+                  },
+                }}
               >
-                {reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE?.score ??
-                  "N/A"}
-                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                  {reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE
-                    ?.reason ?? "No details available"}
-                </div>
-              </span>
+                {reviewedData?.data?.score &&
+                  reviewedData?.data?.score.toFixed(0)}
+              </CircularProgressbarWithChildren>
             </div>
-            <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
-              <span className="font-medium">Soft Skill:</span>
-              <span
-                className={`ml-2 ${getColorClass(
-                  reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score
-                )}`}
-              >
-                {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score ??
-                  "N/A"}
-                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                  {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE
-                    ?.reason ?? "No details available"}
+            <div className="h-full p-4 rounded-lg flex-grow">
+              <h2 className="text-lg font-semibold">Resume Evaluation</h2>
+              <div className="h-[1px] bg-slate-300 w-full mb-4"></div>
+              <div className="flex flex-col w-full">
+                <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
+                  <span className="font-medium">Hard Skill:</span>
+                  <span
+                    className={`ml-2 ${getColorClass(
+                      reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE?.score
+                    )}`}
+                  >
+                    {reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE?.score ??
+                      "N/A"}
+                    <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                      {reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE
+                        ?.reason ?? "No details available"}
+                    </div>
+                  </span>
                 </div>
-              </span>
-            </div>
-            <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
-              <span className="font-medium">Experience:</span>
-              <span
-                className={`ml-2 ${getColorClass(
-                  reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE?.score
-                )}`}
-              >
-                {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE?.score ??
-                  "N/A"}
-                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                  {reviewedData.resume_score?.DETAILS.EXPERIENCE_SCORE
-                    ?.reason ?? "No details available"}
+                <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
+                  <span className="font-medium">Soft Skill:</span>
+                  <span
+                    className={`ml-2 ${getColorClass(
+                      reviewedData?.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score
+                    )}`}
+                  >
+                    {reviewedData?.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score ??
+                      "N/A"}
+                    <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                      {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE
+                        ?.reason ?? "No details available"}
+                    </div>
+                  </span>
                 </div>
-              </span>
-            </div>
-            <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
-              <span className="font-medium">Education:</span>
-              <span
-                className={`ml-2 ${getColorClass(
-                  reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.score
-                )}`}
-              >
-                {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.score ??
-                  "N/A"}
-                <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                  {reviewedData.resume_score?.DETAILS.EDUCATION_SCORE?.reason ??
-                    "No details available"}
+                <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
+                  <span className="font-medium">Experience:</span>
+                  <span
+                    className={`ml-2 ${getColorClass(
+                      reviewedData?.resume_score?.DETAILS.EXPERIENCE_SCORE?.score
+                    )}`}
+                  >
+                    {reviewedData?.resume_score?.DETAILS.EXPERIENCE_SCORE?.score ??
+                      "N/A"}
+                    <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                      {reviewedData?.resume_score?.DETAILS.EXPERIENCE_SCORE
+                        ?.reason ?? "No details available"}
+                    </div>
+                  </span>
                 </div>
-              </span>
-            </div>
-            {!reviewedData.resume_score && (
-              <div className="text-sm text-gray-500">
-                Scores are not available at the moment.{" "}
-                <button
-                  onClick={() => runAnalysis("resume_score")}
-                  className="underline hover:text-primary"
-                >
-                  Please try again
-                </button>
+                <div className="flex items-center hover:bg-slate-200 duration-300 py-2 px-4 relative group rounded-md cursor-pointer ">
+                  <span className="font-medium">Education:</span>
+                  <span
+                    className={`ml-2 ${getColorClass(
+                      reviewedData?.resume_score?.DETAILS.EDUCATION_SCORE?.score
+                    )}`}
+                  >
+                    {reviewedData?.resume_score?.DETAILS.EDUCATION_SCORE?.score ??
+                      "N/A"}
+                    <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
+                      {reviewedData?.resume_score?.DETAILS.EDUCATION_SCORE?.reason ??
+                        "No details available"}
+                    </div>
+                  </span>
+                </div>
+                {!reviewedData?.resume_score && (
+                  <div className="text-sm text-gray-500">
+                    Scores are not available at the moment.{" "}
+                    <button
+                      onClick={() => runAnalysis("resume_score")}
+                      className="underline hover:text-primary"
+                    >
+                      Please try again
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
-        </div>
-      </div>
-      <div className="w-full px-2 py-4 rounded-lg h-[calc(100vh-5rem)] overflow-auto scrollbar-hide text-[#202020] ">
-        <div>
-          <h3 className="text-lg text-primary font-bold text-[#666]">
-            Hello, {userData?.name?.trim().split(" ")[0] || "User"}!
-          </h3>
-          <p className="pl-2 text-[#888] font-semibold text-sm">
-            Click on different parameters to get detailed analysis
-          </p>
-          <h2 className="text-xl font-bold mt-2">Summary</h2>
-          <Dialog>
-            <DialogTrigger className="px-4 py-2 bg-white shadow rounded-lg ">
-              <div className="line-clamp-3 rounded-lg text-left text-sm font-medium text-[#333]">
-                {reviewedData.summary && reviewedData.summary.Summary}
-              </div>
-            </DialogTrigger>
-            <DialogContent className="">
-              <DialogHeader>
-                <DialogTitle>Summary</DialogTitle>
-                <DialogDescription className="text-sm">
-                  {reviewedData.summary && reviewedData.summary.Summary}
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
-        </div>
-        <div>
-          <h2 className="text-xl font-bold h-full">Fixes or Corrections</h2>
-          <div className="flex flex-wrap justify-between bg-[#fafafa] shadow rounded-lg items-start gap-y-4 gap-x-2 p-4 ">
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("quantification_checker")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/2.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Quantification Checker
+          <div className="w-full px-2 py-4 rounded-lg h-[calc(100vh-5rem)] overflow-auto scrollbar-hide text-[#202020] ">
+            <div>
+              <h3 className="text-lg text-primary font-bold text-[#666]">
+                Hello, {userData?.name?.trim().split(" ")[0] || "User"}!
+              </h3>
+              <p className="pl-2 text-[#888] font-semibold text-sm">
+                Click on different parameters to get detailed analysis
+              </p>
+              <h2 className="text-xl font-bold mt-2">Summary</h2>
+              <Dialog>
+                <DialogTrigger className="px-4 py-2 bg-white shadow rounded-lg ">
+                  <div className="line-clamp-3 rounded-lg text-left text-sm font-medium text-[#333]">
+                    {reviewedData?.data?.summary || "No summary available"}
                   </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle>Quantification Checker</DialogTitle>
-                  <DialogDescription className="">
-                    <Accordion type="single" collapsible>
-                      <AccordionItem value={`item-1`}>
-                        {reviewedData["quantification_checker"] && (
-                          <AccordionTrigger>
-                            Needs Quantification
-                          </AccordionTrigger>
-                        )}
-                        {reviewedData["quantification_checker"] &&
-                          reviewedData["quantification_checker"][
-                            "Not Quantify"
-                          ].map((data: string, index: number) => {
-                            return (
-                              <AccordionContent key={index}>
-                                {data}
-                              </AccordionContent>
-                            );
-                          })}
-                      </AccordionItem>
-                      <AccordionItem value={`item-2`}>
-                        {reviewedData["quantification_checker"] && (
-                          <AccordionTrigger>Quantified</AccordionTrigger>
-                        )}
-                        {reviewedData["quantification_checker"] &&
-                          reviewedData["quantification_checker"][
-                            "Quantify"
-                          ].map((data: string, index: number) => {
-                            return (
-                              <AccordionContent key={index}>
-                                {data}
-                              </AccordionContent>
-                            );
-                          })}
-                      </AccordionItem>
-                    </Accordion>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("bullet_point_length")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/3.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Bullet Point Length
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle>Bullet Point Length</DialogTitle>
-                  <DialogDescription>
-                    {reviewedData.bullet_point_length &&
-                    reviewedData.bullet_point_length.length === 0 ? (
-                      reviewedData.bullet_point_length.Result.map(
-                        (data: string, ind: number) => {
-                          return <div key={ind}>{data}</div>;
-                        }
-                      )
-                    ) : (
-                      <div>Nothing to Show</div>
-                    )}
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("bullet_points_improver")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/4.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Bullet Points Improver
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle> Bullet Points Improver </DialogTitle>
-                  <DialogDescription>
-                    <Accordion type="single" collapsible>
-                      {reviewedData.bullet_points_improver &&
-                        reviewedData.bullet_points_improver.bulletPoints.map(
-                          (data: any, ind: number) => (
-                            <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                              <AccordionTrigger className="text-left">
-                                Original: {data.original}
+                </DialogTrigger>
+                <DialogContent className="">
+                  <DialogHeader>
+                    <DialogTitle>Summary</DialogTitle>
+                    <DialogDescription className="text-sm">
+                      {reviewedData?.data?.summary || "No summary available"}
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold h-full">Fixes or Corrections</h2>
+              <div className="flex flex-wrap justify-between bg-[#fafafa] shadow rounded-lg items-start gap-y-4 gap-x-2 p-4 ">
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                  // onClick={() => runAnalysis("quantification_checker")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/2.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Quantification Checker
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle>Quantification Checker</DialogTitle>
+                      <DialogDescription className="">
+                        <Accordion type="single" collapsible>
+                          <AccordionItem value={`item-1`}>
+                            {reviewedData?.data?.quantification && (
+                              <AccordionTrigger>
+                                Needs Quantification
                               </AccordionTrigger>
-                              <AccordionContent>
-                                Improved: {data.improved}
-                              </AccordionContent>
-                            </AccordionItem>
+                            )}
+                            {reviewedData?.data?.quantification &&
+                              reviewedData?.data?.quantification["Not Quantified"]?.map((data: string, index: number) => {
+                                return (
+                                  <AccordionContent key={index}>
+                                    {data}
+                                  </AccordionContent>
+                                );
+                              })}
+                          </AccordionItem>
+                          <AccordionItem value={`item-2`}>
+                            {reviewedData?.data?.quantification && (
+                              <AccordionTrigger>Quantified</AccordionTrigger>
+                            )}
+                            {reviewedData?.data?.quantification ?
+                              reviewedData?.data?.quantification["Quantified"]?.map((data: string, index: number) => {
+                                return (
+                                  <AccordionContent key={index}>
+                                    {data}
+                                  </AccordionContent>
+                                );
+                              }) : (<AccordionContent key={"N/A"}>
+                                {"N/A"}
+                              </AccordionContent>)}
+                          </AccordionItem>
+                        </Accordion>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                    onClick={() => {
+                      runAnalysis("bullet_point_length")}}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/3.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Bullet Point Length
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle>Bullet Point Length</DialogTitle>
+                      <DialogDescription>
+                        {reviewedData.bullet_point_length &&
+                          reviewedData.bullet_point_length.length === 0 ? (
+                          reviewedData.bullet_point_length.Result.map(
+                            (data: string, ind: number) => {
+                              return <div key={ind}>{data}</div>;
+                            }
                           )
+                        ) : (
+                          <div>Nothing to Show</div>
                         )}
-                    </Accordion>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("total_bullet_points")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/5.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Total Bullet Points
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle> Total Bullet Points </DialogTitle>
-                  <DialogDescription>
-                    {reviewedData.total_bullet_points &&
-                      reviewedData.total_bullet_points.Result}
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("verb_tense_checker")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/6.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Verb Tense Checker
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle> Verb Tense Checker </DialogTitle>
-                  <DialogDescription>
-                    <Accordion type="single" collapsible>
-                      {reviewedData.verb_tense_checker && (
-                        <div>
-                          {" "}
-                          {Object.keys(reviewedData.verb_tense_checker).map(
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                    onClick={() => runAnalysis("bullet_points_improver")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/4.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Bullet Points Improver
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle> Bullet Points Improver </DialogTitle>
+                      <DialogDescription>
+                        <Accordion type="single" collapsible> 
+                          {reviewedData?.bullet_points_improver &&
+                            reviewedData?.bullet_points_improver?.bulletPoints?.map(
+                              (data: any, ind: number) => (
+                                <AccordionItem value={`item-${ind + 1}`} key={ind}>
+                                  <AccordionTrigger className="text-left">
+                                    Original: {data.original}
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                    Improved: {data.improved}
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )
+                            )}
+                        </Accordion>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                    onClick={() => runAnalysis("total_bullet_points")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/5.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Total Bullet Points
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle> Total Bullet Points </DialogTitle>
+                      <DialogDescription>
+                        {reviewedData.total_bullet_points &&
+                          reviewedData.total_bullet_points.Result}
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                  // onClick={() => runAnalysis("verb_tense_checker")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/6.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Verb Tense Checker
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle> Verb Tense Checker </DialogTitle>
+                      <DialogDescription>
+                        <Accordion type="single" collapsible>
+                          {reviewedData?.data?.verbtense && (
+                            <div>
+                              {" "}
+                              {Object.keys(reviewedData?.data?.verbtense).map(
+                                (key, ind: number) => (
+                                  <AccordionItem
+                                    value={`item-${ind + 1}`}
+                                    key={ind}
+                                  >
+                                    <AccordionTrigger className="text-left">
+                                      {key}
+                                    </AccordionTrigger>
+                                    {Object.keys(reviewedData?.data?.verbtense[key]).map((key1, ind1: number) => (
+                                      <>
+                                        <AccordionContent>
+                                          <span className="mr-2">Correction:</span>
+                                          {
+                                            reviewedData?.data?.verbtense[key][key1].correction
+                                          }
+                                        </AccordionContent>
+                                        <AccordionContent>
+                                          <span className="mr-2">
+                                            Reason:
+                                          </span>
+                                          {reviewedData?.data?.verbtense[key][key1].explanation}
+                                        </AccordionContent>
+                                        <AccordionContent>
+                                          <span className="mr-2">
+                                            Impact:
+                                          </span>
+                                          {reviewedData?.data?.verbtense[key][key1].impact}
+                                        </AccordionContent>
+                                      </>
+                                    ))}
+                                  </AccordionItem>
+                                )
+                              )}
+                            </div>
+                          )}
+                        </Accordion>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                  // onClick={() => runAnalysis("weak_verb_checker")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/7.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Weak Verb Checker
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle> Weak Verb Checker </DialogTitle>
+                      <DialogDescription>
+                        <Accordion type="single" collapsible>
+                          {reviewedData?.data?.verbstrength &&
+                            Object.keys(reviewedData?.data?.verbstrength["Weak Verbs"]).map(
+                              (key, ind: number) => (
+                                <AccordionItem value={`item-${ind + 1}`} key={ind}>
+                                  <AccordionTrigger className="text-left">
+                                    {key}
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                    {reviewedData?.data?.verbstrength["Weak Verbs"][key].join(", ")}
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )
+                            )}
+                        </Accordion>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                  // onClick={() => runAnalysis("section_checker")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/8.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Section Checker
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle> Section Checker </DialogTitle>
+                      <DialogDescription>
+                        <Accordion type="single" collapsible>
+                          {reviewedData?.data?.sectionanalysis &&
+                            Object.keys(reviewedData?.data?.sectionanalysis).map(
+                              (key, ind: number) => (
+                                <AccordionItem value={`item-${ind + 1}`} key={ind}>
+                                  <AccordionTrigger className="text-left">
+                                    {key}
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                    {reviewedData?.data?.sectionanalysis[key]?.map(data => { return <div>{data}</div> })}
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )
+                            )}
+                        </Accordion>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                  // onClick={() => runAnalysis("skill_checker")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/9.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Skill Checker
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle> Skill Checker </DialogTitle>
+                      <DialogDescription>
+                        <Accordion type="single" collapsible>
+                          {reviewedData?.data?.skillsassessment &&
+                            Object.keys(reviewedData?.data?.skillsassessment).map(
+                              (key, ind: number) => (
+                                <AccordionItem value={`item-${ind + 1}`} key={ind}>
+                                  <AccordionTrigger className="text-left">
+                                    {key}
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                    {reviewedData?.data?.skillsassessment[key].join(", ")}
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )
+                            )}
+                        </Accordion>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                  // onClick={() => runAnalysis("repetition_checker")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/10.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Repetition Checker
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle> Repetition Checker </DialogTitle>
+                      <DialogDescription>
+                        <Accordion type="single" collapsible>
+                          {reviewedData?.data?.repetition &&
+                            Object.keys(reviewedData?.data?.repetition).map(
+                              (key, ind: number) => (
+                                <AccordionItem value={`item-${ind + 1}`} key={ind}>
+                                  {Object.keys(reviewedData?.data?.repetition[key])?.map((key1, ind1: number) => {
+                                    return <>
+                                      <AccordionTrigger className="text-left">
+                                        {key1}
+                                      </AccordionTrigger>
+                                      <AccordionContent>
+                                        {reviewedData?.data?.repetition[key][key1]}
+                                      </AccordionContent>
+                                    </>
+                                  }
+                                  )}
+
+                                </AccordionItem>
+                              )
+                            )}
+                        </Accordion>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                    onClick={() => runAnalysis("personal_info")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/11.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Personal Info
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogTitle> Personal Info </DialogTitle>
+                    <DialogDescription>
+                      <Accordion type="single" collapsible>
+                        {reviewedData.personal_info &&
+                          Object.keys(reviewedData.personal_info).map(
                             (key, ind: number) => (
-                              <AccordionItem
-                                value={`item-${ind + 1}`}
-                                key={ind}
-                              >
+                              <AccordionItem value={`item-${ind + 1}`} key={ind}>
                                 <AccordionTrigger className="text-left">
                                   {key}
                                 </AccordionTrigger>
                                 <AccordionContent>
-                                  Correction:{" "}
-                                  {
-                                    reviewedData.verb_tense_checker[key]
-                                      .correction
-                                  }
-                                </AccordionContent>
-                                <AccordionContent>
-                                  Reason:{" "}
-                                  {reviewedData.verb_tense_checker[key].reason}
-                                </AccordionContent>
-                                <AccordionContent>
-                                  Impact:{" "}
-                                  {reviewedData.verb_tense_checker[key].impact}
+                                  {reviewedData.personal_info[key]}
                                 </AccordionContent>
                               </AccordionItem>
                             )
                           )}
-                        </div>
-                      )}
-                    </Accordion>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("weak_verb_checker")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/7.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Weak Verb Checker
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle> Weak Verb Checker </DialogTitle>
-                  <DialogDescription>
-                    <Accordion type="single" collapsible>
-                      {reviewedData.weak_verb_checker &&
-                        Object.keys(reviewedData.weak_verb_checker).map(
-                          (key, ind: number) => (
-                            <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                              <AccordionTrigger className="text-left">
-                                {key}
-                              </AccordionTrigger>
-                              <AccordionContent>
-                                {reviewedData.weak_verb_checker[key].join(", ")}
-                              </AccordionContent>
-                            </AccordionItem>
-                          )
-                        )}
-                    </Accordion>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("section_checker")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/8.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Section Checker
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle> Section Checker </DialogTitle>
-                  <DialogDescription>
-                    <Accordion type="single" collapsible>
-                      {reviewedData.section_checker &&
-                        Object.keys(reviewedData.section_checker).map(
-                          (key, ind: number) => (
-                            <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                              <AccordionTrigger className="text-left">
-                                {key}
-                              </AccordionTrigger>
-                              <AccordionContent>
-                                {reviewedData.section_checker[key]}
-                              </AccordionContent>
-                            </AccordionItem>
-                          )
-                        )}
-                    </Accordion>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("skill_checker")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/9.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Skill Checker
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle> Skill Checker </DialogTitle>
-                  <DialogDescription>
-                    <Accordion type="single" collapsible>
-                      {reviewedData.skill_checker &&
-                        Object.keys(reviewedData.skill_checker).map(
-                          (key, ind: number) => (
-                            <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                              <AccordionTrigger className="text-left">
-                                {key}
-                              </AccordionTrigger>
-                              <AccordionContent>
-                                {reviewedData.skill_checker[key].join(", ")}
-                              </AccordionContent>
-                            </AccordionItem>
-                          )
-                        )}
-                    </Accordion>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("repetition_checker")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/10.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Repetition Checker
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle> Repetition Checker </DialogTitle>
-                  <DialogDescription>
-                    <Accordion type="single" collapsible>
-                      {reviewedData.repetition_checker &&
-                        Object.keys(reviewedData.repetition_checker).map(
-                          (key, ind: number) => (
-                            <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                              <AccordionTrigger className="text-left">
-                                {key}
-                              </AccordionTrigger>
-                              {key === "score" ? (
-                                <AccordionContent>
-                                  reviewedData.repetition_checker.score
-                                </AccordionContent>
-                              ) : (
-                                <>
+                      </Accordion>
+                    </DialogDescription>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                    onClick={() => runAnalysis("responsibility_checker")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/12.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Responsibilty
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle> Responsibility Checker </DialogTitle>
+                      <DialogDescription>
+                        <Accordion type="single" collapsible>
+                          {reviewedData.responsibility_checker &&
+                            Object.keys(reviewedData.responsibility_checker).map(
+                              (key, ind: number) => (
+                                <AccordionItem value={`item-${ind + 1}`} key={ind}>
+                                  <AccordionTrigger className="text-left">
+                                    {key}
+                                  </AccordionTrigger>
                                   <AccordionContent>
-                                    {reviewedData.repetition_checker[key].text}
+                                    Correction:{" "}
+                                    {
+                                      reviewedData.responsibility_checker[key]
+                                        .correction
+                                    }
                                   </AccordionContent>
                                   <AccordionContent>
+                                    Reason:{" "}
                                     {
-                                      reviewedData.repetition_checker[key]
+                                      reviewedData.responsibility_checker[key]
                                         .reason
                                     }
                                   </AccordionContent>
-                                </>
-                              )}
-                            </AccordionItem>
-                          )
-                        )}
-                    </Accordion>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("personal_info")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/11.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Personal Info
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogTitle> Personal Info </DialogTitle>
-                <DialogDescription>
-                  <Accordion type="single" collapsible>
-                    {reviewedData.personal_info &&
-                      Object.keys(reviewedData.personal_info).map(
-                        (key, ind: number) => (
-                          <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                            <AccordionTrigger className="text-left">
-                              {key}
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              {reviewedData.personal_info[key]}
-                            </AccordionContent>
-                          </AccordionItem>
-                        )
-                      )}
-                  </Accordion>
-                </DialogDescription>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("responsibility_checker")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/12.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Responsibilty
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle> Responsibility Checker </DialogTitle>
-                  <DialogDescription>
-                    <Accordion type="single" collapsible>
-                      {reviewedData.responsibility_checker &&
-                        Object.keys(reviewedData.responsibility_checker).map(
-                          (key, ind: number) => (
-                            <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                              <AccordionTrigger className="text-left">
-                                {key}
-                              </AccordionTrigger>
-                              <AccordionContent>
-                                Correction:{" "}
-                                {
-                                  reviewedData.responsibility_checker[key]
-                                    .correction
-                                }
-                              </AccordionContent>
-                              <AccordionContent>
-                                Reason:{" "}
-                                {
-                                  reviewedData.responsibility_checker[key]
-                                    .reason
-                                }
-                              </AccordionContent>
-                            </AccordionItem>
-                          )
-                        )}
-                    </Accordion>
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger
-                className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                onClick={() => runAnalysis("spelling_checker")}
-              >
-                <div className="flex items-center justify-center flex-col">
-                  <Image
-                    src="/cvreviewer/13.svg"
-                    height={30}
-                    width={30}
-                    alt="icon"
-                    className="-translate-y-5"
-                  ></Image>
-                  <div className="absolute top-[70px] w-full text-sm px-3 ">
-                    {" "}
-                    Spelling Checker
-                  </div>
-                </div>
-              </DialogTrigger>
-              <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
-                <DialogHeader>
-                  <DialogTitle>Spelling Checker</DialogTitle>
-                  <DialogDescription>
-                    {reviewedData.spelling_checker &&
-                      reviewedData.spelling_checker.Result.join(", ")}
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog>
+                                </AccordionItem>
+                              )
+                            )}
+                        </Accordion>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
+                  <DialogTrigger
+                    className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
+                  // onClick={() => runAnalysis("spelling_checker")}
+                  >
+                    <div className="flex items-center justify-center flex-col">
+                      <Image
+                        src="/cvreviewer/13.svg"
+                        height={30}
+                        width={30}
+                        alt="icon"
+                        className="-translate-y-5"
+                      ></Image>
+                      <div className="absolute top-[70px] w-full text-sm px-3 ">
+                        {" "}
+                        Spelling Checker
+                      </div>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
+                    <DialogHeader>
+                      <DialogTitle>Spelling Checker</DialogTitle>
+                      <DialogDescription>
+                        {reviewedData?.data?.spellingerrors &&
+                          reviewedData?.data?.spellingerrors.join(", ")}
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
       <div className=" py-2">
         <div
           className="pdf-viewer-container shadow-lg rounded-md  overflow-hidden"
