@@ -116,7 +116,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         const instance = new Mark(textLayerRef.current);
         instance.unmark();
       }
-sadfasdfasdfasdfasdfsdfsdfjaksjdlfkjaslkdfjalskdjflaskdjflskjdflasjdfkasjdflkjasdlfjsldkfj
+
       switch (analysisType) {
         case "resume_score":
           if (!reviewedData.resume_score) {

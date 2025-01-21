@@ -75,7 +75,7 @@ export default function LoginComponent() {
         if (res.user && res.accessToken) {
           setUserData(res.user, res.accessToken);
           setCookie("accessToken", res.accessToken);
-          router.push("/home");
+          router.push("/talentmatch");
         } else {
           toast.error("Failed to login");
         }

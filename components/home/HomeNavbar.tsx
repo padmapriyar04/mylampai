@@ -17,16 +17,24 @@ import { setCookie } from "@/utils/cookieUtils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useRoleStore } from "@/utils/loginStore";
+import { usePathname } from "next/navigation";
 
 const HomeNavbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
   const { data } = useSession();
+  const pathname = usePathname();
 
   const { role, setRole } = useRoleStore();
 
   const { userData, setUserData } = useUserStore();
   const [initials, setInitials] = useState("Home");
+  const hiddenOn = ["/recruiter/"];
+
+  const isHidden = hiddenOn.some((route) =>
+    pathname.startsWith(route.replace(/\/$/, ""))
+  );
+  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,19 +53,6 @@ const HomeNavbar = () => {
     };
   }, []);
 
-  const handleLogin = async (email: string, role: "user" | "recruiter") => {
-    const res = await nextAuthLogin({ email, role });
-
-    if (res.status === "success" && res.user && res.accessToken) {
-      setUserData(res.user, res.accessToken);
-      setCookie("accessToken", res.accessToken);
-    } else {
-      toast.error(res.message);
-    }
-
-    await signOut();
-  };
-
   useEffect(() => {
     if (role === null) return;
 
@@ -66,6 +61,19 @@ const HomeNavbar = () => {
     }
 
     const email = data.user.email as string;
+
+    const handleLogin = async (email: string, role: "user" | "recruiter") => {
+      const res = await nextAuthLogin({ email, role });
+
+      if (res.status === "success" && res.user && res.accessToken) {
+        setUserData(res.user, res.accessToken);
+        setCookie("accessToken", res.accessToken);
+      } else {
+        toast.error(res.message);
+      }
+
+      await signOut();
+    };
 
     handleLogin(email, role);
   }, [data, router, role, setUserData]);
@@ -89,10 +97,12 @@ const HomeNavbar = () => {
 
     setInitials(getUserInitials);
   }, [userData]);
+  
+  if (isHidden) return null;
 
   return (
     <div
-      className={`flex justify-end items-center gap-4 bg-transparent transition px-8 sticky top-0 w-full z-50 min-h-[64px]`}
+      className={`flex justify-end items-center gap-4 bg-transparent transition px-8 fixed top-0 w-full z-50 min-h-[64px]`}
     >
       <Link
         href={"/"}
@@ -130,7 +140,7 @@ const HomeNavbar = () => {
 
         {userData ? (
           <Link
-            href={"/home"}
+            href={"/talentmatch"}
             className="flex items-center bg-primary h-[35px] text-white pl-4 pr-2 gap-2 rounded-lg "
           >
             {initials}

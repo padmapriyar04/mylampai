@@ -17,6 +17,7 @@ export default function Cobe({ glowColor = [1.2, 1.2, 1.2], baseColor = [1, 1, 1
       precision: 0.001,
     },
   }));
+  
   useEffect(() => {
     let phi = 0;
     let width = 0;
@@ -55,7 +56,7 @@ export default function Cobe({ glowColor = [1.2, 1.2, 1.2], baseColor = [1, 1, 1
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
-  }, []);
+  }, [glowColor, baseColor, r]);
 
   return (
     <div

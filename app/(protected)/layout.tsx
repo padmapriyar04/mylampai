@@ -3,6 +3,7 @@ import { auth } from "@/lib/authlib";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/global/Sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import BottomNavBar from "@/components/home/BottomNavBar";
 
 export const metadata: Metadata = {
   title: "wiZe (myLampAI)",
@@ -16,17 +17,18 @@ export default async function ProtectedLayout({
 }) {
   const user = await auth();
 
-  if (!user) {
-    redirect("/login");
-  }
+  // if (!user) {
+  //   redirect("/login");
+  // }
 
   return (
     <>
-      <div className="flex">
-        <AppSidebar />
+      <div className="flex-1 flex">
+        <AppSidebar user={user} />
         <ScrollArea className="h-screen w-full flex flex-1 flex-col">
           {children}
         </ScrollArea>
+        <BottomNavBar />
       </div>
     </>
   );

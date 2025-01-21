@@ -11,7 +11,12 @@ import { useInterviewStore } from "@/utils/store";
 import { toast } from "sonner";
 import * as pdfjsLib from "pdfjs-dist";
 import { useUserStore } from "@/utils/userStore";
-import { BlobServiceClient, ContainerSASPermissions, generateBlobSASQueryParameters, StorageSharedKeyCredential } from "@azure/storage-blob";
+import {
+  BlobServiceClient,
+  ContainerSASPermissions,
+  generateBlobSASQueryParameters,
+  StorageSharedKeyCredential,
+} from "@azure/storage-blob";
 import { generateSasToken } from "@/actions/azureActions";
 
 const baseUrl = process.env.NEXT_PUBLIC_RESUME_API_ENDPOINT
@@ -30,10 +35,12 @@ interface StepOneTwoProps {
   handleUploadJDToggle: () => void;
   handleManualJDUpload: () => void;
   isManualEntry: boolean;
-  profile: string | null;
   manualJobDescription: string;
-  setProfile: React.Dispatch<React.SetStateAction<string | null>>; // Ensure this is correctly typed
   setManualJobDescription: React.Dispatch<React.SetStateAction<string>>;
+  profile: string | null;
+  setProfile: React.Dispatch<React.SetStateAction<string | null>>;
+  cvId: string;
+  setCvId: React.Dispatch<React.SetStateAction<string>>; // Updated type
 }
 
 
@@ -46,8 +53,6 @@ function generateFileName(
   return `${timestamp}_${filetype}.${fileExtension}`;
 }
 
-
-
 const StepOneTwo: React.FC<StepOneTwoProps> = ({
   step,
   triggerFileInput,
@@ -57,6 +62,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   profile,
   manualJobDescription,
   setManualJobDescription,
+  setCvId
 }) => {
   const {
     setResumeFile,
@@ -66,6 +72,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     setResumeId,
     resumeId
   } = useInterviewStore();
+
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [otherProfile, setOtherProfile] = useState("");
@@ -110,6 +117,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           toast.error("Resume Upload Failed");
         } else {
           // console.log(uploadResponse);
+
         }
       } catch (error) {
         console.error(error);
@@ -121,9 +129,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       let extractedText = "";
 
       fileReader.onload = async function () {
-        const typedArray = new Uint8Array(
-          this.result as ArrayBuffer
-        );
+        const typedArray = new Uint8Array(this.result as ArrayBuffer);
 
         // Load the PDF document
         const pdf = await pdfjsLib.getDocument(typedArray).promise;
@@ -226,9 +232,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       let extractedText = "";
 
       fileReader.onload = async function () {
-        const typedArray = new Uint8Array(
-          this.result as ArrayBuffer
-        );
+        const typedArray = new Uint8Array(this.result as ArrayBuffer);
 
         // Load the PDF document
         const pdf = await pdfjsLib.getDocument(typedArray).promise;
@@ -292,6 +296,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           return;
         }
         const response = await fetch("/api/interviewer/post_cv", {
+
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -308,6 +313,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         await getSummary(extractedText, tempId)
         console.log(extractedText)
         console.log(resumeId)
+        setCvId(cvid.id)
+
+        
       } catch (error) {
         console.error("Error:", error);
         toast.error("summary analysis failed")
@@ -315,7 +323,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
       }
     },
-    []
+    [manualJobDescription,setCvId,token]
   );
 
   const extractStructuredData = useCallback(async (text: string) => {
@@ -374,9 +382,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   }, []);
   console.log(structuredData)
   return (
-    <div className="md:h-screen bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
+    <div className="md:h-screen bg-primary-foreground min-h-screen p-4 flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
       <div className="max-w-[1350px] h-full max-h-[570px]  w-full flex flex-col items-stretch md:flex-row justify-evenly">
-        <div className="max-w-[450px] w-[90vw] md:w-[50vw] flex flex-col items-center justify-evenly bg-primary shadow-lg text-white rounded-3xl p-8 gap-8 relative">
+        <div className="hidden max-w-[450px] w-[90vw] md:w-[50vw] sm:flex flex-col items-center justify-evenly bg-primary shadow-lg text-white rounded-3xl p-8 gap-8 relative">
           <Image
             src={"/images/Globe.svg"}
             className="w-full h-auto px-12"

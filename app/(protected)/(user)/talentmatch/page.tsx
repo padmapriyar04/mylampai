@@ -1,471 +1,139 @@
-"use client";
-import { useEffect, useState, useCallback, useRef } from "react";
+"use server";
+import { auth } from "@/lib/authlib";
 import {
-  getTalentMatches,
-  createTalentProfile,
-  getTalentProfiles,
-  acceptTalentMatch,
-  getResumeAndInterviewIds,
-  uploadResumeToAzure,
-  updateTalentProfile,
-} from "@/actions/talentMatchActions";
-import { getTalentPoolsData } from "@/actions/talentPoolActions";
-import { useUserStore } from "@/utils/userStore";
-import { toast } from "sonner";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { CirclePlus } from "lucide-react";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  ProfileDataType,
-  profileDataSchema,
-} from "@/schemas/talentMatchSchema";
-import { generateSasToken } from "@/actions/azureActions";
-import * as pdfjsLib from "pdfjs-dist";
-import { ArrayInput } from "@/components/misc/ArrayInput";
-import { TalentProfileCard } from "./TalentProfileCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MapPinIcon, IndianRupee } from "lucide-react";
+  Lock,
+  FileText,
+  TvMinimal,
+  BriefcaseBusiness,
+  Eye,
+  CalendarCheck2,
+} from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+import TalentMatchCSS from "./Talent.module.css";
+import CreateTalenProfileDialog from "./CreateTalentProfile";
+import { getTalentProfiles } from "@/actions/talentMatchActions";
+import { Badge } from "@/components/ui/badge";
+import PdfToImage from "@/components/misc/pdftoimg";
 
-type TalentMatchType = {
-  id: string;
-  skills: string[];
-  profiles: string[];
-  salary: string;
-  locationPref: string;
-  isMatched: boolean;
-  matchId: string;
-};
+export default async function TalentMatchPage() {
+  const user = await auth();
 
-type TalentProfileType = {
-  id: string;
-  resumeId: string | null;
-  interviewId: string | null;
-  skills: string[];
-  profiles: string[];
-  certifications: string[];
-  expectedSalary: string | null;
-  locationPref: string | null;
-  availability: string | null;
-  experienceYears: string | null;
-};
-
-type IdsType = {
-  id: string;
-};
-
-const baseUrl = "https://optim-cv-judge.onrender.com";
-
-type StructuredData = {
-  "Personal Information": {
-    [key: string]: string;
-  };
-  Description: string[];
-  Skills: {
-    HARD: string[];
-    SOFT: string[];
-  };
-  Education: {
-    [key: string]: string;
-  }[];
-  Sections: string[];
-  Interests: string[];
-  Projects: {
-    [key: string]: string | string[];
-  }[];
-  "Work Experience": {
-    [key: string]: string | string[];
-  }[];
-};
-
-export default function TalentMatchPage() {
-  const { userData } = useUserStore();
-  const [talentMatches, setTalentMatches] = useState<TalentMatchType[]>([]);
-  const [talentProfiles, setTalentProfiles] = useState<TalentProfileType[]>([]);
-  const [resumeIds, setResumeIds] = useState<IdsType[]>([]);
-  const [interviewIds, setInterviewIds] = useState<IdsType[]>([]);
-  const structuredData = useRef<StructuredData | null>(null);
-
-  const [profileId, setProfileId] = useState<string | null>(null);
-
-  const form = useForm<ProfileDataType>({
-    resolver: zodResolver(profileDataSchema),
-    defaultValues: {
-      resumeId: "",
-      interviewId: "",
-      skills: [],
-      profiles: [],
-      certifications: [],
-      expectedSalary: "",
-      locationPref: "onsite",
-      availability: "FULL_TIME",
-      experienceYears: "",
-    },
-  });
-
-  async function onSubmit(values: ProfileDataType) {
-    try {
-      if (!userData || !profileId) return;
-
-      const userName = userData.name || "No Name";
-
-      const res = await updateTalentProfile(
-        {
-          ...values,
-          userName,
-        },
-        profileId
-      );
-
-      if (res === "success") {
-        form.reset();
-        toast.success("Talent Profile created Successfully");
-      } else {
-        toast.error("Failed to create talent profile");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to create talent profile");
-    }
+  if (!user) {
+    return null;
   }
 
-  const extractStructuredData = useCallback(async (text: string) => {
-    try {
-      const response = await fetch(`${baseUrl}/extract_structured_data`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cv_text: text }),
-      });
-
-      const result = await response.json();
-
-      return response.ok ? result.message : null;
-    } catch (error) {
-      return null;
-    }
-  }, []);
-
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    event.preventDefault();
-    const file = event.target.files?.[0];
-
-    if (!file || file.type !== "application/pdf") {
-      toast.error("Please upload a PDF file");
-      return;
-    }
-
-    if (file.size > 1 * 1024 * 1024) {
-      toast.error("File size should not exceed 1MB");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await uploadResumeToAzure(formData);
-
-      if (res.status === "failed") {
-        toast.error(res.message);
-        return;
-      }
-    } catch (error) {
-      console.error("Error uploading resume:", error);
-      toast.error("Failed to upload resume");
-      return;
-    }
-
-    const fileReader = new FileReader();
-    let extractedText = "";
-
-    fileReader.onload = async function () {
-      const typedArray = new Uint8Array(this.result as ArrayBuffer);
-
-      const pdf = await pdfjsLib.getDocument(typedArray).promise;
-
-      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-        const page = await pdf.getPage(pageNumber);
-        const textContent = await page.getTextContent();
-
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(" ");
-        extractedText += pageText + "\n";
-      }
-
-      if (!extractedText) {
-        toast.error("Error extracting text");
-        return;
-      }
-
-      const structuredDataResult = await extractStructuredData(extractedText);
-
-      if (!structuredDataResult) {
-        toast.error("Failed to analyse resume");
-        return;
-      }
-
-      structuredData.current = structuredDataResult;
-
-      console.log(structuredDataResult);
-    };
-
-    fileReader.readAsArrayBuffer(file);
-  };
-
-  const handleConfirmMatch = async (matchId: string) => {
-    try {
-      const res = await acceptTalentMatch(matchId);
-
-      if (res === "success") {
-        toast.success("Match confirmed successfully");
-      } else {
-        toast.error("Failed to confirm match");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to confirm match");
-    }
-  };
-
-  useEffect(() => {
-    if (!userData || !userData.id) return;
-
-    const fetchIds = async () => {
-      try {
-        const ids = await getResumeAndInterviewIds(userData?.id);
-
-        if (ids.status === "success") {
-          setResumeIds(ids.cvIds);
-          setInterviewIds(ids.interviewIds);
-        }
-      } catch (error) {
-        console.error("Error fetching resume id:", error);
-      }
-    };
-
-    fetchIds();
-  }, [userData]);
-
-  useEffect(() => {
-    if (!userData || !userData.id) return;
-
-    const fetchData = async (userId: string) => {
-      try {
-        const [matches, profiles] = await Promise.all([
-          getTalentMatches(userId),
-          getTalentProfiles(userId),
-        ]);
-
-        // if (profiles) {
-        //   setTalentProfiles(profiles);
-        // }
-
-        // if (matches && matches.length) {
-        //   const talentPoolIds = matches.map((match) => match.talentPoolId);
-        //   const talentPoolsData = await getTalentPoolsData(talentPoolIds);
-
-        //   const mergedData = matches.map((match, index) => ({
-        //     matchId: match.id,
-        //     isMatched: match.isMatched,
-        //     ...(talentPoolsData[index] || {}),
-        //   }));
-
-        //   setTalentMatches(mergedData);
-        // }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData(userData.id);
-  }, [userData]);
+  const talentProfiles = await getTalentProfiles(user.id);
 
   return (
-    <div className="flex  ">
-      <ScrollArea className="h-screen w-[42.5%]">
-        <div>
-          <div className="w-full flex py-2">
-            {talentMatches.map((match, index) => (
-              <div
-                key={index}
-                className="scale-75 border-primary border rounded-lg"
-              >
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold">Skills</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.skills.map((skill) => (
-                        <Badge key={skill} variant="secondary">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Profiles</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.profiles.map((profile) => (
-                        <Badge key={profile} variant="outline">
-                          {profile}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <IndianRupee className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Salary: ₹{match.salary}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <MapPinIcon className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Location Preference: {match.locationPref}</span>
-                  </div>
-                </div>
-                {!match.isMatched ? (
-                  <Button onClick={() => handleConfirmMatch(match.matchId)}>
-                    Confirm Match
-                  </Button>
-                ) : (
-                  <Badge variant="outline">Match Confirmed</Badge>
-                )}
-              </div>
-            ))}
-            {talentMatches.map((match, index) => (
-              <div key={index} className="p-4 border-primary border rounded-lg">
-                <div className="space-y-4">
-                  <div className="flex justify-start gap-2">
-                    <h3 className="font-semibold mt-2">Skills</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.skills.map((skill) => (
-                        <Badge key={skill} variant="secondary">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex justify-start gap-2">
-                    <h3 className="font-semibold mt-2">Profiles</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.profiles.map((profile) => (
-                        <Badge key={profile} variant="outline">
-                          {profile}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <IndianRupee className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Salary: ₹{match.salary}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <MapPinIcon className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Location Preference: {match.locationPref}</span>
-                  </div>
-                </div>
-                {!match.isMatched ? (
-                  <Button onClick={() => handleConfirmMatch(match.matchId)}>
-                    Confirm Match
-                  </Button>
-                ) : (
-                  <Badge variant="outline">Match Confirmed</Badge>
-                )}
-              </div>
-            ))}
-            {talentMatches.map((match, index) => (
-              <div
-                key={index}
-                className="scale-75 border-primary border rounded-lg"
-              >
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold">Skills</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.skills.map((skill) => (
-                        <Badge key={skill} variant="secondary">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Profiles</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {match.profiles.map((profile) => (
-                        <Badge key={profile} variant="outline">
-                          {profile}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <IndianRupee className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Salary: ₹{match.salary}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <MapPinIcon className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span>Location Preference: {match.locationPref}</span>
-                  </div>
-                </div>
-                {!match.isMatched ? (
-                  <Button onClick={() => handleConfirmMatch(match.matchId)}>
-                    Confirm Match
-                  </Button>
-                ) : (
-                  <Badge variant="outline">Match Confirmed</Badge>
-                )}
-              </div>
-            ))}
+    <div className="flex sm:flex-row flex-col px-2 py-2 sm:py-0 sm:pr-2">
+      <ScrollArea className="h-60 sm:h-screen w-full sm:w-5/12 sm:p-4">
+        <div className="h-52 sm:h-[calc(100vh-2rem)] flex items-center border rounded-lg">
+          <div
+            className={`${TalentMatchCSS.verticalText} h-full text-white rounded-r-lg px-2 text-center bg-primary`}
+          >
+            Your Matches
           </div>
-        </div>
-        <div>
-          {talentProfiles.map((profile, index) => (
-            <div key={index}>
-              <div>
-                {profile.profiles.map((item, ind) => (
-                  <Badge key={ind} variant="outline">
-                    {item}
-                  </Badge>
-                ))}
-              </div>
+          <div className="w-full flex flex-col items-center justify-center py-2">
+            <Lock className="w-8 h-8 text-primary" />
+            <div className="text-center max-w-[400px] text-sm text-muted-foreground mt-2 p-4">
+              Complete your profile and attempt the AI interview to be
+              considered for the talent pool.
             </div>
-          ))}
-        </div>
-        <Button type="button">Create new profile</Button>
-        <Input type="file" onChange={handleFileChange} />
-      </ScrollArea>
-      <ScrollArea className="h-screen w-[57.5%] ">
-        <div>
-          <div className="flex items-center">
-            {talentProfiles.map((profile) => (
-              <TalentProfileCard key={profile.id} profile={profile} />
-            ))}
           </div>
         </div>
       </ScrollArea>
+      <div className="flex flex-col border my-4 w-full sm:w-7/12 rounded-lg h-[calc(100vh-2rem)]">
+        <div className="border-b py-3 px-5 flex relative text-sm gap-4 ">
+          {talentProfiles && talentProfiles.length < 3 && (
+            <CreateTalenProfileDialog />
+          )}
+          <div className="font-medium cursor-pointer">Career Profile</div>
+          <div className="text-muted-foreground">Work Preference</div>
+        </div>
+        <ScrollArea className="h-[calc(100vh-80px)]">
+          <div className="flex flex-col gap-2 p-2">
+            {talentProfiles?.map((profile, index) => (
+              <div
+                key={index}
+                className="border p-4 flex flex-col gap-4 rounded-lg shadow-sm cursor-pointer"
+              >
+                <div className="flex items-center gap-4">
+                  <BriefcaseBusiness className="w-12 h-12 bg-primary text-white rounded-lg p-3 " />
+                  <h2 className="text-xl font-semibold uppercase">
+                    {profile.title}
+                  </h2>
+                </div>
+                <div>
+                  <h3 className="font-medium mb-2">Experts in</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.skills.map((skill, index) => (
+                      <Badge key={index} variant="secondary">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-2 justify-between items-start">
+                  <div className="w-full">
+                    <h3 className="font-medium mb-2">Looking for</h3>
+                    {profile.target && (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="capitalize"
+                      >
+                        {profile.target.toLowerCase()}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="w-full">
+                    <h3 className="font-medium mb-2">Availability</h3>
+                    {profile.target && (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="capitalize"
+                      >
+                        {profile.availability?.toLowerCase().replace("_", " ")}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="border w-full bg-muted-foreground"></div>
+                <div className="flex justify-between flex-col md:flex-row gap-8 sm:gap-4 items-start mb-4">
+                  <div className="flex items-center gap-2 text-muted-foreground w-full ">
+                    <div className="flex gap-2 justify-center items-center bg-accent text-accent-foreground relative h-8 rounded-lg w-full sm:w-[150px] text-center text-sm">
+                      <div className="absolute bottom-0 translate-y-full text-xs italic font-light left-16 w-full">
+                        resume uploaded
+                      </div>
+                      <FileText className="w-4 h-4" /> Resume
+                    </div>
+                    <div className="bg-primary text-white rounded-lg">
+                      <PdfToImage pdfUrl={profile.resumeUrl} />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground w-full">
+                    <div className="flex gap-2 justify-center items-center bg-accent text-accent-foreground relative h-8 rounded-lg w-full sm:w-[150px] text-center text-sm">
+                      <div className="absolute bottom-0 translate-y-full text-xs italic font-light left-12 w-[250px]">
+                        scheduled on{" "}
+                        {profile.interviewDate &&
+                          new Date(profile.interviewDate).toLocaleString(
+                            "en-IN",
+                            { timeZone: "Asia/Kolkata" }
+                          )}
+                      </div>
+                      <TvMinimal className="w-4 h-4" /> Interview
+                    </div>
+                    <div className="bg-primary text-white p-2 rounded-lg">
+                      <CalendarCheck2 className="w-4 h-4" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }

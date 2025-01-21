@@ -14,10 +14,6 @@
 .deployment
 
 
-#docker
-/.dockerignore
-Dockerfile
-
 # next.js
 /.next/
 /out/
@@ -45,3 +41,6 @@ data/arched-branch.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+#credentials
+credential.json
