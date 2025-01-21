@@ -62,6 +62,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     setResumeFile,
     setExtractedText,
     setStructuredData,
+    structuredData,
     setResumeId,
     resumeId
   } = useInterviewStore();
@@ -303,9 +304,9 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         });
         const cvid = await response.json()
         const tempId: string = cvid.cv.id
-        const summary = await getSummary(extractedText, tempId)
-        console.log(extractedText)
         setResumeId(tempId)
+        await getSummary(extractedText, tempId)
+        console.log(extractedText)
         console.log(resumeId)
       } catch (error) {
         console.error("Error:", error);
@@ -371,7 +372,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       console.error("Error in getSummary:", error);
     }
   }, []);
-
+  console.log(structuredData)
   return (
     <div className="md:h-screen bg-primary-foreground flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
       <div className="max-w-[1350px] h-full max-h-[570px]  w-full flex flex-col items-stretch md:flex-row justify-evenly">

@@ -1,4 +1,5 @@
 "use client";
+// fetch nessesary details first from the apis then load to the db
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useInterviewStore } from "@/utils/store";
 import * as pdfjsLib from "pdfjs-dist/webpack";
@@ -56,7 +57,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-
         },
         body: JSON.stringify({ id: resumeId }),
       });
@@ -116,7 +116,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         const instance = new Mark(textLayerRef.current);
         instance.unmark();
       }
-
+sadfasdfasdfasdfasdfsdfsdfjaksjdlfkjaslkdfjalskdjflaskdjflskjdflasjdfkasjdflkjasdlfjsldkfj
       switch (analysisType) {
         case "resume_score":
           if (!reviewedData.resume_score) {
@@ -678,7 +678,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   // }, []);
 
   return (
-
     <div className="flex h-full justify-between bg-primary-foreground items-stretch gap-2 px-2 pl-0">
       {loading ? (<div className="flex items-center justify-center w-full min-h-screen"><span className="w-16 h-16 border-4 border-x-gray-400 border-t-gray-400 rounded-full animate-spin"></span></div>) : (
         <>

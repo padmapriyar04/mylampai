@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 export const POST = async (req: NextRequest) => {
-    const baseUrl = process.env.NEXT_PUBLIC_RESUME_API_ENDPOINT?.concat("/summary");
+    const baseUrl = process.env.NEXT_PUBLIC_RESUME_API_ENDPOINT?.trim();
     const jwtSecret = process.env.JWT_SECRET;
 
     if (!baseUrl) {
@@ -58,15 +58,17 @@ export const POST = async (req: NextRequest) => {
     }
 
     try {
-        // Send the POST request to the external API
-        const response = await fetch(baseUrl, {
+        // Send the POST request to the external API with the response of the summary
+        const endpoint = ["responsibility_checker","personal_info","total_bullet_points","bullet_points_improver","bullet_point_length","resume_length","resume_score"]
+        
+        const response = await fetch(baseUrl.concat("/summary"), {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(body),
         });
-
+        
         if (!response.ok) {
             const errorText = await response.text(); // Capture error details
             console.error(`Failed to fetch summary: ${response.status} - ${errorText}`);
@@ -77,7 +79,17 @@ export const POST = async (req: NextRequest) => {
         }
 
         const result = await response.json();
+        
+        
         if (result?.message) {
+            const response = await fetch(baseUrl.concat("/personal_info"), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+            console.log("profile data",await response.text())
             const summary = transformKeys(result.message) as AnalysisDataType;
             summary.cvId = body.id as string;
             // console.log("this is body",summary)
