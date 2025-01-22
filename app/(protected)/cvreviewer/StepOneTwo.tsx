@@ -161,6 +161,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               // Check if structuredDataResult and structuredDataResult.message exist before accessing
               if (structuredDataResult && structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
+                toast.success("extracted structured data");
               } else {
                 toast.error("Failed to extract structured data");
               }
@@ -264,6 +265,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               // Check if structuredDataResult and structuredDataResult.message exist before accessing
               if (structuredDataResult && structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
+                toast.success("extracted structured data");
               } else {
                 toast.error("Failed to extract structured data");
               }
@@ -278,7 +280,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             toast.error("Error converting file to base64 or extracting text");
           }
         };
-
         base64Reader.readAsDataURL(file); // Start reading the file as a data URL
       };
 
@@ -308,6 +309,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           }),
         });
         const cvid = await response.json()
+        console.log(cvid)
         const tempId: string = cvid.cv.id
         setResumeId(tempId)
         await getSummary(extractedText, tempId)
@@ -360,9 +362,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ cv_text: text, id: ResumeId }),
+        body: JSON.stringify({ cv_text: text, id: ResumeId, structuredData:structuredData }),
       });
-
 
       if (!response.ok) {
         toast.error("Error in getSummary")
@@ -380,7 +381,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       console.error("Error in getSummary:", error);
     }
   }, []);
-  console.log(structuredData)
   return (
     <div className="md:h-screen bg-primary-foreground min-h-screen p-4 flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
       <div className="max-w-[1350px] h-full max-h-[570px]  w-full flex flex-col items-stretch md:flex-row justify-evenly">

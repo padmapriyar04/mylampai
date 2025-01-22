@@ -42,7 +42,8 @@ export const POST = async (req: NextRequest) => {
         return NextResponse.json({ error: "Unauthorized: Invalid token" }, { status: 401 });
     }
 
-    let body: Record<string, unknown>;
+    // Declare the body variable with a more specific type, assuming it will hold the parsed JSON data from the request
+    let body: { id: string; structuredData: Record<string, unknown> };
     try {
         // Parse the request body
         body = await req.json();
@@ -58,9 +59,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     try {
-        // Send the POST request to the external API with the response of the summary
-        const endpoint = ["responsibility_checker","personal_info","total_bullet_points","bullet_points_improver","bullet_point_length","resume_length","resume_score"]
-        
+
         const response = await fetch(baseUrl.concat("/summary"), {
             method: "POST",
             headers: {
@@ -68,7 +67,7 @@ export const POST = async (req: NextRequest) => {
             },
             body: JSON.stringify(body),
         });
-        
+
         if (!response.ok) {
             const errorText = await response.text(); // Capture error details
             console.error(`Failed to fetch summary: ${response.status} - ${errorText}`);
@@ -79,22 +78,56 @@ export const POST = async (req: NextRequest) => {
         }
 
         const result = await response.json();
-        
-        
+
         if (result?.message) {
-            const response = await fetch(baseUrl.concat("/personal_info"), {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-            });
-            console.log("profile data",await response.text())
             const summary = transformKeys(result.message) as AnalysisDataType;
             summary.cvId = body.id as string;
-            // console.log("this is body",summary)
+
+
+
+
+            // Send the POST request to the external API with the response of the summary
+            const endpoint = ["responsibility_checker", "personal_info", "total_bullet_points", "bullet_points_improver", "bullet_point_length", "resume_length", "resume_score"]
+
+            // console.log("body content",body.structuredData)
+            endpoint.forEach(async (element) => {
+                const response = await fetch(baseUrl.concat(`/${element}`), {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ extracted_data: body.structuredData }),
+                });
+                const data = await response.json();
+
+                console.log(element, data)
+                switch (element) {
+                    case "responsibility_checker":
+                        summary.responsibility = data ?? {}
+                        break;
+                    case "personal_info":
+                        summary.personal_info = data ?? body.structuredData["Personal Information"];
+                        break;
+                    case "total_bullet_points":
+                        summary.total_bullet_points = data ?? [""]
+                        break;
+                    case "bullet_points_improver":
+                        summary.bullet_point_improver = data ?? [""]
+                        break;
+                    case "bullet_point_length":
+                        summary.bullet_point_length = data ?? [""]
+                    case "resume_length":
+                        summary.resume_length =data ?? [""]
+                    case "resume_score":
+                        summary.resume_score =data ?? {}
+                    default:
+                        break;
+                }
+            })
             // Save the analysis result
+
             const summaryResponse = await analysisResume(summary);
+            console.log(summaryResponse)
             return NextResponse.json(summaryResponse, { status: 200 });
         }
 
