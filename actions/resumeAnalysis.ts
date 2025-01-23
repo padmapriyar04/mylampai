@@ -14,7 +14,14 @@ export type AnalysisDataType = {
     genericpoints: string[];
     summary: string;
     score: number;
-    cvId?:string
+    personal_info: object;
+    bullet_point_length?: string[];
+    bullet_point_improver?: string[];
+    total_bullet_points?: object;
+    responsibility?: object;
+    resume_length?: string[];
+    resume_score?:object
+    cvId?: string;
 };
 
 export const analysisResume = async (data: AnalysisDataType) => {
@@ -23,7 +30,6 @@ export const analysisResume = async (data: AnalysisDataType) => {
         if (!data || typeof data !== "object") {
             throw new Error("Data is missing or invalid");
         }
-
         const {
             sectionanalysis,
             skillsassessment,
@@ -36,6 +42,13 @@ export const analysisResume = async (data: AnalysisDataType) => {
             genericpoints,
             summary,
             score,
+            personal_info,
+            bullet_point_length,
+            bullet_point_improver,
+            total_bullet_points,
+            responsibility,
+            resume_length,
+            resume_score,
             cvId
         } = data;
 
@@ -52,8 +65,16 @@ export const analysisResume = async (data: AnalysisDataType) => {
             !genericpoints.length ||
             !summary ||
             !cvId ||
+            !personal_info ||
+            !bullet_point_length ||
+            !bullet_point_improver ||
+            !total_bullet_points ||
+            !responsibility ||
+            !resume_length ||
+            !resume_score ||
             typeof score !== "number"
         ) {
+            console.log({ error: "Missing required fields", status: 400 })
             return { error: "Missing required fields", status: 400 };
         }
         // console.log(userId)
@@ -71,10 +92,19 @@ export const analysisResume = async (data: AnalysisDataType) => {
                 genericpoints,
                 summary,
                 score,
+                personal_info,
+                bullet_point_length,
+                bullet_point_improver,
+                total_bullet_points,
+                responsibility,
+                resume_length,
+                resume_score,
                 cvId
             },
         });
         // Return response or error
+        // console.log("this is data",data)
+        // console.log("the response it is", response)
         if (!response) {
             return { error: "Failed to create resume analysis", status: 500 };
         }
@@ -90,7 +120,7 @@ export const fetchAnalysis = async (id: string) => {
     try {
         // Fetch analysis by id
         const response = await prisma.resumeAnalysis.findFirst({
-            where: { cvId:id }
+            where: { cvId: id }
         });
         // Return response or error
         console.log(response)
@@ -101,5 +131,5 @@ export const fetchAnalysis = async (id: string) => {
     } catch (error) {
         console.error("Error in fetchAnalysis:", error);
         return { success: false, error: "Internal server error", status: 500 };
-        }
+    }
 }

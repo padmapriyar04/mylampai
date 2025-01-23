@@ -49,7 +49,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const { token } = useUserStore();
 
   // fetch resume analysis data via id from db and then update the reviewedData state 
-  console.log("fetching")
+  // console.log("fetching",structuredData)
   const fetchResumeAnalysis = async (resumeId: string) => {
     try {
       const response = await fetch(`/api/interviewer/fetchAnalysis`, {
@@ -62,7 +62,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
       });
       const result = await response.json();
       if (response.ok) {
-        setReviewedData((data:any)=>({...data, ...result}));
+        setReviewedData((data: any) => ({ ...data, ...result }));
         console.log("reviewedData", reviewedData);
       } else {
         console.error("Failed to fetch resume analysis:", result);
@@ -78,6 +78,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
   const analyzeResume = useCallback(
     async (endpoint: string, data: any, query: string) => {
       setLoading(true)
+      console.log("data here", data)
       try {
         const response = await fetch(`${baseUrl}${endpoint}${query}`, {
           method: "POST",
@@ -88,7 +89,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
         });
         const result = await response.json();
         console.log("result here", result)
-        if (response.ok){
+        if (response.ok) {
 
           setLoading(false)
           return result;
@@ -142,7 +143,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
               }
               setReviewedData((prevData: any) => ({
                 ...prevData,
-                resume_score: result?.message?result?.message:"not available",
+                resume_score: result?.message ? result?.message : "not available",
               }));
             }
           }
@@ -157,7 +158,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             result = await analyzeResume(endpoint, data, query);
             setReviewedData((prevData: any) => ({
               ...prevData,
-              resume_length: result?.message?result?.message:"not available",
+              resume_length: result?.message ? result?.message : "not available",
             }));
           }
           break;
@@ -172,12 +173,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             result = await analyzeResume(endpoint, data, query);
             setReviewedData((prevData: any) => ({
               ...prevData,
-              resume_length: result?.message?result?.message:"not available",
+              resume_length: result?.message ? result?.message : "not available",
             }));
           }
           break;
         case "bullet_point_length":
-          if (!reviewedData.bullet_point_length) {
+          if (!reviewedData?.data?.bullet_point_length) {
             endpoint = "/bullet_point_length";
             data = {
               extracted_data: structuredData,
@@ -195,7 +196,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             }
             setReviewedData((prevData: any) => ({
               ...prevData,
-              bullet_point_length: result?.message?result?.message:"not available",
+              bullet_point_length: result?.message ? result?.message : "not available",
             }));
           } else {
             setSentencesToHighlight(reviewedData.data.bullet_point_length.Result);
@@ -221,7 +222,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             }
             setReviewedData((prevData: any) => ({
               ...prevData,
-              bullet_points_improver: result?.message? result?.message:"not available",
+              bullet_points_improver: result?.message ? result?.message : "not available",
             }));
           } else {
             const bulletPoints = reviewedData.bullet_points_improver.bulletPoints;
@@ -244,20 +245,21 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             result = await analyzeResume(endpoint, data, query);
             setReviewedData((prevData: any) => ({
               ...prevData,
-              total_bullet_points: result?.message?result?.message:"not available",
+              total_bullet_points: result?.message ? result?.message : "not available",
             }));
           }
           break;
         case "personal_info":
           if (!reviewedData.personal_info) {
             endpoint = "/personal_info";
+            console.log(structuredData)
             data = {
               extracted_data: structuredData,
             };
             result = await analyzeResume(endpoint, data, query);
             setReviewedData((prevData: any) => ({
               ...prevData,
-              personal_info: result?.message?result?.message:"not available",
+              personal_info: result?.message ? result?.message : "not available",
             }));
           }
           break;
@@ -281,7 +283,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
 
             setReviewedData((prevData: any) => ({
               ...prevData,
-              responsibility_checker: result?.message?result?.message:"not available",
+              responsibility_checker: result?.message ? result?.message : "not available",
             }));
           } else {
             const sentencesToHighlight = Object.values(
@@ -293,7 +295,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
             }
           }
           break;
-          
+
         // case "summary":
         //   if (!reviewedData.summary) {
         //     endpoint = "/summary";
@@ -518,7 +520,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
 
       }
       setIsTextLayerReady(true);
-      console.log("lorem",reviewedData)
+      console.log("lorem", reviewedData)
     },
     [structuredData, extractedText, profile, reviewedData]
   );
@@ -669,6 +671,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
     }
   }, [isTextLayerReady, sentencesToHighlight, resumeFile, resumeId, setLoading]);
 
+  console.log(structuredData)
 
   //console.log("Reviewed Data:", reviewedData);
 
@@ -718,13 +721,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   <span className="font-medium">Hard Skill:</span>
                   <span
                     className={`ml-2 ${getColorClass(
-                      reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE?.score
+                      reviewedData?.data?.resume_score?.DETAILS?.HARD_SKILLS_SCORE?.score
                     )}`}
                   >
-                    {reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE?.score ??
+                    {reviewedData?.data?.resume_score?.DETAILS?.HARD_SKILLS_SCORE?.score ??
                       "N/A"}
                     <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                      {reviewedData.resume_score?.DETAILS.HARD_SKILLS_SCORE
+                      {reviewedData?.data?.resume_score?.DETAILS?.HARD_SKILLS_SCORE
                         ?.reason ?? "No details available"}
                     </div>
                   </span>
@@ -733,13 +736,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   <span className="font-medium">Soft Skill:</span>
                   <span
                     className={`ml-2 ${getColorClass(
-                      reviewedData?.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score
+                      reviewedData?.data?.resume_score?.DETAILS?.SOFT_SKILLS_SCORE?.score
                     )}`}
                   >
-                    {reviewedData?.resume_score?.DETAILS.SOFT_SKILLS_SCORE?.score ??
+                    {reviewedData?.data?.resume_score?.DETAILS?.SOFT_SKILLS_SCORE?.score ??
                       "N/A"}
                     <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                      {reviewedData.resume_score?.DETAILS.SOFT_SKILLS_SCORE
+                      {reviewedData?.data?.resume_score?.DETAILS?.SOFT_SKILLS_SCORE
                         ?.reason ?? "No details available"}
                     </div>
                   </span>
@@ -748,13 +751,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   <span className="font-medium">Experience:</span>
                   <span
                     className={`ml-2 ${getColorClass(
-                      reviewedData?.resume_score?.DETAILS.EXPERIENCE_SCORE?.score
+                      reviewedData?.data?.resume_score?.DETAILS?.EXPERIENCE_SCORE?.score
                     )}`}
                   >
-                    {reviewedData?.resume_score?.DETAILS.EXPERIENCE_SCORE?.score ??
+                    {reviewedData?.data?.resume_score?.DETAILS?.EXPERIENCE_SCORE?.score ??
                       "N/A"}
                     <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                      {reviewedData?.resume_score?.DETAILS.EXPERIENCE_SCORE
+                      {reviewedData?.data?.resume_score?.DETAILS?.EXPERIENCE_SCORE
                         ?.reason ?? "No details available"}
                     </div>
                   </span>
@@ -763,22 +766,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   <span className="font-medium">Education:</span>
                   <span
                     className={`ml-2 ${getColorClass(
-                      reviewedData?.resume_score?.DETAILS.EDUCATION_SCORE?.score
+                      reviewedData?.data?.resume_score?.DETAILS?.EDUCATION_SCORE?.score
                     )}`}
                   >
-                    {reviewedData?.resume_score?.DETAILS.EDUCATION_SCORE?.score ??
+                    {reviewedData?.data?.resume_score?.DETAILS?.EDUCATION_SCORE?.score ??
                       "N/A"}
                     <div className="absolute right-0 min-h-full top-1/2 -translate-y-1/2 transform z-10 translate-x-full mb-2 hidden group-hover:block p-2 bg-gray-800 text-white text-sm rounded">
-                      {reviewedData?.resume_score?.DETAILS.EDUCATION_SCORE?.reason ??
+                      {reviewedData?.data?.resume_score?.DETAILS?.EDUCATION_SCORE?.reason ??
                         "No details available"}
                     </div>
                   </span>
                 </div>
-                {!reviewedData?.resume_score && (
+                {!reviewedData?.data?.resume_score && (
                   <div className="text-sm text-gray-500">
                     Scores are not available at the moment.{" "}
                     <button
-                      onClick={() => runAnalysis("resume_score")}
+                      // onClick={() => runAnalysis("resume_score")}
                       className="underline hover:text-primary"
                     >
                       Please try again
@@ -878,8 +881,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <Dialog>
                   <DialogTrigger
                     className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                    onClick={() => {
-                      runAnalysis("bullet_point_length")}}
+                    // onClick={() => {
+                    //   runAnalysis("bullet_point_length")
+                    // }}
                   >
                     <div className="flex items-center justify-center flex-col">
                       <Image
@@ -899,9 +903,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                     <DialogHeader>
                       <DialogTitle>Bullet Point Length</DialogTitle>
                       <DialogDescription>
-                        {reviewedData.bullet_point_length &&
-                          reviewedData.bullet_point_length.length === 0 ? (
-                          reviewedData.bullet_point_length.Result.map(
+                        {reviewedData?.data?.bullet_point_length &&
+                          reviewedData?.data?.bullet_point_length.length === 0 ? (
+                          reviewedData?.data?.bullet_point_length.Result.map(
                             (data: string, ind: number) => {
                               return <div key={ind}>{data}</div>;
                             }
@@ -916,7 +920,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <Dialog>
                   <DialogTrigger
                     className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                    onClick={() => runAnalysis("bullet_points_improver")}
+                    // onClick={() => runAnalysis("bullet_points_improver")}
                   >
                     <div className="flex items-center justify-center flex-col">
                       <Image
@@ -936,17 +940,23 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                     <DialogHeader>
                       <DialogTitle> Bullet Points Improver </DialogTitle>
                       <DialogDescription>
-                        <Accordion type="single" collapsible> 
-                          {reviewedData?.bullet_points_improver &&
-                            reviewedData?.bullet_points_improver?.bulletPoints?.map(
-                              (data: any, ind: number) => (
+                        <Accordion type="single" collapsible>
+                          {console.log(reviewedData?.data)}
+                          {reviewedData?.data?.bullet_point_improver &&
+                            // reviewedData?.data?.bullet_points_improver?.bulletPoints?.map(
+                            reviewedData?.data?.bullet_point_improver?.map(
+                              (value: any, ind: number) => (
                                 <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                                  <AccordionTrigger className="text-left">
-                                    Original: {data.original}
-                                  </AccordionTrigger>
-                                  <AccordionContent>
-                                    Improved: {data.improved}
-                                  </AccordionContent>
+                                  {value ?
+                                    (<>
+                                      <AccordionTrigger className="text-left">
+                                        Original: {value.original}
+                                      </AccordionTrigger>
+                                      <AccordionContent>
+                                        Improved: {value.improved}
+                                      </AccordionContent>
+                                    </>) : (<h1>data not found</h1>)
+                                  }
                                 </AccordionItem>
                               )
                             )}
@@ -958,7 +968,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <Dialog>
                   <DialogTrigger
                     className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                    onClick={() => runAnalysis("total_bullet_points")}
+                    // onClick={() => runAnalysis("total_bullet_points")}
                   >
                     <div className="flex items-center justify-center flex-col">
                       <Image
@@ -978,8 +988,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                     <DialogHeader>
                       <DialogTitle> Total Bullet Points </DialogTitle>
                       <DialogDescription>
-                        {reviewedData.total_bullet_points &&
-                          reviewedData.total_bullet_points.Result}
+                        {reviewedData?.data?.total_bullet_points ?
+                          reviewedData?.data?.total_bullet_points.Result : <h1>data not found</h1>}
                       </DialogDescription>
                     </DialogHeader>
                   </DialogContent>
@@ -1229,7 +1239,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <Dialog>
                   <DialogTrigger
                     className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                    onClick={() => runAnalysis("personal_info")}
+                  // onClick={() => runAnalysis("personal_info")}
                   >
                     <div className="flex items-center justify-center flex-col">
                       <Image
@@ -1249,19 +1259,20 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                     <DialogTitle> Personal Info </DialogTitle>
                     <DialogDescription>
                       <Accordion type="single" collapsible>
-                        {reviewedData.personal_info &&
-                          Object.keys(reviewedData.personal_info).map(
+                        {reviewedData?.data?.personal_info &&
+                          Object.keys(reviewedData?.data?.personal_info).map(
                             (key, ind: number) => (
                               <AccordionItem value={`item-${ind + 1}`} key={ind}>
                                 <AccordionTrigger className="text-left">
                                   {key}
                                 </AccordionTrigger>
                                 <AccordionContent>
-                                  {reviewedData.personal_info[key]}
+                                  {reviewedData?.data?.personal_info[key]}
                                 </AccordionContent>
                               </AccordionItem>
                             )
-                          )}
+                          )
+                        }
                       </Accordion>
                     </DialogDescription>
                   </DialogContent>
@@ -1269,7 +1280,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                 <Dialog>
                   <DialogTrigger
                     className="max-w-[140px] bg-primary text-white rounded-lg font-semibold capitalize w-full min-h-[130px] flex items-center relative justify-center shadow-lg hover:scale-[1.02] duration-200 text-center "
-                    onClick={() => runAnalysis("responsibility_checker")}
+                  // onClick={() => runAnalysis("responsibility_checker")}
                   >
                     <div className="flex items-center justify-center flex-col">
                       <Image
@@ -1287,30 +1298,35 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                   </DialogTrigger>
                   <DialogContent className="max-h-[95vh] overflow-y-scroll scrollbar-hide max-w-[60vw]">
                     <DialogHeader>
+                      {/* this section update the data in future */}
                       <DialogTitle> Responsibility Checker </DialogTitle>
                       <DialogDescription>
                         <Accordion type="single" collapsible>
-                          {reviewedData.responsibility_checker &&
-                            Object.keys(reviewedData.responsibility_checker).map(
+                          {reviewedData?.data?.responsibility_checker &&
+                            Object.keys(reviewedData?.data?.responsibility_checker).map(
                               (key, ind: number) => (
                                 <AccordionItem value={`item-${ind + 1}`} key={ind}>
-                                  <AccordionTrigger className="text-left">
-                                    {key}
-                                  </AccordionTrigger>
-                                  <AccordionContent>
-                                    Correction:{" "}
-                                    {
-                                      reviewedData.responsibility_checker[key]
-                                        .correction
-                                    }
-                                  </AccordionContent>
-                                  <AccordionContent>
-                                    Reason:{" "}
-                                    {
-                                      reviewedData.responsibility_checker[key]
-                                        .reason
-                                    }
-                                  </AccordionContent>
+                                  {!key ? <h1>data not found</h1> :
+                                    <>
+                                      <AccordionTrigger className="text-left">
+                                        {key}
+                                      </AccordionTrigger>
+                                      <AccordionContent>
+                                        Correction:{" "}
+                                        {
+                                          reviewedData?.data?.responsibility_checker[key]
+                                            .correction
+                                        }
+                                      </AccordionContent>
+                                      <AccordionContent>
+                                        Reason:{" "}
+                                        {
+                                          reviewedData?.data?.responsibility_checker[key]
+                                            .reason
+                                        }
+                                      </AccordionContent>
+                                    </>
+                                  }
                                 </AccordionItem>
                               )
                             )}

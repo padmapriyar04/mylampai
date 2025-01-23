@@ -26,20 +26,20 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: 'Resume and Job Description are required' }, { status: 400 });
     }
 
-    const existingCV = await prisma.cV.findFirst({
-      where: {
-        userId,
-        Resume,
-        JobDescription,
-      },
-    });
+    // const existingCV = await prisma.cV.findFirst({
+    //   where: {
+    //     userId,
+    //     Resume,
+    //     JobDescription,
+    //   },
+    // });
 
-    if (existingCV) {
-      return NextResponse.json(
-        { error: 'CV with the same resume and job description already exists' },
-        { status: 409 }
-      );
-    }
+    // if (existingCV) {
+    //   return NextResponse.json(
+    //     { error: 'CV with the same resume and job description already exists' },
+    //     { status: 409 }
+    //   );
+    // }
 
     // Create a new CV entry
     const newCV = await prisma.cV.create({
