@@ -1,7 +1,6 @@
 "use client";
 import {
   useState,
-  useEffect,
   DragEvent,
   ChangeEvent,
   useCallback,
@@ -20,10 +19,8 @@ import {
 } from "@azure/storage-blob";
 import { generateSasToken } from "@/actions/azureActions";
 
-// const baseUrl = "https://optim-cv-judge.onrender.com";
-const baseUrl = process.env.NEXT_PUBLIC_CV_REVIEWER_SERVER_URL;
-console.log("baseurl ",baseUrl)
-
+const baseUrl = process.env.NEXT_PUBLIC_RESUME_API_ENDPOINT
+// console.log(baseUrl)
 
 interface StepOneTwoProps {
   step: number;
@@ -46,7 +43,11 @@ interface StepOneTwoProps {
   setCvId: React.Dispatch<React.SetStateAction<string>>; // Updated type
 }
 
-function generateFileName(originalFileName: string, filetype: string) {
+
+function generateFileName(
+  originalFileName: string,
+  filetype: string,
+) {
   const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
   const fileExtension = originalFileName.split(".").pop();
   return `${timestamp}_${filetype}.${fileExtension}`;
@@ -63,17 +64,26 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   setManualJobDescription,
   setCvId
 }) => {
-  const { setResumeFile, setExtractedText, setStructuredData } =
-    useInterviewStore();
+  const {
+    setResumeFile,
+    setExtractedText,
+    setStructuredData,
+    structuredData,
+    setResumeId,
+    resumeId
+  } = useInterviewStore();
+
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [otherProfile, setOtherProfile] = useState("");
+  const [next,Setnext] = useState<boolean>(false)
 
   const { token } = useUserStore();
 
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
+
 
   const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -106,7 +116,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         if (!uploadResponse.ok) {
           toast.error("Resume Upload Failed");
         } else {
-          console.log(uploadResponse);
+          // console.log(uploadResponse);
+
         }
       } catch (error) {
         console.error(error);
@@ -150,6 +161,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               // Check if structuredDataResult and structuredDataResult.message exist before accessing
               if (structuredDataResult && structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
+                toast.success("extracted structured data");
               } else {
                 toast.error("Failed to extract structured data");
               }
@@ -209,7 +221,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         if (!uploadResponse.ok) {
           toast.error("Resume Upload Failed");
         } else {
-          console.log(uploadResponse);
+          // console.log(uploadResponse);
         }
       } catch (error) {
         console.error(error);
@@ -253,6 +265,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               // Check if structuredDataResult and structuredDataResult.message exist before accessing
               if (structuredDataResult && structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
+                toast.success("extracted structured data");
               } else {
                 toast.error("Failed to extract structured data");
               }
@@ -267,7 +280,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             toast.error("Error converting file to base64 or extracting text");
           }
         };
-
         base64Reader.readAsDataURL(file); // Start reading the file as a data URL
       };
 
@@ -278,32 +290,43 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     }
   };
 
-  // const uploadCVAndJobDescription = useCallback(
-  //   async (base64String: string, extractedText: string) => {
-  //     try {
-  //       if (!token) {
-  //         return;
-  //       }
-  //       const response = await fetch("/api/interviewer/post_cv", {
-  //         method: "POST",
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           Resume: base64String, // Sending base64 string of the PDF
-  //           JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
-  //         }),
-  //       });
-  //       const result = await response.json();
-  //       setCvId(result.id)
+  const uploadCVAndJobDescription = useCallback(
+    async (base64String: string, extractedText: string) => {
+      try {
+        if (!token) {
+          return;
+        }
+        const response = await fetch("/api/interviewer/post_cv", {
 
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //     }
-  //   },
-  //   [manualJobDescription, setCvId, token]
-  // );
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            Resume: base64String, // Sending base64 string of the PDF
+            JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
+          }),
+        });
+        const cvid = await response.json()
+        console.log(cvid)
+        const tempId: string = cvid.cv.id
+        setResumeId(tempId)
+        await getSummary(extractedText, tempId)
+        console.log(extractedText)
+        console.log(resumeId)
+        setCvId(cvid.id)
+
+        
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("summary analysis failed")
+        setUploading(false);
+
+      }
+    },
+    [manualJobDescription,setCvId,token]
+  );
 
   const extractStructuredData = useCallback(async (text: string) => {
     try {
@@ -319,6 +342,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       if (response.ok) {
         setIsResumeUploaded(true);
         toast.success("Resume uploaded successfully");
+        // console.log(summary )
+
         return result;
       }
       toast.error("Error extracting structured data from resume");
@@ -329,7 +354,33 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       return null;
     }
   }, []);
+  const getSummary = useCallback(async (text: string, ResumeId: string) => {
+    try {
+      const response = await fetch("/api/interviewer/resumeAnalysis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ cv_text: text, id: ResumeId, structuredData:structuredData }),
+      });
 
+      if (!response.ok) {
+        toast.error("Error in getSummary")
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      // console.log("Response received:", result);
+      
+      // Return result if needed
+      Setnext(true)
+      toast.success("Summary uploaded successfully")
+      return result;
+    } catch (error) {
+      console.error("Error in getSummary:", error);
+    }
+  }, []);
   return (
     <div className="md:h-screen bg-primary-foreground min-h-screen p-4 flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
       <div className="max-w-[1350px] h-full max-h-[570px]  w-full flex flex-col items-stretch md:flex-row justify-evenly">
@@ -479,8 +530,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             >
               <select
                 className={`w-full p-4 py-2 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${profile === "other" || profile === null || profile === ""
-                    ? "border-slate-500"
-                    : "border-primary ring-primary ring-1"
+                  ? "border-slate-500"
+                  : "border-primary ring-primary ring-1"
                   }  `}
                 value={manualJobDescription}
                 onChange={(e) => {
@@ -504,8 +555,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                 <input
                   type="text"
                   className={`w-full p-4 py-2 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${profile === "other" || profile === null
-                      ? "border-slate-500"
-                      : "border-primary ring-primary ring-1"
+                    ? "border-slate-500"
+                    : "border-primary ring-primary ring-1"
                     }  `}
                   placeholder="Please specify your profile"
                   value={otherProfile}
@@ -521,10 +572,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             {step === 1 ? (
               <button
                 className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-4 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${isResumeUploaded
-                    ? "bg-gray-600 hover:bg-gray-800 text-white"
-                    : "bg-slate-500 text-gray-800 cursor-not-allowed"
+                  ? "bg-gray-600 hover:bg-gray-800 text-white"
+                  : "bg-slate-500 text-gray-800 cursor-not-allowed"
                   }`}
-                disabled={!isResumeUploaded}
+                disabled={!next}
                 onClick={handleNextClick}
               >
                 Next
@@ -533,10 +584,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               <>
                 <button
                   className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-4 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${profile
-                      ? "bg-gray-600 hover:bg-gray-800 text-white"
-                      : "bg-slate-500 text-gray-800 cursor-not-allowed"
+                    ? "bg-gray-600 hover:bg-gray-800 text-white"
+                    : "bg-slate-500 text-gray-800 cursor-not-allowed"
                     }`}
-                  disabled={!profile}
+                  disabled={!profile }
                   onClick={handleNextClick}
                 >
                   Next

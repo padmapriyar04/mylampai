@@ -7,7 +7,7 @@ import PDFViewer from "./StepThree";
 import { toast } from "sonner";
 
 // const baseUrl = "https://optim-cv-judge.onrender.com";
-const baseUrl = process.env.NEXT_PUBLIC_CV_REVIEWER_SERVER_URL;
+const baseUrl = process.env.NEXT_PUBLIC_RESUME_API_ENDPOINT;
 
 const Page: React.FC = () => {
   const { setResumeFile, setJobDescriptionFile, resumeFile } =

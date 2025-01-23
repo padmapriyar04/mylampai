@@ -41,7 +41,7 @@ const formSchema = z.object({
 });
 
 // const baseUrl = "https://optim-cv-judge.onrender.com";
-const baseUrl = process.env.NEXT_PUBLIC_CV_REVIEWER_SERVER_URL;
+const baseUrl = process.env.NEXT_PUBLIC_RESUME_API_ENDPOINT;
 
 
 function generateFileName(originalFileName: string, filetype: string) {

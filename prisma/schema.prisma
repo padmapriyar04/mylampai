@@ -255,33 +255,33 @@ enum Availability {
 }
 
 model JobRound {
-  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
   roundName           String
   roundNumber         Int
   details             String
   roundType           String
   roundDate           DateTime
   candidatesQualified QualifiedRounds[]
-  jobProfileId        String             @db.ObjectId
-  jobProfile          JobProfile         @relation(fields: [jobProfileId], references: [id], onDelete: Cascade)
-  rubrics             JobRoundRubric[]   
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  jobProfileId        String            @db.ObjectId
+  jobProfile          JobProfile        @relation(fields: [jobProfileId], references: [id], onDelete: Cascade)
+  rubrics             JobRoundRubric[]
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 }
 
 //Evaluation Criteria for each JobRound created by recruiter
 
-model JobRoundRubric {                  
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+model JobRoundRubric {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   parameter   String
   description String
   weightage   Int
   type        String
   condition   String
-  jobRound    JobRound  @relation(fields: [jobRoundId], references: [id], onDelete: Cascade)  
-  jobRoundId  String    @db.ObjectId     
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  jobRound    JobRound @relation(fields: [jobRoundId], references: [id], onDelete: Cascade)
+  jobRoundId  String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model JobCandidate {
@@ -314,20 +314,46 @@ model QualifiedRounds {
 }
 
 model CV {
-  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
   Resume         String
   JobDescription String
-  userId         String?     @db.ObjectId
-  user           User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  analysis       CVAnalysis?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  userId         String?          @db.ObjectId
+  user           User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ResumeAnalysis ResumeAnalysis[]
+  analysis       CVAnalysis[]
+}
+
+model ResumeAnalysis {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  cvId                  String?  @db.ObjectId
+  cv                    CV?      @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  sectionanalysis       Json
+  skillsassessment      Json
+  quantification        Json
+  repetition            Json
+  verbstrength          Json
+  verbtense             Json
+  overusedphrases       Json
+  spellingerrors        String[]
+  genericpoints         String[]
+  summary               String
+  personal_info         Json
+  bullet_point_length   String[]
+  bullet_point_improver String[]
+  total_bullet_points   Json
+  responsibility        Json
+  resume_length         String[]
+  resume_score          Json
+  score                 Int
+  createdAt             DateTime @default(now())
 }
 
 model CVAnalysis {
   id                      String   @id @default(auto()) @map("_id") @db.ObjectId
-  cv                      CV       @relation(fields: [cvId], references: [id])
-  cvId                    String   @unique @db.ObjectId
+  cvId                    String   @db.ObjectId
+  cv                      CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
   summary                 String?
   resumeScore             Float?
   hardSkillsScore         Float?
@@ -409,8 +435,6 @@ model Email {
   newsletterId String     @db.ObjectId
   newsletter   Newsletter @relation(fields: [newsletterId], references: [id])
 }
-
-
 
 model Newsletter {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
