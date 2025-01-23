@@ -1,7 +1,6 @@
 "use server";
 import prisma from "@/lib/index";
 import { uploadFileToAzure } from "./uploadActions";
-import { useId } from "react";
 
 export const createTalentProfile = async (
   formData: FormData,

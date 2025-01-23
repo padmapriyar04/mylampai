@@ -1,3 +1,6 @@
+//npx prisma generate 
+//After every change in this file 
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -26,6 +29,9 @@ model User {
   gender         String?
   location       String?
   role           String          @default("user")
+  work_category  String?
+  work_specialities String[]
+  jobRole        String
   languages      Language[]
   education      Education[]
   talentPool     TalentPool[]
@@ -49,6 +55,7 @@ model User {
   JobCandidate   JobCandidate[]
   // newsletters    Newsletter[]    @relation("NewsletterRecipients")
   Resume         Resume[]
+
 }
 
 model Account {
@@ -307,38 +314,40 @@ model QualifiedRounds {
 }
 
 model CV {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
   Resume         String
   JobDescription String
-  userId         String?  @db.ObjectId
-  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  analysis       CVanalysis
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  userId         String?     @db.ObjectId
+  user           User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analysis       CVAnalysis?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 }
+
 model CVAnalysis {
-  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  cvId                String   @db.ObjectId
-  cv                  CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
-  summary             String? 
-  resumeScore         Float?
-  hardSkillsScore     Float?   
-  softSkillsScore     Float?   
-  experienceScore     Float?   
-  educationScore      Float?   
-  quantificationIssues String[] 
-  bulletPointLength   Json?    
-  bulletPointImprovements Json? 
-  verbTenseIssues     Json?   
-  weakVerbUsage       Json?   
-  repetitionIssues    Json?    
-  sectionFeedback     Json?    
-  skillAnalysis       Json?   
-  spellingIssues      String[] 
-  responsibilityIssues Json?  
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+  cv                      CV       @relation(fields: [cvId], references: [id])
+  cvId                    String   @unique @db.ObjectId
+  summary                 String?
+  resumeScore             Float?
+  hardSkillsScore         Float?
+  softSkillsScore         Float?
+  experienceScore         Float?
+  educationScore          Float?
+  quantificationIssues    String[]
+  bulletPointLength       Json?
+  bulletPointImprovements Json?
+  verbTenseIssues         Json?
+  weakVerbUsage           Json?
+  repetitionIssues        Json?
+  sectionFeedback         Json?
+  skillAnalysis           Json?
+  spellingIssues          String[]
+  responsibilityIssues    Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 }
+
 model Interview {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
   cvText            String?

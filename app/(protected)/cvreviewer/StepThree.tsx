@@ -24,7 +24,9 @@ import {
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const baseUrl = "https://optim-cv-judge.onrender.com";
+// const baseUrl = "https://optim-cv-judge.onrender.com";
+const baseUrl = process.env.NEXT_PUBLIC_CV_REVIEWER_SERVER_URL;
+
 
 interface PDFViewerProps {
   profile: string | null;
