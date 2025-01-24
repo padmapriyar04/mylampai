@@ -32,6 +32,7 @@ model User {
   work_category  String?
   work_specialities String[]
   jobRole        String
+  Notification     Notification[]
   languages      Language[]
   education      Education[]
   talentPool     TalentPool[]
@@ -373,6 +374,21 @@ model CVAnalysis {
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 }
+model Notification {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String @db.ObjectId
+  recruiterId String @db.ObjectId
+  message     String
+  received    Boolean @default(false) 
+  user        User @relation(fields: [userId],references: [id])
+  recuiter  Recruiter? @relation(fields: [recruiterId],references: [id],onDelete: Cascade) 
+}
+
+model Recruiter {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  notification  Notification[]
+}
+
 
 model Interview {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
