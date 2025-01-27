@@ -42,6 +42,7 @@ const Page: React.FC = () => {
   };
 
   const handleNextClick = () => {
+    console.log("next triggered : ",step)
     setStep((prevStep) => prevStep + 1);
   };
 

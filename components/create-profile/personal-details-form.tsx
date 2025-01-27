@@ -35,6 +35,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { useUserStore } from "@/utils/userStore";
 import { updateProfile, uploadImage } from "@/actions/setupProfileActions";
+import { useEffect } from "react";
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -85,6 +86,10 @@ export function PersonalDetailsForm({
   const [profileImagePreview, setProfileImagePreview] = React.useState<string>(
     "https://i.pinimg.com/originals/57/3f/22/573f22a1aa17b366f5489745dc4704e1.jpg"
   );
+  
+  useEffect(()=>{
+    console.log("userInfo in personal details forms__-> ",userData)
+  },[userData])
 
   const form = useForm<PersonalDetailsForm>({
     resolver: zodResolver(formSchema),
@@ -201,7 +206,7 @@ export function PersonalDetailsForm({
                 <FormItem className="w-[calc(33%-0.5rem)]">
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your phone number" {...field} />
+                    <Input placeholder="Enter your phone number" {...field} defaultValue={userData?.phone} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -258,7 +263,7 @@ export function PersonalDetailsForm({
                 <FormItem className="col-span-2">
                   <FormLabel>Street Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your street address" {...field} />
+                    <Input placeholder="Enter your street address" {...field} defaultValue={userData?.street} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -282,7 +287,9 @@ export function PersonalDetailsForm({
                       </FormControl>
                       <SelectContent>
                         {countries.map((country) => (
-                          <SelectItem key={country.code} value={country.code}>
+                          <SelectItem key={country.code} value={country.code} defaultValue={
+                            countries.find(c => c.name === userData?.country)?.code
+                          } >
                             {country.name}
                           </SelectItem>
                         ))}

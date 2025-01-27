@@ -29,9 +29,6 @@ model User {
   gender         String?
   location       String?
   role           String          @default("user")
-  work_category  String?
-  work_specialities String[]
-  jobRole        String
   languages      Language[]
   education      Education[]
   talentPool     TalentPool[]
