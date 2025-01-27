@@ -1136,7 +1136,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {
                                     {key}
                                   </AccordionTrigger>
                                   <AccordionContent>
-                                    {reviewedData?.data?.sectionanalysis[key]?.map(data => { return <div>{data}</div> })}
+                                    {reviewedData?.data?.sectionanalysis[key]?.map((data: string) => { return <div key={data}>{data}</div> })}
                                   </AccordionContent>
                                 </AccordionItem>
                               )

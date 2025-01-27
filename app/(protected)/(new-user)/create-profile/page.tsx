@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { addSkills, createTalentProfile } from "@/actions/setupProfileActions";
+import { addProfiles, addSkills, createEducation, createEmployments, createTalentProfile, updateDescription, updateProfile, updateTitle } from "@/actions/setupProfileActions";
 import { Clock9 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JobCategoriesSelector } from "@/components/create-profile/job-specialites";
@@ -26,14 +26,15 @@ import { LanguageSelector } from "@/components/create-profile/language-selector"
 import { BioDetails } from "@/components/create-profile/bio-details";
 import { HourlyRate } from "@/components/create-profile/hourly-rate";
 import { PersonalDetailsForm } from "@/components/create-profile/personal-details-form";
-import { useState, useRef, useCallback, DragEvent } from "react";
+import { useState, useRef, useCallback, DragEvent, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUserStore } from "@/utils/userStore";
 import { useProfileStore } from "@/utils/profileStore";
 import * as pdfjsLib from "pdfjs-dist/webpack";
 import { generateSasToken } from "@/actions/azureActions";
 import { IoCloudUploadOutline, IoDocumentAttach } from "react-icons/io5";
-import { User } from "next-auth";
+import { title } from "process";
+import { updateEmployment } from "@/actions/talentMatchActions";
 
 
 const formSchema = z.object({
@@ -50,42 +51,42 @@ function generateFileName(originalFileName: string, filetype: string) {
   return `${timestamp}_${filetype}.${fileExtension}`;
 }
 
-interface Experience {
-  Company: string;
-  Position: string;
-  Location: string;
-  "Start Date": string;
-  "End Date": string;
-  Description: string;
+interface EmploymentData {
+  company: string;
+  position: string;
+  location?: string;
+  startDate: Date;
+  endDate: Date;
+  description: string;
 }
 
-interface Education {
-  "School/Institution": string;
-  Degree: string | null;
-  "Field of Study": string | null;
-  Grade: string;
-  "Start Date": string;
-  "End Date": string;
-  Description: string | null;
-}
+interface EducationData {
+  school: string;
+  degree: string;
+  field?: string;
+  grade?:string;
+  startDate?: Date;
+  endDate?: Date;
+  description?: string;
+};
 
 interface StructuredResult {
-  Name: string;
-  "First Name": string;
-  "Last Name": string;
-  "Phone Number": string;
-  "Street Address": string | null;
-  Country: string | null;
-  City: string | null;
-  "State/Province": string | null;
-  "ZIP/Postal Code": string | null;
-  "Work Category": string;
-  "Work Specialities": string[];
-  Skills: string[];
-  "Job Role": string;
-  Experience: Experience[];
-  Education: Education[];
-  Bio: string;
+  name: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  street: string | null;
+  country: string | null;
+  city: string | null;
+  state: string | null;
+  zipCode: string | null;
+  workCategory: string;
+  profiles: string[];
+  skills: string[];
+  jobRole: string;
+  experience: EmploymentData[];
+  education: EducationData[];
+  bio: string;
 }
 
 interface UserInfo {
@@ -98,30 +99,35 @@ interface UserInfo {
   state: string;
   country: string;
   zipCode: string;
-  work_category: string;
-  work_specialities: string[];
 }
 
 export default function CreateProfile() {
   const { id, setId, setResumeUrl } = useProfileStore();
-  const { userData } = useUserStore();
+  const { userData,setUser} = useUserStore();
   const [step, setStep] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [userInfo,setuserInfo]=useState<UserInfo>({
-    name:"",
-    first_name:"",
-    last_name:"",
-    phone:"",
-    street:"",
-    city:"",
-    state:"",
-    country:"",
-    zipCode:"",
-    work_category:"",
-    work_specialities:[]
+  const [analysing, setAnalysing] = useState(false)
+  const [userInfo, setuserInfo] = useState<UserInfo>({
+    name: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
+    street: "",
+    city: "",
+    state: "",
+    country: "",
+    zipCode: ""
   })
+
+  const [profiles, setProfiles] = useState<string[]>([])
+  const [skills, setSkills] = useState<string[]>([])
+  const [jobTitle, setJobTitle] = useState<string>("")
+  const [experiences, setExperiences] = useState<EmploymentData[]>([])
+  const [educations, setEducations] = useState<EducationData[]>([])
+  const [userBio, setUserBio] = useState<string>("")
+  // const user = await auth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -137,132 +143,12 @@ export default function CreateProfile() {
   };
 
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-    };
-  
-    const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      const file = event.dataTransfer.files[0];
-  
-      setUploading(true);
-  
-      if (file && file.type === "application/pdf") {
-        if (file.size > 1 * 1024 * 1024) {
-          toast.error("File size should be less than 1MB");
-          setUploading(false);
-          return;
-        }
-        const blobName = generateFileName(file.name, "cv");
-        const sasUrl = await generateSasToken(blobName);
-        if (!sasUrl) {
-          toast.error("Error uploading resume");
-          return;
-        }
-  
-        try {
-          const uploadResponse = await fetch(sasUrl, {
-            method: "PUT",
-            headers: {
-              "x-ms-blob-type": "BlockBlob",
-            },
-            body: file,
-          });
-  
-          if (!uploadResponse.ok) {
-            toast.error("Resume Upload Failed");
-          } else {
-            console.log(uploadResponse);
-          }
-        } catch (error) {
-          console.error(error);
-        }
-  
-        // setResumeFile(file);
-  
-        const fileReader = new FileReader();
-        let extractedText = "";
-  
-        fileReader.onload = async function () {
-          const typedArray = new Uint8Array(this.result as ArrayBuffer);
-  
-          // Load the PDF document
-          const pdf = await pdfjsLib.getDocument(typedArray).promise;
-  
-          // Loop through each page
-          for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
-            const page = await pdf.getPage(pageNumber);
-            const textContent = await page.getTextContent();
-  
-            // Extract text
-            const pageText = textContent.items
-              .map((item: any) => item.str)
-              .join(" ");
-            extractedText += pageText + "\n";
-          }
-  
-          // Convert the file to base64
-          const base64Reader = new FileReader();
-          base64Reader.onloadend = async () => {
-            const base64String = base64Reader.result?.toString().split(",")[1];
-  
-            if (base64String && extractedText) {
-              try {
-                // setExtractedText(extractedText);
-                const structuredDataResult = await extractStructuredData(
-                  extractedText
-                );
-  
-                // Check if structuredDataResult and 
-                console.log("structurnmn  ",structuredDataResult)
-                // structuredDataResult.message exist before accessing
-                if (structuredDataResult) {
-                  // setStructuredData(structuredDataResult.message);
-                } else {
-                  toast.error("Failed to extract structured data");
-                }
-  
-                // Trigger the upload of CV and Job Description with base64 string and extracted text
-                // await uploadCVAndJobDescription(base64String, extractedText);
-              } catch (err) {
-                toast.error("Failed to process the PDF");
-                console.error("Error:", err);
-              }
-            } else {
-              toast.error("Error converting file to base64 or extracting text");
-            }
-          };
-  
-          base64Reader.readAsDataURL(file); // Start reading the file as a data URL
-        };
-  
-        fileReader.readAsArrayBuffer(file);
-      } else {
-        toast.error("Please upload a PDF file");
-        setUploading(false);
-      }
-    };
-
-    const mapStructuredResultToUserInfo  =(structuredResult:StructuredResult):UserInfo=>{
-       return {
-        name: structuredResult.Name || "",
-        first_name: structuredResult["First Name"] || "",
-        last_name: structuredResult["Last Name"] || "",
-        phone: structuredResult["Phone Number"] || "",
-        street: structuredResult["Street Address"] || "",
-        city: structuredResult.City || "",
-        state: structuredResult["State/Province"] || "",
-        country: structuredResult.Country || "",
-        zipCode: structuredResult["ZIP/Postal Code"] || "",
-        work_category: structuredResult["Work Category"] || "",
-        work_specialities: structuredResult["Work Specialities"] || []
-       }
-    }
-
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
     event.preventDefault();
-    const file = event.target.files?.[0];
+  };
+
+  const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
 
     setUploading(true);
 
@@ -274,7 +160,6 @@ export default function CreateProfile() {
       }
       const blobName = generateFileName(file.name, "cv");
       const sasUrl = await generateSasToken(blobName);
-
       if (!sasUrl) {
         toast.error("Error uploading resume");
         return;
@@ -329,15 +214,14 @@ export default function CreateProfile() {
           if (base64String && extractedText) {
             try {
               // setExtractedText(extractedText);
-              console.log("extracted Text :-> ", extractedText)
               const structuredDataResult = await extractStructuredData(
                 extractedText
               );
 
-              // Check if structuredDataResult and structuredDataResult.message exist before accessing
+              // Check if structuredDataResult and 
+              console.log("structurnmn  ", structuredDataResult)
+              // structuredDataResult.message exist before accessing
               if (structuredDataResult) {
-                console.log("structuredDataResult :-> ", structuredDataResult)
-                setuserInfo(mapStructuredResultToUserInfo(structuredDataResult))
                 // setStructuredData(structuredDataResult.message);
               } else {
                 toast.error("Failed to extract structured data");
@@ -357,6 +241,185 @@ export default function CreateProfile() {
         base64Reader.readAsDataURL(file); // Start reading the file as a data URL
       };
 
+      fileReader.readAsArrayBuffer(file);
+    } else {
+      toast.error("Please upload a PDF file");
+      setUploading(false);
+    }
+  };
+
+  const mapStructuredResultToUserInfo = (structuredResult: StructuredResult): UserInfo => {
+    return {
+      name: structuredResult.name || "",
+      first_name: structuredResult.first_name || "",
+      last_name: structuredResult.last_name || "",
+      phone: structuredResult.phone|| "",
+      street: structuredResult.street || "",
+      city: structuredResult.city || "",
+      state: structuredResult.state || "",
+      country: structuredResult.country || "",
+      zipCode: structuredResult.zipCode || ""
+    }
+  }
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    event.preventDefault();
+    const file = event.target.files?.[0];
+
+    setUploading(true);
+
+    if (file && file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file");
+      return;
+    }
+
+    if (!userData) {
+      toast.error("Unknown error occurred");
+      return;
+    }
+
+    if (file && file.type === "application/pdf") {
+      if (file.size > 1 * 1024 * 1024) {
+        toast.error("File size should be less than 1MB");
+        setUploading(false);
+        return;
+      }
+
+      //calling creatTalentProfile
+      const data = new FormData();
+      data.append("resume", file);
+
+      try {
+        const res = await createTalentProfile(data, userData.id)
+
+        if (res.status !== 200) {
+          toast.error(res.error);
+        } else {
+          if (res.data) {
+            setResumeUrl(res.data.resumeUrl);
+            setId(res.data.id);
+          }
+        }
+
+      } catch (error) {
+        toast.error("Failed to upload resume")
+      }
+
+      const blobName = generateFileName(file.name, "cv");
+      const sasUrl = await generateSasToken(blobName);
+
+      if (!sasUrl) {
+        toast.error("Error uploading resume");
+        return;
+      }
+
+      try {
+        const uploadResponse = await fetch(sasUrl, {
+          method: "PUT",
+          headers: {
+            "x-ms-blob-type": "BlockBlob",
+          },
+          body: file,
+        });
+
+        if (!uploadResponse.ok) {
+          toast.error("Resume Upload Failed");
+        } else {
+          console.log(uploadResponse);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+
+      // setResumeFile(file);
+
+      const fileReader = new FileReader();
+      let extractedText = "";
+      setAnalysing(true)
+      fileReader.onload = async function () {
+        const typedArray = new Uint8Array(this.result as ArrayBuffer);
+
+        // Load the PDF document
+        const pdf = await pdfjsLib.getDocument(typedArray).promise;
+
+        // Loop through each page
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+          const page = await pdf.getPage(pageNumber);
+          const textContent = await page.getTextContent();
+
+          // Extract text
+          const pageText = textContent.items
+            .map((item: any) => item.str)
+            .join(" ");
+          extractedText += pageText + "\n";
+        }
+
+        // Convert the file to base64
+        const base64Reader = new FileReader();
+        base64Reader.onloadend = async () => {
+          const base64String = base64Reader.result?.toString().split(",")[1];
+
+          if (base64String && extractedText) {
+            try {
+              // setExtractedText(extractedText);
+              // console.log("extracted Text :-> ", extractedText)
+              const structuredDataResult = await extractStructuredData(
+                extractedText
+              );
+
+              // Check if structuredDataResult and structuredDataResult.message exist before accessing
+              if (structuredDataResult) {
+                setuserInfo(mapStructuredResultToUserInfo(structuredDataResult))
+                console.log("setting up the userInfo ")
+                console.log("structuredDataResult :-> ", structuredDataResult.profiles)
+                setProfiles(structuredDataResult.profiles)
+                console.log("skills --> ", structuredDataResult.skills)
+                setSkills(structuredDataResult.skills)
+
+                setJobTitle(structuredDataResult.jobRole)
+
+                interface RawEmploymentData {
+                  company: string;
+                  position: string;
+                  location?: string;
+                  startDate: string; // API returns dates as strings
+                  endDate: string;
+                  description: string;
+                }
+
+                setExperiences(structuredDataResult["experience"].map((exp: RawEmploymentData): EmploymentData => ({
+                  ...exp,
+                  startDate: new Date(exp.startDate),
+                  endDate: new Date(exp.endDate)
+                })))
+
+
+
+                setEducations(structuredDataResult.education)
+
+                setUserBio(structuredDataResult.bio)
+
+                // setStructuredData(structuredDataResult.message);
+              } else {
+                toast.error("Failed to extract structured data");
+              }
+
+              // Trigger the upload of CV and Job Description with base64 string and extracted text
+              // await uploadCVAndJobDescription(base64String, extractedText);
+            } catch (err) {
+              toast.error("Failed to process the PDF");
+              console.error("Error:", err);
+            }
+          } else {
+            toast.error("Error converting file to base64 or extracting text");
+          }
+        };
+
+        base64Reader.readAsDataURL(file); // Start reading the file as a data URL
+      };
+      setAnalysing(false)
       fileReader.readAsArrayBuffer(file);
     } else {
       toast.error("Please upload a PDF file");
@@ -415,6 +478,116 @@ export default function CreateProfile() {
     if (step > 1) setStep(val);
   };
 
+  //hooks for calling actions
+  useEffect(() => {
+      if (userData && userData.id) {
+        // console.log("calling....")
+        setUser({
+          ...userData,
+          name: userInfo.name,
+          first_name: userInfo.first_name,
+          last_name: userInfo.last_name,
+          phone: userInfo.phone,
+          street: userInfo.street,
+          city: userInfo.city,
+          state: userInfo.state,
+          country: userInfo.country,
+          zipCode: userInfo.zipCode
+        });
+      }
+  }, [userInfo]);
+
+  // useEffect(() => {
+  //   const updateData = async () => {
+  //     console.log("ids--> ", id)
+  //     if (id) {
+  //       const res = await addProfiles(profiles, id);
+  //       if (res.status !== 200) {
+  //         // toast.error(res.error)
+  //       }else{
+  //         console.log("profiles added successfully")
+  //       }
+  //     }
+  //   }
+  //   updateData()
+  // }, [profiles, id])
+
+  // useEffect(() => {
+  //   const updateData = async () => {
+  //     // console.log("ids--> ", id)
+  //     if (id) {
+  //       const res = await addSkills(profiles, id);
+  //       if (res.status !== 200) {
+  //         // toast.error(res.error)
+  //       }else{
+  //         console.log("skills added successfully: ",id)
+  //       }
+  //     }
+  //   }
+  //   updateData()
+  // }, [skills, id])
+
+  // useEffect(() => {
+
+  //   const updateData = async () => {
+  //     if (id) {
+  //       const res = await updateTitle(jobTitle, id)
+  //       if (res.status !== 200) {
+  //         // toast.error(res.error)
+  //       }else{
+  //         console.log("jobTitle added successfully: ",id)
+  //       }
+  //     }
+  //   }
+  //   updateData()
+
+  // }, [jobTitle, id])
+
+
+  // useEffect(() => {
+  //   const updateData = async () => {
+  //     if (id) {
+  //       const res = await createEmployments(experiences, id)
+  //       if (res.status !== 200) {
+  //         // toast.error(res.error)
+  //       }else {
+  //         console.log("employment added successfully: ",id)
+  //       }
+  //     }
+  //   }
+  //   updateData()
+  // }, [experiences, id])
+
+
+  // useEffect(() => {
+  //   const updateData = async () => {
+  //     if (userData && userData.id) {
+  //       const res = await createEducation(educations, userData.id)
+  //       if (res.status !== 200) {
+  //         // toast.error(res.error)
+  //       }else{
+  //         console.log("educations added : ",userData.id)
+  //       }
+  //     }
+  //   }
+  //   updateData()
+  // }, [educations, userData])
+
+  // useEffect(() => {
+  //   const updateData = async () => {
+  //     if (id) {
+  //       const res = await updateDescription(userBio, id)
+  //       if (res.status !== 200) {
+  //         // toast.error(res.error)
+  //       }else{
+  //         console.log("bio added: ",id)
+  //       }
+  //     }
+  //   }
+  //   updateData()
+  // }, [userBio, id])
+
+
   return (
     <div className="relative">
       <Link href="/" className="absolute top-2 left-4 max-w-[110px]">
@@ -469,7 +642,7 @@ export default function CreateProfile() {
 
           {/* Similar cv uploader like cv reviewer */}
           <div className="flex text-center mb-4 mt-3 w-full text-2xl font-bold text-gray-800">
-             Upload your latest CV/Resume
+            Upload your latest CV/Resume
           </div>
 
           <div className="bg-white py-4 px-8 rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center">
@@ -531,7 +704,7 @@ export default function CreateProfile() {
                   ? "Upload again"
                   : uploading
                     ? "Uploading..."
-                    : "Upload Resume"}
+                    : analysing ? "AI Analysing.." : "Upload Resume"}
               </button>
             </div>
           </div>

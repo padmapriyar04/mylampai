@@ -33,6 +33,8 @@ model User {
   work_specialities String[]
   jobRole        String
   Notification     Notification[]
+
+
   languages      Language[]
   education      Education[]
   talentPool     TalentPool[]
