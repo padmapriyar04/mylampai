@@ -31,7 +31,6 @@ model User {
   role           String          @default("user")
   work_category  String?
   work_specialities String[]
-  jobRole        String
   Notification     Notification[]
 
 
