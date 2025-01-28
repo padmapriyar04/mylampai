@@ -371,7 +371,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       }
       
       const result = await response.json();
-      // console.log("Response received:", result);
+      console.log("Response received:", result);
       
       // Return result if needed
       Setnext(true)

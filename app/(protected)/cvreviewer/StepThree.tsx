@@ -31,6 +31,7 @@ interface PDFViewerProps {
   profile: string | null;
   structuredData: any;
   localResume: any;
+  cvId:string;
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ profile }) => {

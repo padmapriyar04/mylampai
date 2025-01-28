@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { useUserStore } from "@/utils/userStore";
 import { updateProfile, uploadImage } from "@/actions/setupProfileActions";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -86,10 +87,7 @@ export function PersonalDetailsForm({
   const [profileImagePreview, setProfileImagePreview] = React.useState<string>(
     "https://i.pinimg.com/originals/57/3f/22/573f22a1aa17b366f5489745dc4704e1.jpg"
   );
-  
-  useEffect(()=>{
-    console.log("userInfo in personal details forms__-> ",userData)
-  },[userData])
+  const router=useRouter()
 
   const form = useForm<PersonalDetailsForm>({
     resolver: zodResolver(formSchema),
@@ -104,11 +102,13 @@ export function PersonalDetailsForm({
       if (!userData || !userData.id) {
         throw new Error("User not found");
       }
-
+      console.log("updating at id: ",userData?.id)
       const res = await updateProfile(data, userData.id);
 
       if (res.status !== 200) {
         toast.error("Failed to update profile");
+      }else{
+        router.push("/talentmatch")
       }
     } catch (error) {
       console.error(error);
