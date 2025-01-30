@@ -52,46 +52,47 @@ const validateEmail = (email: string) => {
 //   }
 // };
 
-export const GET = async (req: NextRequest) => {
-  const email = req.nextUrl.searchParams.get('email');
-  let opentime = req.nextUrl.searchParams.get('opentime');
-  const newsletterId = req.nextUrl.searchParams.get('newsletterId');
-  if (!email || !newsletterId) {
-    return NextResponse.json({ error: "Email Required" }, { status: 400 });
-  }
+// export const GET = async (req: NextRequest) => {
+//   const email = req.nextUrl.searchParams.get('email');
+//   let opentime = req.nextUrl.searchParams.get('opentime');
+//   const newsletterId = req.nextUrl.searchParams.get('newsletterId');
+//   if (!email || !newsletterId) {
+//     return NextResponse.json({ error: "Email Required" }, { status: 400 });
+//   }
 
-  // if(!opentime){
-  //   opentime = new Date();
-  // }
+//   // if(!opentime){
+//   //   opentime = new Date();
+//   // }
 
-  try {
-    const emailobj = await prisma.email.update({
-      where: {
-        id: newsletterId,
-        emailAddress: email,
-      },
-      data: {
-        status: "read",
-        openedAt: opentime
-      }
-    })
-    console.log(`Email has been opened by ${email} at ${opentime}`);
-  } catch (error) {
-    console.log(error);
-  }
+//   try {
+//     const emailobj = await prisma.email.update({
+//       where: {
+//         id: newsletterId,
+//         emailAddress: email,
+//       },
+//       data: {
+//         status: "read",
+//         openedAt: opentime
+//       }
+//     })
+//     console.log(`Email has been opened by ${email} at ${opentime}`);
+//   } catch (error) {
+//     console.log(error);
+//   }
 
-  return NextResponse.json({ status: 200 });
-}
+//   return NextResponse.json({ status: 200 });
+// }
+
 
 
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { emails, subject, content } = body;
+    const { emails, subject, content,template } = body;
 
-    if (!emails || !subject || !content) {
+    if (!emails || !subject || !content || !template) {
       return NextResponse.json(
-        { error: "Emails, subject, and content are required" },
+        { error: "Emails, subject, content and template are required" },
         { status: 400 }
       );
     }
@@ -99,13 +100,14 @@ export const POST = async (req: NextRequest) => {
     const EmailsMailString = emails.join(", ");
 
     try {
-      const res = await sendEmail(EmailsMailString, subject, content);
+      const res = await sendEmail(EmailsMailString, subject, template);
 
       if (res === "success") {
         const newNewsletter = await prisma.newsletter.create({
           data: {
             subject,
             content,
+            template,
             sentTimestamp: new Date(),
             openCount: 0,
           },
@@ -116,7 +118,7 @@ export const POST = async (req: NextRequest) => {
             prisma.email.create({
               data: {
                 emailAddress: email,
-                status: "sent",
+                status: 'Delivered',
                 newsletterId: newNewsletter.id,
               },
             })

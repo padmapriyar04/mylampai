@@ -4,7 +4,9 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import emailtemplate from "@/utils/newsletter";
 import otptemplate from "@/utils/otptemplate";
+import displaytemplate from '@/utils/displayTemplate';
 import { sendNewsLetter, scheduleNewsLetter } from "@/utils/newlettermailing";
+import { generateEmailTemplate,generateDisplayEmailTemplate } from "@/utils/templatefunction";
 
 const modules = {
   toolbar: [
@@ -26,8 +28,8 @@ const modules = {
 };
 
 const availableTemplates = [
-  { name: "Standard Template", template: emailtemplate },
-  { name: "OTP Template", template: otptemplate },
+  { name: "Standard Template", template: displaytemplate,sendtemplate : emailtemplate },
+  { name: "OTP Template", template: otptemplate,sendtemplate : otptemplate },
 ];
 
 export default function AdminDashboard() {
@@ -35,12 +37,14 @@ export default function AdminDashboard() {
   const [emailContent, setEmailContent] = useState("");
   const [emailTemplate, setEmailTemplate] = useState(emailtemplate);
   const [finalHTMLTemplate, setFinalHtmlTemplate] = useState(emailTemplate);
+  const [displayHTMLTemplate, setDisplayHTMLTemplate] = useState(emailTemplate);
   const [subject, setSubject] = useState("");
   const [emailIds, setEmailIds] = useState("");
   const [scheduleMode, setScheduleMode] = useState(false);
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("");
   const [scheduleFrequency, setScheduleFrequency] = useState("One-Time");
+  const [isEmailSent,setIsEmailSent] = useState(false); 
 
   const createMarkup = (html: any) => {
     setEmailContent(html);
@@ -48,20 +52,31 @@ export default function AdminDashboard() {
       "{{EMAIL_CONTENT}}",
       emailContent
     );
-    setFinalHtmlTemplate(htmlTemplate);
-  };
-
-  useEffect(() => {
-    const htmlTemplate = emailTemplate.replace(
+    const displaytemplate = displayHTMLTemplate.replace(
       "{{EMAIL_CONTENT}}",
       emailContent
-    );
+    )
+    console.log(value);
     setFinalHtmlTemplate(htmlTemplate);
+    setDisplayHTMLTemplate(displaytemplate);
+  };
+
+  const getTextfromHTML = (html :any) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  }
+
+  useEffect(() => {
+    const htmlTemplate = generateEmailTemplate(emailContent);
+    setFinalHtmlTemplate(htmlTemplate);
+    setDisplayHTMLTemplate(generateDisplayEmailTemplate(emailContent));
   }, [emailContent]);
 
   const handleSendEmail = async () => {
     const recipientEmails = emailIds.split(",").map((email) => email.trim());
-    const res = await sendNewsLetter(recipientEmails, subject, finalHTMLTemplate);
+    const body = getTextfromHTML(value);
+    const res = await sendNewsLetter(recipientEmails, subject,body, finalHTMLTemplate);
     console.log(res);
     if(res.message === "Emails sent successfully"){
       alert("Email sent successfully!");
@@ -72,9 +87,11 @@ export default function AdminDashboard() {
 
   const handleScheduleEmail = async () => {
     const recipientEmails = emailIds.split(",").map((email) => email.trim());
+    const body = getTextfromHTML(value);
     const res = await scheduleNewsLetter(
       recipientEmails,
       subject,
+      body,
       finalHTMLTemplate,
       scheduleDate as string,
       scheduleTime as string,
@@ -88,6 +105,7 @@ export default function AdminDashboard() {
 
   const handleTemplateChange = (e: any) => {
     setEmailTemplate(availableTemplates[e.target.value].template);
+    setDisplayHTMLTemplate(availableTemplates[e.target.value].template);
   };
 
   return (
@@ -142,7 +160,7 @@ export default function AdminDashboard() {
       <div>
         <label className="block text-lg font-medium text-gray-700">Preview</label>
         <div
-          dangerouslySetInnerHTML={{ __html: finalHTMLTemplate }}
+          dangerouslySetInnerHTML={{ __html: displayHTMLTemplate }}
           className="p-4 border border-gray-300 rounded-lg bg-gray-300 h-96 overflow-y-scroll"
         />
       </div>

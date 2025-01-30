@@ -6,13 +6,13 @@ import * as cronJob from "node-cron";
 export const POST = async (req: NextRequest) => {
     try {
         const body = await req.json();
-        const { emails, subject, content, date, time, frequency } = body;
+        const { emails, subject, content,template, date, time, frequency } = body;
 
         console.log(body);
 
-        if (!emails || !subject || !content || !date) {
+        if (!emails || !subject || !content || !date || !template || !time || !frequency) {
             return NextResponse.json(
-                { error: "Emails, subject, content and time are required" },
+                { error: "Emails, subject, content, time,template and frequency are required" },
                 { status: 400 }
             );
         }
@@ -45,7 +45,7 @@ export const POST = async (req: NextRequest) => {
         const JobPromise = new Promise<string>((resolve, reject) => {
             const task = cronJob.schedule(cronExp, async () => {
                 try {
-                    const res = await sendEmail(EmailsMailString, subject, content);
+                    const res = await sendEmail(EmailsMailString, subject, template);
                     console.log(res);
                     task.stop();
                     resolve(res);
@@ -76,6 +76,7 @@ export const POST = async (req: NextRequest) => {
                 data: {
                     subject,
                     content,
+                    template,
                     sentTimestamp: new Date(),
                     openCount: 0,
                 },
@@ -86,7 +87,7 @@ export const POST = async (req: NextRequest) => {
                     prisma.email.create({
                         data: {
                             emailAddress: email,
-                            status: "sent",
+                            status: 'Delivered',
                             newsletterId: newNewsletter.id,
                         },
                     })

@@ -3,13 +3,14 @@
 export const sendNewsLetter = async (
     emails: string[],
     subject: string,
-    content: string
+    content: string,
+    template : string
 ) => {
     try {
         const response = await fetch("/api/newsletteremails", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ emails, subject, content }),
+            body: JSON.stringify({ emails, subject, content, template }),
         });
 
         if (response.ok) {
@@ -32,6 +33,7 @@ export const scheduleNewsLetter = async (
     emails: string[],
     subject: string,
     content: string,
+    template : string,
     date: string,
     time: string,
     frequency: string
@@ -41,7 +43,7 @@ export const scheduleNewsLetter = async (
         const response = await fetch("/api/ScheduleNewsletter", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ emails, subject, content, date,time,frequency})
+            body: JSON.stringify({ emails, subject, content,template, date,time,frequency})
         });
     
         if (response.ok) {

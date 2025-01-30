@@ -28,13 +28,7 @@ export default function SentMailsList({ Status }: SentMailsListProps) {
                 <ul className="grid grid-cols-1 gap-y-2 gap-x-6 items-start p-6">
                     {emails.map((email) => (
                         <li key={email.id} className="max-w-3xl mt-2 p-6 bg-white shadow-md rounded-lg">
-                            <h2 className="text-2xl font-bold mb-4">{"Email tag" }</h2>
-                            <div>
-                                <span>Subject : </span>{" "}{email.subject || "Not available"}
-                            </div>
-                            {/* <div>
-                    <span>Content : </span>{" "}{newsletter.content || "Not Available"}
-                </div> */}
+                            <h2 className="text-2xl font-bold mb-4"><span>Subject : </span>{" "}{email.subject || "Not available"}</h2>
                             <div>
                                 <span>Template : </span>{" "}{email.template || "Not Available"}
                             </div>
@@ -42,8 +36,6 @@ export default function SentMailsList({ Status }: SentMailsListProps) {
                                 <span className="font-semibold">Open Count:</span>{" "}
                                 {email.openCount ?? "N/A"}
                             </div>
-                            {/* <h3 className=" mb-1 text-slate-900 font-semibold">{email.subject}</h3>
-                            <div className="prose prose-slate prose-sm text-slate-600 h-48 overflow-y-scroll"><p>{email.content}</p></div> */}
                             <button
                                 onClick={() => Status(email.id)}
                                 className="group inline-flex items-center h-9 rounded-full text-sm font-semibold whitespace-nowrap px-3 focus:outline-none focus:ring-2 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 focus:ring-slate-500 mt-6"

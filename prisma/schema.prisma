@@ -353,10 +353,15 @@ model Analysis {
   updatedAt    DateTime  @updatedAt
 }
 
+enum EmailStatus{
+  Delivered
+  Opened
+}
+
 model Email {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   emailAddress String
-  status       String
+  status       EmailStatus     @default(Delivered)
   openedAt     DateTime?
   newsletterId String     @db.ObjectId
   newsletter   Newsletter @relation(fields: [newsletterId], references: [id])

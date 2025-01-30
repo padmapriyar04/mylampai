@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminDashboard from "./dashboard";
 import SentMailsList from "./SentMailsList";
 import EmailStats from "./EmailStats";
