@@ -37,7 +37,7 @@
     "types/pdfjs-dist.d.ts",
     "components/ui/globe.jsx",
     "build/types/**/*.ts"
-  ],
+, "public/audioProcessor.js", "components/speech-to-text/speechRecognition.tsx"  ],
   "exclude": [
     "node_modules",
   ]

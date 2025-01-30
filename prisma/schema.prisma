@@ -248,17 +248,33 @@ enum Availability {
 }
 
 model JobRound {
-  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
+  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
   roundName           String
   roundNumber         Int
   details             String
   roundType           String
   roundDate           DateTime
   candidatesQualified QualifiedRounds[]
-  jobProfileId        String            @db.ObjectId
-  jobProfile          JobProfile        @relation(fields: [jobProfileId], references: [id], onDelete: Cascade)
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  jobProfileId        String             @db.ObjectId
+  jobProfile          JobProfile         @relation(fields: [jobProfileId], references: [id], onDelete: Cascade)
+  rubrics             JobRoundRubric[]   
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+}
+
+//Evaluation Criteria for each JobRound created by recruiter
+
+model JobRoundRubric {                  
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  parameter   String
+  description String
+  weightage   Int
+  type        String
+  condition   String
+  jobRound    JobRound  @relation(fields: [jobRoundId], references: [id], onDelete: Cascade)  
+  jobRoundId  String    @db.ObjectId     
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model JobCandidate {
@@ -296,10 +312,33 @@ model CV {
   JobDescription String
   userId         String?  @db.ObjectId
   user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analysis       CVanalysis
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
-
+model CVAnalysis {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  cvId                String   @db.ObjectId
+  cv                  CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  summary             String? 
+  resumeScore         Float?
+  hardSkillsScore     Float?   
+  softSkillsScore     Float?   
+  experienceScore     Float?   
+  educationScore      Float?   
+  quantificationIssues String[] 
+  bulletPointLength   Json?    
+  bulletPointImprovements Json? 
+  verbTenseIssues     Json?   
+  weakVerbUsage       Json?   
+  repetitionIssues    Json?    
+  sectionFeedback     Json?    
+  skillAnalysis       Json?   
+  spellingIssues      String[] 
+  responsibilityIssues Json?  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
 model Interview {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
   cvText            String?

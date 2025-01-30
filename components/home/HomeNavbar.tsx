@@ -17,16 +17,24 @@ import { setCookie } from "@/utils/cookieUtils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useRoleStore } from "@/utils/loginStore";
+import { usePathname } from "next/navigation";
 
 const HomeNavbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
   const { data } = useSession();
+  const pathname = usePathname();
 
   const { role, setRole } = useRoleStore();
 
   const { userData, setUserData } = useUserStore();
   const [initials, setInitials] = useState("Home");
+  const hiddenOn = ["/recruiter/"];
+
+  const isHidden = hiddenOn.some((route) =>
+    pathname.startsWith(route.replace(/\/$/, ""))
+  );
+  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,6 +97,8 @@ const HomeNavbar = () => {
 
     setInitials(getUserInitials);
   }, [userData]);
+  
+  if (isHidden) return null;
 
   return (
     <div
@@ -130,7 +140,7 @@ const HomeNavbar = () => {
 
         {userData ? (
           <Link
-            href={"/talenmatch"}
+            href={"/talentmatch"}
             className="flex items-center bg-primary h-[35px] text-white pl-4 pr-2 gap-2 rounded-lg "
           >
             {initials}
