@@ -75,7 +75,7 @@ export const generateEmailTemplate = (emailContent: string): string => {
                             style="top: 2px; left: 4px; max-width: 130px;" />
                     </td>
                     <td>
-                    <img src="https://wize.co.in/?utm_source=newsletter&utm_medium=email&utm_campaign=newsletter_views" width="1" height="1" style="display: none;" />
+                    <img src=${process.env.EMAIL_TRACK_URL} width="1" height="1" style="display: none;" />
                     </td>
                 </tr>
                 <tr>
@@ -86,7 +86,7 @@ export const generateEmailTemplate = (emailContent: string): string => {
                 <tr>
                     <td>
                         <div style="margin-top: 24px; text-align: center;">
-                            <a href="https://wize.co.in/"
+                            <a href=${process.env.EMAIL_TRACK_URL}
                                 style="display: inline-block; background-color: #7C3AED; color: white; font-weight: 600; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Join
                                 Now!</a>
                         </div>
