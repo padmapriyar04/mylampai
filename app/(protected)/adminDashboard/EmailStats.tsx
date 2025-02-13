@@ -35,10 +35,11 @@ export default function EmailStats({ newsletterId, onBack }: EmailStatsProps) {
 
     useEffect(() => {
         const data = getData(newsletterId);
-        const emails = fetchEmails(newsletterId);
-        console.log(newsletterId);
-    }, [newsletterId]);
-
+        if (data) {
+            // setNewsletter(data[0]);
+            console.log("data", data);
+        }
+    }, []);
 
     if (!newsletter) {
         return (

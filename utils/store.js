@@ -6,9 +6,13 @@ export const useInterviewStore = create(
     (set) => ({
       resumeFile: null,
       jobDescriptionFile: null,
-      extractedText: "",
+      extractedText: '',
+      resumeId:'',
+      summaryData:null,
       structuredData: null,
+      setResumeId:(data)=>set({resumeId:data}),
       setStructuredData: (data) => set({ structuredData: data }),
+      setSummaryData: (data) => set({ summaryData: data }),
       setResumeFile: (file) => {
         const reader = new FileReader();
         reader.onloadend = () => {

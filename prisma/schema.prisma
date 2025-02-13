@@ -1,3 +1,6 @@
+//npx prisma generate 
+//After every change in this file 
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,36 +11,39 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  email          String          @unique
-  name           String?
-  emailVerified  DateTime?
-  image          String?
-  first_name     String?
-  last_name      String?
-  dateOfBirth    DateTime?
-  phone          String?
-  street         String?
-  city           String?
-  state          String?
-  country        String?
-  zipCode        String?
-  hashedPassword String?
-  gender         String?
-  location       String?
-  role           String          @default("user")
-  languages      Language[]
-  education      Education[]
-  talentPool     TalentPool[]
-  jobProfile     JobProfile[]
-  talentProfile  TalentProfile[]
-  accounts       Account[]
-  sessions       Session[]
-  otps           OTP[]
-  cvs            CV[]
-  credits        Int             @default(0)
-  isRegistered   Boolean         @default(false)
-  interviews     Interview[]
+  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  email             String          @unique
+  name              String?
+  emailVerified     DateTime?
+  image             String?
+  first_name        String?
+  last_name         String?
+  dateOfBirth       DateTime?
+  phone             String?
+  street            String?
+  city              String?
+  state             String?
+  country           String?
+  zipCode           String?
+  hashedPassword    String?
+  gender            String?
+  location          String?
+  role              String          @default("user")
+  work_category     String?
+  work_specialities String[]
+  Notification      Notification[]
+  languages         Language[]
+  education         Education[]
+  talentPool        TalentPool[]
+  jobProfile        JobProfile[]
+  talentProfile     TalentProfile[]
+  accounts          Account[]
+  sessions          Session[]
+  otps              OTP[]
+  cvs               CV[]
+  credits           Int             @default(0)
+  isRegistered      Boolean         @default(false)
+  interviews        Interview[]
   // posts            Modules[]
   // communityIds     String[]        @db.ObjectId
   // communities      Community[]     @relation(fields: [communityIds], references: [id])
@@ -46,9 +52,9 @@ model User {
   // messages         Message[]
   // sentmessages     Directmessage[] @relation("SenderUser")
   // receivedMessages Directmessage[] @relation("ReceiverUser")
-  JobCandidate   JobCandidate[]
+  JobCandidate      JobCandidate[]
   // newsletters    Newsletter[]    @relation("NewsletterRecipients")
-  Resume         Resume[]
+  Resume            Resume[]
 }
 
 model Account {
@@ -248,33 +254,33 @@ enum Availability {
 }
 
 model JobRound {
-  id                  String             @id @default(auto()) @map("_id") @db.ObjectId
+  id                  String            @id @default(auto()) @map("_id") @db.ObjectId
   roundName           String
   roundNumber         Int
   details             String
   roundType           String
   roundDate           DateTime
   candidatesQualified QualifiedRounds[]
-  jobProfileId        String             @db.ObjectId
-  jobProfile          JobProfile         @relation(fields: [jobProfileId], references: [id], onDelete: Cascade)
-  rubrics             JobRoundRubric[]   
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  jobProfileId        String            @db.ObjectId
+  jobProfile          JobProfile        @relation(fields: [jobProfileId], references: [id], onDelete: Cascade)
+  rubrics             JobRoundRubric[]
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 }
 
 //Evaluation Criteria for each JobRound created by recruiter
 
-model JobRoundRubric {                  
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+model JobRoundRubric {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   parameter   String
   description String
   weightage   Int
   type        String
   condition   String
-  jobRound    JobRound  @relation(fields: [jobRoundId], references: [id], onDelete: Cascade)  
-  jobRoundId  String    @db.ObjectId     
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  jobRound    JobRound @relation(fields: [jobRoundId], references: [id], onDelete: Cascade)
+  jobRoundId  String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model JobCandidate {
@@ -307,38 +313,55 @@ model QualifiedRounds {
 }
 
 model CV {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
   Resume         String
   JobDescription String
-  userId         String?  @db.ObjectId
-  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  analysis       CVanalysis
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  userId         String?          @db.ObjectId
+  user           User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ResumeAnalysis ResumeAnalysis[]
 }
-model CVAnalysis {
-  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  cvId                String   @db.ObjectId
-  cv                  CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
-  summary             String? 
-  resumeScore         Float?
-  hardSkillsScore     Float?   
-  softSkillsScore     Float?   
-  experienceScore     Float?   
-  educationScore      Float?   
-  quantificationIssues String[] 
-  bulletPointLength   Json?    
-  bulletPointImprovements Json? 
-  verbTenseIssues     Json?   
-  weakVerbUsage       Json?   
-  repetitionIssues    Json?    
-  sectionFeedback     Json?    
-  skillAnalysis       Json?   
-  spellingIssues      String[] 
-  responsibilityIssues Json?  
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+
+model ResumeAnalysis {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  cvId                  String?  @db.ObjectId
+  cv                    CV?      @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  sectionanalysis       Json?
+  skillsassessment      Json?
+  quantification        Json?
+  repetition            Json?
+  verbstrength          Json?
+  verbtense             Json?
+  spellingerrors        Json?
+  summary               String?
+  personal_info         Json?
+  bullet_point_length   Json?
+  bullet_point_improver Json?
+  total_bullet_points   Json?
+  responsibility        Json?
+  resume_length         Json?
+  resume_score          Json?
+  score                 Int?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
+
+model Notification {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String     @db.ObjectId
+  recruiterId String     @db.ObjectId
+  message     String
+  received    Boolean    @default(false)
+  user        User       @relation(fields: [userId], references: [id])
+  recuiter    Recruiter? @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+}
+
+model Recruiter {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  notification Notification[]
+}
+
 model Interview {
   id                String              @id @default(auto()) @map("_id") @db.ObjectId
   cvText            String?
@@ -405,8 +428,6 @@ model Email {
   newsletterId String     @db.ObjectId
   newsletter   Newsletter @relation(fields: [newsletterId], references: [id])
 }
-
-
 
 model Newsletter {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId

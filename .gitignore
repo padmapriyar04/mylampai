@@ -12,8 +12,6 @@
 # vscode
 /.vscode
 .deployment
-
-
 # next.js
 /.next/
 /out/
@@ -44,3 +42,5 @@ next-env.d.ts
 
 #credentials
 credential.json
+
+structured_data.json

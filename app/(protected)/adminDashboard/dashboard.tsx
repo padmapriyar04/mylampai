@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import QuillWrapper from "@/components/adminDashboard/QuillWrapper";
 import emailtemplate from "@/utils/newsletter";
 import otptemplate from "@/utils/otptemplate";
 import displaytemplate from '@/utils/displayTemplate';
@@ -46,7 +45,7 @@ export default function AdminDashboard() {
   const [scheduleFrequency, setScheduleFrequency] = useState("One-Time");
   const [isEmailSent,setIsEmailSent] = useState(false); 
 
-  const createMarkup = (html: any) => {
+  const createMarkup = (html: string) => {
     setEmailContent(html);
     const htmlTemplate = emailTemplate.replace(
       "{{EMAIL_CONTENT}}",
@@ -93,14 +92,11 @@ export default function AdminDashboard() {
       subject,
       body,
       finalHTMLTemplate,
-      scheduleDate as string,
-      scheduleTime as string,
-      scheduleFrequency as string
+      scheduleDate,
+      scheduleTime,
+      scheduleFrequency
     );
     console.log(res);
-    console.log(scheduleDate, scheduleTime, scheduleFrequency);
-    // if()
-    // alert("Email scheduled successfully!");
   };
 
   const handleTemplateChange = (e: any) => {
@@ -127,13 +123,7 @@ export default function AdminDashboard() {
 
       <div className="space-y-2">
         <label className="block text-lg font-medium text-gray-700">Email Body</label>
-        <ReactQuill
-          value={value}
-          onChange={setValue}
-          modules={modules}
-          placeholder="Enter Email body here"
-          className="bg-white border border-gray-300 rounded-lg"
-        />
+        <QuillWrapper value={value} onChange={setValue} />
       </div>
 
       <div>

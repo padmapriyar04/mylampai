@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib';
 import jwt from 'jsonwebtoken';
-
+export const dynamic = 'force-dynamic';
 export const GET = async (req: NextRequest) => {
   try {
     
@@ -29,7 +29,7 @@ export const GET = async (req: NextRequest) => {
     const cvs = await prisma.cV.findMany({
       where: { userId },
       include: {
-        analysis: true, // Include CVAnalysis relation
+        ResumeAnalysis: true, // Include CVAnalysis relation
       },
       orderBy: {
         createdAt: 'desc',

@@ -34,9 +34,10 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
+    console.log("checking for existing cv:: ",existingCV)
     if (existingCV) {
       return NextResponse.json(
-        { error: 'CV with the same resume and job description already exists' },
+        { message: existingCV },
         { status: 409 }
       );
     }
@@ -49,7 +50,7 @@ export const POST = async (req: NextRequest) => {
         userId,
       },
     });
-
+    console.log("newcv: ",newCV)
     return NextResponse.json(
       { message: 'CV created successfully', cv: newCV },
       { status: 201 }

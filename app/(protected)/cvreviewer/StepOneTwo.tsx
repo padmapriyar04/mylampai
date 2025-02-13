@@ -1,7 +1,6 @@
 "use client";
 import {
   useState,
-  useEffect,
   DragEvent,
   ChangeEvent,
   useCallback,
@@ -20,7 +19,8 @@ import {
 } from "@azure/storage-blob";
 import { generateSasToken } from "@/actions/azureActions";
 
-const baseUrl = "https://optim-cv-judge.onrender.com";
+const baseUrl = process.env.NEXT_PUBLIC_RESUME_API_ENDPOINT
+// console.log(baseUrl)
 
 interface StepOneTwoProps {
   step: number;
@@ -43,7 +43,11 @@ interface StepOneTwoProps {
   setCvId: React.Dispatch<React.SetStateAction<string>>; // Updated type
 }
 
-function generateFileName(originalFileName: string, filetype: string) {
+
+function generateFileName(
+  originalFileName: string,
+  filetype: string,
+) {
   const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
   const fileExtension = originalFileName.split(".").pop();
   return `${timestamp}_${filetype}.${fileExtension}`;
@@ -60,17 +64,26 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
   setManualJobDescription,
   setCvId
 }) => {
-  const { setResumeFile, setExtractedText, setStructuredData } =
-    useInterviewStore();
+  const {
+    setResumeFile,
+    setExtractedText,
+    setStructuredData,
+    structuredData,
+    setResumeId,
+    resumeId
+  } = useInterviewStore();
+
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [otherProfile, setOtherProfile] = useState("");
+  const [next, Setnext] = useState<boolean>(false)
 
   const { token } = useUserStore();
 
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
+
 
   const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -103,7 +116,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         if (!uploadResponse.ok) {
           toast.error("Resume Upload Failed");
         } else {
-          console.log(uploadResponse);
+          // console.log(uploadResponse);
+
         }
       } catch (error) {
         console.error(error);
@@ -147,6 +161,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               // Check if structuredDataResult and structuredDataResult.message exist before accessing
               if (structuredDataResult && structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
+                // toast.success("extracted structured data");
               } else {
                 toast.error("Failed to extract structured data");
               }
@@ -179,6 +194,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
     const file = event.target.files?.[0];
 
     setUploading(true);
+    setIsResumeUploaded(false);
 
     if (file && file.type === "application/pdf") {
       if (file.size > 1 * 1024 * 1024) {
@@ -206,7 +222,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         if (!uploadResponse.ok) {
           toast.error("Resume Upload Failed");
         } else {
-          console.log(uploadResponse);
+          // console.log(uploadResponse);
         }
       } catch (error) {
         console.error(error);
@@ -250,6 +266,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               // Check if structuredDataResult and structuredDataResult.message exist before accessing
               if (structuredDataResult && structuredDataResult.message) {
                 setStructuredData(structuredDataResult.message);
+                // toast.success("extracted structured data");
               } else {
                 toast.error("Failed to extract structured data");
               }
@@ -264,7 +281,6 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             toast.error("Error converting file to base64 or extracting text");
           }
         };
-
         base64Reader.readAsDataURL(file); // Start reading the file as a data URL
       };
 
@@ -281,7 +297,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
         if (!token) {
           return;
         }
-       const response= await fetch("/api/interviewer/post_cv", {
+        const response = await fetch("/api/interviewer/post_cv", {
+
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -292,14 +309,39 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             JobDescription: extractedText || manualJobDescription, // Depending on whether it's a file or manual entry
           }),
         });
-        const result = await response.json();
-        setCvId(result.id)
-        
+
+
+        const res = await response.json()
+        console.log("cvid checke: ", res)
+        let tempId: string = ""
+        if (res.status == 409) {
+          tempId = res.message?.id
+        } else {
+          tempId = res?.cv?.id
+        }
+
+        setResumeId(tempId)
+        console.log("profile check: ", profile)
+        // if (profile) {
+        // await getSummary(extractedText, tempId);
+        // } else {
+        //   console.log("Profile is required");
+        // }
+        // console.log(extractedText)
+        // console.log(resumeId)
+        console.log("cvid:: ", tempId)
+        setCvId(tempId)
+        setUploading(false)
+        setIsResumeUploaded(true);
+        Setnext(true)
       } catch (error) {
         console.error("Error:", error);
+        toast.error("summary analysis failed")
+        setUploading(false);
+
       }
     },
-    [manualJobDescription,setCvId,token]
+    [manualJobDescription, setCvId, token,profile,setResumeId]
   );
 
   const extractStructuredData = useCallback(async (text: string) => {
@@ -314,8 +356,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
 
       const result = await response.json();
       if (response.ok) {
-        setIsResumeUploaded(true);
+
         toast.success("Resume uploaded successfully");
+        // console.log(summary )
+
         return result;
       }
       toast.error("Error extracting structured data from resume");
@@ -326,6 +370,34 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
       return null;
     }
   }, []);
+
+  // const getSummary = useCallback(async (text: string, ResumeId: string) => {
+  //   try {
+  //     const response = await fetch("/api/interviewer/resumeAnalysis", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({ cv_text: text, id: ResumeId, structuredData: structuredData, profile: profile }),
+  //     });
+
+  //     if (!response.ok) {
+  //       toast.error("Error in getSummary")
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+
+  //     const result = await response.json();
+  //     console.log("Response received:", result);
+
+  //     // Return result if needed
+  //     Setnext(true)
+  //     toast.success("Summary uploaded successfully")
+  //     return result;
+  //   } catch (error) {
+  //     console.error("Error in getSummary:", error);
+  //   }
+  // }, []);
 
   return (
     <div className="md:h-screen bg-primary-foreground min-h-screen p-4 flex items-center md:justify-center justify-top w-full border-[#eeeeee] overflow-hidden">
@@ -374,16 +446,14 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                 </svg>
               </div>
               <div
-                className={`absolute top-1/2 left-5 h-1 -translate-y-1/2 transition-all duration-500 ease-in-out ${
-                  isResumeUploaded ? "bg-primary w-full" : "bg-slate-500 w-0"
-                } w-full`}
+                className={`absolute top-1/2 left-5 h-1 -translate-y-1/2 transition-all duration-500 ease-in-out ${isResumeUploaded ? "bg-primary w-full" : "bg-slate-500 w-0"
+                  } w-full`}
               ></div>
             </div>
             <div className="relative">
               <div
-                className={`w-5 h-5 ${
-                  profile ? "bg-primary" : "bg-slate-500"
-                } rounded-full flex items-center justify-center`}
+                className={`w-5 h-5 ${profile ? "bg-primary" : "bg-slate-500"
+                  } rounded-full flex items-center justify-center`}
               >
                 {profile && (
                   <svg
@@ -443,7 +513,7 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                 </div>
 
                 <p className="text-slate-500 text-sm mt-2">
-                  Supported file format: PDF. File size limit 1MB.
+                  Supported file format: .PDF File size limit 1MB.
                 </p>
               </div>
 
@@ -467,8 +537,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
                   {isResumeUploaded
                     ? "Upload again"
                     : uploading
-                    ? "Uploading..."
-                    : "Upload Resume"}
+                      ? "Uploading..."
+                      : "Upload Resume"}
                 </button>
               </div>
             </div>
@@ -477,11 +547,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               className={`p-8 gap-4 flex flex-col items-center justify-start bg-white rounded-3xl w-full md:max-w-[350px] lg:max-w-[400px] shadow-lg text-center md:min-h-[250px]`}
             >
               <select
-                className={`w-full p-4 py-2 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${
-                  profile === "other" || profile === null || profile === ""
-                    ? "border-slate-500"
-                    : "border-primary ring-primary ring-1"
-                }  `}
+                className={`w-full p-4 py-2 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${profile === "other" || profile === null || profile === ""
+                  ? "border-slate-500"
+                  : "border-primary ring-primary ring-1"
+                  }  `}
                 value={manualJobDescription}
                 onChange={(e) => {
                   setManualJobDescription(e.target.value);
@@ -503,11 +572,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               {manualJobDescription === "other" && (
                 <input
                   type="text"
-                  className={`w-full p-4 py-2 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${
-                    profile === "other" || profile === null
-                      ? "border-slate-500"
-                      : "border-primary ring-primary ring-1"
-                  }  `}
+                  className={`w-full p-4 py-2 font-medium outline-none rounded-lg text-md text-center bg-white border-2 ${profile === "other" || profile === null
+                    ? "border-slate-500"
+                    : "border-primary ring-primary ring-1"
+                    }  `}
                   placeholder="Please specify your profile"
                   value={otherProfile}
                   onChange={(e) => {
@@ -521,12 +589,11 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
           <div className="mt-8 w-full px-4 flex flex-col items-center">
             {step === 1 ? (
               <button
-                className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-4 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-                  isResumeUploaded
-                    ? "bg-gray-600 hover:bg-gray-800 text-white"
-                    : "bg-slate-500 text-gray-800 cursor-not-allowed"
-                }`}
-                disabled={!isResumeUploaded}
+                className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-4 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${isResumeUploaded
+                  ? "bg-gray-600 hover:bg-gray-800 text-white"
+                  : "bg-slate-500 text-gray-800 cursor-not-allowed"
+                  }`}
+                disabled={!next}
                 onClick={handleNextClick}
               >
                 Next
@@ -534,11 +601,10 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
             ) : (
               <>
                 <button
-                  className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-4 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${
-                    profile
-                      ? "bg-gray-600 hover:bg-gray-800 text-white"
-                      : "bg-slate-500 text-gray-800 cursor-not-allowed"
-                  }`}
+                  className={`w-[40vw] xl:w-[32vw] md:max-w-[700px] h-full text-lg font-bold py-4 rounded-lg focus:ring-4 focus:ring-gray-200 transition ${profile
+                    ? "bg-gray-600 hover:bg-gray-800 text-white"
+                    : "bg-slate-500 text-gray-800 cursor-not-allowed"
+                    }`}
                   disabled={!profile}
                   onClick={handleNextClick}
                 >
@@ -547,9 +613,8 @@ const StepOneTwo: React.FC<StepOneTwoProps> = ({
               </>
             )}
             <button
-              className={`absolute bottom-0 opacity-0 text-primary w-full font-semibold hover:underline cursor-pointer focus:ring-4 focus:ring-gray-200 transition ${
-                step === 1 ? "opacity-0" : "opacity-100"
-              }`}
+              className={`absolute bottom-0 opacity-0 text-primary w-full font-semibold hover:underline cursor-pointer focus:ring-4 focus:ring-gray-200 transition ${step === 1 ? "opacity-0" : "opacity-100"
+                }`}
               onClick={handleBackClick}
               disabled={step === 1}
             >
