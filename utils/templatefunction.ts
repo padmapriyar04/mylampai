@@ -1,6 +1,7 @@
 
 
 
+
 interface EmailTemplateProps {
     content: string;
     // recipientEmail: string;
@@ -75,7 +76,7 @@ export const generateEmailTemplate = (emailContent: string): string => {
                             style="top: 2px; left: 4px; max-width: 130px;" />
                     </td>
                     <td>
-                    <img src=${process.env.EMAIL_TRACK_URL} width="1" height="1" style="display: none;" />
+                    <img src="${process.env.SERVER_URL}/api/email_tracking?emailid={{USER_EMAIL}}&newsletterId={{NEWSLETTER_ID}}" width="1" height="1" style="display: none;" />
                     </td>
                 </tr>
                 <tr>
@@ -86,7 +87,7 @@ export const generateEmailTemplate = (emailContent: string): string => {
                 <tr>
                     <td>
                         <div style="margin-top: 24px; text-align: center;">
-                            <a href=${process.env.EMAIL_TRACK_URL}
+                            <a href=${process.env.GA_TRACK_URL}
                                 style="display: inline-block; background-color: #7C3AED; color: white; font-weight: 600; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Join
                                 Now!</a>
                         </div>
@@ -202,4 +203,9 @@ export const generateDisplayEmailTemplate = (emailContent: string): string => {
                         </p>
                     </td>
                 </tr>`
+}
+
+export const generateFinalEmailTemplate = (emailTemplate : string,emailId : string,newsletterId : string) : string =>{
+    const finaltemplate = emailTemplate.replace("{{USER_EMAIL}}",emailId).replace("{{NEWSLETTER_ID}}",newsletterId);
+    return finaltemplate;
 }
